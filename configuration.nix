@@ -4,7 +4,9 @@
 
 { config, pkgs, inputs, ... }:
 
-let system = pkgs.stdenv.hostPlatform.system;
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -120,19 +122,9 @@ in {
     obsidian
     webcord
     protonvpn-gui
-    ags
-    brightnessctl
-    sassc
-    asusctl
-    supergfxctl
-    hyprpicker
-    slurp
-    wf-recorder
-    wayshot
-    imagemagick
-    wl-gammactl
-    pavucontrol
-    swappy
+    wl-clipboard
+    # unstable.clipse
+    clipse
   ];
 
   nix.settings = {

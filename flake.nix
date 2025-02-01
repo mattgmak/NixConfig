@@ -13,14 +13,6 @@
 
     xremap-flake.url = "github:xremap/nix-flake";
 
-    ags.url = "github:Aylur/ags";
-    stm.url = "github:Aylur/stm";
-
-    more-waita = {
-      url = "github:somepaulo/MoreWaita";
-      flake = false;
-    };
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

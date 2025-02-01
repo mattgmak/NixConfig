@@ -2,6 +2,7 @@
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
     ${pkgs.waybar}/bin/waybar &
+    clipse -listen &
   '';
 in {
   wayland.windowManager.hyprland.enable = true;
@@ -39,6 +40,7 @@ in {
       "$mod SHIFT, 1, movetoworkspace, 1"
       "$mod SHIFT, 2, movetoworkspace, 2"
       "$mod SHIFT, 3, movetoworkspace, 3"
+      "SUPER, V, exec, wezterm start --class clipse -e clipse"
     ];
     bindm = [ "$mod, mouse:272, movewindow" "$mod, mouse:273, resizewindow" ];
     binde = [
@@ -50,18 +52,9 @@ in {
       "$mod SHIFT, i, moveactive, 0 20"
       "$mod SHIFT, o, moveactive, -20 0"
       "$mod SHIFT, p, moveactive, 20 0"
-      # "$mod, XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+"
-      # "$mod, XF86AudioLowerVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-"
-      # "$mod, XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-    ];
-    bindle = let e = "exec, ags -b hypr -r";
-    in [
-      ",XF86MonBrightnessUp,   ${e} 'brightness.screen += 0.05; indicator.display()'"
-      ",XF86MonBrightnessDown, ${e} 'brightness.screen -= 0.05; indicator.display()'"
-      ",XF86KbdBrightnessUp,   ${e} 'brightness.kbd++; indicator.kbd()'"
-      ",XF86KbdBrightnessDown, ${e} 'brightness.kbd--; indicator.kbd()'"
-      ",XF86AudioRaiseVolume,  ${e} 'audio.speaker.volume += 0.05; indicator.speaker()'"
-      ",XF86AudioLowerVolume,  ${e} 'audio.speaker.volume -= 0.05; indicator.speaker()'"
+      "$mod, XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+"
+      "$mod, XF86AudioLowerVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-"
+      "$mod, XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
     ];
 
     monitor = ", highres, 0x0, 1";
@@ -105,20 +98,6 @@ in {
     };
     cursor = { no_warps = true; };
 
-    windowrule = let f = regex: "float, ^(${regex})$";
-    in [
-      (f "org.gnome.Calculator")
-      (f "org.gnome.Nautilus")
-      (f "pavucontrol")
-      (f "nm-connection-editor")
-      (f "blueberry.py")
-      (f "org.gnome.Settings")
-      (f "org.gnome.design.Palette")
-      (f "Color Picker")
-      (f "xdg-desktop-portal")
-      (f "xdg-desktop-portal-gnome")
-      (f "transmission-gtk")
-      (f "com.github.Aylur.ags")
-    ];
+    windowrulev2 = [ "float,class:(clipse)" "size 622 652,class:(clipse)" ];
   };
 }
