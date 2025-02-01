@@ -4,8 +4,22 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+
     hyprland.url = "github:hyprwm/Hyprland";
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      inputs.nixpkgs.follows = "hyprland";
+    };
+
     xremap-flake.url = "github:xremap/nix-flake";
+
+    ags.url = "github:Aylur/ags";
+    stm.url = "github:Aylur/stm";
+
+    more-waita = {
+      url = "github:somepaulo/MoreWaita";
+      flake = false;
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -14,12 +28,9 @@
   };
 
   outputs = { self, nixpkgs, zen-browser, home-manager, ... }@inputs:
-    let
-      # lib = nixpkgs.lib;
-      # system = "x86_64-linux";
-      # pkgs = import nixpkgs { inherit system; };
+    let username = "goofy";
     in {
-      nixosConfigurations.goofy = nixpkgs.lib.nixosSystem {
+      nixosConfigurations."${username}" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
