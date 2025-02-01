@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  imports = [ ./hyprland.nix ./ags.nix ];
+  imports = [ ./hyprland.nix ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";
   home.stateVersion = "24.11"; # Please read the comment before changing.

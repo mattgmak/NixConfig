@@ -121,6 +121,18 @@ in {
     webcord
     protonvpn-gui
     ags
+    brightnessctl
+    sassc
+    asusctl
+    supergfxctl
+    hyprpicker
+    slurp
+    wf-recorder
+    wayshot
+    imagemagick
+    wl-gammactl
+    pavucontrol
+    swappy
   ];
 
   nix.settings = {
