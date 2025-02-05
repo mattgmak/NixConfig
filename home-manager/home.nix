@@ -6,6 +6,7 @@
     ./nvim/nvim.nix
     ./starship/starship.nix
     ./vscode-custom/vscode-custom.nix
+    ./yazi/yazi.nix
   ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";
