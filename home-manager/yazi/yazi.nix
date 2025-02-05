@@ -1,13 +1,13 @@
 { ... }:
 let
-  keymapTomlText = builtins.readFile ./keymap.toml;
-  themeTomlText = builtins.readFile ./theme.toml;
-  settingsTomlText = builtins.readFile ./yazi.toml;
+  keymapTomlText = builtins.fromTOML (builtins.readFile ./keymap.toml);
+  themeTomlText = builtins.fromTOML (builtins.readFile ./theme.toml);
+  settingsTomlText = builtins.fromTOML (builtins.readFile ./yazi.toml);
 in {
   programs.yazi = {
     enable = true;
     enableNushellIntegration = true;
-    init = ./init.lua;
+    initLua = ./init.lua;
     keymap = keymapTomlText;
     theme = themeTomlText;
     settings = settingsTomlText;
