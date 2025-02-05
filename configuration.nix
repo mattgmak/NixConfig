@@ -73,6 +73,7 @@ in {
     isNormalUser = true;
     description = "Goofy";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.nushell;
     # packages = with pkgs; [ ];
   };
 
@@ -88,6 +89,7 @@ in {
   nixpkgs.config.allowUnfree = true;
 
   security.sudo.enable = true;
+  programs.nushell.enable = true;
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

@@ -97,7 +97,6 @@ in {
       gaps_out = 2;
     };
     cursor = { no_warps = true; };
-
-    windowrulev2 = [ "float,class:(clipse)" "size 622 652,class:(clipse)" ];
+    windowrulev2 = [ "float,class:(clipse)" "size 1000 800,class:(clipse)" ];
   };
 }
