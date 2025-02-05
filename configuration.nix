@@ -128,6 +128,7 @@ in {
     clipse
     pulseaudio-ctl
     brightnessctl
+    playerctl
   ];
 
   nix.settings = {
