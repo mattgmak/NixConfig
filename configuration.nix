@@ -79,6 +79,7 @@ in {
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
+    backupFileExtension = "hm-backup";
     users.goofy = import ./home-manager/home.nix;
   };
 
