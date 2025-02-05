@@ -7,6 +7,7 @@
     ./starship/starship.nix
     ./vscode-custom/vscode-custom.nix
     ./yazi/yazi.nix
+    ./ashell/ashell.nix
   ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";
