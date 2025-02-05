@@ -64,11 +64,11 @@ in {
       "$mod SHIFT, i, moveactive, 0 20"
       "$mod SHIFT, o, moveactive, -20 0"
       "$mod SHIFT, p, moveactive, 20 0"
-      "$mod, XF86AudioRaiseVolume, exec, pulseaudio-ctl up"
-      "$mod, XF86AudioLowerVolume, exec, pulseaudio-ctl down"
-      "$mod, XF86AudioMute, exec, pulseaudio-ctl mute"
-      "$mod, XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-      "$mod, XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+      ", XF86AudioRaiseVolume, exec, pulseaudio-ctl up"
+      ", XF86AudioLowerVolume, exec, pulseaudio-ctl down"
+      ", XF86AudioMute, exec, pulseaudio-ctl mute"
+      ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
+      ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
     ];
 
     monitor = ", highres, 0x0, 1";
