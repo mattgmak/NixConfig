@@ -20,19 +20,23 @@
   };
 
   outputs = { self, nixpkgs, zen-browser, home-manager, ... }@inputs:
-    let username = "goofy";
+    let
+      username = "goofy";
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
     in {
       nixosConfigurations."${username}" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.goofy = import ./home-manager/home.nix;
-          }
+          home-manager.nixosModules.default
+          # home-manager.nixosModules.home-manager
+          # {
+          #   home-manager.useGlobalPkgs = true;
+          #   home-manager.useUserPackages = true;
+          #   home-manager.users.goofy = import ./home-manager/home.nix;
+          # }
         ];
       };
     };

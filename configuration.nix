@@ -4,13 +4,11 @@
 
 { config, pkgs, inputs, ... }:
 
-let
-  system = pkgs.stdenv.hostPlatform.system;
-  unstable = import <nixos-unstable> { config = { allowUnfree = true; }; };
+let system = pkgs.stdenv.hostPlatform.system;
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    # inputs.home-manager.nixosModules.default
+    inputs.home-manager.nixosModules.default
     inputs.xremap-flake.nixosModules.default
   ];
 
@@ -75,10 +73,12 @@ in {
     isNormalUser = true;
     description = "Goofy";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs;
-      [
-        #  thunderbird
-      ];
+    # packages = with pkgs; [ ];
+  };
+
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users.goofy = import ./home-manager/home.nix;
   };
 
   # Install firefox.
@@ -123,7 +123,6 @@ in {
     webcord
     protonvpn-gui
     wl-clipboard
-    # unstable.clipse
     clipse
   ];
 
