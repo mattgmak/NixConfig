@@ -64,11 +64,16 @@ in {
       "$mod SHIFT, i, moveactive, 0 20"
       "$mod SHIFT, o, moveactive, -20 0"
       "$mod SHIFT, p, moveactive, 20 0"
-      ", XF86AudioRaiseVolume, exec, pulseaudio-ctl up"
-      ", XF86AudioLowerVolume, exec, pulseaudio-ctl down"
-      ", XF86AudioMute, exec, pulseaudio-ctl mute"
+      # ", XF86AudioRaiseVolume, exec, pulseaudio-ctl up"
+      # ", XF86AudioLowerVolume, exec, pulseaudio-ctl down"
+      # ", XF86AudioMute, exec, pulseaudio-ctl mute"
+      ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
+      ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+      ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
       ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
       ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+      ", XF86KbdBrightnessUp, exec, brightnessctl set 5%+"
+      ", XF86KbdBrightnessDown, exec, brightnessctl set 5%-"
     ];
 
     monitor = ", highres, 0x0, 1";
