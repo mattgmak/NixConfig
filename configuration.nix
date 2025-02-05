@@ -129,6 +129,12 @@ in {
     pulseaudio-ctl
     brightnessctl
     playerctl
+    (import (pkgs.callPackage (pkgs.fetchFromGitHub {
+      owner = "MalpenZibo";
+      repo = "ashell";
+      rev = "refs/heads/main";
+      sha256 = "sha256-e98ce026795e03739099e511f515f4451e06337c";
+    }) { }).defaultPackage.x86_64-linux)
   ];
 
   nix.settings = {
