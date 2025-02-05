@@ -126,6 +126,8 @@ in {
     protonvpn-gui
     wl-clipboard
     clipse
+    pulseaudio-ctl
+    brightnessctl
   ];
 
   nix.settings = {
