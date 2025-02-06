@@ -27,11 +27,15 @@
     let
       username = "goofy";
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ inputs.hyprpanel.overlay ];
+        config.allowUnfree = true;
+      };
     in {
       nixosConfigurations."${username}" = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        inherit system;
+        specialArgs = { inherit inputs pkgs; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
