@@ -10,6 +10,10 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.nixpkgs.follows = "hyprland";
     };
+    hyprpanel = {
+      url = "github:jas-singhfsu/hyprpanel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     xremap-flake.url = "github:xremap/nix-flake";
 
