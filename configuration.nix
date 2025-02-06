@@ -137,6 +137,7 @@ in {
     # }) { }).defaultPackage.x86_64-linux)
     impala
     bluetui
+    hyprpanel
   ];
 
   nix.settings = {

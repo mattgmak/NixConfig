@@ -1,5 +1,7 @@
-{ inputs, ... }: {
+{ inputs, pkgs, ... }: {
   imports = [ inputs.hyprpanel.homeManagerModules.hyprpanel ];
+
+  pkgs.overlays = [ inputs.hyprpanel.overlay ];
 
   programs.hyprpanel = {
 

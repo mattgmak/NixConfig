@@ -1,6 +1,7 @@
 { pkgs, ... }:
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
+    hyprpanel &
     clipse -listen &
   '';
 in {
