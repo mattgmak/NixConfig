@@ -8,6 +8,8 @@
     ./vscode-custom/vscode-custom.nix
     ./yazi/yazi.nix
     ./ashell/ashell.nix
+    ./bluetui/bluetui.nix
+    ./impala/impala.nix
   ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";
