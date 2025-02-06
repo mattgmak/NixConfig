@@ -1,15 +1,15 @@
 { config, pkgs, ... }: {
   imports = [
-    ./hyprland.nix
-    ./nushell/nushell.nix
-    ./wezterm/wezterm.nix
-    ./nvim/nvim.nix
-    ./starship/starship.nix
-    ./vscode-custom/vscode-custom.nix
-    ./yazi/yazi.nix
-    ./ashell/ashell.nix
-    ./bluetui/bluetui.nix
-    ./impala/impala.nix
+    ./hyprland
+    ./nushell
+    ./wezterm
+    ./nvim
+    ./starship
+    ./vscode-custom
+    ./yazi
+    ./ashell
+    ./bluetui
+    ./impala
   ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";
