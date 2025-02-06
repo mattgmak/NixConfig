@@ -1,7 +1,6 @@
 { pkgs, ... }:
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-    ${pkgs.waybar}/bin/waybar &
     clipse -listen &
   '';
 in {
