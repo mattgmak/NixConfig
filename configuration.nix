@@ -21,6 +21,8 @@ in {
   # Enable networking
   networking.networkmanager.enable = true;
 
+  networking.wireless.iwd.enable = true;
+
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
 
@@ -135,6 +137,8 @@ in {
     #   rev = "main";
     #   sha256 = "sha256-uMXlMDhFIcOwOuOtPYpCjCfM9EIgeP2PBeA3YIFmCBw";
     # }) { }).defaultPackage.x86_64-linux)
+    impala
+    bluetui
   ];
 
   nix.settings = {
