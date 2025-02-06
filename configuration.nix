@@ -20,9 +20,9 @@ in {
 
   # Enable networking
   networking.networkmanager.enable = true;
-  networking.networkmanager.wifi.backend = "iwd";
-  services.connman.wifi.backend = "iwd";
-  networking.wireless.iwd.enable = true;
+  # networking.networkmanager.wifi.backend = "iwd";
+  # services.connman.wifi.backend = "iwd";
+  # networking.wireless.iwd.enable = true;
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
