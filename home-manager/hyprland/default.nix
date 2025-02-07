@@ -84,7 +84,8 @@ in {
       ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
     ];
 
-    monitor = ", highres, 0x0, 1";
+    monitor = [ "eDP-1, highres, 0x0, 1" ", preferred, auto-up, 1" ];
+
     input = {
       kb_layout = "us";
       follow_mouse = 2;
