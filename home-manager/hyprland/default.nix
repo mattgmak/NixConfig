@@ -3,7 +3,7 @@ let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
     hyprpanel &
     clipse -listen &
-    ${config.users.users.goofy.home}/.config/eww/bar/launch_bar &
+    /home/goofy/.config/eww/bar/launch_bar &
   '';
 in {
   wayland.windowManager.hyprland.enable = true;
@@ -13,7 +13,6 @@ in {
     bind = [
       "$mod, Return, exec, wezterm"
       "$mod, h, exec, rofi -show drun"
-      # "$mod, P, exec, rofi -show pmenu"
       "$mod, j, movefocus, u"
       "$mod, k, movefocus, d"
       "$mod, l, movefocus, l"
@@ -61,7 +60,7 @@ in {
       ", XF86AudioNext, exec, playerctl next"
       ", XF86AudioPrev, exec, playerctl previous"
     ];
-    bindm = [ "$mod, mouse:272, movewindow" "$mod, mouse:273, resizewindow" ];
+    bindm = [ "$mod, mouse:272, movewindow" ", mouse:272, resizewindow" ];
     binde = [
       "$mod, u, resizeactive, 0 -20"
       "$mod, i, resizeactive, 0 20"

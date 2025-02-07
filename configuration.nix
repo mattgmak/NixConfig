@@ -137,6 +137,7 @@ in {
     bluetui
     networkmanagerapplet
     overskride
+    eww
   ];
 
   nix.settings = {
