@@ -20,6 +20,11 @@ in {
 
   # Enable networking
   networking.networkmanager.enable = true;
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 80 443 3000 8081 ];
+    allowedUDPPorts = [ 80 443 ];
+  };
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
