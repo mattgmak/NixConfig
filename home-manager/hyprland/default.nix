@@ -1,8 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
     hyprpanel &
     clipse -listen &
+    ${config.users.users.goofy.home}/.config/eww/bar/launch_bar &
   '';
 in {
   wayland.windowManager.hyprland.enable = true;
@@ -123,6 +124,7 @@ in {
     general = {
       gaps_in = 2;
       gaps_out = 2;
+      resize_on_border = true;
     };
     cursor = { no_warps = true; };
     windowrulev2 = [ "float,class:(clipse)" "size 1000 800,class:(clipse)" ];
