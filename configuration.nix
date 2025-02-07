@@ -60,7 +60,6 @@ in {
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  # services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -171,9 +170,11 @@ in {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   hardware.graphics.enable = true;
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
+  };
   services.blueman.enable = true;
-
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }

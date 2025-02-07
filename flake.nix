@@ -45,7 +45,12 @@
           # }
         ];
       };
-      devShells.${system}.drpom =
-        pkgs.mkShell { packages = with pkgs; [ nodejs ]; };
+      devShells.${system}.drpom = pkgs.mkShell {
+        packages = with pkgs; [ nodejs ];
+        shellHook = ''
+          cd ~/DrPOM
+          nu
+        '';
+      };
     };
 }
