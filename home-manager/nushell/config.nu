@@ -953,6 +953,7 @@ def --env gbash [...args] {
 
 def --env nixrb [...args] {
     sudo nixos-rebuild switch --flake $'($env.HOME)/NixConfig#goofy' -I nixos-config=($env.HOME)/NixConfig/configuration.nix ...$args
+    # sudo nixos-rebuild switch --flake ~/NixConfig#goofy -I nixos-config=~/NixConfig/configuration.nix
 }
 
 def --env cu [...args] {

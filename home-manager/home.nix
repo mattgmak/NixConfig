@@ -10,7 +10,7 @@
     ./ashell
     ./bluetui
     ./impala
-    ./hyprpanel
+    # ./hyprpanel
   ];
   home.username = "goofy";
   home.homeDirectory = "/home/goofy";

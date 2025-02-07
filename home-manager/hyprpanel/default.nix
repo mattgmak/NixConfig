@@ -1,24 +1,26 @@
-{ inputs, pkgs, ... }: {
+{ inputs, pkgs, system, ... }: {
   imports = [ inputs.hyprpanel.homeManagerModules.hyprpanel ];
 
-  # pkgs.overlays = [ inputs.hyprpanel.overlay ];
+  # home.packages = [ inputs.hyprpanel.packages.${system}.hyprpanel ];
 
   programs.hyprpanel = {
 
     # Enable the module.
     # Default: false
     enable = true;
+    overlay.enable = true;
 
     # Automatically restart HyprPanel with systemd.
     # Useful when updating your config so that you
     # don't need to manually restart it.
     # Default: false
+    # Obsolete
     systemd.enable = true;
 
     # Add '/nix/store/.../hyprpanel' to your
     # Hyprland config 'exec-once'.
     # Default: false
-    hyprland.enable = true;
+    # hyprland.enable = true;
 
     # Fix the overwrite issue with HyprPanel.
     # See below for more information.
@@ -27,12 +29,12 @@
 
     # Import a theme from './themes/*.json'.
     # Default: ""
-    theme = "rosepine";
+    theme = "rose_pine";
 
     # Override the final config with an arbitrary set.
     # Useful for overriding colors in your selected theme.
     # Default: {}
-    override = { theme.bar.menus.text = "#123ABC"; };
+    # override = { theme.bar.menus.text = "#123ABC"; };
 
     # Configure bar layouts for monitors.
     # See 'https://hyprpanel.com/configuration/panel.html'.
@@ -70,7 +72,7 @@
       theme.bar.transparent = true;
 
       theme.font = {
-        name = "CaskaydiaCove NF";
+        name = "IosevkaTerm Nerd Font";
         size = "16px";
       };
     };

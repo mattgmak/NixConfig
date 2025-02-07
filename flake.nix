@@ -2,7 +2,8 @@
   description = "Nixos config flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.11";
+    # nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -27,18 +28,15 @@
     let
       username = "goofy";
       system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ inputs.hyprpanel.overlay ];
-        config.allowUnfree = true;
-      };
+      pkgs = nixpkgs.legacyPackages.${system};
     in {
       nixosConfigurations."${username}" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs pkgs; };
+        specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
+          # { nixpkgs.overlays = [ inputs.hyprpanel.overlay ]; }
           # home-manager.nixosModules.home-manager
           # {
           #   home-manager.useGlobalPkgs = true;
@@ -47,5 +45,6 @@
           # }
         ];
       };
+      devShells.drpom = pkgs.mkShell { packages = with pkgs; [ nodejs ]; };
     };
 }
