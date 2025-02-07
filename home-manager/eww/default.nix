@@ -1,14 +1,14 @@
 { pkgs, ... }:
 let
 in {
-  # programs.eww = {
-  #   enable = true;
-  #   package = pkgs.eww;
-  #   configDir = ./config;
-  # };
+  programs.eww = {
+    enable = true;
+    package = pkgs.eww;
+    configDir = ./config;
+  };
   home.file = {
-    ".config/eww/" = {
-      source = ./config;
+    ".config/eww-scripts" = {
+      source = ./scripts;
       recursive = true;
     };
   };

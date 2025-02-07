@@ -1,9 +1,9 @@
-{ pkgs, config, ... }:
+{ pkgs, ... }:
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
     hyprpanel &
     clipse -listen &
-    /home/goofy/.config/eww/bar/launch_bar &
+    /home/goofy/.config/eww-scripts/launch_bar &
   '';
 in {
   wayland.windowManager.hyprland.enable = true;
@@ -60,7 +60,8 @@ in {
       ", XF86AudioNext, exec, playerctl next"
       ", XF86AudioPrev, exec, playerctl previous"
     ];
-    bindm = [ "$mod, mouse:272, movewindow" ", mouse:272, resizewindow" ];
+    bindm =
+      [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
     binde = [
       "$mod, u, resizeactive, 0 -20"
       "$mod, i, resizeactive, 0 20"
