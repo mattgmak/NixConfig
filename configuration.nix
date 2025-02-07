@@ -133,12 +133,6 @@ in {
     pulseaudio-ctl
     brightnessctl
     playerctl
-    # (import (pkgs.callPackage (pkgs.fetchFromGitHub {
-    #   owner = "MalpenZibo";
-    #   repo = "ashell";
-    #   rev = "main";
-    #   sha256 = "sha256-uMXlMDhFIcOwOuOtPYpCjCfM9EIgeP2PBeA3YIFmCBw";
-    # }) { }).defaultPackage.x86_64-linux)
     impala
     bluetui
     networkmanagerapplet
