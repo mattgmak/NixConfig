@@ -7,9 +7,9 @@
     ./starship
     ./vscode-custom
     ./yazi
-    ./ashell
     ./bluetui
     ./impala
+    ./eww
     # ./hyprpanel
   ];
   home.username = "goofy";
