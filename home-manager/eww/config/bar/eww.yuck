@@ -37,7 +37,7 @@
 
 ;; widgets
 
-(defwidget wifi [] 
+(defwidget wifi []
   (eventbox :onhover "${eww} update wifi_rev=true"
 			  :onhoverlost "${eww} update wifi_rev=false"
 		(box :vexpand "false" :hexpand "false" :space-evenly "false"
@@ -56,11 +56,11 @@
 
 
 (defwidget bat []
-		(box :class "bat_module" :vexpand "false" :hexpand "false" 
+		(box :class "bat_module" :vexpand "false" :hexpand "false"
             (circular-progress :value battery
                 :class "batbar"
                 :thickness 4
-            (button 
+            (button
                 :class "iconbat"
                 :limit-width 2
                 :tooltip "battery on ${battery}%"
@@ -71,11 +71,11 @@
 
 
 (defwidget mem []
-		(box :class "mem_module" :vexpand "false" :hexpand "false" 
+		(box :class "mem_module" :vexpand "false" :hexpand "false"
             (circular-progress :value memory
                 :class "membar"
                 :thickness 4
-            (button 
+            (button
                 :class "iconmem"
                 :limit-width 2
                 :tooltip "using ${memory}% ram"
@@ -93,7 +93,7 @@
 (defwidget clock_module []
   (eventbox :onhover "${eww} update time_rev=true"
 			  :onhoverlost "${eww} update time_rev=false"
-    (box :class "module" :space-evenly "false" :orientation "h" :spacing "3" 
+    (box :class "module" :space-evenly "false" :orientation "h" :spacing "3"
       (label :text clock_time :class "clock_time_class" )
       (label :text "" :class "clock_time_sep" )
       (label :text clock_minute :class "clock_minute_class")
@@ -104,11 +104,11 @@
              :onclick "$HOME/.config/eww/bar/scripts/pop calendar" clock_date
         )
   ))))
-  
+
 (defwidget volume []
   (eventbox :onhover "${eww} update vol_reveal=true"
 			  :onhoverlost "${eww} update vol_reveal=false"
-  (box :class "module-2" :space-evenly "false" :orientation "h" :spacing "3" 
+  (box :class "module-2" :space-evenly "false" :orientation "h" :spacing "3"
 	(button   :onclick "scripts/pop audio"   :class "volume_icon" "")
 	(revealer :transition "slideleft"
 			  :reveal vol_reveal
@@ -123,7 +123,7 @@
 
 (defwidget bright []
   (eventbox :onhover "${eww} update br_reveal=true" :onhoverlost "${eww} update br_reveal=false"
-  (box :class "module-2" :space-evenly "false" :orientation "h" :spacing "3" 
+  (box :class "module-2" :space-evenly "false" :orientation "h" :spacing "3"
     (label :text "" :class "bright_icon" :tooltip "brightness")
 	(revealer :transition "slideleft"
 			  :reveal br_reveal
@@ -138,17 +138,17 @@
 
 
 
-	;;  Music 
-(defwidget music [] 
+	;;  Music
+(defwidget music []
   (eventbox :onhover "${eww} update music_reveal=true"
 			  :onhoverlost "${eww} update music_reveal=false"
-		(box :class "module-2" :orientation "h" :space-evenly "false" :vexpand "false" :hexpand "false" 
+		(box :class "module-2" :orientation "h" :space-evenly "false" :vexpand "false" :hexpand "false"
 			(box :class "song_cover_art" :vexpand "false" :hexpand "false" :style "background-image: url('${cover_art}');")
 			(button :class "song" :wrap "true" :onclick "~/.config/eww/bar/scripts/pop music" song)
 	    (revealer :transition "slideright"
 			      :reveal music_reveal
 			      :duration "350ms"
-          (box :vexpand "false" :hexpand "false" :oreintation "h" 
+          (box :vexpand "false" :hexpand "false" :oreintation "h"
                     (button :class "song_btn_prev" :onclick "~/.config/eww/bar/scripts/music_info --prev" "")
 					(button :class "song_btn_play" :onclick "~/.config/eww/bar/scripts/music_info --toggle" song_status)
 					(button :class "song_btn_next" :onclick "~/.config/eww/bar/scripts/music_info --next" ""))))))
@@ -156,8 +156,8 @@
 
 
 (defwidget left []
-	(box :orientation "h" 
-		 :space-evenly false  
+	(box :orientation "h"
+		 :space-evenly false
          :halign "end"
 		 :class "left_modules"
 (bright)
@@ -171,16 +171,16 @@
 
 
 (defwidget right []
-	(box :orientation "h" 
-		 :space-evenly false  
+	(box :orientation "h"
+		 :space-evenly false
          :halign "start"
 		 :class "right_modules"
 (workspaces)))
 
 
 (defwidget center []
-	(box :orientation "h" 
-		 :space-evenly false  
+	(box :orientation "h"
+		 :space-evenly false
          :halign "center"
 		 :class "center_modules"
 (music)))
@@ -201,8 +201,9 @@
                        :anchor "top center")
           :stacking "fg"
           :windowtype "dock"
+          :monitor 0
   (bar_1))
-  
+
 (defwidget system []
   (box :class "sys_win" :orientation "v" :space-evenly "false" :hexpand "false" :vexpand "false" :spacing 0
   (box :class "sys_bat_box" :orientation "h" :space-evenly "false"
@@ -267,15 +268,15 @@
 (defwidget cal []
 	(box :class "cal" :orientation "v"
 	(box :class "cal-in"
-	(calendar :class "cal" 
-			  :day calendar_day 
+	(calendar :class "cal"
+			  :day calendar_day
 			  :year calendar_year))))
 
 (defwindow calendar
-	:geometry (geometry :x "-20px" 
-						:y "7%" 
+	:geometry (geometry :x "-20px"
+						:y "7%"
                         :anchor "top right"
-						:width "270px" 
+						:width "270px"
 						:height "60px")
 (cal))
 
@@ -291,7 +292,7 @@
 	(scale    :value volume_percent
               :space-evenly "false"
 			  :orientation "h"
-			  :onchange "amixer -D pulse sset Master {}%" 
+			  :onchange "amixer -D pulse sset Master {}%"
               :tooltip "volume on ${volume_percent}%"
 			  :max 100
 			  :min 0))))
@@ -305,24 +306,24 @@
               :space-evenly "false"
 			  :orientation "h"
               :tooltip "mic on ${mic_percent}%"
-			  :onchange "amixer -D pulse sset Capture {}%" 
+			  :onchange "amixer -D pulse sset Capture {}%"
 			  :max 100
 			  :min 0))))))
 
 (defwindow audio_ctl
-	:geometry (geometry :x "-20px" 
-						:y "7%" 
+	:geometry (geometry :x "-20px"
+						:y "7%"
                         :anchor "top right"
-						:width "280px" 
+						:width "280px"
 						:height "60px")
 (audio))
 
 
 (defwindow system
-	:geometry (geometry :x "-20px" 
-						:y "7%" 
+	:geometry (geometry :x "-20px"
+						:y "7%"
                         :anchor "top right"
-						:width "290px" 
+						:width "290px"
 						:height "120px")
 (system))
 
@@ -347,4 +348,3 @@
 		(defwindow music_win :stacking "fg" :focusable "false" :screen 1
 			    :geometry (geometry :x "0" :y "7%" :width 428 :height 104 :anchor "top center")
 			     				(music_pop))
-

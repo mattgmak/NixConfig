@@ -9,7 +9,7 @@
     ./yazi
     ./bluetui
     ./impala
-    ./eww
+    # ./eww
     # ./hyprpanel
   ];
   home.username = "goofy";
