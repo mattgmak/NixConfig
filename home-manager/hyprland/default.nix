@@ -1,9 +1,8 @@
 { pkgs, ... }:
 let
   startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-    hyprpanel &
+    waybar &
     clipse -listen &
-    # /home/goofy/.config/eww-scripts/launch_bar &
   '';
 in {
   wayland.windowManager.hyprland.enable = true;
