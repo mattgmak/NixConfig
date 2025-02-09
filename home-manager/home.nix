@@ -9,6 +9,7 @@
     ./yazi
     ./bluetui
     ./impala
+    ./hyprpaper
     # ./eww
     # ./hyprpanel
   ];
