@@ -88,7 +88,7 @@ in {
         ", XF86AudioPrev, exec, playerctl previous"
         # Launch shortcuts
         "$mod, return, exec, wezterm"
-        "$mod, M, exec, WAYBAR_ON = 1-$WAYBAR_ON; if [ $WAYBAR_ON -eq 1 ]; then pkill waybar; else waybar; fi"
+        "$mod, M, exec, pkill waybar || waybar"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
@@ -129,7 +129,6 @@ in {
       };
       exec-once = [
         "hyprpaper"
-        "waybar"
         "hyprctl setcursor Bibata-Original-Ice 24"
         "sleep 10; morgen"
       ];
