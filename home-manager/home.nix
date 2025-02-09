@@ -1,6 +1,7 @@
 { config, pkgs, ... }: {
   imports = [
     ./hyprland
+    ./waybar
     ./nushell
     ./wezterm
     ./nvim
@@ -9,7 +10,6 @@
     ./yazi
     ./bluetui
     ./impala
-    ./hyprpaper
     # ./eww
     # ./hyprpanel
   ];
