@@ -10,6 +10,7 @@
     ./yazi
     ./bluetui
     ./impala
+    ./rofi
     # ./eww
     # ./hyprpanel
   ];
