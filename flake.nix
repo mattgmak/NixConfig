@@ -38,7 +38,7 @@
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
-          stylix.nixosModules.default
+          stylix.nixosModules.stylix
           # { nixpkgs.overlays = [ inputs.hyprpanel.overlay ]; }
           # home-manager.nixosModules.home-manager
           # {
