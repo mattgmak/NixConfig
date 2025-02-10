@@ -125,10 +125,7 @@ in {
     nixfmt-classic
     atuin
     nixd
-    waybar
-    dunst
     libnotify
-    rofi-wayland
     kitty
     obsidian
     webcord
