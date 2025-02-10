@@ -10,12 +10,12 @@
         layer = "top";
         position = "top";
         mod = "dock";
-        margin-left = 9;
-        margin-right = 9;
-        margin-top = 4;
-        margin-bottom = 0;
+        margin-left = 2;
+        margin-right = 2;
+        margin-top = 2;
+        margin-bottom = 2;
         reload_style_on_change = true;
-        spacing = 4;
+        spacing = 2;
         modules-left =
           [ "custom/spacer" "hyprland/workspaces" "hyprland/window" ];
         modules-center = [ "clock" ];
@@ -32,7 +32,7 @@
         ];
 
         # Module configuration: Left
-        "custom/spacer" = { format = "   "; };
+        "custom/spacer" = { format = "❄️"; };
         "hyprland/workspaces" = {
           disable-scroll = false;
           all-outputs = false;
@@ -69,7 +69,7 @@
 
         # Module configuration: Center
         clock = {
-          format = "<b> {:%a %b[%m] %d ▒  %I:%M %p}</b>";
+          format = "<b> {:%a %b %d  %I:%M %p}</b>";
           tooltip-format = ''
             <big>{:%Y %B}</big>
             <tt><small>{calendar}</small></tt>'';
@@ -96,12 +96,12 @@
           on-click = "pavucontrol";
         };
         network = {
-          format-wifi = "{essid} ({signalStrength}%) ";
-          format-ethernet = "{ipaddr}/{cidr} ";
-          tooltip-format = "{ifname} via {gwaddr} ";
-          format-linked = "{ifname} (No IP) ";
-          format-disconnected = "Disconnected ⚠";
-          format-alt = "{ifname}: {ipaddr}/{cidr}";
+          format-wifi = "{essid} ({signalStrength}%)  ";
+          format-ethernet = "{ipaddr}/{cidr}  ";
+          tooltip-format = "{ifname} via {gwaddr}  ";
+          format-linked = "{ifname} (No IP)  ";
+          format-disconnected = "Disconnected ⚠ ";
+          format-alt = "{ifname}: {ipaddr}/{cidr} ";
         };
         cpu = {
           format = "{usage}%  ";
@@ -109,7 +109,7 @@
         };
         memory = { format = "{}%  "; };
         backlight = {
-          format = "{percent}% {icon}";
+          format = "{percent}% {icon} ";
           format-icons = [ "" "" "" "" "" "" "" "" "" ];
         };
         battery = {
@@ -118,7 +118,7 @@
             warning = 30;
             critical = 15;
           };
-          format = "{capacity}% {icon}";
+          format = "{capacity}% {icon} ";
           format-charging = "{capacity}% ";
           format-plugged = "{capacity}% ";
           format-alt = "{time} {icon}";
