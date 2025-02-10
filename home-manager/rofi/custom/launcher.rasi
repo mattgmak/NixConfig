@@ -10,7 +10,7 @@ configuration {
 @import "colors.rasi"
 
 * {
-    font: "Maple Mono 13";
+    font: "IosevkaTerm Nerd Font 13";
 }
 
 window {
@@ -149,4 +149,5 @@ element selected.urgent {
 element selected.active {
     background-color:               @BGA;
     color:                          @FG;
+    font-style:                     bold;
 }

@@ -22,9 +22,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, zen-browser, home-manager, ... }@inputs:
+  outputs = { nixpkgs, home-manager, stylix, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
@@ -36,6 +38,7 @@
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
+          stylix.nixosModules.default
           # { nixpkgs.overlays = [ inputs.hyprpanel.overlay ]; }
           # home-manager.nixosModules.home-manager
           # {
