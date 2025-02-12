@@ -79,7 +79,6 @@ in {
         "$mod SHIFT, 7, movetoworkspace, 7"
         "$mod SHIFT, 8, movetoworkspace, 8"
         "$mod SHIFT, 9, movetoworkspace, 9"
-        "SUPER, V, exec, wezterm start --class clipse -e clipse"
         ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
         ", XF86AudioPlay, exec, playerctl play-pause"
@@ -89,6 +88,9 @@ in {
         # Launch shortcuts
         "$mod, return, exec, wezterm"
         "$mod, M, exec, pkill waybar || waybar"
+        # Utility binds
+        "SUPER, V, exec, wezterm start --class clipse -e clipse"
+        ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
@@ -161,7 +163,12 @@ in {
         resize_on_border = true;
       };
       cursor = { no_warps = true; };
-      windowrulev2 = [ "float,class:(clipse)" "size 1000 800,class:(clipse)" ];
+      windowrulev2 = [
+        "float, class:(clipse)"
+        "size 1000 800, class:(clipse)"
+        "float, title:^(Picture-in-Picture)$"
+        "pin, title:^(Picture-in-Picture)$"
+      ];
     };
   };
 }

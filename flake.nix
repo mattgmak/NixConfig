@@ -29,27 +29,23 @@
   outputs = { nixpkgs, home-manager, stylix, ... }@inputs:
     let
       username = "goofy";
+      hostname = "GoofyNixie";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      nixosConfigurations."${username}" = nixpkgs.lib.nixosSystem {
+      nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs hostname username; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
           stylix.nixosModules.stylix
-          # { nixpkgs.overlays = [ inputs.hyprpanel.overlay ]; }
-          # home-manager.nixosModules.home-manager
-          # {
-          #   home-manager.useGlobalPkgs = true;
-          #   home-manager.useUserPackages = true;
-          #   home-manager.users.goofy = import ./home-manager/home.nix;
-          # }
         ];
       };
       devShells.${system}.drpom = pkgs.mkShell {
-        packages = with pkgs; [ nodejs ];
+        packages = with pkgs;
+          [ nodejs_20 androidenv.androidPkgs.platform-tools ]
+          ++ (with pkgs.nodePackages; [ eas-cli firebase-tools ]);
         shellHook = ''
           cd ~/DrPOM
           nu

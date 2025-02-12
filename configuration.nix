@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, hostname, username, ... }:
 
 let system = pkgs.stdenv.hostPlatform.system;
 in {
@@ -16,7 +16,7 @@ in {
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "GoofyNixie"; # Define your hostname.
+  networking.hostName = hostname;
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -25,6 +25,8 @@ in {
     allowedTCPPorts = [ 80 443 3000 8081 ];
     allowedUDPPorts = [ 80 443 ];
   };
+
+  environment.sessionVariables = { FLAKE = "/home/${username}/NixConfig"; };
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
@@ -81,7 +83,7 @@ in {
   users.users.goofy = {
     isNormalUser = true;
     description = "Goofy";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" ];
     shell = pkgs.nushell;
     # packages = with pkgs; [ ];
   };
@@ -139,6 +141,9 @@ in {
     bluetui
     networkmanagerapplet
     overskride
+    nh
+    nvd
+    nix-output-monitor
   ];
 
   nix.settings = {
@@ -162,6 +167,35 @@ in {
   };
 
   fonts.packages = with pkgs; [ nerd-fonts.iosevka-term inter ];
+
+  stylix = {
+    polarity = "dark";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
+    image =
+      "/home/${username}/Pictures/wallpapers/beautiful-mountains-landscape.jpg";
+    cursor = {
+      package = pkgs.bibata-cursors;
+      name = "Bibata-Modern-Ice";
+    };
+    fonts = {
+      monospace = {
+        package = pkgs.nerd-fonts.iosevka-term;
+        name = "Iosevka Term Nerd Font";
+      };
+      sansSerif = {
+        package = pkgs.inter;
+        name = "Inter";
+      };
+      serif = {
+        package = pkgs.noto-fonts-cjk;
+        name = "Noto Sans CJK HK";
+      };
+      emoji = {
+        package = pkgs.noto-fonts-emoji;
+        name = "Noto Color Emoji";
+      };
+    };
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

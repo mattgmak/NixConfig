@@ -16,8 +16,12 @@
         margin-bottom = 2;
         reload_style_on_change = true;
         spacing = 2;
-        modules-left =
-          [ "custom/spacer" "hyprland/workspaces" "hyprland/window" ];
+        modules-left = [
+          "custom/spacer"
+          "hyprland/workspaces"
+          "wlr/taskbar"
+          "hyprland/window"
+        ];
         modules-center = [ "clock" ];
         modules-right = [
           "custom/toggl"
@@ -73,21 +77,21 @@
           tooltip-format = ''
             <big>{:%Y %B}</big>
             <tt><small>{calendar}</small></tt>'';
-          format-alt = "{:%H:%M %Y-%m-%d}";
+          format-alt = "<b>{:%H:%M %Y-%m-%d}</b>";
         };
 
         # Module configuration: Right
         pulseaudio = {
           format = "{volume}% {icon} {format_source}";
-          format-bluetooth = "{volume}% {icon} {format_source}";
-          format-bluetooth-muted = " {icon} {format_source}";
-          format-muted = " {format_source}";
-          format-source = "{volume}% ";
+          format-bluetooth = "{volume}% {icon}  {format_source}";
+          format-bluetooth-muted = " {icon}  {format_source}";
+          format-muted = " {format_source}";
+          format-source = " {volume}% ";
           format-source-muted = "";
           format-icons = {
             headphone = "";
-            hands-free = "";
-            headset = "";
+            hands-free = "";
+            headset = "󰋎";
             phone = "";
             portable = "";
             car = "";
@@ -109,7 +113,7 @@
         };
         memory = { format = "{}%  "; };
         backlight = {
-          format = "{percent}% {icon} ";
+          format = "{percent}% {icon}";
           format-icons = [ "" "" "" "" "" "" "" "" "" ];
         };
         battery = {
