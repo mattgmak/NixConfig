@@ -166,13 +166,18 @@ in {
       inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
   };
 
-  fonts.packages = with pkgs; [ nerd-fonts.iosevka-term inter ];
+  fonts.packages = with pkgs; [
+    nerd-fonts.iosevka-term
+    inter
+    noto-fonts-cjk-serif
+    noto-fonts-emoji
+  ];
 
   stylix = {
+    enable = true;
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
-    image =
-      "/home/${username}/Pictures/wallpapers/beautiful-mountains-landscape.jpg";
+    image = ./resources/beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
@@ -187,7 +192,7 @@ in {
         name = "Inter";
       };
       serif = {
-        package = pkgs.noto-fonts-cjk;
+        package = pkgs.noto-fonts-cjk-serif;
         name = "Noto Sans CJK HK";
       };
       emoji = {

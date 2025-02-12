@@ -1,10 +1,10 @@
 # https://github.com/Alexays/Waybar
-{ pkgs, ... }: {
+{ lib, ... }: {
   home.file.".config/waybar/toggl_status.py".source = ./toggl_status.py;
   programs.waybar = {
     enable = true;
     systemd.enable = true;
-    style = ./style.css;
+    style = lib.mkForce ./style.css;
     settings = {
       mainBar = {
         layer = "top";
