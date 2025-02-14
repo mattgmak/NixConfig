@@ -176,7 +176,7 @@ in {
   stylix = {
     enable = true;
     polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
     image = ./resources/beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
@@ -192,7 +192,7 @@ in {
         name = "Inter";
       };
       serif = {
-        package = pkgs.noto-fonts-cjk-serif;
+        package = pkgs.noto-fonts-cjk-sans;
         name = "Noto Sans CJK HK";
       };
       emoji = {

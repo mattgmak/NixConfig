@@ -957,11 +957,11 @@ def --env nixrb [...args] {
 }
 
 def --env cu [...args] {
-    appimage-run ~/CursorAppImage/* ...$args
+    appimage-run ~/CursorAppImage/* --ozone-platform=wayland ...$args
 }
 
 def --env sucu [...args] {
-    sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox ...$args
+    sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox --ozone-platform=wayland ...$args
 }
 
 source ~/.local/share/atuin/init.nu

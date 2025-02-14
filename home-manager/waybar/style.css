@@ -66,6 +66,7 @@ window.HDMI-A-1 #pulseaudio {
   padding: 0.1rem 0.7rem;
 }
 
+#taskbar,
 #workspaces {
   font-weight: bold;
   background: @surface0;
@@ -78,6 +79,7 @@ window.HDMI-A-1 #pulseaudio {
   margin: 5px 2.5px;
 }
 
+#taskbar button,
 #workspaces button {
   color: @overlay2;
   transition: all 0.3s ease-in-out;
@@ -90,25 +92,27 @@ window.HDMI-A-1 #pulseaudio {
   color: @text;
 }
 
+#taskbar button.visible,
 #workspaces button.visible {
   color: @crust;
   background: @sky;
   padding: 0.2rem 1rem;
 }
 
+#taskbar button.active,
 #workspaces button.active {
   color: @crust;
   background: @mauve;
   padding: 0.2rem 1rem;
 }
 
+#taskbar button:hover,
 #workspaces button:hover {
   color: @crust;
   background: @mauve;
   padding: 0.2rem 1rem;
 }
 
-#taskbar,
 #window {
   background-color: @surface0;
   border-radius: 10px;

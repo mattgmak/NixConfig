@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{
   imports = [
     ./hyprland
     ./waybar
@@ -11,12 +11,15 @@
     ./bluetui
     ./impala
     ./rofi
-    # ./eww
-    # ./hyprpanel
   ];
-  home.username = "goofy";
-  home.homeDirectory = "/home/goofy";
-  home.stateVersion = "24.11"; # Please read the comment before changing.
-  # home.packages = with pkgs; [ hello ];
+  home = {
+    username = "goofy";
+    homeDirectory = "/home/goofy";
+    sessionVariables = {
+      TERMINAL = "wezterm";
+      BROWSER = "zen";
+    };
+    stateVersion = "24.11"; # Please read the comment before changing.
+  };
   programs.home-manager.enable = true;
 }

@@ -1,10 +1,11 @@
 # https://github.com/Alexays/Waybar
-{ lib, ... }: {
+{
+  stylix.targets.waybar.enable = false;
   home.file.".config/waybar/toggl_status.py".source = ./toggl_status.py;
   programs.waybar = {
     enable = true;
     systemd.enable = true;
-    style = lib.mkForce ./style.css;
+    style = ./style.css;
     settings = {
       mainBar = {
         layer = "top";
@@ -56,12 +57,13 @@
           };
         };
         "wlr/taskbar" = {
-          all-outputs = false;
           format = "{icon}";
           icon-size = 13;
           tooltip = true;
           tooltip-format = "{title}";
           active-first = false;
+          on-click = "activate";
+          on-click-middle = "close";
         };
         "hyprland/window" = {
           max-length = 50;
@@ -84,8 +86,8 @@
         pulseaudio = {
           format = "{volume}% {icon} {format_source}";
           format-bluetooth = "{volume}% {icon}  {format_source}";
-          format-bluetooth-muted = " {icon}  {format_source}";
-          format-muted = " {format_source}";
+          format-bluetooth-muted = " {icon}   {format_source}";
+          format-muted = "  {format_source}";
           format-source = " {volume}% ";
           format-source-muted = "";
           format-icons = {
