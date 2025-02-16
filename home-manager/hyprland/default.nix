@@ -158,7 +158,7 @@ in {
         ];
       };
       general = {
-        gaps_in = 5;
+        gaps_in = 2.5;
         gaps_out = 5;
         resize_on_border = true;
         border_size = 2;

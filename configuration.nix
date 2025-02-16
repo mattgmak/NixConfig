@@ -188,7 +188,7 @@ in {
     fonts = {
       monospace = {
         package = pkgs.nerd-fonts.iosevka-term;
-        name = "Iosevka Term Nerd Font";
+        name = "IosevkaTerm Nerd Font";
       };
       sansSerif = {
         package = pkgs.inter;

@@ -9,7 +9,7 @@
     ./vscode-custom
     ./yazi
     ./bluetui
-    ./impala
+    ./makima
     ./rofi
   ];
   home = {
