@@ -54,7 +54,7 @@
         "$mod, t, togglefloating"
         "$mod, f, fullscreen"
         "$mod, d, killactive"
-        "$mod, SUPER, q, exit"
+        "$mod SUPER, q, exit"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
