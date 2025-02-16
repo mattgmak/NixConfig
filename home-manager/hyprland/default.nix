@@ -87,6 +87,10 @@
         "SUPER, V, exec, wezterm start --class clipse -e clipse"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER, N, exec, makoctl dismiss -a"
+        # Focus binds
+        "$mod, R, focuswindow, class:(zen)"
+        "$mod, E, focuswindow, class:(*.cursor*.)"
+        "$mod, W, focuswindow, class:(*.wezterm*.)"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
