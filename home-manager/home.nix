@@ -11,6 +11,7 @@
     ./bluetui
     ./rofi
     ./mako
+    ./input-remapper
   ];
   home = {
     username = "goofy";

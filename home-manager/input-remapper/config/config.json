@@ -1,0 +1,6 @@
+{
+    "version": "2.0.1",
+    "autoload": {
+        "ELAN2514:00 04F3:2AF1": "Excalidraw Binds"
+    }
+}
