@@ -54,7 +54,7 @@
         "$mod, t, togglefloating"
         "$mod, f, fullscreen"
         "$mod, d, killactive"
-        "SUPER, q, exit"
+        "$mod, SUPER, q, exit"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -79,8 +79,7 @@
         ", XF86AudioPause, exec, playerctl play-pause"
         ", XF86AudioNext, exec, playerctl next"
         ", XF86AudioPrev, exec, playerctl previous"
-        # Launch shortcuts
-        "$mod, return, exec, wezterm"
+        # Waybar binds
         "$mod SHIFT, M, exec, pkill waybar || waybar"
         "$mod, M, exec, pkill -SIGUSR1 waybar"
         # Utility binds
@@ -88,9 +87,13 @@
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER, N, exec, makoctl dismiss -a"
         # Focus binds
+        "SUPER, R, exec, zen"
+        "SUPER, E, exec, nu -e cu"
+        "SUPER, W, exec, wezterm"
+        "SUPER, Q, exec, gnome-system-monitor"
         "$mod, R, focuswindow, class:(zen)"
-        "$mod, E, focuswindow, class:(*.cursor*.)"
-        "$mod, W, focuswindow, class:(*.wezterm*.)"
+        "$mod, E, focuswindow, class:(.*cursor.*)"
+        "$mod, W, focuswindow, class:(.*wezterm.*)"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
