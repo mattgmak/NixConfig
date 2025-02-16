@@ -81,13 +81,12 @@
         ", XF86AudioPrev, exec, playerctl previous"
         # Launch shortcuts
         "$mod, return, exec, wezterm"
-        "$mod, M, exec, pkill waybar || waybar"
+        "$mod SHIFT, M, exec, pkill waybar || waybar"
+        "$mod, M, exec, pkill -SIGUSR1 waybar"
         # Utility binds
         "SUPER, V, exec, wezterm start --class clipse -e clipse"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER, N, exec, makoctl dismiss -a"
-        # ", BTN_TOOL_PEN, exec, notify-send 'Stylus' 'Stylus tool pen pressed'"
-        # ", BTN_TOOL_RUBBER, exec, notify-send 'Stylus' 'Stylus tool rubber pressed'"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
