@@ -1,7 +1,6 @@
 # https://github.com/Alexays/Waybar
 {
   stylix.targets.waybar.enable = false;
-  home.file.".config/waybar/toggl_status.py".source = ./toggl_status.py;
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -11,12 +10,8 @@
         layer = "top";
         position = "top";
         mod = "dock";
-        margin-left = 2;
-        margin-right = 2;
-        margin-top = 2;
-        margin-bottom = 2;
+        margin-top = 5;
         reload_style_on_change = true;
-        spacing = 2;
         modules-left = [
           "custom/spacer"
           "hyprland/workspaces"
@@ -125,7 +120,7 @@
             critical = 15;
           };
           format = "{capacity}% {icon} ";
-          format-charging = "{capacity}% ";
+          format-charging = "{capacity}% 󰂄";
           format-plugged = "{capacity}% ";
           format-alt = "{time} {icon}";
           format-icons = [ "" "" "" "" "" ];
@@ -134,12 +129,6 @@
         tray = {
           icon-size = 18;
           spacing = 10;
-        };
-        "custom/toggl" = {
-          format = "{}";
-          exec = "$HOME/.config/waybar/toggl_status.py";
-          interval = 10;
-          on-click = "toggl stop";
         };
       };
     };

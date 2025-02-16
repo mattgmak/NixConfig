@@ -111,8 +111,8 @@ in {
         "$mod SHIFT, PAGEDOWN, moveactive, 0 20"
         "$mod SHIFT, HOME, moveactive, -20 0"
         "$mod SHIFT, END, moveactive, 20 0"
-        ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
-        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%+"
+        ", XF86AudioLowerVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%-"
         ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
         ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
       ];
@@ -158,9 +158,10 @@ in {
         ];
       };
       general = {
-        gaps_in = 2;
-        gaps_out = 2;
+        gaps_in = 5;
+        gaps_out = 5;
         resize_on_border = true;
+        border_size = 2;
       };
       cursor = { no_warps = true; };
       windowrulev2 = [

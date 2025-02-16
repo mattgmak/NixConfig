@@ -54,20 +54,20 @@ window.HDMI-A-1 #pulseaudio {
 #waybar {
   background: transparent;
   color: @text;
-  border-radius: 10px;
 }
 
 #custom-spacer {
   background: @surface0;
   color: @crust;
   border-radius: 10px;
-  margin: 5px 2.5px;
+  margin: 0px 2.5px;
   margin-left: 5px;
   padding: 0.1rem 0.7rem;
 }
 
+#workspaces,
 #taskbar,
-#workspaces {
+#window {
   font-weight: bold;
   background: @surface0;
   color: @text;
@@ -76,7 +76,16 @@ window.HDMI-A-1 #pulseaudio {
   border-radius: 10px;
   transition: all 0.3s ease-in-out;
   padding: 0px 1px;
-  margin: 5px 2.5px;
+  margin: 0px 2.5px;
+}
+
+#taskbar.empty,
+window#waybar.empty #window {
+  display: none;
+}
+
+#window {
+  padding: 0 1rem;
 }
 
 #taskbar button,
@@ -113,23 +122,11 @@ window.HDMI-A-1 #pulseaudio {
   padding: 0.2rem 1rem;
 }
 
-#window {
-  background-color: @surface0;
-  border-radius: 10px;
-  padding: 0rem 1rem;
-  margin: 5px 2.5px;
-}
-
-window#waybar.fullscreen,
-window#waybar.swallowing {
-  color: @red;
-}
-
 #clock {
   color: @mauve;
   border-radius: 10px;
   background: @surface0;
-  margin: 5px 2.5px;
+  margin: 0px 2.5px;
   padding: 0.1rem 0.7rem;
 }
 
@@ -144,7 +141,7 @@ window#waybar.swallowing {
   background: @surface0;
   padding: 0.1rem 0.7rem;
   border-radius: 10px;
-  margin: 5px 2.5px;
+  margin: 0px 2.5px;
 }
 
 #network {

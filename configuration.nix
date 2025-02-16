@@ -41,6 +41,10 @@ in {
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
+  services.input-remapper = {
+    enable = true;
+    package = pkgs.input-remapper;
+  };
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -144,6 +148,7 @@ in {
     nh
     nvd
     nix-output-monitor
+    wev
   ];
 
   nix.settings = {
@@ -177,6 +182,7 @@ in {
     enable = true;
     polarity = "dark";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/darkviolet.yaml";
     image = ./resources/beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
