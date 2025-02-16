@@ -81,7 +81,9 @@ window.HDMI-A-1 #pulseaudio {
 
 #taskbar.empty,
 window#waybar.empty #window {
-  display: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
 }
 
 #window {

@@ -41,10 +41,6 @@ in {
   services.xserver.displayManager.gdm.enable = true;
   services.xserver.desktopManager.gnome.enable = true;
 
-  services.input-remapper = {
-    enable = true;
-    package = pkgs.input-remapper;
-  };
   # Configure keymap in X11
   services.xserver.xkb = {
     layout = "us";
@@ -141,7 +137,6 @@ in {
     pulseaudio-ctl
     brightnessctl
     playerctl
-    impala
     bluetui
     networkmanagerapplet
     overskride
@@ -149,6 +144,8 @@ in {
     nvd
     nix-output-monitor
     wev
+    makima
+    evtest
   ];
 
   nix.settings = {
