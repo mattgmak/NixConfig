@@ -27,6 +27,7 @@ in {
   };
 
   environment.sessionVariables = { FLAKE = "/home/${username}/NixConfig"; };
+  environment.shells = with pkgs; [ nushell bash ];
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
@@ -83,7 +84,7 @@ in {
   users.users.goofy = {
     isNormalUser = true;
     description = "Goofy";
-    extraGroups = [ "networkmanager" "wheel" "adbusers" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "input" ];
     shell = pkgs.nushell;
     # packages = with pkgs; [ ];
   };
@@ -144,9 +145,13 @@ in {
     nvd
     nix-output-monitor
     wev
-    makima
     evtest
+    input-remapper
   ];
+  services.input-remapper = {
+    enable = true;
+    package = pkgs.input-remapper;
+  };
 
   nix.settings = {
     substituters = [ "https://hyprland.cachix.org" ];

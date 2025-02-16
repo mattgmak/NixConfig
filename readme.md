@@ -7,5 +7,5 @@
 - [ ] Custom Cursor package
 - [ ] Custom Zen browser package
 - [ ] Improve hyprland workspaces
-- [ ] Map stylus key
+- [x] Map stylus key
 - [ ] Better app launchers

@@ -9,8 +9,8 @@
     ./vscode-custom
     ./yazi
     ./bluetui
-    ./makima
     ./rofi
+    ./mako
   ];
   home = {
     username = "goofy";

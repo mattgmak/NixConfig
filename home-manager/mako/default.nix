@@ -3,10 +3,8 @@
   services.mako = {
     enable = true;
     anchor = "top-right";
-    borderRadius = 2;
+    borderRadius = 10;
     borderSize = 2;
-    font = "IosevkaTerm Nerd Font";
     icons = true;
-    extraConfig = builtins.readFile ./config;
   };
 }

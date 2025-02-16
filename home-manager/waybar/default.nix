@@ -73,7 +73,7 @@
           format = "<b> {:%a %b %d  %I:%M %p}</b>";
           tooltip-format = ''
             <big>{:%Y %B}</big>
-            <tt><small>{calendar}</small></tt>'';
+            <tt><big>{calendar}</big></tt>'';
           format-alt = "<b>{:%H:%M %Y-%m-%d}</b>";
         };
 
@@ -81,8 +81,8 @@
         pulseaudio = {
           format = "{volume}% {icon} {format_source}";
           format-bluetooth = "{volume}% {icon}  {format_source}";
-          format-bluetooth-muted = " {icon}   {format_source}";
-          format-muted = "  {format_source}";
+          format-bluetooth-muted = " {icon}   {format_source}";
+          format-muted = " {format_source}";
           format-source = " {volume}% ";
           format-source-muted = "";
           format-icons = {
