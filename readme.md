@@ -8,4 +8,6 @@
 - [ ] Custom Zen browser package
 - [ ] Improve hyprland workspaces
 - [x] Map stylus key
-- [ ] Better app launchers
+- [ ] Use Ulauncher as default launcher
+- [ ] Add yazi plugins
+- [ ] Use yazi as default file manager (if possible)

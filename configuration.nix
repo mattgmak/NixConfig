@@ -147,6 +147,8 @@ in {
     wev
     evtest
     input-remapper
+    neofetch
+    nitch
   ];
   services.input-remapper = {
     enable = true;

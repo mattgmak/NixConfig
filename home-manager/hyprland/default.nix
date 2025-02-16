@@ -1,10 +1,4 @@
-{ pkgs, ... }:
-let
-  # startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-  #   waybar &
-  #   clipse -listen &
-  # '';
-in {
+{ pkgs, ... }: {
   imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ];
   home.file.".config/hypr" = {
     recursive = true;
@@ -132,11 +126,11 @@ in {
         };
         sensitivity = 0.5;
       };
-      exec-once = [
-        "hyprpaper"
-        "hyprctl setcursor Bibata-Original-Ice 24"
-        "sleep 10; morgen"
-      ];
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_touch = true;
+      };
+      exec-once = [ "hyprpaper" "hyprctl setcursor Bibata-Original-Ice 24" ];
       xwayland = {
         enabled = true;
         force_zero_scaling = true;
