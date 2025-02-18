@@ -136,7 +136,12 @@
         workspace_swipe = true;
         workspace_swipe_touch = true;
       };
-      exec-once = [ "hyprpaper" "hyprctl setcursor Bibata-Original-Ice 24" ];
+      exec-once = [
+        "hyprpaper"
+        "hyprctl setcursor Bibata-Original-Ice 24"
+        "fcitx5 -dr"
+        "fcitx5-remote -r"
+      ];
       xwayland = {
         enabled = true;
         force_zero_scaling = true;
