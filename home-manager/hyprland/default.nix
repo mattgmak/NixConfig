@@ -29,7 +29,6 @@
     sourceFirst = true;
     settings = {
       "$mod" = "ALT";
-      # source = [ "~/.config/hypr/rose-pine.conf" ];
       unbind = [ ];
       bind = [
         "$mod, Return, exec, wezterm"
@@ -170,11 +169,11 @@
         gaps_in = 2.5;
         gaps_out = 5;
         resize_on_border = true;
-        border_size = 2;
-        "col.activeborder" =
-          lib.mkForce "rgb(${config.stylix.base16Scheme.base0A})";
-        "col.inactiveborder" =
-          lib.mkForce "rgb(${config.stylix.base16Scheme.base01})";
+        border_size = 1;
+        "col.active_border" =
+          lib.mkForce "rgb(${config.lib.stylix.colors.base0A})";
+        "col.inactive_border" =
+          lib.mkForce "rgb(${config.lib.stylix.colors.base01})";
       };
       cursor = { no_warps = true; };
       windowrulev2 = [
