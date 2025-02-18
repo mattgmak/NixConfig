@@ -93,6 +93,8 @@
         "$mod, R, focuswindow, class:(zen)"
         "$mod, E, focuswindow, class:(.*cursor.*)"
         "$mod, W, focuswindow, class:(.*wezterm.*)"
+        # Input toggle binds
+        "SUPER, SPACE, exec, fcitx5-remote -t"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
