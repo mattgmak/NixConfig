@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, config, ... }: {
   imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ];
   home.file.".config/hypr" = {
     recursive = true;
@@ -29,7 +29,7 @@
     sourceFirst = true;
     settings = {
       "$mod" = "ALT";
-      source = [ "~/.config/hypr/rose-pine.conf" ];
+      # source = [ "~/.config/hypr/rose-pine.conf" ];
       unbind = [ ];
       bind = [
         "$mod, Return, exec, wezterm"
@@ -171,6 +171,10 @@
         gaps_out = 5;
         resize_on_border = true;
         border_size = 2;
+        "col.activeborder" =
+          lib.mkForce "rgb(${config.stylix.base16Scheme.base0A})";
+        "col.inactiveborder" =
+          lib.mkForce "rgb(${config.stylix.base16Scheme.base01})";
       };
       cursor = { no_warps = true; };
       windowrulev2 = [

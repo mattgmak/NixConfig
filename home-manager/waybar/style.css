@@ -139,7 +139,8 @@ window#waybar.empty #window {
 #backlight,
 #battery,
 #custom-toggl,
-#pulseaudio {
+#pulseaudio,
+#tray {
   background: @surface0;
   padding: 0.1rem 0.7rem;
   border-radius: 10px;
@@ -180,10 +181,6 @@ window#waybar.empty #window {
   color: @pink;
 }
 
-#battery {
-  margin-right: 5px;
-}
-
 #custom-toggl {
   color: @blue;
 }
@@ -193,5 +190,5 @@ window#waybar.empty #window {
 }
 
 #tray {
-  padding: 0.1rem 0.7rem;
+  margin-right: 5px;
 }
