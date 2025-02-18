@@ -222,4 +222,5 @@ in {
   };
   services.blueman.enable = true;
   system.stateVersion = "24.11"; # Did you read the comment?
+  home-manager.useGlobalPkgs = true;
 }

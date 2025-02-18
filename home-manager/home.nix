@@ -12,6 +12,7 @@
     ./rofi
     ./mako
     ./input-remapper
+    ./fcitx5
   ];
   home = {
     username = "goofy";
