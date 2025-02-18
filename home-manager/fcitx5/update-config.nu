@@ -1,3 +1,4 @@
+# Update fcitx5 config
 let files = (
     ls ~/.config/fcitx5/*
     | where name !~ '.*\.hm-backup$'
