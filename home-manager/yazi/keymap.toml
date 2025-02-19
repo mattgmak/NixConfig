@@ -1,5 +1,89 @@
 "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 
+[[manager.prepend_keymap]]
+on = "<C-y>"
+run = ["plugin system-clipboard"]
+desc = "Copy to system clipboard"
+
+[[manager.prepend_keymap]]
+on = ["s"]
+run = "plugin searchjump"
+desc = "Searchjump mode"
+
+[[manager.prepend_keymap]]
+on = ["1"]
+run = "plugin relative-motions --args=1"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["2"]
+run = "plugin relative-motions --args=2"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["3"]
+run = "plugin relative-motions --args=3"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["4"]
+run = "plugin relative-motions --args=4"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["5"]
+run = "plugin relative-motions --args=5"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["6"]
+run = "plugin relative-motions --args=6"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["7"]
+run = "plugin relative-motions --args=7"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["8"]
+run = "plugin relative-motions --args=8"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["9"]
+run = "plugin relative-motions --args=9"
+desc = "Move in relative steps"
+[[manager.prepend_keymap]]
+on = ["f", "G"]
+run = "plugin fg --args='rg'"
+desc = "find file by content (ripgrep match)"
+
+[[manager.prepend_keymap]]
+on = ["f", "f"]
+run = "plugin fg --args='fzf'"
+desc = "find file by filename"
+
+[[manager.prepend_keymap]]
+on = ["f", "g"]
+run = "plugin fg"
+desc = "find file by content (fuzzy match)"
+
+[[manager.prepend_keymap]]
+on = ["f", "l"]
+run = "filter --smart"
+desc = "Filter files"
+
+[[manager.prepend_keymap]]
+on = ["c", "a"]
+run = "plugin compress"
+desc = "Archive selected files"
+
+[[manager.prepend_keymap]]
+on = "T"
+run = "plugin max-preview"
+desc = "Maximize or restore preview"
+
 [manager]
 
 keymap = [
@@ -228,15 +312,15 @@ keymap = [
   # Tabs
   { on = "t", run = "tab_create --current", desc = "Create a new tab with CWD" },
 
-  # { on = "1", run = "tab_switch 0", desc = "Switch to the first tab" },
-  # { on = "2", run = "tab_switch 1", desc = "Switch to the second tab" },
-  # { on = "3", run = "tab_switch 2", desc = "Switch to the third tab" },
-  # { on = "4", run = "tab_switch 3", desc = "Switch to the fourth tab" },
-  # { on = "5", run = "tab_switch 4", desc = "Switch to the fifth tab" },
-  # { on = "6", run = "tab_switch 5", desc = "Switch to the sixth tab" },
-  # { on = "7", run = "tab_switch 6", desc = "Switch to the seventh tab" },
-  # { on = "8", run = "tab_switch 7", desc = "Switch to the eighth tab" },
-  # { on = "9", run = "tab_switch 8", desc = "Switch to the ninth tab" },
+  { on = "1", run = "tab_switch 0", desc = "Switch to the first tab" },
+  { on = "2", run = "tab_switch 1", desc = "Switch to the second tab" },
+  { on = "3", run = "tab_switch 2", desc = "Switch to the third tab" },
+  { on = "4", run = "tab_switch 3", desc = "Switch to the fourth tab" },
+  { on = "5", run = "tab_switch 4", desc = "Switch to the fifth tab" },
+  { on = "6", run = "tab_switch 5", desc = "Switch to the sixth tab" },
+  { on = "7", run = "tab_switch 6", desc = "Switch to the seventh tab" },
+  { on = "8", run = "tab_switch 7", desc = "Switch to the eighth tab" },
+  { on = "9", run = "tab_switch 8", desc = "Switch to the ninth tab" },
 
   { on = "[", run = "tab_switch -1 --relative", desc = "Switch to the previous tab" },
   { on = "]", run = "tab_switch 1 --relative", desc = "Switch to the next tab" },
@@ -250,42 +334,6 @@ keymap = [
   # Help
   { on = "~", run = "help", desc = "Open help" },
   { on = "<F1>", run = "help", desc = "Open help" },
-
-  # Prepend keymaps moved here
-  { on = "<C-y>", run = [
-    "plugin system-clipboard",
-  ], desc = "Copy to system clipboard" },
-  { on = "s", run = "plugin searchjump", desc = "Searchjump mode" },
-  { on = "1", run = "plugin relative-motions --args=1", desc = "Move in relative steps" },
-  { on = "2", run = "plugin relative-motions --args=2", desc = "Move in relative steps" },
-  { on = "3", run = "plugin relative-motions --args=3", desc = "Move in relative steps" },
-  { on = "4", run = "plugin relative-motions --args=4", desc = "Move in relative steps" },
-  { on = "5", run = "plugin relative-motions --args=5", desc = "Move in relative steps" },
-  { on = "6", run = "plugin relative-motions --args=6", desc = "Move in relative steps" },
-  { on = "7", run = "plugin relative-motions --args=7", desc = "Move in relative steps" },
-  { on = "8", run = "plugin relative-motions --args=8", desc = "Move in relative steps" },
-  { on = "9", run = "plugin relative-motions --args=9", desc = "Move in relative steps" },
-  { on = [
-    "f",
-    "G",
-  ], run = "plugin fg --args='rg'", desc = "find file by content (ripgrep match)" },
-  { on = [
-    "f",
-    "f",
-  ], run = "plugin fg --args='fzf'", desc = "find file by filename" },
-  { on = [
-    "f",
-    "g",
-  ], run = "plugin fg", desc = "find file by content (fuzzy match)" },
-  { on = [
-    "f",
-    "l",
-  ], run = "filter --smart", desc = "Filter files" },
-  { on = [
-    "c",
-    "a",
-  ], run = "plugin compress", desc = "Archive selected files" },
-  { on = "T", run = "plugin max-preview", desc = "Maximize or restore preview" },
 ]
 
 [tasks]

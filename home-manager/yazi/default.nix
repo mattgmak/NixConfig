@@ -1,18 +1,13 @@
-{ pkgs, inputs, lib, ... }:
-let
-  keymapTomlText = builtins.fromTOML (builtins.readFile ./keymap.toml);
-  settingsTomlText = builtins.fromTOML (builtins.readFile ./yazi.toml);
-in {
+{ pkgs, inputs, lib, ... }: {
   programs.yazi = {
     enable = true;
     enableNushellIntegration = true;
     initLua = ./init.lua;
-    keymap = keymapTomlText;
-    settings = settingsTomlText;
   };
 
   home.file = let
-    basePluginPath = ".config/yazi/plugins";
+    baseConfigPath = ".config/yazi";
+    basePluginPath = "${baseConfigPath}/plugins";
     baseOutputPath = "share/yazi/plugins";
     plugins = [
       {
@@ -36,8 +31,11 @@ in {
         pkg = pkgs.callPackage ./plugins/fg.nix { };
       }
     ];
-  in builtins.listToAttrs (map (plugin: {
+  in (builtins.listToAttrs (map (plugin: {
     name = "${basePluginPath}/${plugin.name}.yazi";
     value = { source = "${plugin.pkg}/${baseOutputPath}/${plugin.name}"; };
-  }) plugins);
+  }) plugins)) // {
+    "${baseConfigPath}/yazi.toml" = { source = ./yazi.toml; };
+    "${baseConfigPath}/keymap.toml" = { source = ./keymap.toml; };
+  };
 }
