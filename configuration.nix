@@ -13,8 +13,19 @@ in {
   ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    supportedFilesystems = [ "ntfs" ];
+  };
+
+  fileSystems."/mnt/windows" = {
+    device = "/dev/nvme0n1p5";
+    fsType = "ntfs-3g";
+    options = [ "rw" "uid=1000"];
+  };
 
   networking.hostName = hostname;
 
