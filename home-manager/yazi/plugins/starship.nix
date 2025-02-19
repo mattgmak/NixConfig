@@ -7,8 +7,8 @@ stdenv.mkDerivation {
   src = fetchFromGitHub {
     owner = "Rolv-Apneseth";
     repo = "starship.yazi";
-    rev = "247f49da1c408235202848c0897289ed51b69343";
-    hash = "sha256-0J6hxcdDX9b63adVlNVWysRR5htwAtP5WhIJ2AK2+Gs=";
+    rev = "f6939fbdbc3fdfcdc2a80251841e429e0cd5cf3c";
+    hash = "sha256-5QQsFozbulgLY/Gl6QuKSOTtygULveoRD49V00e0WOw=";
   };
 
   installPhase = ''

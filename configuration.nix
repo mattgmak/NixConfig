@@ -161,6 +161,7 @@ in {
     neofetch
     nitch
     nix-prefetch-github
+    nvfetcher
   ];
   services.input-remapper = {
     enable = true;
