@@ -7,7 +7,7 @@ stdenv.mkDerivation {
   src = fetchgit {
     url = "https://gitee.com/DreamMaoMao/fg.yazi.git";
     rev = "daf696065d65e61a1b3026ab8190351203513d51";
-    hash = "sha256-lxdZAxMz2jDJjz/Ogt/o/DwQtCt1tgHFA5QMdlvUjEc=";
+    hash = "sha256-dcidPBhc0+NvPb80hK+kUoq+PxspceFCliyEc7K3OTk=";
   };
 
   buildInputs = [

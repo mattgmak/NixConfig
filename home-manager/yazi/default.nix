@@ -2,28 +2,6 @@
 let
   keymapTomlText = builtins.fromTOML (builtins.readFile ./keymap.toml);
   settingsTomlText = builtins.fromTOML (builtins.readFile ./yazi.toml);
-  plugins = [
-    {
-      name = "glow";
-      pkg = pkgs.callPackage ./plugins/glow.nix { };
-    }
-    {
-      name = "starship";
-      pkg = pkgs.callPackage ./plugins/starship.nix { };
-    }
-    {
-      name = "relative-motions";
-      pkg = pkgs.callPackage ./plugins/relative-motions.nix { };
-    }
-    {
-      name = "max-preview";
-      pkg = pkgs.callPackage ./plugins/max-preview.nix { };
-    }
-    {
-      name = "fg";
-      pkg = pkgs.callPackage ./plugins/fg.nix { };
-    }
-  ];
 in {
   programs.yazi = {
     enable = true;
@@ -36,6 +14,28 @@ in {
   home.file = let
     basePluginPath = ".config/yazi/plugins";
     baseOutputPath = "share/yazi/plugins";
+    plugins = [
+      {
+        name = "glow";
+        pkg = pkgs.callPackage ./plugins/glow.nix { };
+      }
+      {
+        name = "starship";
+        pkg = pkgs.callPackage ./plugins/starship.nix { };
+      }
+      {
+        name = "relative-motions";
+        pkg = pkgs.callPackage ./plugins/relative-motions.nix { };
+      }
+      {
+        name = "max-preview";
+        pkg = pkgs.callPackage ./plugins/max-preview.nix { };
+      }
+      {
+        name = "fg";
+        pkg = pkgs.callPackage ./plugins/fg.nix { };
+      }
+    ];
   in builtins.listToAttrs (map (plugin: {
     name = "${basePluginPath}/${plugin.name}.yazi";
     value = { source = "${plugin.pkg}/${baseOutputPath}/${plugin.name}"; };

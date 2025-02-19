@@ -61,8 +61,11 @@ def update_nix_file [plugin_name: string, new_rev: string, new_hash: string] {
         } else if ($line | str contains 'version = "') {
             $line | str replace -r '".*"' $"\"($new_version)\""
         } else if ($line | str contains 'hash = ') {
-            # Handle both single-line and multi-line patterns
+            # Handle single line
             $line | str replace -r 'hash = .*' $"hash = \"($new_hash)\";"
+        } else if ($line | str contains '"sha256-') {
+            # Handle multi-line
+            $line | str replace -r '".*"' $"\"($new_hash)\""
         } else {
             $line
         }
