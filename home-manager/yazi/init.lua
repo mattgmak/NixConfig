@@ -1,8 +1,8 @@
 -- require("starship"):setup()
--- require("relative-motions"):setup({
---     show_numbers = "relative",
---     show_motion = true
--- })
+require("relative-motions"):setup({
+    show_numbers = "relative",
+    show_motion = true
+})
 -- require("searchjump"):setup{
 --     opt_unmatch_fg = "#928374",
 --     opt_match_str_fg = "#000000",
