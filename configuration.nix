@@ -21,11 +21,11 @@ in {
     supportedFilesystems = [ "ntfs" ];
   };
 
-  fileSystems."/mnt/windows" = {
-    device = "/dev/nvme0n1p5";
-    fsType = "ntfs-3g";
-    options = [ "rw" "uid=1000"];
-  };
+  # fileSystems."/mnt/windows" = {
+  #   device = "/dev/nvme0n1p5";
+  #   fsType = "ntfs-3g";
+  #   options = [ "rw" "uid=1000" ];
+  # };
 
   networking.hostName = hostname;
 
@@ -160,6 +160,7 @@ in {
     input-remapper
     neofetch
     nitch
+    nix-prefetch-github
   ];
   services.input-remapper = {
     enable = true;

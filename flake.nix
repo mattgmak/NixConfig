@@ -24,6 +24,10 @@
     };
 
     stylix.url = "github:danth/stylix";
+    nix-yazi-plugins = {
+      url = "github:lordkekz/nix-yazi-plugins?ref=yazi-v0.2.5";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, home-manager, stylix, ... }@inputs:
