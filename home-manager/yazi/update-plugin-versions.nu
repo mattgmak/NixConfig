@@ -9,16 +9,40 @@ def extract_plugin_info [plugin_name: string] {
     let content = (open $nix_file)
     let lines = ($content | lines)
 
-    # Extract values using Nushell's built-in commands
-    let owner = ($lines | find "owner = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
-    let repo = ($lines | find "repo = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
-    let current_rev = ($lines | find "rev = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
-    let current_hash = ($lines | find "hash = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
-    let current_version = ($lines | find "version = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
+    # Detect fetcher type
+    let is_github = ($lines | any { |line| $line =~ "fetchFromGitHub" })
+    let is_git = ($lines | any { |line| $line =~ "fetchgit" })
 
-    {
-        owner: $owner,
-        repo: $repo,
+    # Extract values based on fetcher type
+    let info = if $is_github {
+        # Extract GitHub-specific values
+        let owner = ($lines | find "owner = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
+        let repo = ($lines | find "repo = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
+        {
+            type: "github",
+            owner: $owner,
+            repo: $repo,
+            url: $"https://github.com/($owner)/($repo).git"
+        }
+    } else if $is_git {
+        # Extract Git URL
+        let url = ($lines | find "url = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim)
+        {
+            type: "git",
+            url: $url,
+            repo: ($url | str replace ".git$" "" | split row "/" | last)
+        }
+    } else {
+        echo "Error: Unknown fetcher type in Nix file"
+        exit 1
+    }
+
+    # Handle case where rev and hash are not yet set
+    let current_rev = if ($lines | find "rev = " | is-empty) { "main" } else { ($lines | find "rev = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim) }
+    let current_hash = if ($lines | find "hash = " | is-empty) { "" } else { ($lines | find "hash = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim) }
+    let current_version = if ($lines | find "version = " | is-empty) { "" } else { ($lines | find "version = " | first | str replace -r ".*\"(.*)\".*" "$1" | str trim) }
+
+    $info | merge {
         current_rev: $current_rev,
         current_hash: $current_hash,
         current_version: $current_version
@@ -28,17 +52,17 @@ def extract_plugin_info [plugin_name: string] {
 # Function to update Nix file with new values
 def update_nix_file [plugin_name: string, new_rev: string, new_hash: string] {
     let nix_file = $"plugins/($plugin_name).nix"
-    let content = (open $nix_file | lines)
     let new_version = $"unstable-" + (date now | format date "%Y-%m-%d")
+    let lines = (open $nix_file | lines)
 
-    # Update the values while preserving formatting
-    let updated = ($content | each { |line|
-        if ($line | str contains "rev = ") {
-            $line | str replace -r "\".*\"" $"\"($new_rev)\""
-        } else if ($line | str contains "hash = ") {
-            $line | str replace -r "\".*\"" $"\"($new_hash)\""
-        } else if ($line | str contains "version = ") {
-            $line | str replace -r "\".*\"" $"\"($new_version)\""
+    let updated = ($lines | each { |line|
+        if ($line | str contains 'rev = "') {
+            $line | str replace -r '".*"' $"\"($new_rev)\""
+        } else if ($line | str contains 'version = "') {
+            $line | str replace -r '".*"' $"\"($new_version)\""
+        } else if ($line | str contains 'hash = ') {
+            # Handle both single-line and multi-line patterns
+            $line | str replace -r 'hash = .*' $"hash = \"($new_hash)\";"
         } else {
             $line
         }
@@ -51,11 +75,19 @@ def update_nix_file [plugin_name: string, new_rev: string, new_hash: string] {
 def create_nvfetcher_config [plugins: list<string>] {
     let config = ($plugins | each { |name|
         let info = (extract_plugin_info $name)
-        $"
+        if $info.type == "github" {
+            $"
 [($name)]
-src.git = \"https://github.com/($info.owner)/($info.repo).git\"
+src.git = \"($info.url)\"
 fetch.github = \"($info.owner)/($info.repo)\"
 "
+        } else {
+            $"
+[($name)]
+src.git = \"($info.url)\"
+src.branch = \"master\"
+"
+        }
     } | str join "\n")
 
     mkdir plugins/update
@@ -85,6 +117,32 @@ def parse_nvfetcher_output [plugin_name: string] {
     $content | from json | get $plugin_name
 }
 
+# Function to get latest git info
+def get_git_info [url: string] {
+    # Create a temporary directory
+    mkdir plugins/update/_sources
+    cd plugins/update/_sources
+
+    # Clone the repository
+    git clone $url temp
+    cd temp
+
+    # Get the latest commit hash
+    let latest_rev = (git rev-parse HEAD | str trim)
+
+    # Get the hash
+    let latest_hash = (nix hash path . --type sha256 | str trim)
+
+    # Cleanup
+    cd ../..
+    rm -rf _sources
+
+    {
+        rev: $latest_rev,
+        hash: $latest_hash
+    }
+}
+
 # Function to update a single plugin
 def update_plugin [plugin_name: string] {
     print $"\nChecking ($plugin_name)..."
@@ -92,32 +150,45 @@ def update_plugin [plugin_name: string] {
     # Extract current info from Nix file
     let info = (extract_plugin_info $plugin_name)
 
-    # Parse the results
-    let result = (parse_nvfetcher_output $plugin_name)
-    let latest_rev = $result.version
-    let latest_hash = $result.src.sha256
+    # Get latest info based on type
+    let result = if $info.type == "github" {
+        # Parse nvfetcher output for GitHub repos
+        let nvfetcher_result = (parse_nvfetcher_output $plugin_name)
+        {
+            latest_rev: $nvfetcher_result.version,
+            latest_hash: $nvfetcher_result.src.sha256
+        }
+    } else {
+        # Use git commands for other git repos
+        let git_info = (get_git_info $info.url)
+        {
+            latest_rev: $git_info.rev,
+            latest_hash: $git_info.hash
+        }
+    }
+
     let new_version = $"unstable-" + (date now | format date "%Y-%m-%d")
 
     print $"\n($info.repo) Plugin:"
     print $"Current version:  ($info.current_version)"
     print $"Current revision: ($info.current_rev)"
     print $"Current hash:     ($info.current_hash)"
-    print $"Latest revision:  ($latest_rev)"
-    print $"Latest hash:      ($latest_hash)"
+    print $"Latest revision:  ($result.latest_rev)"
+    print $"Latest hash:      ($result.latest_hash)"
     print $"New version:      ($new_version)"
 
-    if $info.current_rev == $latest_rev {
+    if $info.current_rev == $result.latest_rev {
         print $"\n[✓] Plugin is up to date"
         false  # Return false to indicate no update was needed
     } else {
         print $"\n[!] Update available!"
 
         # Update the Nix file
-        update_nix_file $plugin_name $latest_rev $latest_hash
+        update_nix_file $plugin_name $result.latest_rev $result.latest_hash
         print $"\n[✓] Updated ($plugin_name).nix with new values:"
         print $"version = \"($new_version)\";"
-        print $"rev = \"($latest_rev)\";"
-        print $"hash = \"($latest_hash)\";"
+        print $"rev = \"($result.latest_rev)\";"
+        print $"hash = \"($result.latest_hash)\";"
         true  # Return true to indicate an update was performed
     }
 }
@@ -133,11 +204,16 @@ def main [
 
     print $"Fetching latest versions for plugins: ($plugin_names | str join ', ')"
 
-    # Create temporary nvfetcher config for all plugins
-    create_nvfetcher_config $plugin_names
+    # Create temporary nvfetcher config only for GitHub plugins
+    let github_plugins = ($plugin_names | each { |name|
+        let info = (extract_plugin_info $name)
+        if $info.type == "github" { $name } else { null }
+    } | compact)
 
-    # Run nvfetcher with custom build directory
-    nvfetcher --build-dir plugins/update/_sources -c plugins/update/nvfetcher.toml
+    if not ($github_plugins | is-empty) {
+        create_nvfetcher_config $github_plugins
+        nvfetcher --build-dir plugins/update/_sources -c plugins/update/nvfetcher.toml
+    }
 
     # Update each plugin
     let updated_count = ($plugin_names | each { |name| update_plugin $name } | where { |x| $x == true } | length)
@@ -152,6 +228,5 @@ def main [
     }
 
     # Cleanup
-    rm plugins/update/nvfetcher.toml
-    rm -rf plugins/update/_sources
+    rm -rf plugins/update
 }

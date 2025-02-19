@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-starship";
-  version = "unstable-2024-12-14";
+  version = "unstable-2025-02-20";
 
   src = fetchFromGitHub {
     owner = "Rolv-Apneseth";

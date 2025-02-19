@@ -15,6 +15,14 @@ let
       name = "relative-motions";
       pkg = pkgs.callPackage ./plugins/relative-motions.nix { };
     }
+    {
+      name = "max-preview";
+      pkg = pkgs.callPackage ./plugins/max-preview.nix { };
+    }
+    {
+      name = "fg";
+      pkg = pkgs.callPackage ./plugins/fg.nix { };
+    }
   ];
 in {
   programs.yazi = {
