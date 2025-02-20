@@ -9,6 +9,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/share/yazi/plugins/max-preview
     cp -r $src/* $out/share/yazi/plugins/max-preview/
+    chmod -R +x $out/share/yazi/plugins/max-preview/
   '';
 
   meta = with lib; {

@@ -1,4 +1,4 @@
-{ pkgs, inputs, lib, ... }: {
+{ pkgs, ... }: {
   programs.yazi = {
     enable = true;
     enableNushellIntegration = true;
@@ -29,6 +29,18 @@
       {
         name = "fg";
         pkg = pkgs.callPackage ./plugins/fg.nix { };
+      }
+      {
+        name = "compress";
+        pkg = pkgs.callPackage ./plugins/compress.nix { };
+      }
+      {
+        name = "system-clipboard";
+        pkg = pkgs.callPackage ./plugins/system-clipboard.nix { };
+      }
+      {
+        name = "searchjump";
+        pkg = pkgs.callPackage ./plugins/searchjump.nix { };
       }
     ];
   in (builtins.listToAttrs (map (plugin: {

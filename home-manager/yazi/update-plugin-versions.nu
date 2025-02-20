@@ -57,8 +57,10 @@ def update_nix_file [plugin_name: string, new_rev: string, new_hash: string] {
 
     let updated = ($lines | each { |line|
         if ($line | str contains 'rev = "') {
+            # Handle single line
             $line | str replace -r '".*"' $"\"($new_rev)\""
         } else if ($line | str contains 'version = "') {
+            # Handle single line
             $line | str replace -r '".*"' $"\"($new_version)\""
         } else if ($line | str contains 'hash = ') {
             # Handle single line

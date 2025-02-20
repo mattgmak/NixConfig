@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, hostname, username, ... }:
+{ pkgs, inputs, hostname, username, ... }:
 
 let system = pkgs.stdenv.hostPlatform.system;
 in {
