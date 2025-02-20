@@ -12,4 +12,4 @@
 - [ ] Add yazi plugins
 - [ ] Use yazi as default file manager (if possible)
 - [ ] Jyutping input method
-- [ ] Clipse binds
+- [x] Clipse binds
