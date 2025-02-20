@@ -48,7 +48,7 @@
       };
       devShells.${system}.drpom = pkgs.mkShell {
         packages = with pkgs;
-          [ nodejs_20 androidenv.androidPkgs.platform-tools chromium ]
+          [ nodejs_20 androidenv.androidPkgs.platform-tools chromium deno ]
           ++ (with pkgs.nodePackages; [ eas-cli firebase-tools ]);
         shellHook = ''
           cd ~/DrPOM

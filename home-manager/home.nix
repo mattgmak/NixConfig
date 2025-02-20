@@ -13,6 +13,7 @@
     ./mako
     ./input-remapper
     ./fcitx5
+    ./clipse
   ];
   home = {
     username = "goofy";
