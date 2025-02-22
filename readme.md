@@ -13,3 +13,4 @@
 - [ ] Use yazi as default file manager (if possible)
 - [ ] Jyutping input method
 - [x] Clipse binds
+- [ ] Theme better

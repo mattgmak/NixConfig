@@ -169,6 +169,7 @@ in {
     nitch
     nix-prefetch-github
     nvfetcher
+    btop
   ];
   services.input-remapper = {
     enable = true;
