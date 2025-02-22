@@ -14,6 +14,7 @@
     ./input-remapper
     ./fcitx5
     ./clipse
+    ./onedrive
   ];
   home = {
     username = "goofy";

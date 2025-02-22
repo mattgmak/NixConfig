@@ -9,7 +9,7 @@
 - [ ] Improve hyprland workspaces
 - [x] Map stylus key
 - [ ] Use Ulauncher as default launcher
-- [ ] Add yazi plugins
+- [x] Add yazi plugins
 - [ ] Use yazi as default file manager (if possible)
 - [ ] Jyutping input method
 - [x] Clipse binds
