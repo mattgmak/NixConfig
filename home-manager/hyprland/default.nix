@@ -139,7 +139,7 @@
       };
       exec-once = [
         "hyprpaper"
-        "hyprctl setcursor Bibata-Original-Ice 24"
+        # "hyprctl setcursor Bibata-Original-Ice 24"
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"

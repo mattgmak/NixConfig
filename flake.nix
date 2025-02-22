@@ -2,9 +2,8 @@
   description = "Nixos config flake";
 
   inputs = {
-    # nixpkgs = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
-    # nixpkgs-unstable = { url = "github:nixos/nixpkgs/nixos-unstable"; };
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
+    nixpkgs-unstable = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -31,16 +30,20 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, stylix, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix, ... }@inputs:
     let
       username = "goofy";
       hostname = "GoofyNixie";
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      pkgs-stable = import nixpkgs-stable {
+        inherit system;
+        config.allowUnfree = true;
+      };
     in {
       nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs hostname username; };
+        specialArgs = { inherit inputs hostname username pkgs-stable; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default
