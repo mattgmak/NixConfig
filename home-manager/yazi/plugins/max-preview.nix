@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchFromGitHub }:
+{ lib, stdenv }:
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-max-preview";

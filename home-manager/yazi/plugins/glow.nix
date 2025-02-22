@@ -14,6 +14,23 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/share/yazi/plugins/glow
     cp -r $src/* $out/share/yazi/plugins/glow/
+
+    # Create a log file
+    LOG_FILE="$out/share/yazi/plugins/glow/modification.log"
+    touch $LOG_FILE
+
+    {
+      echo ""
+      echo "================================================================"
+      echo "                  YAZI PLUGIN MODIFICATION LOG                    "
+      echo "================================================================"
+
+      echo "Renaming init.lua to main.lua"
+      mv $out/share/yazi/plugins/glow/init.lua $out/share/yazi/plugins/glow/main.lua
+
+      echo "================================================================"
+      echo "Done!"
+    } 2>&1 | tee "$LOG_FILE"
   '';
 
   meta = with lib; {

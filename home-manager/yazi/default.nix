@@ -5,6 +5,8 @@
     initLua = ./init.lua;
   };
 
+  home.packages = with pkgs; [ glow bat fzf ripgrep ];
+
   home.file = let
     baseConfigPath = ".config/yazi";
     basePluginPath = "${baseConfigPath}/plugins";
@@ -14,10 +16,10 @@
         name = "glow";
         pkg = pkgs.callPackage ./plugins/glow.nix { };
       }
-      {
-        name = "starship";
-        pkg = pkgs.callPackage ./plugins/starship.nix { };
-      }
+      # {
+      #   name = "starship";
+      #   pkg = pkgs.callPackage ./plugins/starship.nix { };
+      # }
       {
         name = "relative-motions";
         pkg = pkgs.callPackage ./plugins/relative-motions.nix { };
@@ -33,10 +35,6 @@
       {
         name = "compress";
         pkg = pkgs.callPackage ./plugins/compress.nix { };
-      }
-      {
-        name = "system-clipboard";
-        pkg = pkgs.callPackage ./plugins/system-clipboard.nix { };
       }
       {
         name = "searchjump";

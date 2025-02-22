@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
-    nixpkgs-unstable = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -35,7 +35,10 @@
       username = "goofy";
       hostname = "GoofyNixie";
       system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
       pkgs-stable = import nixpkgs-stable {
         inherit system;
         config.allowUnfree = true;
@@ -43,7 +46,7 @@
     in {
       nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs hostname username pkgs-stable; };
+        specialArgs = { inherit inputs hostname username pkgs pkgs-stable; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.default

@@ -37,7 +37,11 @@ in {
     allowedUDPPorts = [ 80 443 ];
   };
 
-  environment.sessionVariables = { FLAKE = "/home/${username}/NixConfig"; };
+  environment.sessionVariables = {
+    FLAKE = "/home/${username}/NixConfig";
+    TERMINAL = "wezterm";
+    BROWSER = "zen";
+  };
   environment.shells = with pkgs; [ nushell bash ];
 
   # Set your time zone.
@@ -109,8 +113,11 @@ in {
   # Install firefox.
   programs.firefox.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # Add onedrive service
+  services.onedrive = {
+    enable = true;
+    package = pkgs.onedrive;
+  };
 
   security.sudo.enable = true;
 

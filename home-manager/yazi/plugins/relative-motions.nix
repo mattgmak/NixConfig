@@ -39,8 +39,11 @@ stdenv.mkDerivation {
       echo -e "\nVerifying changes..."
       grep -A 1 'if cmd == "j"\|if cmd == "k"\|direction == "j"\|direction == "k"\|cmd = "j"\|cmd = "k"' $out/share/yazi/plugins/relative-motions/init.lua
 
+      echo "Renaming init.lua to main.lua"
+      mv $out/share/yazi/plugins/relative-motions/init.lua $out/share/yazi/plugins/relative-motions/main.lua
+
       echo "================================================================"
-      echo ""
+      echo "Done!"
     } 2>&1 | tee "$LOG_FILE"
   '';
 
