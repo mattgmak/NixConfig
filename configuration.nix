@@ -193,6 +193,7 @@ in {
     nvfetcher
     btop
     termfilechooser
+    xdg-desktop-portal
   ];
 
   # Input remapper
@@ -268,6 +269,24 @@ in {
     package = inputs.hyprland.packages.${system}.hyprland;
     portalPackage =
       inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
+  };
+
+  xdg = {
+    portal = {
+      enable = true;
+      xdgOpenUsePortal = true;
+      config = {
+        common.default = [ "gtk" ];
+        hyprland.default = [ "gtk" "hyprland" ];
+        hyprland."org.freedesktop.impl.portal.FileChooser" =
+          [ "xdg-desktop-portal-termfilechooser" ];
+      };
+      extraPortals = [
+        pkgs.xdg-desktop-portal-gtk
+        # pkgs.xdg-desktop-portal-hyprland
+        termfilechooser
+      ];
+    };
   };
 
   fonts.packages = with pkgs; [

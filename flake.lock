@@ -413,24 +413,6 @@
         "type": "github"
       }
     },
-    "flake-utils_3": {
-      "inputs": {
-        "systems": "systems_5"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
     "fromYaml": {
       "flake": false,
       "locked": {
@@ -1197,7 +1179,7 @@
         "hyprwayland-scanner": "hyprwayland-scanner_3",
         "nixpkgs": "nixpkgs_7",
         "pre-commit-hooks": "pre-commit-hooks_3",
-        "systems": "systems_6",
+        "systems": "systems_5",
         "xdph": "xdph_3"
       },
       "locked": {
@@ -1797,7 +1779,6 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-stable": "nixpkgs-stable_2",
         "stylix": "stylix",
-        "termfilechooser": "termfilechooser",
         "xremap-flake": "xremap-flake",
         "zen-browser": "zen-browser"
       }
@@ -1897,21 +1878,6 @@
     },
     "systems_5": {
       "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_6": {
-      "locked": {
         "lastModified": 1689347949,
         "narHash": "sha256-12tWmuL2zgBgZkdoB6qXZsgJEH9LR3oUgpaQq2RbI80=",
         "owner": "nix-systems",
@@ -1923,24 +1889,6 @@
         "owner": "nix-systems",
         "repo": "default-linux",
         "type": "github"
-      }
-    },
-    "termfilechooser": {
-      "inputs": {
-        "flake-utils": "flake-utils_3",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-4WGwniHY6MYkHHxKXX7xVbKVTGs7v0cvhSUraNoLw+w=",
-        "path": "./packages/xdg-desktop-portal-termfilechooser",
-        "type": "path"
-      },
-      "original": {
-        "path": "./packages/xdg-desktop-portal-termfilechooser",
-        "type": "path"
       }
     },
     "tinted-foot": {

@@ -1,3 +1,5 @@
 [filechooser]
-cmd=<PATH_TO_WRAPPER>
-default_dir=$HOME
+cmd=yazi-wrapper.sh
+default_dir=$HOME/Downloads
+; Uncomment and edit the line below to change the terminal emulator command
+; env=TERMCMD=foot
