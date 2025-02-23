@@ -19,8 +19,6 @@
     swaylock-effects
     wl-clipboard
     wlogout
-    xdg-desktop-portal-gtk
-    xdg-desktop-portal-hyprland
     python312Packages.toggl-cli
   ];
   wayland.windowManager.hyprland = {

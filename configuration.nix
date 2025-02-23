@@ -193,7 +193,7 @@ in {
     nvfetcher
     btop
     termfilechooser
-    xdg-desktop-portal
+    zenity
   ];
 
   # Input remapper
@@ -277,7 +277,7 @@ in {
       xdgOpenUsePortal = true;
       config = {
         common.default = [ "gtk" ];
-        hyprland.default = [ "gtk" "hyprland" ];
+        hyprland.default = [ "hyprland" "gtk" ];
         hyprland."org.freedesktop.impl.portal.FileChooser" =
           [ "xdg-desktop-portal-termfilechooser" ];
       };
@@ -337,4 +337,7 @@ in {
   services.blueman.enable = true;
   system.stateVersion = "24.11"; # Did you read the comment?
   home-manager.useGlobalPkgs = true;
+
+  # Add flatpak support
+  services.flatpak.enable = true;
 }

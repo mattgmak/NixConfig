@@ -1,4 +1,4 @@
-#!/nix/store/fd118hwh7d1ncib4mdw56ylv3g9k0iyj-bash-5.2p37/bin/sh
+#!/usr/bin/env bash
 
 set -x
 
