@@ -1,38 +1,47 @@
-{ lib, stdenv, fetchFromGitHub, meson, ninja, pkg-config, scdoc, systemd, }:
-
+{
+  stdenv,
+  fetchFromGitHub,
+  lib,
+  xdg-desktop-portal,
+  ninja,
+  meson,
+  pkg-config,
+  inih,
+  systemd,
+  scdoc,
+}:
 stdenv.mkDerivation {
   pname = "xdg-desktop-portal-termfilechooser";
-  version = "unstable-2024-02-18";
+  version = "0.4.0";
 
   src = fetchFromGitHub {
     owner = "hunkyburrito";
     repo = "xdg-desktop-portal-termfilechooser";
-    rev = "a1194c7a2e029d6f07b64e35da475e28a383dcf4";
-    hash = "sha256-IMoqpBH4Ny48bec9aDomjL8Y607vW4sE3FlXhaVQbLE=";
+    rev = "c35af27e323a492cbb3b19bdd135657ae523caef";
+    hash = "sha256-9bxhKkk5YFBhR2ylcDzlvt4ltYuF174w00EJK5r3aY0=";
   };
 
-  nativeBuildInputs = [ meson ninja pkg-config scdoc systemd ];
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+    scdoc
+  ];
 
-  buildInputs = [ systemd ];
+  buildInputs = [
+    xdg-desktop-portal
+    inih
+    systemd
+  ];
 
-  mesonFlags = [ "-Dsd-bus-provider=systemd" "-Ddefault-file-manager=yazi" ];
-
-  # Add proper build steps
-  buildPhase = ''
-    meson setup build
-    ninja -C build
-  '';
-
-  installPhase = ''
-    ninja -C build install
-  '';
+  mesonFlags = [ "-Dsd-bus-provider=libsystemd" ];
 
   meta = with lib; {
-    description =
-      "XDG Desktop Portal for choosing files through a terminal file chooser";
-    homepage = "https://github.com/GermainZ/xdg-desktop-portal-termfilechooser";
-    license = licenses.gpl3Plus;
+    description = "xdg-desktop-portal backend for choosing files with your favorite file chooser";
+    homepage = "https://github.com/hunkyburrito/xdg-desktop-portal-termfilechooser";
+    license = licenses.mit;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ ];
+    maintainers = with lib.maintainers; [ body20002 ];
+    mainProgram = "xdg-desktop-portal-termfilechooser";
   };
 }

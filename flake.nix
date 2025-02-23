@@ -28,14 +28,9 @@
       url = "github:lordkekz/nix-yazi-plugins?ref=yazi-v0.2.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    termfilechooser = {
-      url = "path:./packages/xdg-desktop-portal-termfilechooser";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix, termfilechooser
+  outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix
     , ... }@inputs:
     let
       username = "goofy";
@@ -57,14 +52,6 @@
           ./configuration.nix
           home-manager.nixosModules.default
           stylix.nixosModules.stylix
-          ({ pkgs, ... }: {
-            environment.systemPackages =
-              [ termfilechooser.packages.${system}.default ];
-            xdg.portal = {
-              enable = true;
-              extraPortals = [ termfilechooser.packages.${system}.default ];
-            };
-          })
         ];
       };
       devShells.${system}.drpom = pkgs.mkShell {

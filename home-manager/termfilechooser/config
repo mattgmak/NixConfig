@@ -1,0 +1,3 @@
+[filechooser]
+cmd=<PATH_TO_WRAPPER>
+default_dir=$HOME

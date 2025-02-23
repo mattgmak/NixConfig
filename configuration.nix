@@ -1,10 +1,13 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# and in the NixOS manual (accessible by running 'nixos-help').
 
 { pkgs, lib, inputs, hostname, username, ... }:
 
-let system = pkgs.stdenv.hostPlatform.system;
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  termfilechooser =
+    (pkgs.callPackage ./packages/xdg-desktop-portal-termfilechooser { });
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -75,7 +78,26 @@ in {
   };
 
   # Enable CUPS to print documents.
-  services.printing.enable = true;
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [
+      gutenprint
+      hplip
+      splix
+      cups-kyocera
+      foomatic-db
+      foomatic-db-engine
+      foomatic-db-ppds
+      cups-filters
+    ];
+    # Enable browsing of printers that are shared on the network
+    browsing = true;
+    # Enable raw printing
+    allowFrom = [ "all" ];
+    # Enable raw printing
+    listenAddresses = [ "*:631" ];
+    defaultShared = true;
+  };
   services.avahi = {
     enable = true;
     nssmdns4 = true;
@@ -95,7 +117,7 @@ in {
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.goofy = {
     isNormalUser = true;
     description = "Goofy";
@@ -170,6 +192,7 @@ in {
     nix-prefetch-github
     nvfetcher
     btop
+    termfilechooser
   ];
 
   # Input remapper

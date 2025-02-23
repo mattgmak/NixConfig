@@ -1934,7 +1934,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-OWjvhRkeYdDFJPzw8KFac5qhMw5rjxf4BSeVGzu4/f8=",
+        "narHash": "sha256-4WGwniHY6MYkHHxKXX7xVbKVTGs7v0cvhSUraNoLw+w=",
         "path": "./packages/xdg-desktop-portal-termfilechooser",
         "type": "path"
       },

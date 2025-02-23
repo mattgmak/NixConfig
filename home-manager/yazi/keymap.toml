@@ -119,7 +119,7 @@ keymap = [
     "g",
     "g",
   ], run = "arrow top", desc = "Move cursor to the top" },
-  { on = "G", run = "arrow bottom", desc = "Move cursor to the bottom" },
+  { on = "G", run = "arrow bot", desc = "Move cursor to the bottom" },
 
   # Navigation
   { on = "l", run = "leave", desc = "Go back to the parent directory" },
