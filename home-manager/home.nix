@@ -15,6 +15,7 @@
     ./fcitx5
     ./clipse
     ./onedrive
+    ./termfilechooser
   ];
   home = {
     username = "goofy";

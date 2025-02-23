@@ -1,5 +1,6 @@
 {
-  home.file.".config/xdg-desktop-portal-termfilechooser/config" = {
+  home.file.".config/xdg-desktop-portal-termfilechooser/" = {
     source = ./config;
+    recursive = true;
   };
 }
