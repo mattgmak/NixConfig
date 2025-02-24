@@ -10,7 +10,7 @@
 - [x] Map stylus key
 - [ ] Use Ulauncher as default launcher
 - [x] Add yazi plugins
-- [ ] Use yazi as default file manager (if possible)
+- [ ] Use yazi as default file manager (xdg-desktop-portal-termfilechooser) (not working)
 - [ ] Jyutping input method
 - [x] Clipse binds
 - [ ] Theme better
