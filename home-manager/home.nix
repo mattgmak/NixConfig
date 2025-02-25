@@ -16,6 +16,7 @@
     ./clipse
     ./onedrive
     ./termfilechooser
+    ./zen-browser
   ];
   home = {
     username = "goofy";
