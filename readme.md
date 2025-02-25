@@ -5,7 +5,7 @@
 - [ ] Better README file
 - [ ] Power menu on waybar
 - [ ] Custom Cursor package
-- [ ] Custom Zen browser package
+- [x] Home managed zen browser chrome
 - [ ] Improve hyprland workspaces
 - [x] Map stylus key
 - [ ] Use Ulauncher as default launcher
