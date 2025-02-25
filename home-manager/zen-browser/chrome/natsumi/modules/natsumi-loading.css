@@ -39,7 +39,7 @@ their author(s) have been provided above the used code.
       transform: rotate(360deg);
     }
   }
-  
+
   @keyframes browser-urlbar-loading {
     from {
       transform: translateX(calc(var(--urlbar-width) * -2));
@@ -87,7 +87,7 @@ their author(s) have been provided above the used code.
       margin: 0;
     }
   }
-  
+
   @media (-moz-bool-pref: "natsumi.theme.enable-border-animation") {
     :not(:has(hbox.zen-glance-background)):not(:has(hbox.zen-glance-overlay)) {
       .browserStack browser {
@@ -106,8 +106,9 @@ their author(s) have been provided above the used code.
           z-index: 0;
           width: var(--size);
           height: var(--size);
-          left: var(--offset);
-          top: var(--offset);
+          left: 50%;
+          top: 50%;
+          translate: -50% -50%;
           animation: browser-loading-stop var(--animation-exit-duration) linear;
           animation-fill-mode: forwards;
         }
@@ -116,21 +117,24 @@ their author(s) have been provided above the used code.
   }
 
   @media not (-moz-bool-pref: "natsumi.theme.disable-urlbar-animation") {
-    #urlbar-background {
-      overflow: hidden;
+    #urlbar:not([breakout-extend="true"]) {
+      #urlbar-background {
+        overflow: hidden;
 
-      /*noinspection CssInvalidFunction*/
-      &::before {
-        content: "";
-        transition: opacity var(--fadein-duration) ease !important;
-        opacity: 0;
-        width: 300%;
-        height: 100%;
-        position: absolute;
-        background: light-dark(
-          var(--natsumi-primary-color),
-          color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
-        ) !important;
+        /*noinspection CssInvalidFunction*/
+
+        &::before {
+          content: "";
+          transition: opacity var(--fadein-duration) ease !important;
+          opacity: 0;
+          width: 300%;
+          height: 100%;
+          position: absolute;
+          background: light-dark(
+                  var(--natsumi-primary-color),
+                  color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
+          ) !important;
+        }
       }
     }
   }
@@ -142,9 +146,9 @@ their author(s) have been provided above the used code.
 
         &::before {
           background: linear-gradient(
-            90deg,
-            var(--natsumi-primary-color) 0%,
-            var(--natsumi-colors-secondary) 100%
+                  90deg,
+                  var(--natsumi-primary-color) 0%,
+                  var(--natsumi-colors-secondary) 100%
           );
           animation: browser-loading var(--animation-rotation-duration) linear infinite;
           animation-fill-mode: forwards;
@@ -164,32 +168,35 @@ their author(s) have been provided above the used code.
     }
 
     @media not (-moz-bool-pref: "natsumi.theme.disable-urlbar-animation") {
-      #urlbar-background {
-        /*noinspection CssInvalidFunction*/
-        &::before {
-          animation: browser-urlbar-loading var(--animation-duration) linear infinite;
-          opacity: 1;
-          background: linear-gradient(
-            90deg,
-            light-dark(
-              var(--natsumi-primary-color),
-              color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
-            ) 0%,
-            var(--natsumi-colors-secondary) 33%,
-            light-dark(
-              var(--natsumi-primary-color),
-              color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
-            ) 66%,
-            var(--natsumi-colors-secondary) 100%
-          ) !important;
-          transform: translateX(calc(var(--urlbar-width) * -2));
+      #urlbar:not([breakout-extend="true"]) {
+        #urlbar-background {
+          /*noinspection CssInvalidFunction*/
+
+          &::before {
+            animation: browser-urlbar-loading var(--animation-duration) linear infinite;
+            opacity: 1;
+            background: linear-gradient(
+                    90deg,
+                    light-dark(
+                            var(--natsumi-primary-color),
+                            color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
+                    ) 0%,
+                    var(--natsumi-colors-secondary) 33%,
+                    light-dark(
+                            var(--natsumi-primary-color),
+                            color-mix(in srgb, var(--natsumi-primary-color) 60%, transparent)
+                    ) 66%,
+                    var(--natsumi-colors-secondary) 100%
+            ) !important;
+            transform: translateX(calc(var(--urlbar-width) * -2));
+          }
         }
       }
     }
   }
-  
+
   /* Disable animations for non-website elements */
-  
+
   @media (-moz-bool-pref: "natsumi.theme.enable-border-animation") {
     browser.dialogFrame {
       animation-name: none !important;

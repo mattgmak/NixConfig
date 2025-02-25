@@ -98,7 +98,7 @@ their author(s) have been provided above the used code.
       bottom: 0;
     }
 
-    @media (-moz-bool-pref: "natsumi.sidebar.panel-position-right") {
+    @media not (-moz-bool-pref: "sidebar.position_start") {
       left: unset;
       right: var(--natsumi-sidebar-x-offset);
     }
@@ -110,7 +110,7 @@ their author(s) have been provided above the used code.
 
       /*noinspection CssInvalidFunction*/
       @media not (-moz-bool-pref: "natsumi.theme.disable-glass-shadow") {
-        box-shadow: 0 0 var(--natsumi-glass-shadow-size) color-mix(in srgb, var(--natsumi-colors-secondary) var(--natsumi-glass-shadow-opacity), light-dark(black, white)) !important;
+        box-shadow: 0 0 var(--natsumi-glass-shadow-size) var(--natsumi-glass-shadow-color) !important;
       }
 
       /*noinspection CssInvalidFunction*/
@@ -127,7 +127,7 @@ their author(s) have been provided above the used code.
       resize: both;
     }
 
-    &:is([hidden]) {
+    &[hidden] {
       display: flex;
       left: calc(var(--natsumi-sidebar-x-offset) - 20px);
       opacity: 0;
@@ -135,9 +135,23 @@ their author(s) have been provided above the used code.
       animation: glass-disappear 0.2s linear !important;
       animation-fill-mode: forwards !important;
 
-      @media (-moz-bool-pref: "natsumi.sidebar.panel-position-right") {
+      @media not (-moz-bool-pref: "sidebar.position_start") {
         left: auto;
         right: calc(var(--natsumi-sidebar-x-offset) - 20px);
+      }
+    }
+  }
+
+  @media not (-moz-bool-pref: "natsumi.theme.disable-blur") {
+    @media not (-moz-bool-pref: "natsumi.sidebar.disable-panel-transparency") {
+      #browser:has(#sidebar-box:not([hidden])) .deck-selected browser {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      }
+    }
+
+    @media (-moz-bool-pref: "natsumi.sidebar.panel-glass-effect") {
+      #browser:has(#sidebar-box:not([hidden])) .deck-selected browser {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
       }
     }
   }
@@ -146,7 +160,7 @@ their author(s) have been provided above the used code.
 /* ==== Tabs sidebar tweaks ==== */
 
 @media (-moz-bool-pref: "natsumi.sidebar.tabs-glass-effect") {
-  @media (-moz-bool-pref: "zen.view.compact") {
+  :root[zen-compact-mode="true"]:not([customizing]) {
     /*noinspection CssInvalidFunction*/
     @media (-moz-bool-pref: "zen.view.compact.hide-tabbar") {
       #navigator-toolbox:not([animate]) {
@@ -157,7 +171,7 @@ their author(s) have been provided above the used code.
 
           /*noinspection CssInvalidFunction*/
           @media not (-moz-bool-pref: "natsumi.theme.disable-glass-shadow") {
-            box-shadow: 0 0 var(--natsumi-glass-shadow-size) color-mix(in srgb, var(--natsumi-colors-secondary) var(--natsumi-glass-shadow-opacity), light-dark(black, white)) !important;
+            box-shadow: 0 0 var(--natsumi-glass-shadow-size) var(--natsumi-glass-shadow-color) !important;
           }
         }
 
@@ -171,6 +185,12 @@ their author(s) have been provided above the used code.
           #TabsToolbar-customization-target::after {
             background: light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
           }
+        }
+      }
+
+      @media not (-moz-bool-pref: "natsumi.theme.disable-blur") {
+        #browser:has(#navigator-toolbox:is([zen-has-hover], [zen-user-show])) .deck-selected browser {
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
       }
     }

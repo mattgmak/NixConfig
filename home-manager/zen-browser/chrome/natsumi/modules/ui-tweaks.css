@@ -32,6 +32,11 @@ their author(s) have been provided above the used code.
   .tab-text {
     font-size: 12px;
   }
+
+  /* Separately applying here as we need to use !important */
+  input#tab-label-input {
+    font-size: 12px !important;
+  }
 }
 
 
@@ -51,15 +56,15 @@ their author(s) have been provided above the used code.
     transition: opacity 0.2s ease;
     background: var(--natsumi-primary-color) !important;
   }
-  
+
   &:hover::before {
     opacity: 1 !important;
   }
-  
+
   &:is([orient="horizontal"]) {
     margin-top: calc(var(--zen-split-column-gap) / -1.4) !important;
     height: calc(var(--zen-element-separation) * 2 - 3px) !important;
-    
+
     &::before {
       height: 3px;
       width: 30px;
@@ -79,54 +84,13 @@ their author(s) have been provided above the used code.
 
 
 
-/* ==== Smoother workspace switching animation ==== */
-@keyframes custom-slide-in {
-  0% {
-    opacity: 0;
-    transform: translateX(200px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes custom-slide-in-reverse {
-  0% {
-    opacity: 0;
-    transform: translateX(-200px);
-  }
-  
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-#tabbrowser-tabs {
-  & .tabbrowser-tab {
-    &[fadein='true']:not([zen-essential='true']) {
-      #tabbrowser-tabs[zen-workspace-animation='previous'] & {
-        animation: custom-slide-in-reverse 0.2s ease !important;
-      }
-
-      #tabbrowser-tabs[zen-workspace-animation='next'] & {
-        animation: custom-slide-in 0.2s ease !important;
-      }
-    }
-  }
-}
-
-
-
 /* ==== Dialog box animation ==== */
 
 @keyframes overlay-appear {
   0% {
     background-color: transparent;
   }
-  
+
   100% {
     background-color: rgba(28, 27, 34, 0.45);
   }
@@ -138,7 +102,7 @@ their author(s) have been provided above the used code.
     margin-top: 50px;
     margin-bottom: -50px;
   }
-  
+
   100% {
     opacity: 1;
     margin-top: 0;
@@ -148,7 +112,7 @@ their author(s) have been provided above the used code.
 
 .browserStack .dialogOverlay:not([hidden="true"]) {
   animation: overlay-appear 0.3s ease;
-  
+
   .dialogBox {
     animation: dialog-appear 0.3s ease;
   }

@@ -32,5 +32,8 @@ their author(s) have been provided above the used code.
 @import "../natsumi-config.css";
 @import "modules/preload.css";
 @import "modules/pdfjs.css";
+@import "modules/ff-home.css";
+@import "modules/preferences.css";
+@import "modules/global.css";
 
 /* Do NOT enter any additional CSS below. */

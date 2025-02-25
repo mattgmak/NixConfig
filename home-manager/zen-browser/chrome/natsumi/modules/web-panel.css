@@ -48,13 +48,19 @@ their author(s) have been provided above the used code.
 
       /*noinspection CssInvalidFunction*/
       @media not (-moz-bool-pref: "natsumi.theme.disable-glass-shadow") {
-        box-shadow: 0 0 var(--natsumi-glass-shadow-size) color-mix(in srgb, var(--natsumi-colors-secondary) var(--natsumi-glass-shadow-opacity), light-dark(black, white)) !important;
+        box-shadow: 0 0 var(--natsumi-glass-shadow-size) var(--natsumi-glass-shadow-color) !important;
       }
 
       /*noinspection CssInvalidFunction*/
       #zen-sidebar-web-header, #zen-sidebar-panels-wrapper {
         border-color: light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
       }
+    }
+  }
+
+  @media not (-moz-bool-pref: "natsumi.theme.disable-blur") {
+    #browser:has(#zen-sidebar-web-panel[pinned]) .deck-selected browser {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     }
   }
 }

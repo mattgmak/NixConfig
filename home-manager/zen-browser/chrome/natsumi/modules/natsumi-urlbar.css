@@ -33,44 +33,19 @@ their author(s) have been provided above the used code.
 
 @keyframes urlbar-appear {
   0% {
-    margin-top: calc(var(--zen-toolbar-height) * -2);
-  }
-  75% {
-    margin-top: 20px;
+    margin-top: -50vh;
   }
   100% {
-    margin-top: 0;
+    margin-top: -20%;
   }
 }
 
 @keyframes urlbar-appear-sideways {
   0% {
-    margin-left: -28vw;
-  }
-  75% {
-    margin-left: 20px;
+    margin-left: calc(-50% + calc(min(90%, 60rem) / 2));
   }
   100% {
-    margin-left: calc(-1 * var(--urlbar-margin-inline));
-  }
-}
-
-/*noinspection CssInvalidFunction*/
-@keyframes results-appear {
-  0% {
-    opacity: 0;
-    margin-top: -90vh;
-  }
-  50% {
-    opacity: 0;
-    margin-top: -90vh;
-  }
-  75% {
-    opacity: 0;
-    margin-top: 0;
-  }
-  100% {
-    opacity: 1;
+    margin-left: 0;
   }
 }
 
@@ -80,6 +55,7 @@ their author(s) have been provided above the used code.
     opacity: 0;
     scale: 0.5;
     background: var(--natsumi-colors-tertiary);
+    filter: blur(20px);
   }
   50% {
     opacity: 1;
@@ -88,6 +64,7 @@ their author(s) have been provided above the used code.
     opacity: 1;
     scale: var(--expand-width);
     background: light-dark(var(--natsumi-primary-color), var(--natsumi-colors-primary));
+    filter: blur(0);
   }
   100% {
     opacity: 1;
@@ -132,92 +109,20 @@ their author(s) have been provided above the used code.
   }
 }
 
-/* Adds new URLbar style if missing */
-
-@media (-moz-bool-pref: "natsumi.debug.legacy") {
-  * {
-    --urlbarView-item-inline-padding: 8px !important;
-    --urlbarView-item-block-padding: 12px !important;
-  }
-
-  #urlbar[breakout-extend] {
-    #identity-permission-box, #tracking-protection-icon-container, #page-action-buttons {
-      display: none !important;
-    }
-
-    #identity-icon-box {
-      margin-right: 8px !important;
-      padding-left: 9px !important;
-      padding-right: 3px !important;
-    }
-
-    #identity-box {
-      margin: 0 !important;
-    }
-
-    #urlbar-input {
-      font-size: 20px !important;
-      margin-left: 5px !important;
-      margin-right: 5px !important;
-    }
-  }
-
-  .urlbarView-row-inner {
-    border-radius: calc(var(--urlbarView-row-gutter) + var(--toolbarbutton-border-radius));
-  }
-
-  .urlbarView-title, .urlbarView-title-separator, .urlbarView-action, .urlbarView-url {
-    margin-top: auto !important;
-    margin-bottom: auto !important;
-  }
-
-  .urlbarView-title {
-    font-size: 14px !important;
-    font-weight: 500 !important;
-  }
-
-  .urlbarView-url, .urlbarView-title-separator::before {
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #aaa !important;
-  }
-
-  .urlbarView-favicon {
-    margin-left: 0 !important;
-    margin-right: 12px !important;
-    padding: 6px !important;
-    border-radius: 6px !important;
-  }
-
-  .urlbarView-row[has-action]:is([type="switchtab"], [type="remotetab"], [type="clipboard"]) .urlbarView-action {
-    margin-left: auto !important;
-    margin-right: 0 !important;
-  }
-
-  .urlbarView-row:hover, .urlbarView-row-inner[selected] {
-    background-color: var(--natsumi-colors-primary) !important;
-
-    .urlbarView-favicon {
-      background-color: white !important;
-    }
-
-    .urlbarView-url, .urlbarView-title-separator::before {
-      color: color-mix(in srgb, var(--natsumi-colors-primary) 30%, lightgray) !important;
-    }
-  }
-
-  .urlbarView-row:hover {
-    background: transparent;
-
-    .urlbarView-row-inner {
-      background: var(--natsumi-colors-primary) !important;
-    }
-  }
-}
-
 /* URLbar styling */
 
+/*noinspection CssInvalidFunction*/
 @media not (-moz-bool-pref: "natsumi.urlbar.disabled") {
+  :root[zen-compact-mode="true"] {
+    #urlbar {
+      transition: transform 0s linear !important;
+    }
+
+    #urlbar[breakout-extend] {
+      transform: translateX(-50%) !important;
+    }
+  }
+
   * {
     --urlbarView-item-block-padding: 4px !important;
     --urlbarView-item-inline-padding: 4px !important;
@@ -247,8 +152,14 @@ their author(s) have been provided above the used code.
         }
       }
 
+      .urlbarView-row[has-action][type="clipboard"] {
+        .urlbarView-title-separator::before {
+          opacity: 0 !important;
+        }
+      }
+
       &:not([action-override]) {
-        .urlbarView-row[has-action]:is([type="switchtab"], [type="remotetab"], [type="clipboard"]) {
+        .urlbarView-row[has-action]:is([type="switchtab"], [type="remotetab"]) {
           .urlbarView-action {
             margin-left: 8px !important;
           }
@@ -272,10 +183,6 @@ their author(s) have been provided above the used code.
         }
 
         #urlbar-results {
-          animation-name: results-appear;
-          animation-duration: var(--animation-duration);
-          counter-reset: results 0;
-
           .urlbarView-row {
             animation-name: individual-result-appear;
             animation-duration: var(--animation-duration);
@@ -380,10 +287,17 @@ their author(s) have been provided above the used code.
         }
       }
 
+      &[zen-newtab] {
+        #identity-icon {
+          list-style-image: url("chrome://browser/skin/zen-icons/plus.svg") !important;
+        }
+      }
+
       #urlbar-input {
         font-size: 20px !important;
-        margin-left: 2px !important;
+        margin-left: 1.5px !important;
         margin-right: 0 !important;
+        border-radius: 0 !important;
 
         @media (-moz-bool-pref: "zen.view.use-single-toolbar") {
           margin-left: 4px !important;
@@ -400,7 +314,7 @@ their author(s) have been provided above the used code.
       }
 
       #identity-icon-box {
-        margin-left: 1px !important;
+        margin-left: 1.5px !important;
         padding-left: 6px !important;
         padding-right: 6px !important;
         border-radius: var(--urlbar-icon-border-radius) !important;
@@ -416,23 +330,28 @@ their author(s) have been provided above the used code.
         }
       }
 
-      #identity-box {
-        &:is([pageproxystate="invalid"]).verifiedDomain {
-          image {
-            list-style-image: url('chrome://global/skin/icons/search-glass.svg') !important;
+      &:not([zen-newtab]) {
+        #identity-box {
+          &:is([pageproxystate="invalid"]).verifiedDomain {
+            image {
+              list-style-image: url('chrome://global/skin/icons/search-glass.svg') !important;
+            }
           }
         }
       }
 
       /*noinspection CssInvalidFunction*/
       #urlbar-background {
-        backdrop-filter: blur(var(--natsumi-glass-blur-radius));
+        backdrop-filter: blur(var(--natsumi-glass-blur-radius)) !important;
         background: var(--natsumi-glass-background) !important;
         transition: backdrop-filter 0.5s ease, background 0.5s ease;
+        border: 1px solid light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
+        border-radius: 15px !important;
+        outline: unset !important;
 
         /*noinspection CssInvalidFunction*/
         @media not (-moz-bool-pref: "natsumi.theme.disable-glass-shadow") {
-          box-shadow: 0 0 var(--natsumi-glass-shadow-size) color-mix(in srgb, var(--natsumi-colors-secondary) var(--natsumi-glass-shadow-opacity), light-dark(black, white)) !important;
+          box-shadow: 0 0 var(--natsumi-glass-shadow-size) var(--natsumi-glass-shadow-color) !important;
         }
 
         @media (-moz-bool-pref: "natsumi.urlbar.disable-transparency") {
@@ -442,14 +361,12 @@ their author(s) have been provided above the used code.
         }
       }
 
-      @media not (-moz-bool-pref: "natsumi.debug.legacy") {
-        #identity-box {
-          margin-right: 10px !important;
-        }
+      #identity-box {
+        margin-right: 10px !important;
+      }
 
-        .urlbar-input-container {
-          padding-inline: calc(var(--urlbar-margin-inline) + var(--urlbar-container-padding) - 2px) !important;
-        }
+      .urlbar-input-container {
+        padding-inline: calc(var(--urlbar-margin-inline) + var(--urlbar-container-padding) - 2px) !important;
       }
 
       @media (-moz-bool-pref: "natsumi.urlbar.force-nowrap") {
@@ -471,9 +388,7 @@ their author(s) have been provided above the used code.
       }
 
       &:not([zen-floating-urlbar="true"]) {
-        @media not (-moz-bool-pref: "natsumi.debug.legacy") {
-          animation: none !important;
-        }
+        animation: none !important;
 
         #identity-icon-box {
           margin-left: 10px !important;
@@ -523,6 +438,7 @@ their author(s) have been provided above the used code.
 
       &:hover #urlbar-background {
         background: color-mix(in srgb, var(--natsumi-primary-color) 40%, transparent) !important;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.3) !important;
       }
     }
   }
@@ -532,7 +448,7 @@ their author(s) have been provided above the used code.
 
     .urlbarView-row-inner {
       border-radius: 8px !important;
-      transition: background 0.2s ease;
+      transition: background 0.2s ease, transform 0.2s ease;
     }
 
     .urlbarView-title, .urlbarView-url {
@@ -546,7 +462,7 @@ their author(s) have been provided above the used code.
       margin-bottom: auto !important;
     }
 
-    .urlbarView-button {
+    .urlbarView-button-menu {
       display: inline-block !important;
       min-width: 0 !important;
       min-height: 0 !important;
@@ -574,10 +490,12 @@ their author(s) have been provided above the used code.
       background: transparent !important;
 
       .urlbarView-row-inner {
-        background: var(--urlbarView-hover-background) !important;
+        transform: scale(1.01, 1.01) !important;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.3) !important;
+        background-color: light-dark(var(--natsumi-primary-color), var(--natsumi-colors-primary)) !important;
       }
 
-      .urlbarView-button {
+      .urlbarView-button-menu {
         max-width: 24px !important;
         max-height: 24px !important;
         width: 24px !important;
@@ -588,29 +506,44 @@ their author(s) have been provided above the used code.
       }
     }
 
+    &:has(.urlbarView-button-menu:hover) {
+      transform: scale(1, 1) !important;
+
+      .urlbarView-row-inner {
+        transform: scale(1, 1) !important;
+        box-shadow: none !important;
+        background-color: transparent !important;
+      }
+
+      .urlbarView-favicon {
+        background-color: transparent !important;
+      }
+    }
+
+    &:not(:has(.urlbarView-button-menu:hover)) {
+      .urlbarView-row:hover .urlbarView-row-inner, .urlbarView-row-inner[selected] {
+        .urlbarView-no-wrap .urlbarView-favicon {
+          background-color: color-mix(in srgb, light-dark(rgba(0, 0, 0, 0.3), var(--natsumi-colors-primary-foreground)) 50%, transparent) !important;
+        }
+
+        .urlbarView-url {
+          color: light-dark(var(--natsumi-colors-primary), var(--natsumi-colors-primary-foreground)) !important;
+        }
+      }
+    }
+
     .urlbarView-row-inner[selected] {
-      background: var(--urlbarView-hover-background) !important;
+      transform: scale(1.01, 1.01) !important;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.3) !important;
+      background-color: light-dark(var(--natsumi-primary-color), var(--natsumi-colors-primary)) !important;
     }
   }
 
-  /*noinspection CssInvalidFunction*/
   .urlbarView-row-inner .urlbarView-url {
     color: light-dark(var(--natsumi-colors-primary), var(--natsumi-colors-primary-foreground)) !important;
   }
 
-  .urlbarView-row:hover .urlbarView-row-inner, .urlbarView-row-inner[selected] {
-    /*noinspection CssInvalidFunction*/
-    .urlbarView-no-wrap .urlbarView-favicon {
-      background-color: color-mix(in srgb, light-dark(var(--natsumi-primary-color), var(--natsumi-colors-primary-foreground)) 50%, transparent) !important;
-    }
-
-    /*noinspection CssInvalidFunction*/
-    .urlbarView-url {
-      color: light-dark(var(--natsumi-colors-primary), var(--natsumi-colors-primary-foreground)) !important;
-    }
-  }
-
-  .urlbarView-action, .urlbarView-button,
+  .urlbarView-action, .urlbarView-button:not(.urlbarView-button-menu),
   .searchbar-engine-one-off-item {
     --urlbar-box-focus-bgcolor: color-mix(in srgb, currentColor 16%, transparent);
     transition: background-color 0.2s ease !important;
@@ -634,5 +567,79 @@ their author(s) have been provided above the used code.
   /*noinspection CssInvalidFunction*/
   .urlbarView-body-inner, .search-one-offs {
     border-top: 1px solid light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.2)) !important;
+  }
+
+  /* Compact URLbar */
+
+  @media (-moz-bool-pref: "natsumi.urlbar.compact") {
+    @media not (-moz-bool-pref: "zen.view.use-single-toolbar") {
+      @media (-moz-bool-pref: "zen.tabs.vertical") {
+
+        #urlbar:not([breakout-extend="true"]) {
+          --urlbar-anim-time: 0.2s;
+
+          #urlbar-background {
+            opacity: 1 !important;
+            transition: opacity var(--urlbar-anim-time) ease, background-color 0.2s ease 0s, box-shadow 0.2s ease 0s;
+          }
+
+          .urlbar-input-container {
+            max-width: 100% !important;
+            left: 0 !important;
+            transition: max-width var(--urlbar-anim-time) ease, left var(--urlbar-anim-time) ease;
+          }
+
+          .urlbar-input-box {
+            text-align: center !important;
+          }
+
+          #identity-icon-box {
+            transition: padding var(--urlbar-anim-time) ease, background var(--urlbar-anim-time) ease;
+          }
+
+          #tracking-protection-icon-container, .urlbar-page-action {
+            transition: width var(--urlbar-anim-time) ease, opacity var(--urlbar-anim-time) ease, margin var(--urlbar-anim-time) ease;
+          }
+        }
+
+        #zen-appcontent-navbar-container:not(:hover) {
+          #urlbar:not([breakout-extend="true"]):not(:hover):not([focused]):not(:has(.urlbar-page-action[open], #tracking-protection-icon-container[open], .identity-box-button[open])) {
+            & > *, #tracking-protection-icon-container, .urlbar-page-action, #identity-icon-box {
+              transition-delay: 0.5s !important;
+            }
+
+            #identity-icon-box {
+              padding-left: 6px !important;
+              padding-right: 6px !important;
+              background: none !important;
+            }
+
+            #tracking-protection-icon-container, .urlbar-page-action {
+              width: 0 !important;
+              opacity: 0 !important;
+              margin: 0 !important;
+            }
+
+            #urlbar-background {
+              opacity: 0 !important;
+              transition: opacity var(--urlbar-anim-time) ease, background-color 0.2s ease 0s, box-shadow 0s ease 0s !important;
+            }
+
+            .urlbar-input-container {
+              max-width: 300px !important;
+              left: calc(50% - 150px) !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media not (-moz-bool-pref: "natsumi.theme.disable-blur") {
+    @media not (-moz-bool-pref: "natsumi.urlbar.disable-transparency") {
+      #browser:has(#urlbar[breakout-extend]) .deck-selected browser {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+      }
+    }
   }
 }
