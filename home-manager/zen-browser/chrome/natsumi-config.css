@@ -11,17 +11,17 @@ as they use the correct format.
   --natsumi-pages-accent-color: #a0d490;
 
   /* Natsumi Glass Effect */
-  --glass-blur-radius: 10px;
+  --glass-blur-radius: 20px;
   --glass-shadow-size: 10px;
   --glass-shadow-opacity: 75%;
 
   /* Natsumi URLbar appear animations */
   --urlbar-appear-animation-duration: 0.25s;
   --urlbar-results-animation-duration: 0.5s;
-  --urlbar-individual-result-animation-duration: 1s;
-  --urlbar-individual-result-animation-delay: 0.1s;
-  --urlbar-individual-result-animation-delay-offset: 0.3s;
-  --urlbar-individual-result-expand-size: 1.1;
+  --urlbar-individual-result-animation-duration: 0.75s;
+  --urlbar-individual-result-animation-delay: 0.05s;
+  --urlbar-individual-result-animation-delay-offset: 0.05s;
+  --urlbar-individual-result-expand-size: 1.05;
 
   /* Natsumi border reload animations */
   --reload-border-animation-duration: 0.2s;
@@ -41,6 +41,12 @@ as they use the correct format.
   --ff-sidebar-x-offset: 20px;
   --ff-sidebar-y-offset: 20px;
 
+  /* Custom fonts experiment (must be an installed font) */
+  --custom-font: 'Nunito';
+
   /* pdf.js */
   --pdfjs-topbar-max-width: 750px; /* use calc(100% - 10px) for max width */
+
+  /* FF home */
+  --home-background-url: url('');
 }
