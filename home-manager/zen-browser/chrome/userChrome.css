@@ -1,0 +1,14 @@
+/*
+
+This is an example userChrome.css file. Use it if you don't already have a userChrome file.
+If you already have one, append the import statement below at the top of your userChrome file.
+
+*/
+
+@import "natsumi/natsumi.css";
+
+* {
+  font-family: "Inter" !important;
+}
+
+/* You can import additional mods above, or add your own userchrome CSS below. */

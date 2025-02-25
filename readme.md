@@ -15,4 +15,3 @@
 - [x] Clipse binds
 - [ ] Theme better
 - [ ] Use tmux instead of wezterm tabs
-- [ ] Waybar power menu
