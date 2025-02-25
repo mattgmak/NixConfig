@@ -4,14 +4,6 @@
 let source_dir = $"($env.HOME)/.zen/GoofyZen/chrome"
 let target_dir = $"($env.HOME)/NixConfig/home-manager/zen-browser/chrome"
 
-# Remove existing target directory if it exists
-if ($target_dir | path exists) {
-    rm -rf $target_dir
-}
-
-# Create target directory
-mkdir $target_dir
-
 # Function to recursively copy files, excluding hm-backup files
 def copy_recursive [source, target] {
     # Create the target directory if it doesn't exist
@@ -20,15 +12,26 @@ def copy_recursive [source, target] {
     }
 
     # Get all files and directories in the source
-    let items = (ls $source)
+    let items = (ls -a $source)
 
     # Process each item
     for item in $items {
         let item_name = $item.name
         let base_name = ($item_name | path basename)
 
+        # Skip . and .. directories
+        if $base_name == "." or $base_name == ".." {
+            continue
+        }
+
         # Skip files ending with hm-backup
         if ($base_name | str ends-with ".hm-backup") {
+            continue
+        }
+
+        # Skip symlinks
+        if ($item_name | path type) == "symlink" {
+            print $"Skipping symlink: ($item_name)"
             continue
         }
 
