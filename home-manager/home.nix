@@ -17,6 +17,7 @@
     ./onedrive
     ./termfilechooser
     ./zen-browser
+    ./git
   ];
   home = {
     username = "goofy";

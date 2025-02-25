@@ -194,6 +194,7 @@ in {
     btop
     termfilechooser
     zenity
+    gh
   ];
 
   # Input remapper
@@ -281,10 +282,7 @@ in {
         hyprland."org.freedesktop.impl.portal.FileChooser" =
           [ "xdg-desktop-portal-termfilechooser" ];
       };
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-        termfilechooser
-      ];
+      extraPortals = [ pkgs.xdg-desktop-portal-gtk termfilechooser ];
     };
   };
 
