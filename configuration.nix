@@ -297,7 +297,7 @@ in {
     enable = true;
     polarity = "dark";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/dracula.yaml";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/darkviolet.yaml";
+    base16Scheme = ./color-scheme.yaml;
     image = ./resources/beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
