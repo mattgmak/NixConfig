@@ -9,7 +9,7 @@ run = [
 ]
 
 [[manager.prepend_keymap]]
-on = ["s"]
+on = ["<Backspace>"]
 run = "plugin searchjump"
 desc = "Searchjump mode"
 
