@@ -40,7 +40,9 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- toggle relative line numbering
-vim.keymap.set('n', '<leader>ln', ':set relativenumber!<cr>')
+vim.keymap.set('n', '<leader>ln', ':set relativenumber!<cr>', {
+    silent = true
+})
 
 -- void change
 vim.keymap.set('n', 'c', '"_c', {

@@ -928,6 +928,8 @@ use ~/.cache/starship/init.nu
 
 source ~/.zoxide.nu
 
+let flakeDir = $'($env.HOME)/NixConfig'
+
 def --env y [...args] {
 	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
 	yazi ...$args --cwd-file $tmp
@@ -951,7 +953,7 @@ def --env gbash [...args] {
 }
 
 def --env nixrb [...args] {
-    sudo nixos-rebuild switch --flake $'($env.HOME)/NixConfig#goofy' -I nixos-config=($env.HOME)/NixConfig/configuration.nix ...$args
+    sudo nixos-rebuild switch --flake $'($flakeDir)#goofy' -I nixos-config=($flakeDir)/configuration.nix ...$args
     # sudo nixos-rebuild switch --flake ~/NixConfig#goofy -I nixos-config=~/NixConfig/configuration.nix
 }
 
@@ -961,6 +963,10 @@ def --env cu [...args] {
 
 def --env sucu [...args] {
     sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox --ozone-platform=wayland ...$args
+}
+
+def --env d [target] {
+    nix develop $'($flakeDir)/#($target)'
 }
 
 source ~/.local/share/atuin/init.nu
