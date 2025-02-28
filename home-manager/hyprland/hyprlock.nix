@@ -6,6 +6,7 @@
       general = {
         hide_cursor = true;
         ignore_empty_input = true;
+        unlock_cmd = "nmcli radio wifi on";
       };
       background = [{
         path = "screenshot";
