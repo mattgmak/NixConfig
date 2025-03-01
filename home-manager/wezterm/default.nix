@@ -1,8 +1,8 @@
 { ... }:
 let
 in {
-  home.file = {
-    ".config/wezterm".source = ./config;
+  home.file.".config/wezterm" = {
+    source = ./config;
     recursive = true;
   };
 }
