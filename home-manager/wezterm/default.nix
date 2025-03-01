@@ -1,3 +1,8 @@
 { ... }:
 let
-in { home.file = { ".config/wezterm/wezterm.lua".source = ./wezterm.lua; }; }
+in {
+  home.file = {
+    ".config/wezterm".source = ./config;
+    recursive = true;
+  };
+}

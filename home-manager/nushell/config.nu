@@ -1,4 +1,4 @@
-# Nushell Config File from home-manager
+# Nushell Config File
 #
 # version = "0.99.1"
 
