@@ -3,30 +3,26 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local config = wezterm.config_builder()
 
-local copy_mode = nil
-if wezterm.gui then
-    copy_mode = wezterm.gui.default_key_tables().copy_mode
-    table.insert(copy_mode, {
+config.key_tables = wezterm.gui.default_key_tables()
+config.key_tables = {
+    copy_mode = {{
         key = 'j',
         mods = 'NONE',
         action = act.CopyMode 'MoveUp'
-    })
-    table.insert(copy_mode, {
+    }, {
         key = 'k',
         mods = 'NONE',
         action = act.CopyMode 'MoveDown'
-    })
-    table.insert(copy_mode, {
+    }, {
         key = 'l',
         mods = 'NONE',
         action = act.CopyMode 'MoveLeft'
-    })
-    table.insert(copy_mode, {
+    }, {
         key = ';',
         mods = 'NONE',
         action = act.CopyMode 'MoveRight'
-    })
-end
+    }}
+}
 
 -- tmux
 config.leader = {
@@ -98,12 +94,12 @@ config.keys = {{
     action = wezterm.action.AdjustPaneSize {"Up", 5}
 }}
 
-for i = 0, 9 do
+for i = 1, 9 do
     -- leader + number to activate that tab
     table.insert(config.keys, {
         key = tostring(i),
         mods = "LEADER",
-        action = wezterm.action.ActivateTab(i)
+        action = wezterm.action.ActivateTab(i - 1)
     })
 end
 
