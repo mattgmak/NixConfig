@@ -56,6 +56,23 @@ window.HDMI-A-1 #pulseaudio {
   color: @text;
 }
 
+#custom-power {
+  background: @surface0;
+  color: @blue;
+  border-radius: 10px;
+  margin: 0px 2.5px;
+  margin-left: 5px;
+  padding: 0.1rem 0.7rem;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+
+#custom-power:hover {
+  background: @blue;
+  color: @crust;
+}
+
 #custom-spacer {
   background: @surface0;
   color: @crust;

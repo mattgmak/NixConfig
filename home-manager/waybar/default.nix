@@ -1,6 +1,15 @@
 # https://github.com/Alexays/Waybar
-{
+{ pkgs, config, ... }: {
   stylix.targets.waybar.enable = false;
+
+  # Link the power menu script to the user's config directory
+  home.file = {
+    ".config/waybar/scripts/power-menu.sh" = {
+      source = ./scripts/power-menu.sh;
+      executable = true;
+    };
+  };
+
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -13,7 +22,7 @@
         margin-top = 5;
         reload_style_on_change = true;
         modules-left = [
-          "custom/spacer"
+          "custom/power"
           "hyprland/workspaces"
           "wlr/taskbar"
           "hyprland/window"
@@ -32,7 +41,12 @@
         ];
 
         # Module configuration: Left
-        "custom/spacer" = { format = "❄️"; };
+        "custom/power" = {
+          format = "❄️";
+          tooltip = "Power Menu";
+          on-click =
+            "${pkgs.bash}/bin/bash ${config.home.homeDirectory}/.config/waybar/scripts/power-menu.sh";
+        };
         "hyprland/workspaces" = {
           disable-scroll = false;
           all-outputs = false;
