@@ -2,7 +2,6 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
 local config = wezterm.config_builder()
-local setup_tab_bar = require("modules.tab_bar")
 
 local copy_mode = nil
 if wezterm.gui then
@@ -108,10 +107,6 @@ for i = 0, 9 do
     })
 end
 
--- tab bar configuration is now in a separate file
-setup_tab_bar(config)
-
-config.front_end = "OpenGL"
 config.default_prog = {'nu'}
 config.max_fps = 240
 config.animation_fps = 1
@@ -134,13 +129,13 @@ config.window_frame = {
         family = "IosevkaTerm Nerd Font",
         weight = "Bold"
     }),
-    -- font_size = 14.0
     active_titlebar_bg = '#232136',
     inactive_titlebar_bg = '#232136'
 }
 
 config.initial_cols = 80
-config.enable_wayland = true
+config.enable_wayland = false
 config.front_end = "WebGpu"
 
+require("modules.tab_bar").setup(config)
 return config

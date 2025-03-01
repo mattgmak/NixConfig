@@ -8,42 +8,24 @@ local function setup_tab_bar(config)
     config.use_fancy_tab_bar = false
     config.tab_and_split_indices_are_zero_based = true
 
-    config.colors = {
-        tab_bar = {
-            background = '#232136',
-            active_tab = {
-                bg_color = '#7e5ce5',
-                fg_color = '#FFFFFF'
-            },
-            inactive_tab = {
-                bg_color = '#232136',
-                fg_color = '#FFFFFF'
-            },
-            new_tab = {
-                bg_color = '#232136',
-                fg_color = '#FFFFFF'
-            }
-        }
-    }
-
     -- Set up tabline plugin
     tabline.setup({
         options = {
             icons_enabled = true,
-            theme = 'Catppuccin Mocha',
+            theme = config.colors,
             tabs_enabled = true,
             theme_overrides = {},
             section_separators = {
-                left = wezterm.nerdfonts.pl_left_hard_divider,
-                right = wezterm.nerdfonts.pl_right_hard_divider
+                left = wezterm.nerdfonts.ple_left_half_circle_thick,
+                right = wezterm.nerdfonts.ple_right_half_circle_thick
             },
             component_separators = {
-                left = wezterm.nerdfonts.pl_left_soft_divider,
-                right = wezterm.nerdfonts.pl_right_soft_divider
+                left = wezterm.nerdfonts.ple_left_half_circle_thin,
+                right = wezterm.nerdfonts.ple_right_half_circle_thin
             },
             tab_separators = {
-                left = wezterm.nerdfonts.pl_left_hard_divider,
-                right = wezterm.nerdfonts.pl_right_hard_divider
+                left = wezterm.nerdfonts.ple_left_half_circle_thick,
+                right = wezterm.nerdfonts.ple_right_half_circle_thick
             }
         },
         sections = {
@@ -70,8 +52,8 @@ local function setup_tab_bar(config)
                     right = 1
                 }
             }},
-            tabline_x = {'ram', 'cpu'},
-            tabline_y = {'datetime', 'battery'},
+            -- tabline_x = {'ram', 'cpu'},
+            -- tabline_y = {'datetime', 'battery'},
             tabline_z = {'domain'}
         },
         extensions = {}
@@ -81,4 +63,6 @@ local function setup_tab_bar(config)
     return config
 end
 
-return setup_tab_bar
+return {
+    setup = setup_tab_bar
+}
