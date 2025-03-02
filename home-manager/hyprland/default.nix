@@ -10,6 +10,7 @@
     hyprland
     hyprpaper
     hypridle
+    hyprpicker
     hdrop
     libinput
     networkmanagerapplet
@@ -83,6 +84,7 @@
         # Utility binds
         "SUPER, V, exec, wezterm start --class clipse -e clipse"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
+        "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
         # Focus binds
         "SUPER, R, exec, zen"
