@@ -44,8 +44,7 @@
         "custom/power" = {
           format = "❄️";
           tooltip = "Power Menu";
-          on-click =
-            "${pkgs.bash}/bin/bash ${config.home.homeDirectory}/.config/waybar/scripts/power-menu.sh";
+          on-click = "wlogout";
         };
         "hyprland/workspaces" = {
           disable-scroll = false;
@@ -97,8 +96,8 @@
           format-bluetooth = "{volume}% {icon}  {format_source}";
           format-bluetooth-muted = " {icon}   {format_source}";
           format-muted = " {format_source}";
-          format-source = " {volume}% ";
-          format-source-muted = " ";
+          format-source = " {volume}% 󰍬";
+          format-source-muted = " 󰍭";
           format-icons = {
             headphone = "";
             hands-free = "";

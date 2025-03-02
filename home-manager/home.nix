@@ -18,6 +18,7 @@
     ./termfilechooser
     ./zen-browser
     ./git
+    ./wlogout
   ];
   home = {
     username = "goofy";
