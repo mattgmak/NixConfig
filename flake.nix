@@ -33,7 +33,7 @@
   outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix, ... }@inputs:
     let
       username = "goofy";
-      hostname = "GoofyNixie";
+      hostname = "GoofyEnvy";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
@@ -49,7 +49,16 @@
         specialArgs = { inherit inputs hostname username pkgs pkgs-stable; };
         modules = [
           ./configuration.nix
-          home-manager.nixosModules.default
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs; };
+              backupFileExtension = "hm-backup";
+              users.goofy = import ./home-manager/home.nix;
+            };
+          }
           stylix.nixosModules.stylix
         ];
       };

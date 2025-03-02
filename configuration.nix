@@ -11,7 +11,6 @@ let
 in {
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    inputs.home-manager.nixosModules.default
     inputs.xremap-flake.nixosModules.default
   ];
 
@@ -26,7 +25,7 @@ in {
 
   # fileSystems."/mnt/windows" = {
   #   device = "/dev/nvme0n1p5";
-  #   fsType = "ntfs-3g";
+  #   fsType = "ntfs-3g"t;
   #   options = [ "rw" "uid=1000" ];
   # };
 
@@ -125,12 +124,6 @@ in {
     extraGroups = [ "networkmanager" "wheel" "adbusers" "input" ];
     shell = pkgs.nushell;
     # packages = with pkgs; [ ];
-  };
-
-  home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    backupFileExtension = "hm-backup";
-    users.goofy = import ./home-manager/home.nix;
   };
 
   # Install firefox.

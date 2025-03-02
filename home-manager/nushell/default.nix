@@ -1,10 +1,4 @@
-{ ... }:
-let
-  # startupScript = pkgs.pkgs.writeShellScriptBin "start" ''
-  #   ${pkgs.waybar}/bin/waybar &
-  #   clipse -listen &
-  # '';
-in {
+{ ... }: {
   home.file = {
     ".config/nushell/config.nu".source = ./config.nu;
     ".config/nushell/env.nu".source = ./env.nu;

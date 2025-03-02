@@ -1,14 +1,6 @@
 # https://github.com/Alexays/Waybar
-{ pkgs, config, ... }: {
+{ ... }: {
   stylix.targets.waybar.enable = false;
-
-  # Link the power menu script to the user's config directory
-  home.file = {
-    ".config/waybar/scripts/power-menu.sh" = {
-      source = ./scripts/power-menu.sh;
-      executable = true;
-    };
-  };
 
   programs.waybar = {
     enable = true;
