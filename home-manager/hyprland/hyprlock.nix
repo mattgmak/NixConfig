@@ -1,4 +1,4 @@
-{
+{ config, ... }: {
   stylix.targets.hyprlock.enable = false;
   programs.hyprlock = {
     enable = true;
@@ -17,6 +17,28 @@
         vibrancy = 0.1696;
         vibrancy_darkness = 0.0;
       }];
+      label = [
+        {
+          monitor = "";
+          text = ''cmd[update:1000] echo "$(date +"%A, %B %d")"'';
+          color = "rgba(242, 243, 244, 0.75)";
+          font_size = 22;
+          font_family = "IosevkaTerm Nerd Font";
+          position = "0, 300";
+          halign = "center";
+          valign = "center";
+        }
+        {
+          monitor = "";
+          text = ''cmd[update:1000] echo "$(date +"%-I:%M")"'';
+          color = "rgba(242, 243, 244, 0.75)";
+          font_size = 95;
+          font_family = "IosevkaTerm Nerd Font";
+          position = "0, 200";
+          halign = "center";
+          valign = "center";
+        }
+      ];
       input-field = [{
         size = "200, 50";
         halign = "center";
@@ -29,8 +51,8 @@
         font_family = "IosevkaTerm Nerd Font";
         font_color = "rgb(205, 214, 244)";
         inner_color = "rgb(30, 30, 46)";
-        outer_color = "rgb(203, 166, 247)";
-        outline_thickness = 5;
+        outer_color = "rgb(${config.lib.stylix.colors.base0A})";
+        outline_thickness = 2;
         placeholder_text = "<i>Password...</i>";
         shadow_passes = 2;
         check_color = "rgb(166, 227, 161)";
