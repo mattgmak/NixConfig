@@ -13,6 +13,9 @@ touch "$LOG_FILE" 2>/dev/null || {
   touch "$LOG_FILE"
 }
 
+# Clear the log file
+>"$LOG_FILE"
+
 # Log function
 log_message() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%3N')] $1" >>"$LOG_FILE"
@@ -44,12 +47,12 @@ if [ -f "$LOCK_FILE" ]; then
 
   log_message "Lock file exists, age: ${DIFF}ms"
 
-  if [ "$DIFF" -lt 500 ]; then
-    # Less than 500ms since last execution, exit
-    log_message "Debounced: exiting without toggling mic (< 500ms)"
+  if [ "$DIFF" -lt 1000 ]; then
+    # Less than 1000ms since last execution, exit
+    log_message "Debounced: exiting without toggling mic (< 1000ms)"
     exit 0
   else
-    log_message "Lock file older than 500ms, proceeding"
+    log_message "Lock file older than 1000ms, proceeding"
   fi
 else
   log_message "No lock file found, proceeding"
