@@ -1,6 +1,9 @@
 { pkgs, config, ... }: {
   home.packages = with pkgs; [ wlogout ];
-  home.file = {
+  home.file = let
+    imageDir =
+      "/etc/profiles/per-user/${config.home.username}/share/wlogout/icons";
+  in {
     ".config/wlogout/style.css".text = ''
       * {
         background-image: none;
@@ -12,12 +15,16 @@
       }
 
       button {
-        border-radius: 16;
+        border-radius: 10px;
         border-color: black;
         text-decoration-color: #FFFFFF;
+        margin: 10px;
+        font-size: 24px;
         color: #FFFFFF;
-        background-color: ${config.lib.stylix.colors.base01};
-        margin: 5px;
+        background-color: #${config.lib.stylix.colors.base01};
+        border-style: solid;
+        border-width: 5px;
+        border-color: #${config.lib.stylix.colors.base0A};
         background-repeat: no-repeat;
         background-position: center;
         background-size: 25%;
@@ -26,32 +33,38 @@
       button:focus,
       button:active,
       button:hover {
-        background-color: ${config.lib.stylix.colors.base0A};
+        border-color: #${config.lib.stylix.colors.base0C};
         outline-style: none;
       }
 
       #lock {
-        background-image: image(url("/usr/share/wlogout/icons/lock.png"), url("/usr/local/share/wlogout/icons/lock.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/lock.png"), url("${imageDir}/lock.png"));
       }
 
       #logout {
-        background-image: image(url("/usr/share/wlogout/icons/logout.png"), url("/usr/local/share/wlogout/icons/logout.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/logout.png"), url("${imageDir}/logout.png"));
       }
 
       #suspend {
-        background-image: image(url("/usr/share/wlogout/icons/suspend.png"), url("/usr/local/share/wlogout/icons/suspend.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/suspend.png"), url("${imageDir}/suspend.png"));
       }
 
       #hibernate {
-        background-image: image(url("/usr/share/wlogout/icons/hibernate.png"), url("/usr/local/share/wlogout/icons/hibernate.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/hibernate.png"), url("${imageDir}/hibernate.png"));
       }
 
       #shutdown {
-        background-image: image(url("/usr/share/wlogout/icons/shutdown.png"), url("/usr/local/share/wlogout/icons/shutdown.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/shutdown.png"), url("${imageDir}/shutdown.png"));
       }
 
       #reboot {
-        background-image: image(url("/usr/share/wlogout/icons/reboot.png"), url("/usr/local/share/wlogout/icons/reboot.png"));
+        margin: 10px;
+        background-image: image(url("${imageDir}/reboot.png"), url("${imageDir}/reboot.png"));
       }
     '';
     ".config/wlogout/layout".text = ''
