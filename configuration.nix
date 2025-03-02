@@ -275,7 +275,7 @@ in {
       xdgOpenUsePortal = true;
       config = {
         common.default = [ "gtk" ];
-        hyprland.default = [ "hyprland" "gtk" ];
+        hyprland.default = [ "gtk" "hyprland" ];
         hyprland."org.freedesktop.impl.portal.FileChooser" =
           [ "xdg-desktop-portal-termfilechooser" ];
       };
@@ -299,6 +299,7 @@ in {
     cursor = {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
+      size = 24;
     };
     fonts = {
       monospace = {

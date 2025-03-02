@@ -11,6 +11,7 @@
     hyprpaper
     hypridle
     hyprpicker
+    hyprpolkitagent
     hdrop
     libinput
     networkmanagerapplet
@@ -142,7 +143,7 @@
       };
       exec-once = [
         "hyprpaper"
-        # "hyprctl setcursor Bibata-Original-Ice 24"
+        "systemctl --user start hyprpolkitagent"
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"
