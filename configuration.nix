@@ -6,7 +6,7 @@ let
     (pkgs.callPackage ./packages/xdg-desktop-portal-termfilechooser { });
 in {
   imports = [
-    ./hardware-configuration.nix
+    ./hosts/${hostname}/hardware-configuration.nix
     ./modules/input-remapper.nix
     ./modules/styles.nix
     inputs.xremap-flake.nixosModules.default

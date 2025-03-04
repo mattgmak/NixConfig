@@ -3,7 +3,7 @@
 ## To-dos
 
 - [ ] Better README file
-- [ ] Power menu on waybar
+- [x] Power menu on waybar
 - [ ] Custom Cursor package
 - [x] Home managed zen browser chrome
 - [ ] Improve hyprland workspaces
