@@ -19,6 +19,7 @@
     ./zen-browser
     ./git
     ./wlogout
+    ./direnv
   ];
   home = {
     username = "goofy";
