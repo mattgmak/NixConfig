@@ -7,4 +7,5 @@
       nix-direnv.enable = true;
     };
   };
+  home.file = { "test/.envrc".source = ./test/.envrc; };
 }
