@@ -924,9 +924,6 @@ $env.config = {
     ]
 }
 
-use ~/.cache/starship/init.nu
-
-source ~/.zoxide.nu
 
 let flakeDir = $'($env.HOME)/NixConfig'
 
@@ -969,8 +966,13 @@ def --env d [target] {
     nix develop $'($flakeDir)/#($target)'
 }
 
-source ~/.local/share/atuin/init.nu
-
-use ~/.config/nushell/scripts/conda.nu
+use ./scripts/starship.nu
+source ./scripts/.zoxide.nu
+source ./scripts/atuin.nu
+use ./scripts/conda.nu
 
 $env.CONDA_NO_PROMPT = true
+
+$env.config.hooks.pre_prompt = (
+    $env.config.hooks.pre_prompt | append (source ./scripts/direnv.nu)
+)
