@@ -1,4 +1,4 @@
-{ pkgs, inputs, lib, hostname, username, ... }:
+{ pkgs, inputs, hostname, username, ... }:
 
 let
   system = pkgs.stdenv.hostPlatform.system;
@@ -132,7 +132,7 @@ in {
   # Define a user account. Don't forget to set a password with 'passwd'.
   users.users.${username} = {
     isNormalUser = true;
-    description = lib.toSentenceCase username;
+    description = "Goofy";
     extraGroups = [ "networkmanager" "wheel" "adbusers" "input" ];
     shell = pkgs.nushell;
   };
