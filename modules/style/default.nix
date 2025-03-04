@@ -10,7 +10,7 @@
     enable = true;
     polarity = "dark";
     base16Scheme = ./color-scheme.yaml;
-    image = ./resources/beautiful-mountains-landscape.jpg;
+    image = ./beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";

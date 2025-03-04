@@ -8,7 +8,7 @@ in {
   imports = [
     ./hosts/${hostname}/hardware-configuration.nix
     ./modules/input-remapper.nix
-    ./modules/styles.nix
+    ./modules/style
     inputs.xremap-flake.nixosModules.default
   ];
 
