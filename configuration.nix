@@ -197,6 +197,7 @@ in {
     zenity
     gh
     onedrivegui
+    base16-shell-preview
   ];
 
   programs.hyprland = {
