@@ -4,25 +4,27 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 config.key_tables = wezterm.gui.default_key_tables()
-config.key_tables = {
-    copy_mode = {{
-        key = 'j',
-        mods = 'NONE',
-        action = act.CopyMode 'MoveUp'
-    }, {
-        key = 'k',
-        mods = 'NONE',
-        action = act.CopyMode 'MoveDown'
-    }, {
-        key = 'l',
-        mods = 'NONE',
-        action = act.CopyMode 'MoveLeft'
-    }, {
-        key = ';',
-        mods = 'NONE',
-        action = act.CopyMode 'MoveRight'
-    }}
-}
+-- Copy mode key bindings
+table.insert(config.key_tables.copy_mode, {
+    key = 'j',
+    mods = 'NONE',
+    action = act.CopyMode 'MoveUp'
+})
+table.insert(config.key_tables.copy_mode, {
+    key = 'k',
+    mods = 'NONE',
+    action = act.CopyMode 'MoveDown'
+})
+table.insert(config.key_tables.copy_mode, {
+    key = 'l',
+    mods = 'NONE',
+    action = act.CopyMode 'MoveLeft'
+})
+table.insert(config.key_tables.copy_mode, {
+    key = ';',
+    mods = 'NONE',
+    action = act.CopyMode 'MoveRight'
+})
 
 -- tmux
 config.leader = {
