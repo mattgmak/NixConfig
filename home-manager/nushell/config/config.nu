@@ -925,6 +925,11 @@ $env.config = {
 }
 
 
+use ./scripts/starship.nu
+source ./scripts/.zoxide.nu
+source ./scripts/atuin.nu
+use ./scripts/conda.nu
+
 let flakeDir = $'($env.HOME)/NixConfig'
 
 def --env y [...args] {
@@ -965,11 +970,6 @@ def --env sucu [...args] {
 def --env d [target] {
     nix develop $'($flakeDir)/#($target)'
 }
-
-use ./scripts/starship.nu
-source ./scripts/.zoxide.nu
-source ./scripts/atuin.nu
-use ./scripts/conda.nu
 
 $env.CONDA_NO_PROMPT = true
 
