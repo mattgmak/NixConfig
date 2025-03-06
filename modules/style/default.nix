@@ -9,7 +9,8 @@
   stylix = {
     enable = true;
     polarity = "dark";
-    base16Scheme = ./color-scheme.yaml;
+    # rebecca, paraiso, mellow-purple
+    base16Scheme = ./color-scheme/rebecca.yaml;
     image = ./beautiful-mountains-landscape.jpg;
     cursor = {
       package = pkgs.bibata-cursors;
