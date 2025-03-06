@@ -110,7 +110,7 @@ config.max_fps = 240
 config.animation_fps = 1
 config.term = "xterm-256color" -- Set the terminal type
 
--- config.color_scheme = 'duskfox'
+config.color_scheme = 'rebecca'
 config.font = wezterm.font_with_fallback {'IosevkaTerm Nerd Font', 'Noto Sans CJK HK'}
 config.default_cursor_style = "SteadyBlock"
 config.window_decorations = "RESIZE"
