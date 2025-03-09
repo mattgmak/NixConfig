@@ -20,7 +20,6 @@
     ./git
     ./wlogout
     ./direnv
-    ./xdg-desktop-portal
   ];
   home = {
     username = "goofy";
