@@ -141,19 +141,28 @@ if is_vscode then
 
     vim.keymap.set({'n', 'x', 'i'}, '<c-y>', function()
         cursors.addSelectionToNextFindMatch()
-    end)
+    end, {
+        silent = true
+    })
 
     vim.keymap.set({'n', 'x', 'i'}, '<cs-y>', function()
         cursors.addSelectionToPreviousFindMatch()
-    end)
+    end, {
+        silent = true
+    })
 
     vim.keymap.set({'n', 'x', 'i'}, '<cs-o>', function()
         cursors.selectHighlights()
-    end)
+    end, {
+        silent = true
+    })
 
-    vim.keymap.set('n', 'mcm', cursors.cancel)
+    vim.keymap.set('n', 'mcm', cursors.cancel, {
+        silent = true
+    })
     vim.keymap.set('n', '<c-y>', 'mciw*:nohl<cr>', {
-        remap = true
+        remap = true,
+        silent = true
     })
 
     local vscode = require("vscode")

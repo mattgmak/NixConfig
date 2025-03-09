@@ -46,7 +46,9 @@
     in {
       nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs hostname username pkgs pkgs-stable; };
+        specialArgs = {
+          inherit inputs hostname username pkgs pkgs-stable system;
+        };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager

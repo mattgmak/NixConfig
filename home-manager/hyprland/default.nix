@@ -25,8 +25,20 @@
     python312Packages.toggl-cli
   ];
   wayland.windowManager.hyprland = {
+    package = null;
+    portalPackage = null;
     enable = true;
-    xwayland.enable = true;
+    systemd.enable = true;
+    systemd.variables = [
+      "DISPLAY"
+      "HYPRLAND_INSTANCE_SIGNATURE"
+      "WAYLAND_DISPLAY"
+      "XDG_CURRENT_DESKTOP"
+      "XDG_SESSION_DESKTOP"
+      "XDG_SESSION_TYPE"
+      "DESKTOP_SESSION"
+    ];
+
     sourceFirst = true;
     settings = {
       "$mod" = "ALT";
@@ -144,6 +156,8 @@
       exec-once = [
         "hyprpaper"
         "systemctl --user start hyprpolkitagent"
+        # "systemctl --user start xdg-desktop-portal-hyprland.service"
+        # "systemctl --user start xdg-desktop-portal-termfilechooser.service"
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"

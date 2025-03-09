@@ -58,6 +58,7 @@ in {
     FLAKE = "/home/${username}/NixConfig";
     TERMINAL = "wezterm";
     BROWSER = "zen";
+    GTK_USE_PORTAL = "1";
     # Disaabled for obsidian because no stylus support
     # NIXOS_OZONE_WL = "1";
   };
@@ -206,6 +207,7 @@ in {
     package = inputs.hyprland.packages.${system}.hyprland;
     portalPackage =
       inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
+    # withUWSM = false;
   };
 
   xdg = {
@@ -213,10 +215,10 @@ in {
       enable = true;
       xdgOpenUsePortal = true;
       config = {
-        common.default = [ "gtk" ];
-        hyprland.default = [ "gtk" "hyprland" ];
-        hyprland."org.freedesktop.impl.portal.FileChooser" =
-          [ "xdg-desktop-portal-termfilechooser" ];
+        hyprland = {
+          default = [ "hyprland" "gtk" ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
+        };
       };
       extraPortals = [ pkgs.xdg-desktop-portal-gtk termfilechooser ];
     };
