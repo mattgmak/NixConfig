@@ -119,7 +119,6 @@ require('lazy').setup({{
     config = function()
         require('mini.ai').setup()
         require('mini.surround').setup()
-        require('mini.files').setup()
     end
 }})
 
