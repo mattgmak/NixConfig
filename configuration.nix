@@ -58,7 +58,8 @@ in {
     FLAKE = "/home/${username}/NixConfig";
     TERMINAL = "wezterm";
     BROWSER = "zen";
-    NIXOS_OZONE_WL = "1";
+    # Disaabled for obsidian because no stylus support
+    # NIXOS_OZONE_WL = "1";
   };
   environment.shells = with pkgs; [ nushell bash ];
 
