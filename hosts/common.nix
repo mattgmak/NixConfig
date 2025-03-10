@@ -9,7 +9,6 @@ in {
     ../modules/input-remapper.nix
     ../modules/style
     inputs.home-manager.nixosModules.home-manager
-    inputs.xremap-flake.nixosModules.default
     inputs.stylix.nixosModules.stylix
   ];
 

@@ -1,6 +1,10 @@
-{ pkgs, username, ... }: {
+{ pkgs, username, inputs, ... }: {
   # Bootloader
-  imports = [ ./hardware-configuration.nix ../common.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ../common.nix
+    inputs.xremap-flake.nixosModules.default
+  ];
   boot = {
     loader = {
       systemd-boot.enable = true;
