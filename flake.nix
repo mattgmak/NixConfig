@@ -28,9 +28,14 @@
       url = "github:lordkekz/nix-yazi-plugins?ref=yazi-v0.2.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixos-wsl = {
+      url = "github:nix-community/nixos-wsl";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
