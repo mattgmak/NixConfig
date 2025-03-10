@@ -22,8 +22,8 @@
     swaylock-effects
     wl-clipboard
     wlogout
-    python312Packages.toggl-cli
   ];
+
   wayland.windowManager.hyprland = {
     package = null;
     portalPackage = null;

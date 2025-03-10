@@ -109,9 +109,7 @@ in {
     ];
     # Enable browsing of printers that are shared on the network
     browsing = true;
-    # Enable raw printing
     allowFrom = [ "all" ];
-    # Enable raw printing
     listenAddresses = [ "*:631" ];
     defaultShared = true;
   };
@@ -198,25 +196,24 @@ in {
     termfilechooser
     zenity
     gh
-    onedrivegui
     base16-shell-preview
   ];
 
   programs.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${system}.hyprland;
-    portalPackage =
-      inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
-    # withUWSM = false;
+    # package = inputs.hyprland.packages.${system}.hyprland;
+    # portalPackage =
+    #   inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
   };
 
   xdg = {
     portal = {
       enable = true;
-      xdgOpenUsePortal = true;
+      # xdgOpenUsePortal = true;
       config = {
         hyprland = {
           default = [ "hyprland" "gtk" ];
+          # Broken
           "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
         };
       };
