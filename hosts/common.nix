@@ -3,14 +3,23 @@
 let
   system = pkgs.stdenv.hostPlatform.system;
   termfilechooser =
-    (pkgs.callPackage ./packages/xdg-desktop-portal-termfilechooser { });
+    (pkgs.callPackage ../packages/xdg-desktop-portal-termfilechooser { });
 in {
   imports = [
-    ./hosts/${hostname}/hardware-configuration.nix
-    ./modules/input-remapper.nix
-    ./modules/style
+    ../modules/input-remapper.nix
+    ../modules/style
+    inputs.home-manager.nixosModules.home-manager
     inputs.xremap-flake.nixosModules.default
+    inputs.stylix.nixosModules.stylix
   ];
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    extraSpecialArgs = { inherit inputs; };
+    backupFileExtension = "hm-backup";
+    users."${username}" = import ../home-manager/home.nix;
+  };
 
   nix = {
     settings = {
@@ -29,21 +38,6 @@ in {
       options = "--delete-older-than 7d";
     };
   };
-
-  # Bootloader.
-  boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-    };
-    supportedFilesystems = [ "ntfs" ];
-  };
-
-  # fileSystems."/mnt/windows" = {
-  #   device = "/dev/nvme0n1p5";
-  #   fsType = "ntfs-3g"t;
-  #   options = [ "rw" "uid=1000" ];
-  # };
 
   # Enable networking
   networking.hostName = hostname;

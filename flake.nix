@@ -33,7 +33,6 @@
   outputs = { nixpkgs, nixpkgs-stable, home-manager, stylix, ... }@inputs:
     let
       username = "goofy";
-      hostname = "GoofyEnvy";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
@@ -43,26 +42,24 @@
         inherit system;
         config.allowUnfree = true;
       };
+      laptopName = "GoofyEnvy";
+      wslName = "GoofyWSL";
     in {
-      nixosConfigurations."${hostname}" = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs hostname username pkgs pkgs-stable system;
+          inherit inputs username pkgs pkgs-stable system;
+          hostname = laptopName;
         };
-        modules = [
-          ./configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              backupFileExtension = "hm-backup";
-              users.goofy = import ./home-manager/home.nix;
-            };
-          }
-          stylix.nixosModules.stylix
-        ];
+        modules = [ ./hosts/${laptopName}/configuration.nix ];
+      };
+      nixosConfigurations.${wslName} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs username pkgs pkgs-stable system;
+          hostname = wslName;
+        };
+        modules = [ ./hosts/${wslName}/configuration.nix ];
       };
     };
 }
