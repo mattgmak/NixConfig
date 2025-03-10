@@ -64,7 +64,7 @@
           inherit inputs username pkgs pkgs-stable system;
           hostname = wslName;
         };
-        modules = [ ./hosts/${wslName}/configuration.nix ];
+        modules = [ ./hosts/${wslName} ];
       };
     };
 }
