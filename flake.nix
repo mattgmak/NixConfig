@@ -49,6 +49,7 @@
       };
       laptopName = "GoofyEnvy";
       wslName = "GoofyWSL";
+      vmName = "GoofyVM";
     in {
       nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -65,6 +66,14 @@
           hostname = wslName;
         };
         modules = [ ./hosts/${wslName} ];
+      };
+      nixosConfigurations.${vmName} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs username pkgs pkgs-stable system;
+          hostname = vmName;
+        };
+        modules = [ ./hosts/${vmName} ];
       };
     };
 }
