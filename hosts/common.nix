@@ -96,10 +96,7 @@ in {
 
   security.sudo.enable = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
     neovim
@@ -148,6 +145,8 @@ in {
     zenity
     gh
     base16-shell-preview
+    chromium
+    lazygit
   ];
 
   programs.hyprland = {
@@ -164,7 +163,6 @@ in {
       config = {
         hyprland = {
           default = [ "hyprland" "gtk" ];
-          # Broken
           "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
         };
       };

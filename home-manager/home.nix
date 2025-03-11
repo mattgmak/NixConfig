@@ -20,6 +20,7 @@
     ./git
     ./wlogout
     ./direnv
+    ./lazygit
   ];
   home = {
     username = "goofy";

@@ -971,6 +971,10 @@ def --env d [target] {
     nix develop $'($flakeDir)/#($target)'
 }
 
+def --env lg [...args] {
+    lazygit ...$args
+}
+
 $env.CONDA_NO_PROMPT = true
 
 $env.config.hooks.pre_prompt = (
