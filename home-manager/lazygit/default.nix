@@ -1,11 +1,12 @@
 {
   programs.lazygit = {
+    enable = true;
     settings = {
       keybindings = {
         prevItem-alt = "j";
         nextItem-alt = "k";
         prevBlock-alt = "l";
-        nextBlock-alt = ";";
+        nextBlock-alt = "';'";
         scrollUpMain-alt1 = "J";
         scrollDownMain-alt1 = "K";
       };
