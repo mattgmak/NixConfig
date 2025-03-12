@@ -1,6 +1,5 @@
 { pkgs, config, ... }: {
   imports = [ ../common.nix ./hardware-configuration.nix ];
-  virtualisation.virtualbox.guest.enable = true;
   services.openssh.enable = true;
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
