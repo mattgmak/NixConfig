@@ -6,9 +6,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 2;
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl = {
-    enable = true;
-  };
+  hardware.opengl = { enable = true; };
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;
@@ -25,6 +23,16 @@
     git
     neovim
     parted
+    pciutils
   ];
+  environment.sessionVariables = {
+    XDG_CURRENT_DESKTOP = "Hyprland";
+    XDG_SESSION_DESKTOP = "Hyprland";
+    XDG_SESSION_TYPE = "wayland";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+    LIBGL_ALWAYS_SOFTWARE = "true";
+    GALLIUM_DRIVER = "llvmpipe";
+  };
   system.stateVersion = "24.11";
 }
