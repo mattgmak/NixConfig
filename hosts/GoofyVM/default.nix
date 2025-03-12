@@ -25,10 +25,6 @@
     parted
     pciutils
   ];
-  environment.sessionVariables = {
-    WLR_NO_HARDWARE_CURSORS = "1";
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
-    LIBGL_ALWAYS_SOFTWARE = "true";
-  };
+  environment.sessionVariables = { WLR_RENDERER_ALLOW_SOFTWARE = "1"; };
   system.stateVersion = "24.11";
 }
