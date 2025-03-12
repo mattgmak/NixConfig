@@ -8,6 +8,7 @@
     enable = true;
     package = pkgs.nix-ld-rs;
   };
+  environment.systemPackages = with pkgs; [ qemu qemu_kvm ];
 
   system.stateVersion = "24.11";
 }
