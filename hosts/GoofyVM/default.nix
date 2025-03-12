@@ -26,13 +26,9 @@
     pciutils
   ];
   environment.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_DESKTOP = "Hyprland";
-    XDG_SESSION_TYPE = "wayland";
     WLR_NO_HARDWARE_CURSORS = "1";
     WLR_RENDERER_ALLOW_SOFTWARE = "1";
     LIBGL_ALWAYS_SOFTWARE = "true";
-    GALLIUM_DRIVER = "llvmpipe";
   };
   system.stateVersion = "24.11";
 }
