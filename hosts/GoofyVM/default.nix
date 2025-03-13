@@ -5,7 +5,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 2;
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl = { enable = true; };
+  hardware.graphics.enable = true;
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = false;
