@@ -57,7 +57,7 @@
           inherit inputs username pkgs pkgs-stable system;
           hostname = laptopName;
         };
-        modules = [ ./hosts/${laptopName}/configuration.nix ];
+        modules = [ ./hosts/${laptopName} ];
       };
       nixosConfigurations.${wslName} = nixpkgs.lib.nixosSystem {
         inherit system;

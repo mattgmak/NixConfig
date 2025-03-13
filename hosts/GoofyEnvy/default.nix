@@ -63,6 +63,12 @@
     settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
   };
   services.blueman.enable = true;
+
+  swapDevices = [{
+    device = "/swapfile";
+    size = 16 * 1024;
+  }];
+
   system.stateVersion = "24.11";
 
 }
