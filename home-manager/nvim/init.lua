@@ -48,6 +48,9 @@ vim.keymap.set('n', '<leader>ln', ':set relativenumber!<cr>', {
 vim.keymap.set('n', 'c', '"_c', {
     noremap = true
 })
+vim.keymap.set('n', 'C', '"_C', {
+    noremap = true
+})
 vim.keymap.set('n', 'x', '"_x', {
     noremap = true
 })
