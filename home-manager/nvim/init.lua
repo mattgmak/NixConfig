@@ -173,7 +173,6 @@ if is_vscode then
     vim.keymap.set('n', '<leader>cr', function()
         vscode.call("editor.action.rename")
     end)
-    -- buggy
     vim.keymap.set({'n'}, 'J', function()
         vscode.call("editor.action.moveLinesUpAction")
     end)
