@@ -147,6 +147,7 @@ in {
     base16-shell-preview
     chromium
     lazygit
+    okular
   ];
 
   programs.hyprland = {

@@ -27,5 +27,12 @@
     homeDirectory = "/home/goofy";
     stateVersion = "24.11"; # Please read the comment before changing.
   };
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "application/pdf" = [ "okularApplication_pdf.desktop" ];
+      "text/html" = [ "zen.desktop" ];
+    };
+  };
   programs.home-manager.enable = true;
 }
