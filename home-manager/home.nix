@@ -29,6 +29,10 @@
   };
   xdg.mimeApps = {
     enable = true;
+    # Check for desktop files:
+    # ls /run/current-system/sw/share/applications/
+    # Check for mime types:
+    # xdg-mime query filetype file.type
     defaultApplications = {
       "application/pdf" = [ "okularApplication_pdf.desktop" ];
       "text/html" = [ "zen.desktop" ];
