@@ -959,12 +959,12 @@ def --env nixrb [...args] {
     # sudo nixos-rebuild switch --flake ~/NixConfig#goofy -I nixos-config=~/NixConfig/configuration.nix
 }
 
-def --env cu [...args] {
-    appimage-run ~/CursorAppImage/* --ozone-platform=wayland ...$args
+def --env --wrapped cu [...flags] {
+    appimage-run ~/CursorAppImage/* --ozone-platform=wayland --enable-wayland-ime=true ...$flags
 }
 
-def --env sucu [...args] {
-    sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox --ozone-platform=wayland ...$args
+def --env --wrapped sucu [...flags] {
+    sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox --ozone-platform=wayland --enable-wayland-ime=true ...$flags
 }
 
 def --env d [target] {
