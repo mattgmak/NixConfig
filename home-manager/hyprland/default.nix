@@ -159,6 +159,7 @@
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"
+        "~/.config/hypr/scripts/battery-notification.sh"
       ];
       xwayland = {
         enabled = true;

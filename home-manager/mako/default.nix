@@ -6,5 +6,6 @@
     borderRadius = 10;
     borderSize = 2;
     icons = true;
+    layer = "overlay";
   };
 }
