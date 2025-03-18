@@ -177,22 +177,6 @@ window#waybar.empty #window {
   color: @yellow;
 }
 
-#battery {
-  color: @pink;
-}
-
-#battery.charging {
-  color: @green;
-}
-
-#battery.warning:not(.charging) {
-  background: @yellow;
-}
-
-#battery.critical:not(.charging) {
-  background: @red;
-}
-
 #backlight {
   color: @yellow;
 }
@@ -212,4 +196,16 @@ window#waybar.empty #window {
 
 #tray {
   margin-right: 5px;
+}
+
+#battery.charging {
+  color: @green;
+}
+
+#battery.warning:not(.charging) {
+  background: @yellow;
+}
+
+#battery.critical:not(.charging) {
+  background: @red;
 }
