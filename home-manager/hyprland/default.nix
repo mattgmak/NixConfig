@@ -94,6 +94,8 @@
         "$mod, M, exec, pkill -SIGUSR1 waybar"
         # Utility binds
         "SUPER, V, exec, wezterm start --class clipse -e clipse"
+        "SUPER, B, exec, wezterm start --class bluetui -e bluetui"
+        "SUPER, C, exec, wezterm start --class nmtui -e nmtui"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
@@ -159,7 +161,7 @@
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"
-        "~/.config/hypr/scripts/battery-notification.sh"
+        "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
       ];
       xwayland = {
         enabled = true;
@@ -198,8 +200,8 @@
       };
       cursor = { no_warps = true; };
       windowrulev2 = [
-        "float, class:(clipse)"
-        "size 1000 800, class:(clipse)"
+        "float, class:(clipse|bluetui|nmtui)"
+        "size 1200 800, class:(clipse|bluetui|nmtui)"
         "float, title:^(Picture-in-Picture)$"
         "pin, title:^(Picture-in-Picture)$"
       ];

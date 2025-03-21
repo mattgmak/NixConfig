@@ -148,6 +148,7 @@ in {
     chromium
     lazygit
     okular
+    xorg.xeyes
   ];
 
   programs.hyprland = {
