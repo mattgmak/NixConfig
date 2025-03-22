@@ -8,9 +8,17 @@
       pkgs = nixpkgs.legacyPackages.${system};
     in {
       devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          haskellPackages.ghcWithPackages
-          (p: with p; [ stack ])
+        packages = with pkgs.haskell.packages.ghc966; [
+          Cabal
+          ghc
+          ghcid
+          ormolu
+          stack
+          hlint
+          hoogle
+          haskell-language-server
+          retrie
+          pkgs.zlib
         ];
       };
     };
