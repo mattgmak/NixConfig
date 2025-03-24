@@ -150,6 +150,7 @@ in {
     okular
     xorg.xeyes
     appflowy
+    nurl
   ];
 
   programs.hyprland = {

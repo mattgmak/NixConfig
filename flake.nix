@@ -33,6 +33,11 @@
       url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    my-code-cursor = {
+      url = "./packages/my-code-cursor";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, nixpkgs-stable, ... }@inputs:

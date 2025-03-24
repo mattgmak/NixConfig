@@ -8,7 +8,7 @@
     enable = true;
     package = pkgs.nix-ld-rs;
   };
-  environment.systemPackages = with pkgs; [ code-cursor ];
+  environment.systemPackages = with pkgs; [ ];
 
   system.stateVersion = "24.11";
 }
