@@ -35,7 +35,7 @@
     };
 
     my-code-cursor = {
-      url = "./packages/my-code-cursor";
+      url = "git+file:///home/goofy/code/my-code-cursor";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

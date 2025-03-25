@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }: {
+{ inputs, pkgs, system, ... }: {
   imports = [ ../common.nix inputs.nixos-wsl.nixosModules.default ];
   wsl = {
     enable = true;
@@ -8,7 +8,8 @@
     enable = true;
     package = pkgs.nix-ld-rs;
   };
-  environment.systemPackages = with pkgs; [ ];
+  environment.systemPackages =
+    [ inputs.my-code-cursor.packages.${system}.default ];
 
   system.stateVersion = "24.11";
 }
