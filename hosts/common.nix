@@ -149,6 +149,7 @@ in {
     lazygit
     okular
     xorg.xeyes
+    appflowy
   ];
 
   programs.hyprland = {
