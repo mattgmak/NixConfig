@@ -1,26 +1,27 @@
 {
   imports = [
-    ./hyprland
-    ./waybar
-    ./nushell
-    ./wezterm
-    ./nvim
-    ./starship
-    ./vscode-custom
-    ./yazi
-    ./bluetui
-    ./rofi
-    ./mako
-    ./input-remapper
-    ./fcitx5
-    ./clipse
-    ./onedrive
-    ./termfilechooser
-    ./zen-browser
-    ./git
-    ./wlogout
-    ./direnv
-    ./lazygit
+    ./desktop/hyprland
+    ./desktop/waybar
+    ./terminal/nushell
+    ./terminal/wezterm
+    ./terminal/nvim
+    ./terminal/starship
+    ./desktop/vscode-custom
+    ./terminal/yazi
+    ./terminal/bluetui
+    ./desktop/rofi
+    ./desktop/mako
+    ./desktop/input-remapper
+    ./desktop/fcitx5
+    ./terminal/clipse
+    ./desktop/onedrive
+    ./terminal/termfilechooser
+    ./desktop/zen-browser
+    ./terminal/git
+    ./desktop/wlogout
+    ./terminal/direnv
+    ./terminal/lazygit
+    ./desktop/mpv
   ];
   home = {
     username = "goofy";
