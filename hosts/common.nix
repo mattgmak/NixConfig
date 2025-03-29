@@ -100,13 +100,8 @@ in {
     wget
     git
     neovim
-    inputs.zen-browser.packages."${system}".default
-    bitwarden-cli
-    bitwarden-desktop
     chezmoi
-    pkgs.libsForQt5.kdeconnect-kde
     yazi
-    wezterm
     appimage-run
     nushell
     fzf
@@ -118,37 +113,19 @@ in {
     nixfmt-classic
     atuin
     nixd
-    libnotify
     kitty
-    obsidian
-    webcord
-    protonvpn-gui
-    wl-clipboard
-    clipse
-    pulseaudio-ctl
-    brightnessctl
-    playerctl
-    bluetui
-    networkmanagerapplet
-    overskride
     nh
     nvd
     nix-output-monitor
-    wev
-    evtest
     neofetch
     nitch
     nix-prefetch-github
     nvfetcher
-    btop
     termfilechooser
     zenity
     gh
     base16-shell-preview
-    chromium
     lazygit
-    okular
-    xorg.xeyes
     appflowy
     nurl
   ];

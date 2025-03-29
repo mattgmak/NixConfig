@@ -5,6 +5,32 @@
     ../common.nix
     inputs.xremap-flake.nixosModules.default
   ];
+
+  environment.systemPackages = with pkgs; [
+    inputs.zen-browser.packages."${system}".default
+    bitwarden-desktop
+    wezterm
+    libsForQt5.kdeconnect-kde
+    libnotify
+    obsidian
+    webcord
+    protonvpn-gui
+    wl-clipboard
+    clipse
+    pulseaudio-ctl
+    brightnessctl
+    playerctl
+    bluetui
+    networkmanagerapplet
+    overskride
+    wev
+    evtest
+    btop
+    chromium
+    xorg.xeyes
+    okular
+  ];
+
   boot = {
     loader = {
       systemd-boot.enable = true;
