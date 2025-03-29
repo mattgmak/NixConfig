@@ -1,7 +1,6 @@
 { pkgs, inputs, hostname, username, ... }:
 
 let
-  system = pkgs.stdenv.hostPlatform.system;
   termfilechooser =
     (pkgs.callPackage ../packages/xdg-desktop-portal-termfilechooser { });
 in {

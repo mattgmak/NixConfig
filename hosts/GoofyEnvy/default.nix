@@ -1,4 +1,6 @@
-{ pkgs, username, inputs, ... }: {
+{ pkgs, username, inputs, ... }:
+let system = pkgs.stdenv.hostPlatform.system;
+in {
   # Bootloader
   imports = [
     ./hardware-configuration.nix
