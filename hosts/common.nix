@@ -127,7 +127,6 @@ in {
     gh
     base16-shell-preview
     lazygit
-    appflowy
     nurl
   ];
 

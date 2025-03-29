@@ -36,6 +36,7 @@ in {
     qbittorrent
     gparted
     pkgs-for-cursor.code-cursor
+    appflowy
   ];
 
   boot = {
