@@ -1,28 +1,34 @@
-{
+{ hostname }: {
   imports = [
-    ./desktop/hyprland
-    ./desktop/waybar
     ./terminal/nushell
     ./terminal/wezterm
     ./terminal/nvim
     ./terminal/starship
-    ./desktop/vscode-custom
     ./terminal/yazi
+    ./terminal/git
+    ./terminal/direnv
+    ./terminal/lazygit
+  ] ++ (if hostname == "GoofyEnvy" then [
     ./terminal/bluetui
+    ./desktop/onedrive
+    ./desktop/vscode-custom
+    ./desktop/hyprland
+    ./desktop/waybar
+    ./desktop/zen-browser
+    ./desktop/wlogout
     ./desktop/rofi
     ./desktop/mako
     ./desktop/input-remapper
     ./desktop/fcitx5
     ./terminal/clipse
-    ./desktop/onedrive
-    ./terminal/termfilechooser
-    ./desktop/zen-browser
-    ./terminal/git
-    ./desktop/wlogout
-    ./terminal/direnv
-    ./terminal/lazygit
     ./desktop/mpv
-  ];
+    ./terminal/termfilechooser
+  ] else if hostname == "GoofyWSL" then
+    [
+
+    ]
+  else
+    [ ]);
   home = {
     username = "goofy";
     homeDirectory = "/home/goofy";
