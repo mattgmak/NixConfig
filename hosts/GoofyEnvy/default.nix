@@ -31,6 +31,7 @@ in {
     chromium
     xorg.xeyes
     okular
+    mpv
   ];
 
   boot = {
