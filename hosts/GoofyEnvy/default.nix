@@ -32,6 +32,10 @@ in {
     xorg.xeyes
     okular
     mpv
+    yt-dlp
+    qbittorrent
+    gparted
+    code-cursor
   ];
 
   boot = {
