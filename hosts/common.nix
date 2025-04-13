@@ -19,6 +19,8 @@ in {
     users."${username}" = import ../home-manager/home.nix { inherit hostname; };
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   nix = {
     settings = {
       substituters =

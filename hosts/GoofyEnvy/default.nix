@@ -1,4 +1,4 @@
-{ pkgs, username, inputs, ... }:
+{ pkgs, username, inputs, pkgs-for-cursor, ... }:
 let system = pkgs.stdenv.hostPlatform.system;
 in {
   # Bootloader
@@ -35,7 +35,7 @@ in {
     yt-dlp
     qbittorrent
     gparted
-    code-cursor
+    pkgs-for-cursor.code-cursor
   ];
 
   boot = {

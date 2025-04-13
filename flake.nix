@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     hyprland.url = "github:hyprwm/Hyprland";
@@ -40,15 +41,15 @@
     };
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
-      pkgs = import nixpkgs {
+      pkgs-stable = import nixpkgs-stable {
         inherit system;
         config.allowUnfree = true;
       };
-      pkgs-stable = import nixpkgs-stable {
+      pkgs-for-cursor = import nixpkgs-for-cursor {
         inherit system;
         config.allowUnfree = true;
       };
@@ -59,7 +60,7 @@
       nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs username pkgs pkgs-stable system;
+          inherit inputs username pkgs-stable pkgs-for-cursor system;
           hostname = laptopName;
         };
         modules = [ ./hosts/${laptopName} ];
@@ -67,7 +68,7 @@
       nixosConfigurations.${wslName} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs username pkgs pkgs-stable system;
+          inherit inputs username pkgs-stable pkgs-for-cursor system;
           hostname = wslName;
         };
         modules = [ ./hosts/${wslName} ];
@@ -75,7 +76,7 @@
       nixosConfigurations.${vmName} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs username pkgs pkgs-stable system;
+          inherit inputs username pkgs-stable pkgs-for-cursor system;
           hostname = vmName;
         };
         modules = [ ./hosts/${vmName} ];
