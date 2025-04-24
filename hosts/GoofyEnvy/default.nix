@@ -37,6 +37,7 @@ in {
     gparted
     pkgs-for-cursor.code-cursor
     appflowy
+    vial
   ];
 
   boot = {
@@ -56,6 +57,9 @@ in {
         - name: "CapsLock"
           remap:
             CapsLock: esc
+      keymap:
+        - remap:
+            Super-u: NumLock
     '';
   };
 
