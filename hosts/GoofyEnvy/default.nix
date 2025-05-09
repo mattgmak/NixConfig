@@ -37,7 +37,12 @@ in {
     gparted
     pkgs-for-cursor.code-cursor
     appflowy
+    qmk
+    qmk-udev-rules
+    qmk_hid
+    via
     vial
+    kbd
   ];
 
   boot = {
@@ -58,7 +63,8 @@ in {
           remap:
             CapsLock: esc
       keymap:
-        - remap:
+        - name: "Super-u"
+          remap:
             Super-u: NumLock
     '';
   };
@@ -68,6 +74,16 @@ in {
     enable = true;
     package = pkgs.onedrive;
   };
+
+  services.udev = {
+    packages = with pkgs; [
+      qmk
+      qmk-udev-rules # the only relevant
+      qmk_hid
+      via
+      vial
+    ]; # packages
+  }; # udev
 
   # Enable CUPS to print documents.
   services.printing = {
