@@ -19,13 +19,7 @@
             chromium
             deno
             android-studio
-            # (androidenv.emulateApp {
-            #   name = "drpom";
-            #   platformVersion = "35";
-            #   abiVersion = "x86_64";
-            #   systemImageType = "google_apis_playstore";
-            # })
-          ] ++ (with pkgs.nodePackages; [ firebase-tools ]);
+          ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ]);
         shellHook = ''
           export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
         '';
