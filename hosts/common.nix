@@ -128,6 +128,7 @@ in {
     base16-shell-preview
     lazygit
     nurl
+    dua
   ];
 
   programs.hyprland = {

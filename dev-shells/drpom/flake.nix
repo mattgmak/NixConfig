@@ -23,6 +23,7 @@
           ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ]);
         shellHook = ''
           export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
+          export ANDROID_HOME=~/Android/Sdk
         '';
       };
     };
