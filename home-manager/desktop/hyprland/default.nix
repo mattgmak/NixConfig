@@ -104,7 +104,7 @@
         "SUPER, E, exec, nu -e cu"
         "SUPER, W, exec, wezterm"
         "SUPER, Q, exec, gnome-system-monitor"
-        "$mod, R, focuswindow, class:(zen*)"
+        "$mod, R, focuswindow, class:(zen.*)"
         "$mod, E, focuswindow, class:(.*cursor.*)"
         "$mod, W, focuswindow, class:(.*wezterm.*)"
         # Input toggle binds
