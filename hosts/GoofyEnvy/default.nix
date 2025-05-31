@@ -1,4 +1,4 @@
-{ pkgs, username, inputs, pkgs-for-cursor, lib, ... }:
+{ pkgs, username, inputs, pkgs-for-cursor, ... }:
 let
   system = pkgs.stdenv.hostPlatform.system;
 
@@ -28,6 +28,7 @@ in {
       frame = false;
       titleBarStyle = "hiddenInset";
     };
+    customCSS = { imports = [ ../../modules/cursor-ui-style/vscode.css ]; };
   };
 
   environment.systemPackages = with pkgs; [
