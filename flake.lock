@@ -1505,26 +1505,6 @@
         "type": "github"
       }
     },
-    "my-code-cursor": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1742829082,
-        "narHash": "sha256-TN9uRPGg91Dbhc0/XEqdEMzLXhHQEySBBeF0wenCI4Q=",
-        "ref": "refs/heads/main",
-        "rev": "671f344895923b6c1e72faeb86bdc68f4ac75689",
-        "revCount": 15,
-        "type": "git",
-        "url": "file:///home/goofy/code/my-code-cursor"
-      },
-      "original": {
-        "type": "git",
-        "url": "file:///home/goofy/code/my-code-cursor"
-      }
-    },
     "nix-yazi-plugins": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -1869,7 +1849,6 @@
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
         "hyprpanel": "hyprpanel",
-        "my-code-cursor": "my-code-cursor",
         "nix-yazi-plugins": "nix-yazi-plugins",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",

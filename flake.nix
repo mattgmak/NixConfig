@@ -35,10 +35,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    my-code-cursor = {
-      url = "git+file:///home/goofy/code/my-code-cursor";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, ... }@inputs:

@@ -5,8 +5,15 @@ in {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
+    ../../modules/custom-code-cursor.nix
     inputs.xremap-flake.nixosModules.default
   ];
+
+  programs.code-cursor = {
+    enable = true;
+    package = pkgs-for-cursor.code-cursor;
+    enableCustomFrame = true;
+  };
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default
@@ -35,7 +42,6 @@ in {
     yt-dlp
     qbittorrent
     gparted
-    pkgs-for-cursor.code-cursor
     appflowy
     qmk
     qmk-udev-rules
