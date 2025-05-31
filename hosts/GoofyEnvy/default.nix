@@ -2,7 +2,10 @@
 let
   system = pkgs.stdenv.hostPlatform.system;
   mkCustomCodeCursor = import ../../modules/custom-code-cursor.nix;
-  custom-code-cursor = mkCustomCodeCursor { inherit pkgs-for-cursor lib; };
+  custom-code-cursor = mkCustomCodeCursor {
+    inherit lib;
+    pkgs = pkgs-for-cursor;
+  };
 in {
   # Bootloader
   imports = [
