@@ -5,6 +5,7 @@ let
   custom-code-cursor = mkCustomCodeCursor {
     inherit lib;
     pkgs = pkgs-for-cursor;
+    asar = pkgs.asar;
   };
 in {
   # Bootloader
