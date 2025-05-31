@@ -11,6 +11,19 @@ let
   else
     pkgs.code-cursor;
 
+  # Convert electron options to JSON string (removing outer braces for injection)
+  electronOptionsStr = if cfg.electron != { } then
+    let
+      electronJson = builtins.toJSON cfg.electron;
+      # Remove the outer braces to get just the key-value pairs
+      innerJson = builtins.substring 1 (builtins.stringLength electronJson - 2)
+        electronJson;
+      # Escape quotes for shell usage in sed commands
+      escapedJson = lib.replaceStrings [ ''"'' ] [ ''\"'' ] innerJson;
+    in escapedJson
+  else
+    "";
+
   # Status bar indicator JavaScript (adapted from vscode-custom-css extension for Cursor)
   cursorStatusBarJs = ''
     (function () {
@@ -42,46 +55,60 @@ let
 
   # Create a modified cursor package with UI customizations
   modifiedCursor = pkgs.runCommand "cursor-ui-styled" {
-    buildInputs = [ pkgs.jq pkgs.gnused ];
+    # Inherit version and other metadata from the original cursor package
+    inherit (cursorPkg) version;
+    meta = cursorPkg.meta or { };
+    passthru = cursorPkg.passthru or { };
   } ''
+        # Create the build script content as a variable
+        BUILD_SCRIPT=$(cat << 'BUILD_SCRIPT_EOF'
+    #!/bin/bash
+    set -e
+
     # Create output directory
     mkdir -p $out
 
-    # Copy the original cursor
+    # Copy the original cursor package
     cp -r ${cursorPkg}/* $out/
-    chmod -R +w $out/
+    chmod -R u+w $out/
 
-    # Find the main.js file for electron options
+    # Find the main.js file for electron options injection
     MAIN_JS=""
-    if [ -f "$out/share/cursor/resources/app/out/vs/code/electron-main/main.js" ]; then
-      MAIN_JS="$out/share/cursor/resources/app/out/vs/code/electron-main/main.js"
-    elif [ -f "$out/share/cursor/resources/app/out/main.js" ]; then
-      MAIN_JS="$out/share/cursor/resources/app/out/main.js"
-    else
-      echo "Error: Could not find main.js in cursor installation"
-      find $out -name "main.js" -type f
+
+    # Try different possible locations for main.js in Cursor
+    for possible_path in \
+      "$out/share/cursor/resources/app/out/main.js" \
+      "$out/usr/share/cursor/resources/app/out/vs/code/electron-main/main.js" \
+      "$out/share/cursor/resources/app/out/vs/code/electron-main/main.js" \
+      "$out/lib/cursor/resources/app/out/vs/code/electron-main/main.js"
+    do
+      if [ -f "$possible_path" ]; then
+        MAIN_JS="$possible_path"
+        break
+      fi
+    done
+
+    if [ -z "$MAIN_JS" ]; then
+      echo "Error: Could not find main.js file in Cursor installation"
+      echo "Available files in app/out:"
+      find $out -name "*.js" -path "*/app/out/*" | head -10
       exit 1
     fi
 
     echo "Found main.js at: $MAIN_JS"
 
-    # Create backup of main.js
-    cp "$MAIN_JS" "$MAIN_JS.original"
-
     ${optionalString (cfg.electron != { }) ''
       echo "Applying electron window options..."
+      echo "Electron options to inject: ${electronOptionsStr}"
 
-      # Convert electron options to JSON string (removing outer braces)
-      ELECTRON_JSON='${builtins.toJSON cfg.electron}'
-      ELECTRON_OPTIONS=$(echo "$ELECTRON_JSON" | sed 's/^{//;s/}$//')
-
-      echo "Electron options to inject: $ELECTRON_OPTIONS"
+      # Create backup of main.js
+      cp "$MAIN_JS" "$MAIN_JS.original"
 
       # Find and replace the experimentalDarkMode entry to inject our options
-      sed -i "s/experimentalDarkMode:!0/experimentalDarkMode:!0,$ELECTRON_OPTIONS/g" "$MAIN_JS"
+      sed -i "s/experimentalDarkMode:!0/experimentalDarkMode:!0,${electronOptionsStr}/g" "$MAIN_JS"
 
       # Verify the change was made
-      if grep -q "$ELECTRON_OPTIONS" "$MAIN_JS"; then
+      if grep -q "${electronOptionsStr}" "$MAIN_JS"; then
         echo "Successfully injected electron options"
       else
         echo "Warning: Failed to inject electron options"
@@ -99,6 +126,7 @@ let
     # Try different possible locations for the workbench HTML file in Cursor
     for possible_path in \
       "$out/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html" \
+      "$out/usr/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html" \
       "$out/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.esm.html" \
       "$out/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench-apc-extension.html" \
       "$out/lib/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html" \
@@ -123,61 +151,97 @@ let
 
       ${
         optionalString (cfg.customCSS.imports != [ ]) ''
-                  echo "Processing custom CSS/JS imports for Cursor..."
+                                      echo "Processing custom CSS/JS imports for Cursor..."
 
-                  # Generate the injection content
-                  INJECTION_CONTENT=""
+                                      # Generate the injection content
+                                      INJECTION_CONTENT=""
 
-                  ${
-                    lib.concatStringsSep "\n" (map (file:
-                      let
-                        filePath = if builtins.isString file then
-                          file
-                        else if builtins.isPath file then
-                          toString file
-                        else
-                          throw "Import must be a string path or path type";
-                        ext =
-                          let parts = lib.splitString "." (baseNameOf filePath);
-                          in if length parts > 1 then
-                            ".${lib.last parts}"
-                          else
-                            "";
-                      in if ext == ".css" then ''
-                        echo "Adding CSS file: ${filePath}"
-                        INJECTION_CONTENT="$INJECTION_CONTENT<style>$(cat ${filePath})</style>"'' else if ext
-                      == ".js" then ''
-                        echo "Adding JS file: ${filePath}"
-                        INJECTION_CONTENT="$INJECTION_CONTENT<script>$(cat ${filePath})</script>"'' else
-                        ''
-                          echo "Warning: Unsupported file extension for ${filePath}, skipping"'')
-                      cfg.customCSS.imports)
-                  }
+                                      ${
+                                        lib.concatStringsSep "\n" (map (file:
+                                          let
+                                            filePath =
+                                              if builtins.isPath file then
+                                                toString file
+                                              else
+                                                throw
+                                                "Import must be a path type";
+                                            ext = let
+                                              parts = lib.splitString "."
+                                                (baseNameOf filePath);
+                                            in if length parts > 1 then
+                                              ".${lib.last parts}"
+                                            else
+                                              "";
+                                            # Read file content using Nix builtins instead of cat
+                                            fileContent =
+                                              if builtins.isPath file then
+                                                builtins.readFile file
+                                              else
+                                                throw
+                                                "Import must be a path type";
+                                            # Use base64 encoding to safely handle content with special characters
+                                            base64Content = builtins.readFile
+                                              (pkgs.runCommand
+                                                "base64-${baseNameOf filePath}"
+                                                { } ''
+                                                  echo -n ${
+                                                    lib.escapeShellArg
+                                                    fileContent
+                                                  } | base64 -w 0 > $out
+                                                '');
+                                          in if ext == ".css" then ''
+                                            echo "Adding CSS file: ${filePath}"
+                                            DECODED_CONTENT=$(echo "${base64Content}" | base64 -d)
+                                            INJECTION_CONTENT="$INJECTION_CONTENT<style>$DECODED_CONTENT</style>"'' else if ext
+                                          == ".js" then ''
+                                            echo "Adding JS file: ${filePath}"
+                                            DECODED_CONTENT=$(echo "${base64Content}" | base64 -d)
+                                            INJECTION_CONTENT="$INJECTION_CONTENT<script>$DECODED_CONTENT</script>"'' else
+                                            ''
+                                              echo "Warning: Unsupported file extension for ${filePath}, skipping"'')
+                                          cfg.customCSS.imports)
+                                      }
 
-                  ${
-                    optionalString cfg.customCSS.statusBar ''
-                                echo "Adding status bar indicator..."
-                                cat >> /tmp/statusbar.js << 'EOF'
-                      ${cursorStatusBarJs}
-                      EOF
-                                INJECTION_CONTENT="$INJECTION_CONTENT<script>$(cat /tmp/statusbar.js)</script>"
-                    ''
-                  }
+                                      ${
+                                        optionalString
+                                        cfg.customCSS.statusBar ''
+                                          echo "Adding status bar indicator..."
+                                          # Use base64 encoding to safely handle JavaScript content
+                                          JS_BASE64="${
+                                            builtins.readFile (pkgs.runCommand
+                                              "base64-statusbar-js" { } ''
+                                                echo -n ${
+                                                  lib.escapeShellArg
+                                                  cursorStatusBarJs
+                                                } | base64 -w 0 > $out
+                                              '')
+                                          }"
+                                          DECODED_JS=$(echo "$JS_BASE64" | base64 -d)
+                                          INJECTION_CONTENT="$INJECTION_CONTENT<script>$DECODED_JS</script>"
+                                        ''
+                                      }
 
-                  # Remove Content Security Policy meta tag to allow custom scripts
-                  sed -i '/<meta.*http-equiv="Content-Security-Policy".*\/>/d' "$WORKBENCH_HTML"
+                                      # Remove Content Security Policy meta tag to allow custom scripts
+                                      sed -i '/<meta.*http-equiv="Content-Security-Policy".*\/>/d' "$WORKBENCH_HTML"
 
-                  # Inject our custom content before the closing </html> tag
-                  # Add session ID and markers similar to the original extension
-                  SESSION_ID="nixos-cursor-$(date +%s)"
+                                      # Inject our custom content before the closing </html> tag
+                                      # Add session ID and markers similar to the original extension
+                                      SESSION_ID="nixos-cursor-$(date +%s)"
 
-                  sed -i "s|</html>|<!-- !! CURSOR-CUSTOM-CSS-SESSION-ID $SESSION_ID !! -->
+                                      # Replace the closing </html> tag with our injection content
+                                      sed -i 's|</html>||g' "$WORKBENCH_HTML"
+
+                                      # Append the injection content directly
+                                      cat >> "$WORKBENCH_HTML" << INJECTION_EOF
+
+          <!-- !! CURSOR-CUSTOM-CSS-SESSION-ID $SESSION_ID !! -->
           <!-- !! CURSOR-CUSTOM-CSS-START !! -->
           $INJECTION_CONTENT
           <!-- !! CURSOR-CUSTOM-CSS-END !! -->
-          </html>|" "$WORKBENCH_HTML"
+          </html>
+          INJECTION_EOF
 
-                  echo "Successfully injected custom CSS/JS into Cursor workbench"
+                                      echo "Successfully injected custom CSS/JS into Cursor workbench"
         ''
       }
 
@@ -188,7 +252,243 @@ let
       }
     fi
 
+    # Recursively fix all references to the original cursor package
+    echo "Recursively replacing all references to original cursor package..."
+    echo "Original package path: ${cursorPkg}"
+    echo "Modified package path: $out"
+
+    # Function to process a file or symlink
+    process_file() {
+      local file_path="$1"
+      local relative_path="''${file_path#$out/}"
+
+      if [ -L "$file_path" ]; then
+        # Handle symlinks: convert to regular file if it points to original package
+        local link_target=$(readlink "$file_path")
+        if [[ "$link_target" == *"${cursorPkg}"* ]]; then
+          echo "Converting symlink to regular file: $relative_path"
+          # Remove the symlink
+          rm "$file_path"
+          # Copy the target file
+          cp -L "${cursorPkg}/$relative_path" "$file_path" 2>/dev/null || {
+            echo "Warning: Could not copy target for symlink $relative_path"
+            return
+          }
+          # Make it writable
+          chmod u+w "$file_path"
+        fi
+      fi
+
+      # Process regular files (including converted symlinks)
+      if [ -f "$file_path" ] && [ ! -L "$file_path" ]; then
+        # Check if file contains references to original package
+        if grep -q "${cursorPkg}" "$file_path" 2>/dev/null; then
+          echo "Updating references in: $relative_path"
+          # Create backup
+          cp "$file_path" "$file_path.original" 2>/dev/null || true
+          # Replace all references
+          sed -i "s|${cursorPkg}|$out|g" "$file_path" 2>/dev/null || {
+            echo "Warning: Could not update references in $relative_path"
+          }
+        fi
+      fi
+    }
+
+    # Export the function so it can be used with find -exec
+    export -f process_file
+    export out
+
+    # Process all files and symlinks recursively
+    echo "Scanning for files and symlinks to process..."
+    find "$out" -type f -o -type l | grep -v '\.original$' | while read -r file_path; do
+      process_file "$file_path"
+    done
+
+    # Special handling for common wrapper scripts and executables
+    echo "Applying special fixes for common wrapper locations..."
+
+    # Fix any shell scripts that might contain package references
+    find "$out" -type f \( -name "*.sh" -o -name "cursor*" -o -name "*.wrapper" \) | grep -v '\.original$' | while read -r script_file; do
+      if [ -f "$script_file" ] && grep -q "${cursorPkg}" "$script_file" 2>/dev/null; then
+        echo "Fixing script: ''${script_file#$out/}"
+        cp "$script_file" "$script_file.original" 2>/dev/null || true
+        sed -i "s|${cursorPkg}|$out|g" "$script_file"
+      fi
+    done
+
+    # Fix desktop files and other configuration files
+    find "$out" -type f \( -name "*.desktop" -o -name "*.conf" -o -name "*.json" -o -name "*.xml" \) | grep -v '\.original$' | while read -r config_file; do
+      if [ -f "$config_file" ] && grep -q "${cursorPkg}" "$config_file" 2>/dev/null; then
+        echo "Fixing config file: ''${config_file#$out/}"
+        cp "$config_file" "$config_file.original" 2>/dev/null || true
+        sed -i "s|${cursorPkg}|$out|g" "$config_file"
+      fi
+    done
+
+    echo "Completed recursive package reference replacement"
+
+    # Special handling for wrapped binaries
+    echo "Fixing wrapped binaries..."
+    find "$out" -type f -name "*-wrapped" -o -name ".*-wrapped" | grep -v '\.original$' | while read -r wrapped_file; do
+      if [ -f "$wrapped_file" ]; then
+        echo "Processing wrapped binary: ''${wrapped_file#$out/}"
+
+        # Check if it's a script or binary that contains package references
+        if file "$wrapped_file" | grep -q "text\|script"; then
+          # It's a text file/script
+          if grep -q "${cursorPkg}" "$wrapped_file" 2>/dev/null; then
+            echo "Updating references in wrapped script: ''${wrapped_file#$out/}"
+            cp "$wrapped_file" "$wrapped_file.original" 2>/dev/null || true
+            sed -i "s|${cursorPkg}|$out|g" "$wrapped_file"
+          fi
+        else
+          # It's a binary - check if it's actually a symlink to the original package
+          if [ -L "$wrapped_file" ]; then
+            link_target=$(readlink "$wrapped_file")
+            if [[ "$link_target" == *"${cursorPkg}"* ]]; then
+              echo "Updating wrapped binary symlink: ''${wrapped_file#$out/}"
+              rm "$wrapped_file"
+              # Create new symlink pointing to our modified package
+              new_target="''${link_target//${cursorPkg}/$out}"
+              ln -s "$new_target" "$wrapped_file"
+            fi
+          fi
+        fi
+      fi
+    done
+
+    # Also check for any remaining symlinks that might point to the original package
+    echo "Checking for remaining symlinks to original package..."
+    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+      link_target=$(readlink "$symlink_file")
+      if [[ "$link_target" == *"${cursorPkg}"* ]]; then
+        echo "Fixing remaining symlink: ''${symlink_file#$out/} -> $link_target"
+        rm "$symlink_file"
+        new_target="''${link_target//${cursorPkg}/$out}"
+        ln -s "$new_target" "$symlink_file"
+      fi
+    done
+
+    # Special handling for cursor-related symlinks that might point to wrapped versions
+    echo "Checking for cursor-related symlinks (including wrapped versions)..."
+    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+      link_target=$(readlink "$symlink_file")
+      # Check if the symlink points to any cursor-related package in the nix store
+      if [[ "$link_target" == *"/nix/store/"*"cursor-"* ]]; then
+        # Extract the cursor version from our package
+        cursor_version=$(basename "${cursorPkg}" | sed 's/cursor-//' | sed 's/-.*$//')
+        echo "Found cursor-related symlink: ''${symlink_file#$out/} -> $link_target"
+        echo "Cursor version detected: $cursor_version"
+
+        # Check if this symlink should point to our modified package instead
+        relative_path="''${symlink_file#$out/}"
+        if [ -f "$out/$relative_path" ] || [ -L "$out/$relative_path" ]; then
+          # Try to find the equivalent file in our modified package
+          potential_target=""
+
+          # For .cursor-wrapped, try to find the actual cursor executable in our package
+          if [[ "$relative_path" == *".cursor-wrapped"* ]]; then
+            # Look for the main cursor executable in our package
+            for possible_cursor in \
+              "$out/share/cursor/cursor" \
+              "$out/lib/cursor/cursor" \
+              "$out/bin/cursor-unwrapped" \
+              "$out/share/cursor/resources/app/cursor"
+            do
+              if [ -f "$possible_cursor" ]; then
+                potential_target="$possible_cursor"
+                break
+              fi
+            done
+
+            if [ -n "$potential_target" ]; then
+              echo "Redirecting wrapped cursor to modified package: $potential_target"
+              rm "$symlink_file"
+              ln -s "$potential_target" "$symlink_file"
+            else
+              echo "Warning: Could not find cursor executable in modified package for $relative_path"
+            fi
+          fi
+        fi
+      fi
+    done
+
+    # Handle external cursor-related symlinks by copying targets locally
+    echo "Fixing external cursor-related symlinks..."
+    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+      link_target=$(readlink "$symlink_file")
+      # Check if symlink points to external cursor packages
+      if [[ "$link_target" == *"/nix/store/"*"cursor-"* ]] && [[ "$link_target" != "$out"* ]]; then
+        echo "Found external cursor symlink: ''${symlink_file#$out/} -> $link_target"
+
+        # Copy the target file into our package if it exists
+        if [ -f "$link_target" ]; then
+          # Create a local copy of the target
+          local_target="$out/lib/cursor-wrapped-$(basename "$link_target")"
+          mkdir -p "$(dirname "$local_target")"
+          cp "$link_target" "$local_target"
+          chmod +x "$local_target"
+
+          # Update the symlink to point to our local copy
+          rm "$symlink_file"
+          ln -s "$local_target" "$symlink_file"
+
+          echo "Copied external target and updated symlink: ''${symlink_file#$out/} -> $local_target"
+        else
+          echo "Warning: External target does not exist: $link_target"
+        fi
+      fi
+    done
+
+    # Verify the main cursor binary was processed
+    CURSOR_BIN=""
+    for possible_bin in \
+      "$out/bin/cursor" \
+      "$out/usr/bin/cursor"
+    do
+      if [ -f "$possible_bin" ]; then
+        CURSOR_BIN="$possible_bin"
+        break
+      fi
+    done
+
+    if [ -n "$CURSOR_BIN" ]; then
+      if grep -q "$out" "$CURSOR_BIN" 2>/dev/null; then
+        echo "✓ Main cursor binary successfully updated: ''${CURSOR_BIN#$out/}"
+      else
+        echo "⚠ Warning: Main cursor binary may not have been updated properly"
+      fi
+    else
+      echo "⚠ Warning: Could not find main cursor binary to verify"
+    fi
+
     echo "Cursor UI modifications completed"
+    BUILD_SCRIPT_EOF
+    )
+
+        # Save the script for debugging and execute it with error handling
+        echo "$BUILD_SCRIPT" > /tmp/cursor-ui-build-script.sh
+        chmod +x /tmp/cursor-ui-build-script.sh
+
+        echo "=== Executing Cursor UI build script ==="
+        echo "Script saved to: /tmp/cursor-ui-build-script.sh"
+        echo "Script size: $(echo "$BUILD_SCRIPT" | wc -c) bytes"
+        echo "Script lines: $(echo "$BUILD_SCRIPT" | wc -l) lines"
+        echo ""
+
+        # Execute the script and capture any errors
+        if ! bash /tmp/cursor-ui-build-script.sh; then
+          echo ""
+          echo "=== BUILD SCRIPT FAILED - DUMPING SCRIPT CONTENT FOR DEBUG ==="
+          echo "=============================================================="
+          echo "$BUILD_SCRIPT"
+          echo "=============================================================="
+          echo "=== END OF SCRIPT DUMP ==="
+          echo ""
+          echo "You can also find the script at: /tmp/cursor-ui-build-script.sh"
+          echo "To debug: bash -n /tmp/cursor-ui-build-script.sh"
+          exit 1
+        fi
   '';
 
   # Create management scripts
@@ -208,10 +508,114 @@ let
     echo "The modifications are applied at build time, so they're persistent across reboots."
     echo ""
     echo "To see the differences, compare:"
-    echo "  Original Cursor: ${cursorPkg}/share/cursor/resources/app/out/vs/code/electron-main/main.js"
-    echo "  Modified Cursor: ${modifiedCursor}/share/cursor/resources/app/out/vs/code/electron-main/main.js"
+    echo "  Original Cursor: ${cursorPkg}/share/cursor/resources/app/out/main.js"
+    echo "  Modified Cursor: ${modifiedCursor}/share/cursor/resources/app/out/main.js"
     echo "  Original Workbench: ${cursorPkg}/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/"
     echo "  Modified Workbench: ${modifiedCursor}/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/"
+    echo ""
+    echo "Run 'cursor-ui-diff' to see the actual file differences."
+  '';
+
+  cursorUIDiffScript = pkgs.writeShellScriptBin "cursor-ui-diff" ''
+    echo "Cursor UI Style File Differences:"
+    echo "================================="
+    echo ""
+
+    # Check if modified cursor exists
+    if [ ! -d "${modifiedCursor}" ]; then
+      echo "Error: Modified cursor package not found at ${modifiedCursor}"
+      echo "Make sure cursor-ui-style is enabled and the system has been rebuilt."
+      exit 1
+    fi
+
+    # Find main.js files
+    ORIGINAL_MAIN_JS=""
+    MODIFIED_MAIN_JS=""
+
+    # Try different possible locations for main.js
+    for possible_path in \
+      "share/cursor/resources/app/out/main.js" \
+      "usr/share/cursor/resources/app/out/vs/code/electron-main/main.js" \
+      "share/cursor/resources/app/out/vs/code/electron-main/main.js"
+    do
+      if [ -f "${cursorPkg}/$possible_path" ]; then
+        ORIGINAL_MAIN_JS="${cursorPkg}/$possible_path"
+        MODIFIED_MAIN_JS="${modifiedCursor}/$possible_path"
+        break
+      fi
+    done
+
+    if [ -n "$ORIGINAL_MAIN_JS" ] && [ -f "$MODIFIED_MAIN_JS" ]; then
+      echo "📄 Main.js Differences (Electron Options):"
+      echo "-------------------------------------------"
+      if diff -q "$ORIGINAL_MAIN_JS" "$MODIFIED_MAIN_JS" > /dev/null; then
+        echo "No differences found in main.js"
+      else
+        echo "Original: $ORIGINAL_MAIN_JS"
+        echo "Modified: $MODIFIED_MAIN_JS"
+        echo ""
+        # Show context around changes
+        diff -u "$ORIGINAL_MAIN_JS" "$MODIFIED_MAIN_JS" | head -50
+        echo ""
+        echo "(Showing first 50 lines of diff. Use 'diff -u \"$ORIGINAL_MAIN_JS\" \"$MODIFIED_MAIN_JS\"' for full diff)"
+      fi
+    else
+      echo "⚠️  Could not find main.js files to compare"
+    fi
+
+    echo ""
+    echo "🌐 Workbench HTML Differences (Custom CSS/JS):"
+    echo "----------------------------------------------"
+
+    # Find workbench HTML files
+    ORIGINAL_WORKBENCH=""
+    MODIFIED_WORKBENCH=""
+
+    # Try different possible locations for workbench HTML
+    for possible_path in \
+      "share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html" \
+      "usr/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html" \
+      "share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench.esm.html" \
+      "share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/workbench-apc-extension.html"
+    do
+      if [ -f "${cursorPkg}/$possible_path" ]; then
+        ORIGINAL_WORKBENCH="${cursorPkg}/$possible_path"
+        MODIFIED_WORKBENCH="${modifiedCursor}/$possible_path"
+        break
+      fi
+    done
+
+    if [ -n "$ORIGINAL_WORKBENCH" ] && [ -f "$MODIFIED_WORKBENCH" ]; then
+      if diff -q "$ORIGINAL_WORKBENCH" "$MODIFIED_WORKBENCH" > /dev/null; then
+        echo "No differences found in workbench HTML"
+      else
+        echo "Original: $ORIGINAL_WORKBENCH"
+        echo "Modified: $MODIFIED_WORKBENCH"
+        echo ""
+        # Show only the injected content (look for our markers)
+        if grep -q "CURSOR-CUSTOM-CSS-START" "$MODIFIED_WORKBENCH"; then
+          echo "🎨 Injected Custom CSS/JS Content:"
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+          sed -n '/<!-- !! CURSOR-CUSTOM-CSS-START !! -->/,/<!-- !! CURSOR-CUSTOM-CSS-END !! -->/p' "$MODIFIED_WORKBENCH"
+          echo ""
+        fi
+
+        # Show context diff of the end of the file where injection happens
+        echo "📍 HTML Injection Point (last 20 lines):"
+        echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        diff -u "$ORIGINAL_WORKBENCH" "$MODIFIED_WORKBENCH" | tail -30
+      fi
+    else
+      echo "⚠️  Could not find workbench HTML files to compare"
+    fi
+
+    echo ""
+    echo "💡 Tips:"
+    echo "--------"
+    echo "• Use 'cursor-ui-info' for configuration details"
+    echo "• Full diffs: diff -u <original> <modified>"
+    echo "• Check injected CSS: grep -A 50 'CURSOR-CUSTOM-CSS-START' \"$MODIFIED_WORKBENCH\""
+    echo "• Backup files are saved with .original extension in the modified package"
   '';
 
 in {
@@ -299,6 +703,7 @@ in {
       else
         cursorPkg)
       cursorUIScripts
+      cursorUIDiffScript
     ];
 
     # Add some helpful information
