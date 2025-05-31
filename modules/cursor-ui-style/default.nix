@@ -14,6 +14,9 @@ let
   # Create a modified cursor package with UI customizations
   modifiedCursor =
     pkgs.runCommand "cursor-ui-styled" { buildInputs = [ pkgs.jq ]; } ''
+      # Create output directory
+      mkdir -p $out
+
       # Copy the original cursor
       cp -r ${cursorPkg}/* $out/
       chmod -R +w $out/
