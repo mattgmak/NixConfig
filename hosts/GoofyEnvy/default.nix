@@ -1,19 +1,15 @@
-{ pkgs, username, inputs, pkgs-for-cursor, ... }:
-let system = pkgs.stdenv.hostPlatform.system;
+{ pkgs, username, inputs, pkgs-for-cursor, lib, ... }:
+let
+  system = pkgs.stdenv.hostPlatform.system;
+  mkCustomCodeCursor = import ../../modules/custom-code-cursor.nix;
+  custom-code-cursor = mkCustomCodeCursor { inherit pkgs-for-cursor lib; };
 in {
   # Bootloader
   imports = [
     ./hardware-configuration.nix
     ../common.nix
-    ../../modules/custom-code-cursor.nix
     inputs.xremap-flake.nixosModules.default
   ];
-
-  programs.code-cursor = {
-    enable = true;
-    package = pkgs-for-cursor.code-cursor;
-    enableCustomFrame = true;
-  };
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default
@@ -49,6 +45,7 @@ in {
     via
     vial
     kbd
+    custom-code-cursor
   ];
 
   boot = {
