@@ -1,11 +1,15 @@
 { pkgs, username, inputs, pkgs-for-cursor, lib, ... }:
 let
   system = pkgs.stdenv.hostPlatform.system;
-  mkCustomCodeCursor = import ../../modules/custom-code-cursor.nix;
-  custom-code-cursor = mkCustomCodeCursor {
-    inherit lib;
-    pkgs = pkgs-for-cursor;
-    asar = pkgs.asar;
+
+  # Create a module that passes pkgs-for-cursor to cursor-ui-style
+  cursorUIStyleWithPkgs = { config, lib, pkgs, ... }: {
+    imports = [
+      (import ../../modules/cursor-ui-style {
+        inherit config lib pkgs;
+        pkgs-for-cursor = pkgs-for-cursor;
+      })
+    ];
   };
 in {
   # Bootloader
@@ -13,7 +17,18 @@ in {
     ./hardware-configuration.nix
     ../common.nix
     inputs.xremap-flake.nixosModules.default
+    cursorUIStyleWithPkgs
   ];
+
+  # Configure cursor UI style with the requested settings
+  programs.cursor-ui-style = {
+    enable = true;
+    autoApply = true;
+    electron = {
+      frame = false;
+      titleBarStyle = "hiddenInset";
+    };
+  };
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default
@@ -49,7 +64,6 @@ in {
     via
     vial
     kbd
-    custom-code-cursor
   ];
 
   boot = {
