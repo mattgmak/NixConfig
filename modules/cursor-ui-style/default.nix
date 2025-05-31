@@ -123,58 +123,61 @@ let
 
       ${
         optionalString (cfg.customCSS.imports != [ ]) ''
-                    echo "Processing custom CSS/JS imports for Cursor..."
+                  echo "Processing custom CSS/JS imports for Cursor..."
 
-                    # Generate the injection content
-                    INJECTION_CONTENT=""
+                  # Generate the injection content
+                  INJECTION_CONTENT=""
 
-                    ${
-                      lib.concatMapStrings (file:
-                        let
-                          filePath = if builtins.isString file then
-                            file
-                          else if builtins.isPath file then
-                            toString file
-                          else
-                            throw "Import must be a string path or path type";
-                          ext = let
-                            parts = lib.splitString "." (baseNameOf filePath);
+                  ${
+                    lib.concatStringsSep "\n" (map (file:
+                      let
+                        filePath = if builtins.isString file then
+                          file
+                        else if builtins.isPath file then
+                          toString file
+                        else
+                          throw "Import must be a string path or path type";
+                        ext =
+                          let parts = lib.splitString "." (baseNameOf filePath);
                           in if length parts > 1 then
                             ".${lib.last parts}"
                           else
                             "";
-                        in if ext == ".css" then ''
-                          echo "Adding CSS file: ${filePath}"
-                          INJECTION_CONTENT="$INJECTION_CONTENT<style>$(cat ${filePath})</style>"
-                        '' else if ext == ".js" then ''
-                          echo "Adding JS file: ${filePath}"
-                          INJECTION_CONTENT="$INJECTION_CONTENT<script>$(cat ${filePath})</script>"
-                        '' else ''
-                          echo "Warning: Unsupported file extension for ${filePath}, skipping"
-                        '') cfg.customCSS.imports
-                    }
+                      in if ext == ".css" then ''
+                        echo "Adding CSS file: ${filePath}"
+                        INJECTION_CONTENT="$INJECTION_CONTENT<style>$(cat ${filePath})</style>"'' else if ext
+                      == ".js" then ''
+                        echo "Adding JS file: ${filePath}"
+                        INJECTION_CONTENT="$INJECTION_CONTENT<script>$(cat ${filePath})</script>"'' else
+                        ''
+                          echo "Warning: Unsupported file extension for ${filePath}, skipping"'')
+                      cfg.customCSS.imports)
+                  }
 
-                    ${
-                      optionalString cfg.customCSS.statusBar ''
-                        echo "Adding status bar indicator..."
-                        INJECTION_CONTENT="$INJECTION_CONTENT<script>${cursorStatusBarJs}</script>"
-                      ''
-                    }
+                  ${
+                    optionalString cfg.customCSS.statusBar ''
+                                echo "Adding status bar indicator..."
+                                cat >> /tmp/statusbar.js << 'EOF'
+                      ${cursorStatusBarJs}
+                      EOF
+                                INJECTION_CONTENT="$INJECTION_CONTENT<script>$(cat /tmp/statusbar.js)</script>"
+                    ''
+                  }
 
-                    # Remove Content Security Policy meta tag to allow custom scripts
-                    sed -i '/<meta.*http-equiv="Content-Security-Policy".*\/>/d' "$WORKBENCH_HTML"
+                  # Remove Content Security Policy meta tag to allow custom scripts
+                  sed -i '/<meta.*http-equiv="Content-Security-Policy".*\/>/d' "$WORKBENCH_HTML"
 
-                    # Inject our custom content before the closing </html> tag
-                    # Add session ID and markers similar to the original extension
-                    SESSION_ID="nixos-cursor-$(date +%s)"
+                  # Inject our custom content before the closing </html> tag
+                  # Add session ID and markers similar to the original extension
+                  SESSION_ID="nixos-cursor-$(date +%s)"
 
-                    sed -i "s|</html>|<!-- !! CURSOR-CUSTOM-CSS-SESSION-ID $SESSION_ID !! -->
+                  sed -i "s|</html>|<!-- !! CURSOR-CUSTOM-CSS-SESSION-ID $SESSION_ID !! -->
           <!-- !! CURSOR-CUSTOM-CSS-START !! -->
           $INJECTION_CONTENT
           <!-- !! CURSOR-CUSTOM-CSS-END !! -->
           </html>|" "$WORKBENCH_HTML"
 
-                    echo "Successfully injected custom CSS/JS into Cursor workbench"
+                  echo "Successfully injected custom CSS/JS into Cursor workbench"
         ''
       }
 
@@ -299,12 +302,12 @@ in {
     ];
 
     # Add some helpful information
-    warnings = (mkIf (cfg.enable && cfg.electron != { }) [''
+    warnings = (optionals (cfg.enable && cfg.electron != { }) [''
       cursor-ui-style: Applied electron options: ${builtins.toJSON cfg.electron}
 
       Note: Changes require a complete restart of Cursor to take effect.
       Run 'cursor-ui-info' for more details about the modifications.
-    '']) ++ (mkIf (cfg.enable && cfg.customCSS.imports != [ ]) [''
+    '']) ++ (optionals (cfg.enable && cfg.customCSS.imports != [ ]) [''
       cursor-ui-style: Injected ${
         toString (length cfg.customCSS.imports)
       } custom CSS/JS file(s) into Cursor

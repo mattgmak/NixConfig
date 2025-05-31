@@ -28,7 +28,9 @@ in {
       frame = false;
       titleBarStyle = "hiddenInset";
     };
-    customCSS = { imports = [ ../../modules/cursor-ui-style/vscode.css ]; };
+    customCSS = {
+      imports = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
+    };
   };
 
   environment.systemPackages = with pkgs; [
