@@ -67,6 +67,7 @@ in {
     via
     vial
     kbd
+    zoom-us
   ];
 
   boot = {

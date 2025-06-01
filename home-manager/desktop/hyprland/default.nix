@@ -101,11 +101,11 @@
         "SUPER, N, exec, makoctl dismiss -a"
         # Focus binds
         "SUPER, R, exec, zen"
-        "SUPER, E, exec, nu -e cu"
+        "SUPER, E, exec, cursor"
         "SUPER, W, exec, wezterm"
         "SUPER, Q, exec, gnome-system-monitor"
         "$mod, R, focuswindow, class:(.*zen-beta.*)"
-        "$mod, E, focuswindow, class:(.*cursor.*)"
+        "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*wezterm.*)"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
