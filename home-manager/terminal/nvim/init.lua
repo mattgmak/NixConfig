@@ -349,6 +349,9 @@ if is_vscode then
     vim.keymap.set('n', '<leader>k', function()
         vscode.call("snipe-vscode.switchTab")
     end)
+    vim.keymap.set('n', '<leader>a', function()
+        vscode.call("editor.action.quickFix")
+    end)
 end
 
 -- flash
