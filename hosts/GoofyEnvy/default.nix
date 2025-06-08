@@ -68,6 +68,7 @@ in {
     vial
     kbd
     zoom-us
+    code-cursor
   ];
 
   boot = {

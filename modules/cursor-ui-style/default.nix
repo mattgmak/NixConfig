@@ -101,9 +101,6 @@ let
       echo "Applying electron window options..."
       echo "Electron options to inject: ${electronOptionsStr}"
 
-      # Create backup of main.js
-      cp "$MAIN_JS" "$MAIN_JS.original"
-
       # Find and replace the experimentalDarkMode entry to inject our options
       sed -i "s/experimentalDarkMode:!0/experimentalDarkMode:!0,${electronOptionsStr}/g" "$MAIN_JS"
 
@@ -145,9 +142,6 @@ let
       echo "Skipping CSS/JS injection..."
     else
       echo "Found workbench HTML at: $WORKBENCH_HTML"
-
-      # Create backup of workbench HTML
-      cp "$WORKBENCH_HTML" "$WORKBENCH_HTML.original"
 
       ${
         optionalString (cfg.customCSS.imports != [ ]) ''
@@ -284,8 +278,6 @@ let
         # Check if file contains references to original package
         if grep -q "${cursorPkg}" "$file_path" 2>/dev/null; then
           echo "Updating references in: $relative_path"
-          # Create backup
-          cp "$file_path" "$file_path.original" 2>/dev/null || true
           # Replace all references
           sed -i "s|${cursorPkg}|$out|g" "$file_path" 2>/dev/null || {
             echo "Warning: Could not update references in $relative_path"
@@ -300,7 +292,7 @@ let
 
     # Process all files and symlinks recursively
     echo "Scanning for files and symlinks to process..."
-    find "$out" -type f -o -type l | grep -v '\.original$' | while read -r file_path; do
+    find "$out" -type f -o -type l | while read -r file_path; do
       process_file "$file_path"
     done
 
@@ -308,19 +300,17 @@ let
     echo "Applying special fixes for common wrapper locations..."
 
     # Fix any shell scripts that might contain package references
-    find "$out" -type f \( -name "*.sh" -o -name "cursor*" -o -name "*.wrapper" \) | grep -v '\.original$' | while read -r script_file; do
+    find "$out" -type f \( -name "*.sh" -o -name "cursor*" -o -name "*.wrapper" \) | while read -r script_file; do
       if [ -f "$script_file" ] && grep -q "${cursorPkg}" "$script_file" 2>/dev/null; then
         echo "Fixing script: ''${script_file#$out/}"
-        cp "$script_file" "$script_file.original" 2>/dev/null || true
         sed -i "s|${cursorPkg}|$out|g" "$script_file"
       fi
     done
 
     # Fix desktop files and other configuration files
-    find "$out" -type f \( -name "*.desktop" -o -name "*.conf" -o -name "*.json" -o -name "*.xml" \) | grep -v '\.original$' | while read -r config_file; do
+    find "$out" -type f \( -name "*.desktop" -o -name "*.conf" -o -name "*.json" -o -name "*.xml" \) | while read -r config_file; do
       if [ -f "$config_file" ] && grep -q "${cursorPkg}" "$config_file" 2>/dev/null; then
         echo "Fixing config file: ''${config_file#$out/}"
-        cp "$config_file" "$config_file.original" 2>/dev/null || true
         sed -i "s|${cursorPkg}|$out|g" "$config_file"
       fi
     done
@@ -329,7 +319,7 @@ let
 
     # Special handling for wrapped binaries
     echo "Fixing wrapped binaries..."
-    find "$out" -type f -name "*-wrapped" -o -name ".*-wrapped" | grep -v '\.original$' | while read -r wrapped_file; do
+    find "$out" -type f -name "*-wrapped" -o -name ".*-wrapped" | while read -r wrapped_file; do
       if [ -f "$wrapped_file" ]; then
         echo "Processing wrapped binary: ''${wrapped_file#$out/}"
 
@@ -338,7 +328,6 @@ let
           # It's a text file/script
           if grep -q "${cursorPkg}" "$wrapped_file" 2>/dev/null; then
             echo "Updating references in wrapped script: ''${wrapped_file#$out/}"
-            cp "$wrapped_file" "$wrapped_file.original" 2>/dev/null || true
             sed -i "s|${cursorPkg}|$out|g" "$wrapped_file"
           fi
         else
@@ -359,7 +348,7 @@ let
 
     # Also check for any remaining symlinks that might point to the original package
     echo "Checking for remaining symlinks to original package..."
-    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+    find "$out" -type l | while read -r symlink_file; do
       link_target=$(readlink "$symlink_file")
       if [[ "$link_target" == *"${cursorPkg}"* ]]; then
         echo "Fixing remaining symlink: ''${symlink_file#$out/} -> $link_target"
@@ -371,7 +360,7 @@ let
 
     # Special handling for cursor-related symlinks that might point to wrapped versions
     echo "Checking for cursor-related symlinks (including wrapped versions)..."
-    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+    find "$out" -type l | while read -r symlink_file; do
       link_target=$(readlink "$symlink_file")
       # Check if the symlink points to any cursor-related package in the nix store
       if [[ "$link_target" == *"/nix/store/"*"cursor-"* ]]; then
@@ -415,7 +404,7 @@ let
 
     # Handle external cursor-related symlinks by copying targets locally
     echo "Fixing external cursor-related symlinks..."
-    find "$out" -type l | grep -v '\.original$' | while read -r symlink_file; do
+    find "$out" -type l | while read -r symlink_file; do
       link_target=$(readlink "$symlink_file")
       # Check if symlink points to external cursor packages
       if [[ "$link_target" == *"/nix/store/"*"cursor-"* ]] && [[ "$link_target" != "$out"* ]]; then
@@ -440,7 +429,8 @@ let
       fi
     done
 
-    # Verify the main cursor binary was processed
+    # Rename the main cursor binary to cursor-styled
+    echo "Renaming cursor executable to cursor-styled..."
     CURSOR_BIN=""
     for possible_bin in \
       "$out/bin/cursor" \
@@ -453,16 +443,23 @@ let
     done
 
     if [ -n "$CURSOR_BIN" ]; then
-      if grep -q "$out" "$CURSOR_BIN" 2>/dev/null; then
-        echo "✓ Main cursor binary successfully updated: ''${CURSOR_BIN#$out/}"
-      else
-        echo "⚠ Warning: Main cursor binary may not have been updated properly"
-      fi
+      CURSOR_STYLED="$(dirname "$CURSOR_BIN")/cursor-styled"
+      mv "$CURSOR_BIN" "$CURSOR_STYLED"
+      echo "✓ Renamed cursor binary: ''${CURSOR_BIN#$out/} -> ''${CURSOR_STYLED#$out/}"
+
+      # Update any desktop files to reference cursor-styled
+      find "$out" -name "*.desktop" -type f | while read -r desktop_file; do
+        if grep -q "cursor" "$desktop_file"; then
+          echo "Updating desktop file: ''${desktop_file#$out/}"
+          sed -i "s|/cursor|/cursor-styled|g" "$desktop_file"
+          sed -i "s|Exec=cursor|Exec=cursor-styled|g" "$desktop_file"
+        fi
+      done
     else
-      echo "⚠ Warning: Could not find main cursor binary to verify"
+      echo "⚠ Warning: Could not find main cursor binary to rename"
     fi
 
-    echo "Cursor UI modifications completed"
+    echo "Cursor UI modifications completed with cursor-styled executable"
     BUILD_SCRIPT_EOF
     )
 
@@ -506,6 +503,7 @@ let
     echo ""
     echo "This module creates a modified Cursor package with your customizations."
     echo "The modifications are applied at build time, so they're persistent across reboots."
+    echo "The modified version is available as 'cursor-styled' to run alongside the original."
     echo ""
     echo "To see the differences, compare:"
     echo "  Original Cursor: ${cursorPkg}/share/cursor/resources/app/out/main.js"
@@ -514,6 +512,8 @@ let
     echo "  Modified Workbench: ${modifiedCursor}/share/cursor/resources/app/out/vs/code/electron-sandbox/workbench/"
     echo ""
     echo "Run 'cursor-ui-diff' to see the actual file differences."
+    echo "Run 'cursor-styled' to launch the modified version."
+    echo "Run 'cursor' to launch the original version (if installed separately)."
   '';
 
   cursorUIDiffScript = pkgs.writeShellScriptBin "cursor-ui-diff" ''
@@ -613,9 +613,10 @@ let
     echo "💡 Tips:"
     echo "--------"
     echo "• Use 'cursor-ui-info' for configuration details"
+    echo "• Run 'cursor-styled' to launch the modified version"
+    echo "• Run 'cursor' to launch the original version (if installed separately)"
     echo "• Full diffs: diff -u <original> <modified>"
     echo "• Check injected CSS: grep -A 50 'CURSOR-CUSTOM-CSS-START' \"$MODIFIED_WORKBENCH\""
-    echo "• Backup files are saved with .original extension in the modified package"
   '';
 
 in {
@@ -711,6 +712,7 @@ in {
       cursor-ui-style: Applied electron options: ${builtins.toJSON cfg.electron}
 
       Note: Changes require a complete restart of Cursor to take effect.
+      The modified version is available as 'cursor-styled'.
       Run 'cursor-ui-info' for more details about the modifications.
     '']) ++ (optionals (cfg.enable && cfg.customCSS.imports != [ ]) [''
       cursor-ui-style: Injected ${
@@ -723,6 +725,7 @@ in {
       }
 
       Note: Changes require a complete restart of Cursor to take effect.
+      The modified version is available as 'cursor-styled'.
       Run 'cursor-ui-info' for more details about the modifications.
     '']);
 
