@@ -352,6 +352,9 @@ if is_vscode then
     vim.keymap.set('n', '<leader>a', function()
         vscode.call("editor.action.quickFix")
     end)
+    vim.keymap.set('n', '<leader>s', function()
+        vscode.call("workbench.action.files.save")
+    end)
 end
 
 -- flash

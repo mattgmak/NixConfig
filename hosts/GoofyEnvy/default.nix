@@ -22,15 +22,13 @@ in {
 
   # Configure cursor UI style with the requested settings
   programs.cursor-ui-style = {
-    enable = true;
+    enable = false;
     autoApply = true;
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";
     };
-    customCSS = {
-      imports = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
-    };
+    customFiles = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -68,7 +66,11 @@ in {
     vial
     kbd
     zoom-us
-    code-cursor
+    # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
+    (if pkgs-for-cursor ? code-cursor then
+      pkgs-for-cursor.code-cursor
+    else
+      pkgs.code-cursor)
   ];
 
   boot = {
