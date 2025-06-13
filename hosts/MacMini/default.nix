@@ -1,7 +1,8 @@
 # in configuration.nix
 { pkgs, inputs, hostname, username, ... }:
 # inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
-{
+let system = pkgs.stdenv.hostPlatform.system;
+in {
   nixpkgs.hostPlatform = "aarch64-darwin";
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = 6;
@@ -10,6 +11,7 @@
   imports = [
     # ./common.nix
     inputs.home-manager.darwinModules.home-manager
+    inputs.nix-homebrew.darwinModules.nix-homebrew
   ];
 
   users.users.${username} = {
@@ -46,7 +48,29 @@
     wezterm
     raycast
     jq # Required for yabai window focusing scripts
+    mas
+    direnv
   ];
+
+  nix-homebrew = {
+    enable = true;
+    enableRosetta = true;
+    user = username;
+    autoMigrate = true;
+  };
+
+  homebrew = {
+    enable = true;
+    casks = [
+      "google-chrome"
+      "github-copilot-for-xcode"
+      "vial"
+      "android-studio"
+      "android-platform-tools"
+    ];
+    onActivation.cleanup = "zap";
+    # masApps = { "Yoink" = 457622435; };
+  };
 
   fonts.packages = with pkgs; [
     nerd-fonts.iosevka-term
@@ -177,7 +201,7 @@
       # Focus specific applications (similar to your Hyprland focus binds)
       alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="WezTerm") | .id' | head -1)
       alt - e : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Code" or .app=="Cursor") | .id' | head -1)
-      alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Google Chrome" or .app=="Safari") | .id' | head -1)
+      alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Google Chrome" or .app=="Zen") | .id' | head -1)
 
       # Toggle window split
       # alt - r : yabai -m window --toggle split

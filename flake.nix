@@ -8,7 +8,7 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {
@@ -40,7 +40,8 @@
 
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
+  outputs =
+    { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
