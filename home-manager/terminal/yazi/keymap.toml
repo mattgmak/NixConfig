@@ -1,94 +1,94 @@
 "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 
 # Copy file path to wl-clipboard
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = "y"
 run = [
   'shell -- for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list',
   "yank",
 ]
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["<Backspace>"]
 run = "plugin searchjump"
 desc = "Searchjump mode"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["1"]
 run = "plugin relative-motions 1"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["2"]
 run = "plugin relative-motions 2"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["3"]
 run = "plugin relative-motions 3"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["4"]
 run = "plugin relative-motions 4"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["5"]
 run = "plugin relative-motions 5"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["6"]
 run = "plugin relative-motions 6"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["7"]
 run = "plugin relative-motions 7"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["8"]
 run = "plugin relative-motions 8"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["9"]
 run = "plugin relative-motions 9"
 desc = "Move in relative steps"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["f", "G"]
 run = "plugin fg rg"
 desc = "find file by content (ripgrep match)"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["f", "f"]
 run = "plugin fg fzf"
 desc = "find file by filename"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["f", "g"]
 run = "plugin fg"
 desc = "find file by content (fuzzy match)"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["f", "l"]
 run = "filter --smart"
 desc = "Filter files"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["c", "a"]
 run = "plugin compress"
 desc = "Archive selected files"
 
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = "T"
 run = "plugin max-preview"
 desc = "Maximize or restore preview"
 
-[manager]
+[mgr]
 
 keymap = [
   { on = "<Esc>", run = "escape", desc = "Exit visual mode, clear selected, or cancel search" },

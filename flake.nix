@@ -6,6 +6,9 @@
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
 
     hyprland.url = "github:hyprwm/Hyprland";
     hyprland-plugins = {
@@ -37,7 +40,7 @@
 
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
@@ -52,6 +55,7 @@
       laptopName = "GoofyEnvy";
       wslName = "GoofyWSL";
       vmName = "GoofyVM";
+      macMiniName = "MacMini";
     in {
       nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -76,6 +80,14 @@
           hostname = vmName;
         };
         modules = [ ./hosts/${vmName} ];
+      };
+      darwinConfigurations.${macMiniName} = nix-darwin.lib.darwinSystem {
+        specialArgs = {
+          inherit inputs pkgs-stable pkgs-for-cursor;
+          username = "mattgmak";
+          hostname = macMiniName;
+        };
+        modules = [ ./hosts/${macMiniName} ];
       };
     };
 }

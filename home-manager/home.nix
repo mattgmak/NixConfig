@@ -1,4 +1,4 @@
-{ hostname }: {
+{ hostname, username, pkgs }: {
   imports = [
     ./terminal/nushell
     ./terminal/wezterm
@@ -8,10 +8,10 @@
     ./terminal/git
     ./terminal/direnv
     ./terminal/lazygit
+    ./desktop/vscode-custom
   ] ++ (if hostname == "GoofyEnvy" then [
     ./terminal/bluetui
     ./desktop/onedrive
-    ./desktop/vscode-custom
     ./desktop/hyprland
     ./desktop/waybar
     ./desktop/zen-browser
@@ -23,6 +23,7 @@
     ./terminal/clipse
     ./desktop/mpv
     ./terminal/termfilechooser
+    ./stylix.nix
   ] else if hostname == "GoofyWSL" then
     [
 
@@ -30,13 +31,16 @@
   else
     [ ]);
   home = {
-    username = "goofy";
-    homeDirectory = "/home/goofy";
+    username = username;
+    homeDirectory = if hostname == "MacMini" then
+      "/Users/${username}"
+    else
+      "/home/${username}";
     stateVersion = "24.11"; # Please read the comment before changing.
   };
-  xdg.mimeApps = {
+  xdg.mimeApps = pkgs.lib.mkIf (!pkgs.stdenv.isDarwin) {
     enable = true;
-    # Check for desktop files:
+    # Check for desktop file:
     # ls /run/current-system/sw/share/applications/
     # Check for mime types:
     # xdg-mime query filetype file.type

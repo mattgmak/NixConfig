@@ -105,7 +105,7 @@ for i = 1, 9 do
     })
 end
 
-config.default_prog = {'nu'}
+config.default_prog = {'/run/current-system/sw/bin/nu'}
 config.max_fps = 240
 config.animation_fps = 1
 config.term = "xterm-256color" -- Set the terminal type

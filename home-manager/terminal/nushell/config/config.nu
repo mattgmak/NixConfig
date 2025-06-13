@@ -925,10 +925,10 @@ $env.config = {
 }
 
 
-use ./scripts/starship.nu
-source ./scripts/.zoxide.nu
-source ./scripts/atuin.nu
-use ./scripts/conda.nu
+use ~/.nushell-extra/starship.nu
+source ~/.nushell-extra/.zoxide.nu
+source ~/.nushell-extra/atuin.nu
+use ~/.nushell-extra/conda.nu
 
 let flakeDir = $'($env.HOME)/NixConfig'
 
@@ -978,5 +978,5 @@ def --env lg [...args] {
 $env.CONDA_NO_PROMPT = true
 
 $env.config.hooks.pre_prompt = (
-    $env.config.hooks.pre_prompt | append (source ./scripts/direnv.nu)
+    $env.config.hooks.pre_prompt | append (source ~/.nushell-extra/direnv.nu)
 )
