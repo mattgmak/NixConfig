@@ -211,6 +211,7 @@
         AppleShowAllExtensions = true;
       };
       dock = { autohide = true; };
+      NSGlobalDomain.ApplePressAndHoldEnabled = false;
     };
     primaryUser = username;
   };
