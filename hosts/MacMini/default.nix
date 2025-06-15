@@ -1,8 +1,4 @@
-# in configuration.nix
-{ pkgs, inputs, hostname, username, ... }:
-# inputs.self, inputs.nix-darwin, and inputs.nixpkgs can be accessed here
-let system = pkgs.stdenv.hostPlatform.system;
-in {
+{ pkgs, inputs, hostname, username, ... }: {
   nixpkgs.hostPlatform = "aarch64-darwin";
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = 6;
@@ -12,6 +8,7 @@ in {
     # ./common.nix
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
+    inputs.stylix.darwinModules.stylix
   ];
 
   users.users.${username} = {
