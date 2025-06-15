@@ -53,7 +53,7 @@ in {
     btop
     chromium
     xorg.xeyes
-    okular
+    kdePackages.okular
     mpv
     yt-dlp
     qbittorrent

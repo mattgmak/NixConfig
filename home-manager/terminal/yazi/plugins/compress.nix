@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-compress";
-  version = "unstable-2025-02-20";
+  version = "unstable-2025-06-15";
 
   src = fetchFromGitHub {
     owner = "KKV9";
     repo = "compress.yazi";
-    rev = "60b24af23d1050f1700953a367dd4a2990ee51aa";
-    hash = "sha256-Yf5R3H8t6cJBMan8FSpK3BDSG5UnGlypKSMOi0ZFqzE=";
+    rev = "9fc8fe0bd82e564f50eb98b95941118e7f681dc8";
+    hash = "sha256-VKo4HmNp5LzOlOr+SwUXGx3WsLRUVTxE7RI7kIRKoVs=";
   };
 
   buildInputs = [

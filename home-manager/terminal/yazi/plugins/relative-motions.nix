@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-relative-motions";
-  version = "unstable-2024-12-14";
+  version = "unstable-2025-06-15";
 
   src = fetchFromGitHub {
     owner = "dedukun";
     repo = "relative-motions.yazi";
-    rev = "df97039a04595a40a11024f321a865b3e9af5092";
-    hash = "sha256-csX8T2a5f7k6g2mlR+08rm0qBeWdI4ABuja+klIvwqw=";
+    rev = "2e3b6172e6226e0db96aea12d09dea2d2e443fea";
+    hash = "sha256-v0e06ieBKNmt9DATdL7R4AyVFa9DlNBwpfME3LHozLA=";
   };
 
   installPhase = ''
@@ -26,21 +26,18 @@ stdenv.mkDerivation {
       echo "================================================================"
 
       echo "Checking original content..."
-      grep -A 1 'if cmd == "j"\|if cmd == "k"\|direction == "j"\|direction == "k"\|cmd = "j"\|cmd = "k"' $out/share/yazi/plugins/relative-motions/init.lua
+      grep -A 1 'if cmd == "j"\|if cmd == "k"\|direction == "j"\|direction == "k"\|cmd = "j"\|cmd = "k"' $out/share/yazi/plugins/relative-motions/main.lua
 
       echo -e "\nPerforming key swaps..."
       # First, replace all j with TEMP_J
-      sed -i 's/"j"/"TEMP_J"/g' $out/share/yazi/plugins/relative-motions/init.lua
+      sed -i 's/"j"/"TEMP_J"/g' $out/share/yazi/plugins/relative-motions/main.lua
       # Then replace all k with j
-      sed -i 's/"k"/"j"/g' $out/share/yazi/plugins/relative-motions/init.lua
+      sed -i 's/"k"/"j"/g' $out/share/yazi/plugins/relative-motions/main.lua
       # Finally replace TEMP_J with k
-      sed -i 's/"TEMP_J"/"k"/g' $out/share/yazi/plugins/relative-motions/init.lua
+      sed -i 's/"TEMP_J"/"k"/g' $out/share/yazi/plugins/relative-motions/main.lua
 
       echo -e "\nVerifying changes..."
-      grep -A 1 'if cmd == "j"\|if cmd == "k"\|direction == "j"\|direction == "k"\|cmd = "j"\|cmd = "k"' $out/share/yazi/plugins/relative-motions/init.lua
-
-      echo "Renaming init.lua to main.lua"
-      mv $out/share/yazi/plugins/relative-motions/init.lua $out/share/yazi/plugins/relative-motions/main.lua
+      grep -A 1 'if cmd == "j"\|if cmd == "k"\|direction == "j"\|direction == "k"\|cmd = "j"\|cmd = "k"' $out/share/yazi/plugins/relative-motions/main.lua
 
       echo "================================================================"
       echo "Done!"

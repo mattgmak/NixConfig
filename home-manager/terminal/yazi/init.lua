@@ -21,7 +21,6 @@ require("relative-motions"):setup({
 --     filename_max_length = 24, -- trim when filename > 24
 --     filename_trim_length = 6 -- trim 6 chars from both ends
 -- })
-
 -- Add symlink to status bar
 Status:children_add(function(self)
     local h = self._current.hovered

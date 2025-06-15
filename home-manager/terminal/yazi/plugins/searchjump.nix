@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-searchjump";
-  version = "unstable-2025-02-20";
+  version = "unstable-2025-06-15";
 
   src = fetchFromGitHub {
     owner = "DreamMaoMao";
     repo = "searchjump.yazi";
-    rev = "df6ee75772d4095c740572fa4adb06a27857c721";
-    hash = "sha256-JgHxItaE/C7xdc7fe35KfLZGJKiIvurKizPH9cOb3Z0=";
+    rev = "fe884f42fbb642b0e3a9f43487f9c6561b9d4fc6";
+    hash = "sha256-Vss5CLoFmy5r5hX69CFLF2u2Mz0P8hDgFy8riLftRFk=";
   };
 
   installPhase = ''

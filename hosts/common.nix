@@ -14,9 +14,10 @@ in {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs hostname; };
+    extraSpecialArgs = { inherit inputs hostname username; };
     backupFileExtension = "hm-backup-1";
-    users."${username}" = import ../home-manager/home.nix { inherit hostname; };
+    users."${username}" =
+      import ../home-manager/home.nix { inherit hostname username pkgs; };
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -49,7 +50,7 @@ in {
   };
 
   environment.sessionVariables = {
-    FLAKE = "/home/${username}/NixConfig";
+    NH_OS_FLAKE = "/home/${username}/NixConfig";
     TERMINAL = "wezterm";
     BROWSER = "zen";
     GTK_USE_PORTAL = "1";
@@ -68,8 +69,8 @@ in {
   services.xserver.enable = true;
 
   # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -129,6 +130,8 @@ in {
     lazygit
     nurl
     dua
+    nautilus
+    kdePackages.dolphin
   ];
 
   programs.hyprland = {

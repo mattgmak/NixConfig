@@ -2,10 +2,12 @@
 {
   services.mako = {
     enable = true;
-    anchor = "top-right";
-    borderRadius = 10;
-    borderSize = 2;
-    icons = true;
-    layer = "overlay";
+    settings = {
+      anchor = "top-right";
+      border-radius = 10;
+      border-size = 2;
+      icons = true;
+      layer = "overlay";
+    };
   };
 }

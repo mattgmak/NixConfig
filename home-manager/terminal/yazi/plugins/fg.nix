@@ -2,12 +2,12 @@
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-fg";
-  version = "unstable-2025-02-20";
+  version = "unstable-2025-06-15";
 
   src = fetchgit {
     url = "https://gitee.com/DreamMaoMao/fg.yazi.git";
-    rev = "daf696065d65e61a1b3026ab8190351203513d51";
-    hash = "sha256-dcidPBhc0+NvPb80hK+kUoq+PxspceFCliyEc7K3OTk=";
+    rev = "46a5c16f62f415f691319f984b9548249b0edc96";
+    hash = "sha256-B6Feg8icshHQYv04Ee/Bo9PPaiDPRyt1HwpirI/yXj8=";
   };
 
   buildInputs = [

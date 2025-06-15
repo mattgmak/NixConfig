@@ -1,3 +1,1 @@
-{
-  stylix.targets.lazygit.enable = false;
-}
+{ stylix.targets.lazygit.enable = false; }

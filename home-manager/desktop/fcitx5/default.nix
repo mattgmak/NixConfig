@@ -2,7 +2,8 @@
 
   home.file = { ".config/fcitx5/config".source = ./config/config; };
   i18n.inputMethod = {
-    enabled = "fcitx5";
+    type = "fcitx5";
+    enable = true;
     fcitx5.addons = with pkgs; [
       fcitx5-rime
       fcitx5-chinese-addons

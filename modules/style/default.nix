@@ -6,6 +6,8 @@
     noto-fonts-emoji
   ];
 
+  stylix.targets.gnome-text-editor.enable = false;
+
   stylix = {
     enable = true;
     polarity = "dark";
