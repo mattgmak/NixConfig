@@ -48,6 +48,8 @@
     jq # Required for yabai window focusing scripts
     mas
     direnv
+    git-credential-manager
+    cocoapods
   ];
 
   nix-homebrew = {
