@@ -50,6 +50,7 @@
     direnv
     git-credential-manager
     cocoapods
+    ruby_3_4
   ];
 
   nix-homebrew = {
