@@ -198,10 +198,7 @@
       # Focus specific applications (similar to your Hyprland focus binds)
       alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="WezTerm") | .id' | head -1)
       alt - e : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Code" or .app=="Cursor") | .id' | head -1)
-      alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Google Chrome" or .app=="Zen") | .id' | head -1)
-
-      # Toggle window split
-      # alt - r : yabai -m window --toggle split
+      alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Zen") | .id' | head -1)
 
       # Balance all windows
       # alt + shift - space : yabai -m space --balance
