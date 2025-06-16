@@ -19,7 +19,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs hostname; };
+    extraSpecialArgs = { inherit inputs hostname username; };
     backupFileExtension = "hm-backup";
     users.${username} =
       import ../../home-manager/home.nix { inherit hostname username pkgs; };
