@@ -14,7 +14,7 @@
     # rebecca, paraiso, mellow-purple
     base16Scheme = ./color-scheme/rebecca.yaml;
     image = ./beautiful-mountains-landscape.jpg;
-    cursor = {
+    cursor = pkgs.lib.mkIf pkgs.stdenv.isLinux {
       package = pkgs.bibata-cursors;
       name = "Bibata-Modern-Ice";
       size = 24;
