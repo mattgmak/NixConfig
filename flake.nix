@@ -33,10 +33,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    mac-app-util.url = "github:hraban/mac-app-util";
   };
 
-  outputs =
-    { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin
+    , mac-app-util, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";

@@ -96,6 +96,7 @@ $env.NU_PLUGIN_DIRS = [
 # path add ($env.CARGO_HOME | path join "bin")
 # path add ($env.HOME | path join ".local" "bin")
 # $env.PATH = ($env.PATH | uniq)
+$env.PATH = ($env.PATH | prepend "/nix/var/nix/profiles/default/bin")
 $env.PATH = ($env.PATH | prepend "/run/wrappers/bin")
 $env.PATH = ($env.PATH | prepend "/run/current-system/sw/bin")
 $env.PATH = ($env.PATH | append "/snap/bin")

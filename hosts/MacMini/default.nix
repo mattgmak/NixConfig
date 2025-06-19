@@ -25,33 +25,34 @@
     users.${username} =
       import ../../home-manager/home.nix { inherit hostname username pkgs; };
   };
-  environment.systemPackages = with pkgs; [
-    git
-    neovim
-    yazi
-    fzf
-    zoxide
-    starship
-    ripgrep
-    nixfmt-classic
-    atuin
-    nixd
-    nh
-    nvd
-    nix-output-monitor
-    neofetch
-    gh
-    base16-shell-preview
-    lazygit
-    wezterm
-    raycast
-    jq # Required for yabai window focusing scripts
-    mas
-    direnv
-    git-credential-manager
-    cocoapods
-    ruby_3_4
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      git
+      neovim
+      yazi
+      fzf
+      zoxide
+      starship
+      ripgrep
+      nixfmt-classic
+      atuin
+      nixd
+      nh
+      nvd
+      nix-output-monitor
+      neofetch
+      gh
+      base16-shell-preview
+      lazygit
+      wezterm
+      jq # Required for yabai window focusing scripts
+      mas
+      direnv
+      git-credential-manager
+      cocoapods
+      ruby_3_4
+      nix-search-cli
+    ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
     enable = true;
@@ -203,6 +204,7 @@
       alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="WezTerm") | .id' | head -1)
       alt - e : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Code" or .app=="Cursor") | .id' | head -1)
       alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Zen") | .id' | head -1)
+      alt - x : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Xcode") | .id' | head -1)
 
       # Balance all windows
       # alt + shift - space : yabai -m space --balance
@@ -232,7 +234,10 @@
         AppleShowAllFiles = true;
         AppleShowAllExtensions = true;
       };
-      dock = { autohide = true; };
+      dock = {
+        autohide = true;
+        persistent-apps = [ ];
+      };
       NSGlobalDomain.ApplePressAndHoldEnabled = false;
     };
     primaryUser = username;
