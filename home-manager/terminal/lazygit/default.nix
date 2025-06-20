@@ -1,10 +1,22 @@
-{ config, ... }: {
-  programs.lazygit = { enable = true; };
-  home.file.".config/lazygit/config.yml".text = ''
-    keybindings:
-      nextItem-alt: k
-      prevItem-alt: j
-      scrollDownMain-alt1: K
-      scrollUpMain-alt1: J
-  '';
+{ ... }: {
+  programs.lazygit = {
+    enable = true;
+    settings = {
+      keybinding = {
+        universal = {
+          nextItem-alt = "k";
+          prevItem-alt = "j";
+          prevBlock-alt = "l";
+          nextBlock-alt = ";";
+          scrollDownMain-alt1 = "K";
+          scrollUpMain-alt1 = "J";
+          scrollLeft = "L";
+          scrollRight = ":";
+          executeShellCommand = "h";
+        };
+      };
+      gui = { scrollHeight = 10; };
+    };
+  };
+
 }
