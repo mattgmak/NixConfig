@@ -1,6 +1,7 @@
 { hostname, ... }: {
   programs.git = {
     enable = true;
+    delta = { enable = true; };
     userName = "mattgmak";
     userEmail = "u3592095@connect.hku.hk";
     extraConfig = {

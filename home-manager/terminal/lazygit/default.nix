@@ -16,6 +16,13 @@
         };
       };
       gui = { scrollHeight = 10; };
+      git = {
+        paging = {
+          colorArg = "always";
+          pager =
+            "delta --paging=never --line-numbers --hunk-header-style=omit";
+        };
+      };
     };
   };
 
