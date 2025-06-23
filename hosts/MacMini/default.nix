@@ -52,6 +52,7 @@
       cocoapods
       ruby_3_4
       nix-search-cli
+      delta
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
