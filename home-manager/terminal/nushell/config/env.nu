@@ -99,6 +99,7 @@ $env.NU_PLUGIN_DIRS = [
 $env.PATH = ($env.PATH | prepend "/nix/var/nix/profiles/default/bin")
 $env.PATH = ($env.PATH | prepend "/run/wrappers/bin")
 $env.PATH = ($env.PATH | prepend "/run/current-system/sw/bin")
+$env.PATH = ($env.PATH | prepend "/opt/homebrew/bin")
 $env.PATH = ($env.PATH | append "/snap/bin")
 $env.PATH = ($env.PATH | append "/home/goofy/.cargo/bin")
 $env.PATH = ($env.PATH | append "/usr/local/cuda/bin")

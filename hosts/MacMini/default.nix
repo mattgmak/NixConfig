@@ -25,6 +25,13 @@
     users.${username} =
       import ../../home-manager/home.nix { inherit hostname username pkgs; };
   };
+
+  environment.variables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+    DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
+  };
+
   environment.systemPackages = with pkgs;
     [
       git
@@ -53,6 +60,10 @@
       ruby_3_4
       nix-search-cli
       delta
+      swift-format
+      swiftlint
+      xcbeautify
+      sourcekit-lsp
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
@@ -70,7 +81,9 @@
       "vial"
       "android-studio"
       "android-platform-tools"
+      "locationsimulator"
     ];
+    brews = [ "xcode-build-server" ];
     onActivation.cleanup = "zap";
     # masApps = { "Yoink" = 457622435; };
   };

@@ -32,9 +32,10 @@
                 [ ]);
             shellHook = ''
               export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
-              ${if pkgs.stdenv.isDarwin then
-                "export ANDROID_HOME=~/Library/Android/sdk"
-              else
+              ${if pkgs.stdenv.isDarwin then ''
+                export ANDROID_HOME=~/Library/Android/sdk
+                export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+              '' else
                 "export ANDROID_HOME=~/Android/Sdk"}
             '';
           };
