@@ -23,13 +23,17 @@
         in {
           default = pkgs.mkShell {
             packages = with pkgs;
-              [ nodejs_20 browser deno pnpm ]
-              ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ])
-              ++ (if pkgs.stdenv.isLinux then [
-                android-studio
+              [
+                nodejs_20
+                browser
+                deno
+                pnpm
                 androidenv.androidPkgs.platform-tools
-              ] else
-                [ ]);
+                jdk17
+                kotlin
+                kotlin-language-server
+              ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ])
+              ++ (if pkgs.stdenv.isLinux then [ android-studio ] else [ ]);
             shellHook = ''
               export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
               ${if pkgs.stdenv.isDarwin then ''
