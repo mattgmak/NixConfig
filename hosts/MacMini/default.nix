@@ -64,6 +64,8 @@
       swiftlint
       xcbeautify
       sourcekit-lsp
+      nodejs_20
+      btop
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
