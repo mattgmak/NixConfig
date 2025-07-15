@@ -53,6 +53,7 @@
       wslName = "GoofyWSL";
       vmName = "GoofyVM";
       macMiniName = "MacMini";
+      desktopName = "GoofyDesky";
     in {
       nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -85,6 +86,14 @@
           hostname = macMiniName;
         };
         modules = [ ./hosts/${macMiniName} ];
+      };
+      nixosConfigurations.${desktopName} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs username pkgs-stable pkgs-for-cursor system;
+          hostname = desktopName;
+        };
+        modules = [ ./hosts/${desktopName} ];
       };
     };
 }
