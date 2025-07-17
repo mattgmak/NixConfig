@@ -28,12 +28,15 @@
                 browser
                 deno
                 pnpm
-                androidenv.androidPkgs.platform-tools
                 jdk17
                 kotlin
                 kotlin-language-server
               ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ])
-              ++ (if pkgs.stdenv.isLinux then [ android-studio ] else [ ]);
+              ++ (if pkgs.stdenv.isLinux then [
+                android-studio
+                androidenv.androidPkgs.platform-tools
+              ] else
+                [ ]);
             shellHook = ''
               export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
               ${if pkgs.stdenv.isDarwin then ''
