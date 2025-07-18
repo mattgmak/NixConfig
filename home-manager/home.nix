@@ -9,7 +9,9 @@
     ./terminal/direnv
     ./terminal/lazygit
     ./desktop/vscode-custom
-  ] ++ (if hostname == "GoofyEnvy" then [
+    ./terminal/zellij
+    ./terminal/ghostty
+  ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
     ./terminal/bluetui
     ./desktop/onedrive
     ./desktop/hyprland

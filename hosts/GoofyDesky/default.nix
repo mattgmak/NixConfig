@@ -13,12 +13,8 @@ let
   };
 in {
   # Bootloader
-  imports = [
-    ./hardware-configuration.nix
-    ../common.nix
-    inputs.xremap-flake.nixosModules.default
-    cursorUIStyleWithPkgs
-  ];
+  imports =
+    [ ./hardware-configuration.nix ../common.nix cursorUIStyleWithPkgs ];
 
   # Configure cursor UI style with the requested settings
   programs.cursor-ui-style = {
@@ -31,6 +27,8 @@ in {
     customFiles = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
   };
 
+  programs.neovim.defaultEditor = true;
+
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default
     bitwarden-desktop
@@ -38,7 +36,6 @@ in {
     libsForQt5.kdeconnect-kde
     libnotify
     obsidian
-    webcord
     protonvpn-gui
     wl-clipboard
     clipse
@@ -65,6 +62,9 @@ in {
     via
     vial
     kbd
+    vesktop
+    ferium
+    prismlauncher
     # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
     (if pkgs-for-cursor ? code-cursor then
       pkgs-for-cursor.code-cursor
@@ -74,16 +74,27 @@ in {
 
   boot = {
     loader = {
-      systemd-boot.enable = true;
+      grub = {
+        enable = true;
+        devices = [ "nodev" ];
+        efiSupport = true;
+        useOSProber = true;
+      };
       efi.canTouchEfiVariables = true;
     };
     supportedFilesystems = [ "ntfs" ];
   };
 
-  # Add onedrive service
-  services.onedrive = {
-    enable = true;
-    package = pkgs.onedrive;
+  fileSystems."/mnt/windows/c" = {
+    device = "/dev/nvme1n1p4";
+    fsType = "ntfs";
+    options = [ "defaults" "nofail" ];
+  };
+
+  fileSystems."/mnt/windows/d" = {
+    device = "/dev/sdb2";
+    fsType = "ntfs";
+    options = [ "defaults" "nofail" ];
   };
 
   services.udev = {
@@ -96,6 +107,8 @@ in {
     ]; # packages
   }; # udev
 
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia.open = true;
   hardware.graphics.enable = true;
   hardware.bluetooth = {
     enable = true;

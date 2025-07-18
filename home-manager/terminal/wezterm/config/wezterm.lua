@@ -132,8 +132,8 @@ config.window_frame = {
 }
 
 config.initial_cols = 80
-config.enable_wayland = false
-config.front_end = "WebGpu"
+config.enable_wayland = true
+config.front_end = "OpenGL"
 
 require("modules.tab_bar").setup(config)
 return config

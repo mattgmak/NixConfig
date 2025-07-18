@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }: {
+{ pkgs, lib, config, hostname, ... }: {
   imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ];
   home.file.".config/hypr" = {
     recursive = true;
@@ -137,7 +137,15 @@
         ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
       ];
 
-      monitor = [ "eDP-1, highres, 0x0, 1" ", preferred, auto-up, 1" ];
+      monitor = if hostname == "GoofyDesky" then [
+        "DP-3, 2560x1440@240.00Hz, 0x0, 1"
+        "HDMI-A-5, 1920x1080@144.00Hz, -1080x-650, 1, transform, 3"
+      ] else [
+        "eDP-1, highres, 0x0, 1"
+        ", preferred, auto-up, 1"
+      ];
+      workspace =
+        if hostname == "GoofyDesky" then [ "name:1, monitor:DP-3" ] else [ ];
 
       input = {
         kb_layout = "us";
@@ -147,7 +155,7 @@
           disable_while_typing = 1;
           scroll_factor = 0.5;
         };
-        sensitivity = 0.5;
+        sensitivity = if hostname == "GoofyDesky" then 0.15 else 0.5;
       };
       gestures = {
         workspace_swipe = true;
@@ -162,6 +170,7 @@
         "fcitx5 -dr"
         "fcitx5-remote -r"
         "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
+        "hyprctl dispatch workspace 1"
       ];
       xwayland = {
         enabled = true;
