@@ -12,7 +12,8 @@
     enable = true;
     polarity = "dark";
     # rebecca, paraiso, mellow-purple
-    base16Scheme = ./color-scheme/rebecca.yaml;
+    base16Scheme =
+      "${pkgs.base16-schemes}/share/themes/tokyodark-terminal.yaml";
     image = ./beautiful-mountains-landscape.jpg;
     cursor = pkgs.lib.mkIf pkgs.stdenv.isLinux {
       package = pkgs.bibata-cursors;

@@ -44,7 +44,6 @@
       "$mod" = "ALT";
       unbind = [ ];
       bind = [
-        "$mod, Return, exec, wezterm"
         "$mod, h, exec, rofi -show drun"
         "$mod, j, movefocus, u"
         "$mod, k, movefocus, d"
@@ -93,20 +92,23 @@
         "$mod SHIFT, M, exec, pkill waybar || waybar"
         "$mod, M, exec, pkill -SIGUSR1 waybar"
         # Utility binds
-        "SUPER, V, exec, wezterm start --class clipse -e clipse"
-        "SUPER, B, exec, wezterm start --class bluetui -e bluetui"
-        "SUPER, C, exec, wezterm start --class nmtui -e nmtui"
+        "SUPER, V, exec, ghostty --title=clipse -e clipse"
+        "SUPER, B, exec, ghostty --title=bluetui -e bluetui"
+        "SUPER, Q, exec, ghostty --title=btop -e btop"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
-        # Focus binds
+        # App launch binds
         "SUPER, R, exec, zen"
         "SUPER, E, exec, cursor"
-        "SUPER, W, exec, wezterm"
-        "SUPER, Q, exec, gnome-system-monitor"
+        "SUPER, W, exec, ghostty"
+        "SUPER, C, exec, vesktop"
+        # Focus binds
         "$mod, R, focuswindow, class:(.*zen-beta.*)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
-        "$mod, W, focuswindow, class:(.*wezterm.*)"
+        "$mod, W, focuswindow, class:(.*ghostty.*)"
+        "$mod, C, focuswindow, class:(vesktop)"
+        "$mod, G, workspace, name:Game"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind
@@ -144,8 +146,11 @@
         "eDP-1, highres, 0x0, 1"
         ", preferred, auto-up, 1"
       ];
-      workspace =
-        if hostname == "GoofyDesky" then [ "name:1, monitor:DP-3" ] else [ ];
+      workspace = if hostname == "GoofyDesky" then [
+        "name:1, monitor:DP-3"
+        "name:Game, monitor:DP-3"
+      ] else
+        [ ];
 
       input = {
         kb_layout = "us";
@@ -155,7 +160,7 @@
           disable_while_typing = 1;
           scroll_factor = 0.5;
         };
-        sensitivity = if hostname == "GoofyDesky" then 0.15 else 0.5;
+        sensitivity = if hostname == "GoofyDesky" then -0.3 else 0.5;
       };
       gestures = {
         workspace_swipe = true;
@@ -164,8 +169,6 @@
       exec-once = [
         "hyprpaper"
         "systemctl --user start hyprpolkitagent"
-        # "systemctl --user start xdg-desktop-portal-hyprland.service"
-        # "systemctl --user start xdg-desktop-portal-termfilechooser.service"
         "clipse -listen"
         "fcitx5 -dr"
         "fcitx5-remote -r"
@@ -201,19 +204,27 @@
         gaps_in = 2.5;
         gaps_out = 5;
         resize_on_border = true;
-        border_size = 1;
+        border_size = if hostname == "GoofyDesky" then 2 else 1;
         "col.active_border" =
-          lib.mkForce "rgb(${config.lib.stylix.colors.base0A})";
+          lib.mkForce "rgb(${config.lib.stylix.colors.base0E})";
         "col.inactive_border" =
-          lib.mkForce "rgb(${config.lib.stylix.colors.base01})";
+          lib.mkForce "rgb(${config.lib.stylix.colors.base03})";
       };
       cursor = { no_warps = true; };
-      windowrulev2 = [
-        "float, class:(clipse|bluetui|nmtui)"
-        "size 1200 800, class:(clipse|bluetui|nmtui)"
-        "float, title:^(Picture-in-Picture)$"
-        "pin, title:^(Picture-in-Picture)$"
-      ];
+      windowrule = let matchPip = "title:^(Picture-in-Picture)$";
+      in [
+        "float, title:(clipse|bluetui|nmtui|btop)"
+        "size 1200 800, title:(clipse|bluetui|nmtui)"
+        "size 1600 900, title:(btop)"
+        "float, ${matchPip}"
+        "pin, ${matchPip}"
+      ] ++ (if hostname == "GoofyDesky" then [
+        "monitor HDMI-A-5, ${matchPip}"
+        "size 100% 40%, ${matchPip}"
+        "noinitialfocus, ${matchPip}"
+        "workspace name:Game, class:(org.prismlauncher.PrismLauncher)"
+      ] else
+        [ ]);
     };
   };
 }

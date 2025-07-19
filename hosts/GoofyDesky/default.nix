@@ -32,7 +32,6 @@ in {
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default
     bitwarden-desktop
-    wezterm
     libsForQt5.kdeconnect-kde
     libnotify
     obsidian
@@ -63,7 +62,6 @@ in {
     vial
     kbd
     vesktop
-    ferium
     prismlauncher
     # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
     (if pkgs-for-cursor ? code-cursor then
