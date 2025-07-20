@@ -92,7 +92,8 @@ in {
   users.users.${username} = {
     isNormalUser = true;
     description = "Goofy";
-    extraGroups = [ "networkmanager" "wheel" "adbusers" "input" "kvm" ];
+    extraGroups =
+      [ "networkmanager" "wheel" "adbusers" "input" "kvm" "dialout" ];
     shell = pkgs.nushell;
   };
 

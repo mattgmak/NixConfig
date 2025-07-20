@@ -72,6 +72,7 @@ in {
     kbd
     vesktop
     prismlauncher
+    hyperhdr
     # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
     (if pkgs-for-cursor ? code-cursor then
       pkgs-for-cursor.code-cursor
@@ -102,6 +103,16 @@ in {
     device = "/dev/sdb2";
     fsType = "ntfs";
     options = [ "defaults" "nofail" ];
+  };
+
+  systemd.services.hyperhdr = {
+    enable = true;
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      User = "goofy";
+      Group = "dialout";
+      ExecStart = "${pkgs.hyperhdr}/bin/hyperhdr";
+    };
   };
 
   services.udev = {
