@@ -27,7 +27,16 @@ in {
     customFiles = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
   };
 
-  programs.neovim.defaultEditor = true;
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+  };
+  programs.appimage = {
+    enable = true;
+    binfmt = true;
+  };
 
   environment.systemPackages = with pkgs; [
     inputs.zen-browser.packages."${system}".default

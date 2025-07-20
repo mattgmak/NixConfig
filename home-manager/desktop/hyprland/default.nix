@@ -1,4 +1,4 @@
-{ pkgs, lib, config, hostname, ... }: {
+{ pkgs, lib, config, hostname, inputs, ... }: {
   imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ];
   home.file.".config/hypr" = {
     recursive = true;
@@ -39,6 +39,9 @@
       "DESKTOP_SESSION"
     ];
 
+    plugins =
+      [ inputs.hyprland-plugins.packages.${pkgs.system}.csgo-vulkan-fix ];
+
     sourceFirst = true;
     settings = {
       "$mod" = "ALT";
@@ -74,6 +77,7 @@
         "$mod, 6, workspace, 6"
         "$mod, 7, workspace, 7"
         "$mod, 8, workspace, 8"
+        "$mod, G, workspace, name:Game"
         "$mod SHIFT, 1, movetoworkspacesilent, 1"
         "$mod SHIFT, 2, movetoworkspacesilent, 2"
         "$mod SHIFT, 3, movetoworkspacesilent, 3"
@@ -82,6 +86,7 @@
         "$mod SHIFT, 6, movetoworkspacesilent, 6"
         "$mod SHIFT, 7, movetoworkspacesilent, 7"
         "$mod SHIFT, 8, movetoworkspacesilent, 8"
+        "$mod SHIFT, G, movetoworkspacesilent, name:Game"
         ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ", XF86AudioMicMute, exec, ~/.config/hypr/scripts/mic-toggle.sh"
         ", XF86AudioPlay, exec, playerctl play-pause"
@@ -108,7 +113,6 @@
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*ghostty.*)"
         "$mod, C, focuswindow, class:(vesktop)"
-        "$mod, G, workspace, name:Game"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind
@@ -200,6 +204,15 @@
           "workspaces, 1, 6, default"
         ];
       };
+
+      plugin = {
+        csgo-vulkan-fix = {
+          res_w = 2560;
+          res_h = 1440;
+          class = "cs2";
+        };
+      };
+
       general = {
         gaps_in = 2.5;
         gaps_out = 5;
@@ -209,6 +222,7 @@
           lib.mkForce "rgb(${config.lib.stylix.colors.base0E})";
         "col.inactive_border" =
           lib.mkForce "rgb(${config.lib.stylix.colors.base03})";
+        allow_tearing = true;
       };
       cursor = { no_warps = true; };
       windowrule = let matchPip = "title:^(Picture-in-Picture)$";
@@ -222,7 +236,9 @@
         "monitor HDMI-A-5, ${matchPip}"
         "size 100% 40%, ${matchPip}"
         "noinitialfocus, ${matchPip}"
-        "workspace name:Game, class:(org.prismlauncher.PrismLauncher)"
+        "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2)"
+        "immediate, class:^(cs2)$"
+        "fullscreen, class:^(cs2)$"
       ] else
         [ ]);
     };

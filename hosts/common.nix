@@ -132,6 +132,7 @@ in {
     dua
     nautilus
     kdePackages.dolphin
+    git-credential-oauth
   ];
 
   programs.hyprland = {

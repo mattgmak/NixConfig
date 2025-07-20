@@ -9,7 +9,6 @@
     ./terminal/direnv
     ./terminal/lazygit
     ./desktop/vscode-custom
-    ./terminal/zellij
     ./terminal/ghostty
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
     ./terminal/bluetui

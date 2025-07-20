@@ -7,6 +7,7 @@
     extraConfig = {
       fetch.prune = true;
       rerere.enabled = true;
+      credential.helper = [ "cache --timeout 21600" "oauth" ];
     } // (if hostname == "GoofyWSL" then {
       credential.helper =
         "/mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe";
