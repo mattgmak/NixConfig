@@ -178,7 +178,6 @@
         "fcitx5-remote -r"
         "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
         "hyprctl dispatch workspace 1"
-        "hyperhdr"
       ];
       xwayland = {
         enabled = true;
