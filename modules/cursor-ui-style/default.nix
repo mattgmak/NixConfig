@@ -56,7 +56,7 @@ let
       '';
 
       # Override the entire appimageTools.wrapType2 call
-    in pkgs.appimageTools.wrapType2 rec {
+    in pkgs.appimageTools.wrapType2 {
       inherit (originalCursor) version src;
       pname = "${originalCursor.pname or "code-cursor"}-ui-styled";
 
@@ -114,69 +114,6 @@ let
       '';
     };
   };
-
-  # Create management scripts
-  cursorUIScripts = pkgs.writeShellScriptBin "cursor-ui-info" ''
-    echo "Cursor UI Style Module Information:"
-    echo "=================================="
-    echo "Electron options: ${builtins.toJSON cfg.electron}"
-    echo "Auto-apply: ${if cfg.autoApply then "enabled" else "disabled"}"
-    echo ""
-    echo "Cursor Custom CSS/JS:"
-    echo "Imports: ${toString cfg.customFiles}"
-    echo "Status bar indicator: ${
-      if cfg.statusBarIndicator then "enabled" else "disabled"
-    }"
-    echo ""
-    echo "This module uses an overlay to modify the code-cursor package with your customizations."
-    echo "The modifications are applied to the extracted AppImage contents at build time."
-    echo ""
-    echo "Original Cursor package: ${
-      if pkgs-for-cursor ? code-cursor then
-        pkgs-for-cursor.code-cursor
-      else
-        pkgs.code-cursor
-    }"
-    echo "Modified via overlay: nixpkgs.overlays (targets extracted contents)"
-    echo ""
-    echo "Run 'cursor-ui-diff' to see the actual file differences."
-    echo "Run 'cursor' to launch the styled version."
-  '';
-
-  cursorUIDiffScript = pkgs.writeShellScriptBin "cursor-ui-diff" ''
-    echo "Cursor UI Style File Differences:"
-    echo "================================="
-    echo ""
-
-    # Get the current cursor package from the system
-    CURSOR_PKG=$(readlink -f $(which cursor) | sed 's|/bin/cursor.*||')
-    ORIGINAL_PKG="${
-      if pkgs-for-cursor ? code-cursor then
-        pkgs-for-cursor.code-cursor
-      else
-        pkgs.code-cursor
-    }"
-
-    echo "Current Cursor package: $CURSOR_PKG"
-    echo "Original Cursor package: $ORIGINAL_PKG"
-    echo ""
-
-    # Check if this is a styled version
-    if [[ "$CURSOR_PKG" == *"ui-styled"* ]]; then
-      echo "✅ Currently using styled version of Cursor"
-      echo "📁 Extracted contents should also be modified"
-    else
-      echo "ℹ️  Currently using original version of Cursor"
-    fi
-
-    echo ""
-    echo "💡 Tips:"
-    echo "--------"
-    echo "• Use 'cursor-ui-info' for configuration details"
-    echo "• The overlay modifies the extracted AppImage contents"
-    echo "• Changes are applied during system build"
-    echo "• Check extracted store path: \$(nix eval .#nixosConfigurations.GoofyEnvy.pkgs.code-cursor.extracted --raw)"
-  '';
 
 in {
   options.programs.cursor-ui-style = {

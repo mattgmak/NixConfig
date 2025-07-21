@@ -1,5 +1,11 @@
 "$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
 
+[[mgr.prepend_keymap]]
+on = "!"
+for = "unix"
+run = 'shell "$SHELL" --block'
+desc = "Open shell here"
+
 # Copy file path to wl-clipboard
 [[mgr.prepend_keymap]]
 on = "y"
@@ -60,12 +66,12 @@ desc = "Move in relative steps"
 
 [[mgr.prepend_keymap]]
 on = ["f", "G"]
-run = "plugin fg rg"
+run = "plugin fg -- rg"
 desc = "find file by content (ripgrep match)"
 
 [[mgr.prepend_keymap]]
 on = ["f", "f"]
-run = "plugin fg fzf"
+run = "plugin fg -- fzf"
 desc = "find file by filename"
 
 [[mgr.prepend_keymap]]
