@@ -18,8 +18,8 @@ in {
 
   # Configure cursor UI style with the requested settings
   programs.cursor-ui-style = {
-    enable = false;
-    autoApply = true;
+    enable = true;
+    autoApply = true; # Re-enable autoApply to use the fixed module overlay
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";
@@ -74,10 +74,11 @@ in {
     prismlauncher
     hyperhdr
     # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
-    (if pkgs-for-cursor ? code-cursor then
-      pkgs-for-cursor.code-cursor
-    else
-      pkgs.code-cursor)
+    code-cursor
+    # (if pkgs-for-cursor ? code-cursor then
+    #   pkgs-for-cursor.code-cursor
+    # else
+    #   pkgs.code-cursor)
   ];
 
   boot = {

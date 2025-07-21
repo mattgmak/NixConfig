@@ -13,62 +13,59 @@ let
       else
         prev.code-cursor;
 
-      # Convert electron options to JSON string (removing outer braces for injection)
-      electronOptionsStr = if cfg.electron != { } then
-        let
-          electronJson = builtins.toJSON cfg.electron;
-          # Remove the outer braces to get just the key-value pairs
-          innerJson =
-            builtins.substring 1 (builtins.stringLength electronJson - 2)
-            electronJson;
-        in innerJson
-      else
-        "";
+      # Convert electron options to JSON string (keeping full JSON object syntax)
+      electronOptionsStr =
+        if cfg.electron != { } then builtins.toJSON cfg.electron else "{}";
 
       # Create script to inject into main process
       injectionScript = ''
         // Cursor UI Style - Electron Options
-        const { app } = require('electron');
-        ${optionalString (electronOptionsStr != "")
-        "Object.assign(process.env, { ELECTRON_OPTIONS: '${electronOptionsStr}' });"}
+        import { app, BrowserWindow } from "electron";
 
-        // Load custom CSS/JS files
-        ${concatMapStringsSep "\n" (file: ''
-          try {
-            const customPath = '${file}';
-            if (require('fs').existsSync(customPath)) {
-              if (customPath.endsWith('.css')) {
-                const css = require('fs').readFileSync(customPath, 'utf8');
-                app.whenReady().then(() => {
-                  const { session } = require('electron');
-                  session.defaultSession.webContents.on('dom-ready', () => {
-                    session.defaultSession.webContents.insertCSS(css);
-                  });
-                });
-              } else if (customPath.endsWith('.js')) {
-                require(customPath);
-              }
-            }
-          } catch (e) {
-            console.error('Cursor UI Style injection error:', e);
+        ${if cfg.electron != { } then ''
+          // Apply electron options by intercepting BrowserWindow creation
+          const electronOptions = ${electronOptionsStr};
+          console.log("Cursor UI Style: Applying electron options:", electronOptions);
+
+          // Store the original BrowserWindow constructor
+          const OriginalBrowserWindow = BrowserWindow;
+
+          // Override BrowserWindow to apply our options
+          function PatchedBrowserWindow(options = {}) {
+            // Merge our electron options with the existing options
+            const mergedOptions = { ...options, ...electronOptions };
+            console.log("Cursor UI Style: Creating BrowserWindow with options:", mergedOptions);
+            return new OriginalBrowserWindow(mergedOptions);
           }
-        '') cfg.customFiles}
+
+          // Replace the original BrowserWindow
+          global.BrowserWindow = PatchedBrowserWindow;
+          // module.exports.BrowserWindow = PatchedBrowserWindow;
+          export { PatchedBrowserWindow as BrowserWindow };
+        '' else
+          ""}
       '';
 
-      # Override the entire appimageTools.wrapType2 call
-    in pkgs.appimageTools.wrapType2 {
-      inherit (originalCursor) version src;
-      pname = "${originalCursor.pname or "code-cursor"}-ui-styled";
+      # Override the original cursor package instead of replacing it entirely
+    in originalCursor.overrideAttrs (oldAttrs: {
+      # Override postUnpack to modify extracted content directly
+      postUnpack = (oldAttrs.postUnpack or "") + ''
+        echo "Applying Cursor UI customizations..."
 
-      # Use the postExtract hook to modify the extracted contents
-      postExtract = ''
-        echo "Applying Cursor UI customizations to extracted contents..."
+        # Get the extracted directory name
+        extracted_dir=$(find . -maxdepth 1 -name "*extracted" -type d | head -1)
+        if [[ -z "$extracted_dir" ]]; then
+          echo "Error: Could not find extracted directory"
+          exit 1
+        fi
 
-        # Find the main.js file in the extracted AppImage
+        echo "Working on extracted directory: $extracted_dir"
+
+        # Find the main.js file in the extracted directory
         mainjs_file=""
-        for candidate in "$extracted/usr/share/cursor/resources/app/out/main.js" \
-                         "$extracted/resources/app/out/main.js" \
-                         "$extracted/opt/Cursor/resources/app/out/main.js"; do
+        for candidate in "$extracted_dir/usr/share/cursor/resources/app/out/main.js" \
+                         "$extracted_dir/resources/app/out/main.js" \
+                         "$extracted_dir/opt/Cursor/resources/app/out/main.js"; do
           if [[ -f "$candidate" ]]; then
             mainjs_file="$candidate"
             echo "Found main.js at: $mainjs_file"
@@ -77,42 +74,65 @@ let
         done
 
         if [[ -z "$mainjs_file" ]]; then
-          echo "Warning: Could not find main.js file in extracted AppImage"
-          find "$extracted" -name "main.js" -type f | head -5
+          echo "Warning: Could not find main.js file in extracted directory"
+          find "$extracted_dir" -name "main.js" -type f | head -5
         else
           # Inject our customizations at the beginning of main.js
-          echo "Injecting cursor UI customizations..."
+          echo "Injecting cursor UI customizations into main.js..."
           {
-            echo '${injectionScript}'
-            echo ""
             cat "$mainjs_file"
+            echo ""
+            echo '${injectionScript}'
           } > "$mainjs_file.tmp"
           mv "$mainjs_file.tmp" "$mainjs_file"
           echo "Successfully injected customizations into main.js"
         fi
 
-        # Also try to find and modify any workbench.html files
-        find "$extracted" -name "workbench.html" -type f | while read -r htmlfile; do
+        # Also try to find and modify any workbench.html files in extracted directory
+        find "$extracted_dir" -name "workbench.html" -type f | while read -r htmlfile; do
           echo "Found workbench.html: $htmlfile"
           ${
             optionalString (cfg.customFiles != [ ]) ''
               # Inject custom CSS/JS files into HTML
-              ${concatMapStringsSep "\n" (file: ''
-                if [[ "${file}" == *.css ]]; then
-                  echo "Injecting CSS file: ${file}"
-                  sed -i 's|</head>|<style>/*Custom Cursor UI Style*/ @import url("file://${file}");</style></head>|' "$htmlfile"
-                elif [[ "${file}" == *.js ]]; then
-                  echo "Injecting JS file: ${file}"
-                  sed -i 's|</head>|<script src="file://${file}"></script></head>|' "$htmlfile"
-                fi
-              '') cfg.customFiles}
+              ${concatMapStringsSep "\n" (file:
+                let
+                  fileContent = builtins.readFile file;
+                  # Escape special characters for shell
+                  escapedContent =
+                    builtins.replaceStrings [ "\n" "\r" "\\" "'" ''"'' "$" ] [
+                      "\\n"
+                      "\\r"
+                      "\\\\"
+                      "\\'"
+                      ''\"''
+                      "\\$"
+                    ] fileContent;
+                in ''
+                                    if [[ "${file}" == *.css ]]; then
+                                      echo "Injecting CSS file: ${file}"
+                                      # Use printf to handle multiline content properly
+                                      printf '%s\n' "$(cat <<'EOF'
+                  s|</head>|<style>/*Custom Cursor UI Style ${file}*/ ${escapedContent}</style></head>|
+                  EOF
+                  )" | sed -i -f - "$htmlfile"
+                                    elif [[ "${file}" == *.js ]]; then
+                                      echo "Injecting JS file: ${file}"
+                                      printf '%s\n' "$(cat <<'EOF'
+                  s|</head>|<script>/*Custom Cursor UI Style ${file}*/ ${escapedContent}</script></head>|
+                  EOF
+                  )" | sed -i -f - "$htmlfile"
+                                    fi
+                '') cfg.customFiles}
             ''
           }
         done
 
-        echo "Cursor UI customization complete."
+        echo "Cursor UI customization complete on extracted directory."
       '';
-    };
+
+      # Keep the original sourceRoot since we're modifying in place
+      # sourceRoot remains: ${oldAttrs.pname}-${oldAttrs.version}-extracted/usr/share/cursor
+    });
   };
 
 in {
