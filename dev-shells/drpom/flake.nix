@@ -39,6 +39,7 @@
                 [ ]);
             shellHook = ''
               export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
+              export NODE_OPTIONS="--experimental-vm-modules"
               ${if pkgs.stdenv.isDarwin then ''
                 export ANDROID_HOME=~/Library/Android/sdk
                 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer

@@ -87,6 +87,7 @@
       "locationsimulator"
       "zulu@17"
       "chromium"
+      "ghostty"
     ];
     brews = [ "xcode-build-server" ];
     onActivation.cleanup = "zap";

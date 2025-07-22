@@ -1,8 +1,7 @@
-{ ... }:
-let
-in {
+{ pkgs, ... }: {
   programs.ghostty = {
-    enable = true;
+    # Only enable on Linux for now, install ghostty on macOS with brew
+    enable = pkgs.stdenv.isLinux;
     settings = {
       font-size = 14;
       font-family = "IosevkaTerm Nerd Font";
