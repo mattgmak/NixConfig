@@ -8,7 +8,12 @@
       fetch.prune = true;
       rerere.enabled = true;
       # 7 days
-      credential.helper = [ "cache --timeout 604800" "oauth" ];
+      # credential.helper = [ "cache --timeout 604800" "oauth" ];
+      credential = {
+        helper = "manager";
+        "https://github.com".username = "mattgmak";
+        credentialStore = "cache";
+      };
     } // (if hostname == "GoofyWSL" then {
       credential.helper =
         "/mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe";
