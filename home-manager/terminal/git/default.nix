@@ -10,7 +10,7 @@
       # 7 days
       # credential.helper = [ "cache --timeout 604800" "oauth" ];
       credential = {
-        helper = "manager";
+        helper = [ "cache --timeout 604800" "manager" ];
         "https://github.com".username = "mattgmak";
         credentialStore = "cache";
       };
