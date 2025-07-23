@@ -185,8 +185,24 @@ in {
   }; # udev
 
   services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia.open = true;
-  hardware.graphics.enable = true;
+  hardware = {
+    graphics = {
+      enable = true;
+      extraPackages = with pkgs; [
+        nvidia-vaapi-driver
+        vaapiVdpau
+        libvdpau
+        libvdpau-va-gl
+        vdpauinfo
+        libva
+        libva-utils
+      ];
+    };
+    nvidia = {
+      open = true;
+      powerManagement.enable = true;
+    };
+  };
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
