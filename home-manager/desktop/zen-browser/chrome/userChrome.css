@@ -5,7 +5,7 @@ If you already have one, append the import statement below at the top of your us
 
 */
 
-@import "natsumi/natsumi.css";
+@import "Nebula/Nebula.css";
 
 * {
   font-family: "Inter" !important;

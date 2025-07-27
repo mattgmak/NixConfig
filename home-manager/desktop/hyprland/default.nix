@@ -109,7 +109,7 @@
         "SUPER, W, exec, ghostty"
         "SUPER, C, exec, vesktop"
         # Focus binds
-        "$mod, R, focuswindow, class:(.*zen-beta.*)"
+        "$mod, R, focuswindow, class:(.*zen.*)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*ghostty.*)"
         "$mod, C, focuswindow, class:(vesktop)"

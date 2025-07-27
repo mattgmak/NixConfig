@@ -2,7 +2,7 @@
 
 # Copy Zen Browser configuration files, excluding backup files
 let source_dir = $"($env.HOME)/.zen/GoofyZen/chrome"
-let target_dir = $"($env.HOME)/NixConfig/home-manager/zen-browser/chrome"
+let target_dir = $"($env.HOME)/NixConfig/home-manager/desktop/zen-browser/chrome"
 
 # Function to recursively copy files, excluding hm-backup files
 def copy_recursive [source, target] {
@@ -25,7 +25,7 @@ def copy_recursive [source, target] {
         }
 
         # Skip files ending with hm-backup
-        if ($base_name | str ends-with ".hm-backup") {
+        if ($base_name | str contains ".hm-backup") {
             continue
         }
 

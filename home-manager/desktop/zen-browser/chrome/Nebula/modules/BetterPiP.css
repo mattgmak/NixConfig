@@ -1,54 +1,41 @@
-/*
+/* Add rounded corners to player holder */
+.player-holder {
+  border-radius: 7.6px !important; /* Adjust the radius as needed */
+}
 
-Natsumi Browser - A userchrome for Zen Browser that makes things flow.
+/* ------------------------- Nebula Picture in Picture ------------------------- */
 
-Copyright (c) 2024-present Green (@greeeen-dev)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-Natsumi Browser uses code from others. The link to the original projects or
-their author(s) have been provided above the used code.
-
-*/
-
-/* ==== Natsumi PiP ==== */
-
-@media not (-moz-bool-pref: "natsumi.pip.disabled") {
+@media not -moz-pref("nebula.pip.disabled") {
   @-moz-document url("chrome://global/content/pictureinpicture/player.xhtml") {
     /*noinspection CssInvalidFunction*/
     * {
-      --natsumi-primary-color: #a0d490;
-      --natsumi-colors-primary: color-mix(in srgb, var(--natsumi-primary-color) 50%, black 50%);
-      --natsumi-colors-secondary: color-mix(in srgb, var(--natsumi-colors-primary) 20%, white 80%);
+      --nebula-primary-color: #a0d490;
+      --nebula-colors-primary: color-mix(in srgb, var(--nebula-primary-color) 50%, black 50%);
+      --nebula-colors-secondary: color-mix(in srgb, var(--nebula-colors-primary) 20%, white 80%);
 
       @media (prefers-color-scheme: dark) {
-        --natsumi-colors-primary: color-mix(in srgb, var(--natsumi-primary-color) 20%, #1d1d1d 80%);
-        --natsumi-colors-secondary: color-mix(in srgb, var(--natsumi-primary-color) 30%, #1d1d1d 70%);
+        --nebula-colors-primary: color-mix(in srgb, var(--nebula-primary-color) 20%, #1d1d1d 80%);
+        --nebula-colors-secondary: color-mix(in srgb, var(--nebula-primary-color) 30%, #1d1d1d 70%);
       }
 
-      --natsumi-glass-background: color-mix(in srgb, var(--natsumi-colors-secondary) 75%, transparent);
-      --natsumi-glass-shadow-color: color-mix(in srgb, var(--natsumi-colors-secondary) 75%, light-dark(black, white));
+      /* Material: Haze */
+      --nebula-mat-hz-background: rgba(255, 255, 255, 0.8);
+      --nebula-mat-hz-background-tinted: color-mix(in srgb, var(--nebula-primary-color) 30%, rgba(255, 255, 255, 0.8));
+      --nebula-mat-hz-blur-radius: 100px;
+
+      @media (prefers-color-scheme: dark) {
+        --nebula-mat-hz-background: rgba(0, 0, 0, 0.8);
+        --nebula-mat-hz-background-tinted: color-mix(in srgb, var(--nebula-colors-secondary) 40%, rgba(0, 0, 0, 0.8));
+      }
+
+      /* Material: Glass */
+      --nebula-mat-ga-background: color-mix(in srgb, var(--nebula-colors-secondary) 75%, transparent);
+      --nebula-mat-ga-shadow-color: color-mix(in srgb, var(--nebula-colors-secondary) 75%, light-dark(black, white));
       --toolbarbutton-hover-background: color-mix(in srgb, light-dark(#1d1d1d, #ebebeb) 10%, transparent 90%);
       --toolbarbutton-active-background: light-dark(rgba(0, 0, 0, 0.07), rgba(255, 255, 255, 0.11));
 
-      @media (-moz-bool-pref: "natsumi.theme.force-dark-shadows") {
-        --natsumi-glass-shadow-color: color-mix(in srgb, var(--natsumi-colors-secondary) 75%, black);
+      @media -moz-pref("nebula.theme.force-dark-shadows") {
+        --nebula-mat-ga-shadow-color: color-mix(in srgb, var(--nebula-colors-secondary) 75%, black);
       }
     }
 
@@ -84,37 +71,51 @@ their author(s) have been provided above the used code.
       }
     }
 
+    @media -moz-pref("nebula.pip.rounded") {
+      /* This won't work on Linux (sadly), might be just a Gnome thing. */
+      /* If you're seeing this, create an issue if it does indeed work */
+
+      @media (-moz-platform: windows) {
+        window, html, body {
+          /* Share same radius as macOS for the sake of simplicity later */
+          border-radius: 9px !important;
+        }
+      }
+    }
+
     html {
       animation: pip-fadein-html 0.5s ease !important;
     }
 
     .player-holder {
       animation: pip-fadein-player 0.5s ease !important;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
     }
 
     #controls {
       opacity: 1 !important;
 
+      /*noinspection CssInvalidFunction*/
       & > button {
         opacity: 0 !important;
         top: 0 !important;
         filter: blur(5px);
         border-radius: 6px !important;
         transition: opacity 0.3s ease, top 0.3s ease, filter 0.3s ease, background-color 0.2s ease !important;
-        backdrop-filter: blur(15px);
+        backdrop-filter: saturate(var(--nebula-mat-hz-saturation)) contrast(var(--nebula-mat-hz-contrast)) blur(var(--nebula-mat-hz-blur-radius)) !important;
         background-image: none !important;
-        background-color: var(--natsumi-glass-background) !important;
-        box-shadow: 0 0 10px var(--natsumi-glass-shadow-color) !important;
-        border: 1px solid rgba(20, 20, 20, 0.2) !important;
+        background-color: var(--nebula-mat-hz-background) !important;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.5) !important;
+        border: 2px solid light-dark(rgba(20, 20, 20, 0.1), rgba(235, 235, 235, 0.1)) !important;
 
-        @media (prefers-color-scheme: dark) {
-          border: 1px solid rgba(235, 235, 235, 0.3) !important;
+        @media -moz-pref("nebula.pip.tinted-haze") {
+          background-color: var(--nebula-mat-hz-background-tinted) !important;
         }
 
         &::before {
           content: "";
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           padding: 2px;
           display: flex;
           position: absolute;
@@ -134,16 +135,16 @@ their author(s) have been provided above the used code.
           content: url("chrome://browser/skin/zen-icons/close.svg") !important;
         }
 
+        &#minimize::before {
+          content: url("chrome://browser/skin/zen-icons/unpin.svg") !important;
+        }
+
         &#unpip::before {
-          content: url("chrome://browser/skin/zen-icons/open.svg") !important;
+          content: url("chrome://browser/skin/zen-icons/screen.svg") !important;
         }
 
         &:hover {
-          background-color: color-mix(in srgb, var(--natsumi-glass-background) 80%, white) !important;
-
-          @media (prefers-color-scheme: light) {
-            background-color: color-mix(in srgb, var(--natsumi-glass-background) 80%, black) !important;
-          }
+          background-color: black !important;
         }
       }
 
@@ -155,22 +156,30 @@ their author(s) have been provided above the used code.
       #controls-bottom {
         opacity: 0 !important;
         bottom: -5px !important;
-        background-color: var(--natsumi-glass-background) !important;
-        border: 1px solid light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
+        background-color: var(--nebula-mat-hz-background) !important;
         border-radius: 10px !important;
         padding: 10px 15px !important;
         margin: 0 5px !important;
-        width: calc(100% - 10px) !important;
+        margin-bottom: 5px !important;
+        width: min(calc(100% - 10px), 700px) !important;
         box-sizing: border-box !important;
-        box-shadow: 0 0 10px var(--natsumi-glass-shadow-color) !important;
-        backdrop-filter: blur(0);
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: saturate(3) contrast(2) blur(var(--nebula-mat-hz-blur-radius)) !important;
         filter: blur(10px);
-        transition: opacity 0.3s ease, bottom 0.3s ease, backdrop-filter 0.3s ease, filter 0.3s ease !important;
+        transition: opacity 0.3s ease, bottom 0.3s ease, filter 0.3s ease !important;
+        border: 2px solid light-dark(rgba(20, 20, 20, 0.1), rgba(235, 235, 235, 0.1)) !important;
+        left: calc(50% - 5px) !important;
+        transform: translateX(-50%) !important;
 
-        @media (-moz-bool-pref: "natsumi.pip.native-border-radius") {
+        @media -moz-pref("nebula.pip.tinted-haze") {
+          background-color: var(--nebula-mat-hz-background-tinted) !important;
+        }
+
+        @media -moz-pref("nebula.pip.native-border-radius") and (width <= 710px) {
           /* For the sake of adding native radius, we'll reduce the margin of the controls here */
-          width: 100% !important;
+          width: min(100%, 700px) !important;
           margin: 0 !important;
+          left: calc(50%) !important;
           bottom: -10px !important;
 
           /*
@@ -183,7 +192,9 @@ their author(s) have been provided above the used code.
         }
 
         .start-controls {
-          display: flex !important;
+          @media (width > 300px) {
+            display: flex !important;
+          }
 
           /*noinspection CssInvalidFunction*/
           #timestamp {
@@ -199,9 +210,9 @@ their author(s) have been provided above the used code.
         #scrubber, #audio-scrubber {
           margin: 0 !important;
 
-          &::-moz-range-progress {
-            background: linear-gradient(to right, white, var(--natsumi-primary-color)) !important;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5) !important;
+          /*noinspection CssInvalidFunction*/
+          #scrubber::-moz-range-progress {
+            background: white !important;
           }
 
           /*noinspection CssInvalidFunction*/
@@ -209,19 +220,12 @@ their author(s) have been provided above the used code.
             background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1)) !important;
           }
 
+          /*noinspection CssInvalidFunction*/
           &::-moz-range-thumb {
-            background-color: var(--natsumi-primary-color) !important;
+            background: white !important;
             width: 12px !important;
             height: 12px !important;
             border: none !important;
-            opacity: 0;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.4) !important;
-          }
-
-          &:hover {
-            &::-moz-range-thumb {
-              opacity: 1;
-            }
           }
         }
 
@@ -361,13 +365,13 @@ their author(s) have been provided above the used code.
         input {
           /*noinspection CssInvalidFunction*/
           &:checked {
-            border-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+            border-color: light-dark(var(--nebula-colors-primary), var(--nebula-primary-color)) !important;
           }
 
           /*noinspection CssInvalidFunction*/
           &:checked + .slider {
-            background-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
-            outline-color: light-dark(var(--natsumi-colors-primary), var(--natsumi-primary-color)) !important;
+            background-color: light-dark(var(--nebula-colors-primary), var(--nebula-primary-color)) !important;
+            outline-color: light-dark(var(--nebula-colors-primary), var(--nebula-primary-color)) !important;
 
             &::before {
               background-color: white !important;
@@ -377,12 +381,12 @@ their author(s) have been provided above the used code.
 
         /*noinspection CssInvalidFunction*/
         & > .panel-fieldset {
-          background-color: var(--natsumi-glass-background) !important;
+          background-color: var(--nebula-mat-ga-background) !important;
           backdrop-filter: blur(15px);
           filter: blur(0);
           transition: backdrop-filter 0.3s ease, filter 0.3s ease;
           border: 1px solid light-dark(rgba(20, 20, 20, 0.2), rgba(235, 235, 235, 0.3)) !important;
-          box-shadow: 0 0 10px var(--natsumi-glass-shadow-color) !important;
+          box-shadow: 0 0 10px var(--nebula-mat-ga-shadow-color) !important;
           padding: 0 !important;
         }
 
@@ -420,28 +424,31 @@ their author(s) have been provided above the used code.
           }
         }
       }
+    }
 
-      &:hover {
-        & > button {
-          opacity: 1 !important;
-          top: 10px !important;
-          filter: blur(0) !important;
-        }
+    body:fullscreen #controls[showing]:hover, body:not(:fullscreen) #controls:hover {
+      & > button {
+        opacity: 1 !important;
+        top: 10px !important;
+        filter: blur(0) !important;
+      }
 
-        #controls-bottom {
-          opacity: 1 !important;
-          bottom: 5px !important;
-          backdrop-filter: blur(15px);
-          filter: blur(0);
+      #controls-bottom {
+        opacity: 1 !important;
+        bottom: 5px !important;
+        filter: blur(0);
 
-          @media (-moz-bool-pref: "natsumi.pip.native-border-radius") {
-            bottom: 0 !important;
-          }
+        @media -moz-pref("nebula.pip.native-border-radius") {
+          bottom: 0 !important;
         }
       }
     }
 
     body:fullscreen {
+      &:has(#controls:not([showing])) {
+        cursor: none !important;
+      }
+
       #controls {
         #controls-bottom {
           #fullscreen {

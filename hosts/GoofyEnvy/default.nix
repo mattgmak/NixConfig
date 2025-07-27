@@ -32,7 +32,7 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    inputs.zen-browser.packages."${system}".default
+    # inputs.zen-browser.packages."${system}".default
     bitwarden-desktop
     wezterm
     libsForQt5.kdeconnect-kde
