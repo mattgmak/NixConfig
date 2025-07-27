@@ -25,6 +25,7 @@
     ./desktop/mpv
     ./terminal/termfilechooser
     ./stylix.nix
+    ./desktop/kdeconnect
   ] else if hostname == "GoofyWSL" then
     [
 

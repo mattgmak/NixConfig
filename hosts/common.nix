@@ -69,8 +69,21 @@ in {
     enable = true;
     allowedTCPPorts = [ 80 443 3000 8081 ];
     allowedUDPPorts = [ 80 443 ];
+    allowedTCPPortRanges = [
+      # KDEConnect
+      {
+        from = 1714;
+        to = 1764;
+      }
+    ];
+    allowedUDPPortRanges = [
+      # KDEConnect
+      {
+        from = 1714;
+        to = 1764;
+      }
+    ];
   };
-
   environment.sessionVariables = {
     NH_OS_FLAKE = "/home/${username}/NixConfig";
     TERMINAL = "wezterm";
@@ -157,6 +170,7 @@ in {
     kdePackages.dolphin
     git-credential-manager
     code-cursor
+    kdePackages.kdeconnect-kde
   ];
 
   programs.hyprland = {
