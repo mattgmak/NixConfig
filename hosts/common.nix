@@ -1,14 +1,25 @@
-{ pkgs, inputs, hostname, username, ... }:
+{ pkgs, inputs, hostname, username, pkgs-for-cursor, ... }:
 
 let
   termfilechooser =
     (pkgs.callPackage ../packages/xdg-desktop-portal-termfilechooser { });
+
+  # Create a module that passes pkgs-for-cursor to cursor-ui-style
+  cursorUIStyleWithPkgs = { config, lib, pkgs, ... }: {
+    imports = [
+      (import ../modules/cursor-ui-style {
+        inherit config lib pkgs;
+        pkgs-for-cursor = pkgs-for-cursor;
+      })
+    ];
+  };
 in {
   imports = [
     ../modules/input-remapper.nix
     ../modules/style
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
+    cursorUIStyleWithPkgs
   ];
 
   home-manager = {
@@ -18,6 +29,17 @@ in {
     backupFileExtension = "hm-backup-1";
     users."${username}" =
       import ../home-manager/home.nix { inherit hostname username pkgs; };
+  };
+
+  # Configure cursor UI style with the requested settings
+  programs.cursor-ui-style = {
+    enable = true;
+    autoApply = true; # Re-enable autoApply to use the fixed module overlay
+    electron = {
+      frame = false;
+      titleBarStyle = "hiddenInset";
+    };
+    customFiles = [ ../home-manager/desktop/vscode-custom/vscode.css ];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -134,6 +156,7 @@ in {
     nautilus
     kdePackages.dolphin
     git-credential-manager
+    code-cursor
   ];
 
   programs.hyprland = {

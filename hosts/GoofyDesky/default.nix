@@ -1,16 +1,6 @@
-{ pkgs, inputs, pkgs-for-cursor, ... }:
+{ pkgs, inputs, ... }:
 let
   system = pkgs.stdenv.hostPlatform.system;
-
-  # Create a module that passes pkgs-for-cursor to cursor-ui-style
-  cursorUIStyleWithPkgs = { config, lib, pkgs, ... }: {
-    imports = [
-      (import ../../modules/cursor-ui-style {
-        inherit config lib pkgs;
-        pkgs-for-cursor = pkgs-for-cursor;
-      })
-    ];
-  };
   orcaSlicerDesktopItem = pkgs.makeDesktopItem {
     name = "orca-slicer-dri";
     desktopName = "OrcaSlicer (DRI)";
@@ -66,19 +56,7 @@ let
     pkgs.writeText "orca-slicer-mimeapps.list" mimeappsListContent;
 in {
   # Bootloader
-  imports =
-    [ ./hardware-configuration.nix ../common.nix cursorUIStyleWithPkgs ];
-
-  # Configure cursor UI style with the requested settings
-  programs.cursor-ui-style = {
-    enable = true;
-    autoApply = true; # Re-enable autoApply to use the fixed module overlay
-    electron = {
-      frame = false;
-      titleBarStyle = "hiddenInset";
-    };
-    customFiles = [ ../../home-manager/desktop/vscode-custom/vscode.css ];
-  };
+  imports = [ ./hardware-configuration.nix ../common.nix ];
 
   programs.steam = {
     enable = true;
@@ -126,13 +104,6 @@ in {
     vesktop
     prismlauncher
     hyperhdr
-    # Use code-cursor from pkgs-for-cursor if available, otherwise from pkgs
-    code-cursor
-    # (if pkgs-for-cursor ? code-cursor then
-    #   pkgs-for-cursor.code-cursor
-    # else
-    #   pkgs.code-cursor)
-    # orca-slicer
     orcaSlicerDesktopItem
   ];
 
