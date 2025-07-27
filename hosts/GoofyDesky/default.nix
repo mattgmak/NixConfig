@@ -124,13 +124,15 @@ in {
   };
 
   fileSystems."/mnt/windows/c" = {
-    device = "/dev/nvme1n1p4";
+    # device = "/dev/nvme1n1p4";
+    device = "/dev/disk/by-uuid/FC880B87880B401E";
     fsType = "ntfs";
     options = [ "defaults" "nofail" ];
   };
 
   fileSystems."/mnt/windows/d" = {
-    device = "/dev/sdb2";
+    # device = "/dev/sdb2";
+    device = "/dev/disk/by-uuid/F6025F5D025F21C3";
     fsType = "ntfs";
     options = [ "defaults" "nofail" ];
   };

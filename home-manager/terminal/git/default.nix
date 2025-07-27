@@ -10,10 +10,10 @@
       # 7 days
       # credential.helper = [ "cache --timeout 604800" "oauth" ];
       credential = {
-        helper = [ "manager" ];
+        helper = "manager";
         "https://github.com".username = "mattgmak";
         credentialStore = "cache";
-        cacheOptions = "--timeout 604800";
+        # cacheOptions = "--timeout 604800";
       };
     } // (if hostname == "GoofyWSL" then {
       credential.helper =
