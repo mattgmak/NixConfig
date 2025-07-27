@@ -119,7 +119,9 @@ in {
         session    include                     login
         session    optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
       '';
+      enableGnomeKeyring = true;
     };
+  services.gnome.gnome-keyring.enable = true;
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
