@@ -358,6 +358,9 @@ if is_vscode then
     vim.keymap.set('n', '<leader>k', function()
         vscode.call("workbench.action.showAllEditorsByMostRecentlyUsed")
     end)
+    vim.keymap.set('n', '<leader>ca', function()
+        vscode.call("workbench.action.closeAllEditors")
+    end)
 end
 
 -- flash
