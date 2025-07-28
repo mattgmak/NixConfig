@@ -1,5 +1,5 @@
 { pkgs, lib, config, hostname, inputs, ... }: {
-  imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ];
+  imports = [ ./hyprlock.nix ./hyprpaper.nix ./hypridle.nix ./hyprsunset.nix ];
   home.file.".config/hypr" = {
     recursive = true;
     source = ./hypr;
@@ -7,11 +7,11 @@
 
   home.packages = with pkgs; [
     grim
-    hyprland
     hyprpaper
     hypridle
     hyprpicker
     hyprpolkitagent
+    hyprsunset
     hdrop
     libinput
     networkmanagerapplet
@@ -25,8 +25,10 @@
   ];
 
   wayland.windowManager.hyprland = {
-    package = null;
-    portalPackage = null;
+    package =
+      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    portalPackage =
+      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     enable = true;
     systemd.enable = true;
     systemd.variables = [
@@ -178,6 +180,7 @@
         "fcitx5-remote -r"
         "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
         "hyprctl dispatch workspace 1"
+        "hyprsunset"
       ];
       xwayland = {
         enabled = true;
