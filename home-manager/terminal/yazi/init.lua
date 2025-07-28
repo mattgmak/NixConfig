@@ -26,6 +26,8 @@ require("fg"):setup({
     default_action = "menu"
 })
 
+require("fr"):setup()
+
 -- Add symlink to status bar
 Status:children_add(function(self)
     local h = self._current.hovered

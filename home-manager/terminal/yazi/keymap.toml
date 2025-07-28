@@ -64,20 +64,20 @@ on = ["9"]
 run = "plugin relative-motions 9"
 desc = "Move in relative steps"
 
-# [[mgr.prepend_keymap]]
-# on = ["f", "G"]
-# run = "plugin fg -- rg"
-# desc = "find file by content (ripgrep match)"
+[[mgr.prepend_keymap]]
+on = ["f", "r"]
+run = "plugin fr rg"
+desc = "Search file by content (rg)"
 
 [[mgr.prepend_keymap]]
 on = ["f", "f"]
 run = "plugin fg -- fzf"
 desc = "find file by filename"
 
-# [[mgr.prepend_keymap]]
-# on = ["f", "g"]
-# run = "plugin fg"
-# desc = "find file by content (fuzzy match)"
+[[mgr.prepend_keymap]]
+on = ["f", "a"]
+run = "plugin fr rga"
+desc = "Search file by content (rga)"
 
 [[mgr.prepend_keymap]]
 on = ["f", "l"]
@@ -172,6 +172,8 @@ keymap = [
   { on = "<C-;>", run = "shell --interactive", desc = "Run a shell command" },
   { on = "<C-:>", run = "shell --block --interactive", desc = "Run a shell command (block until finishes)" },
   { on = ".", run = "hidden toggle", desc = "Toggle the visibility of hidden files" },
+  { on = "s", run = "search --via=fd", desc = "Search files by name via fd" },
+  { on = "S", run = "search --via=rg", desc = "Search files by content via ripgrep" },
   { on = "<C-s>", run = "escape --search", desc = "Cancel the ongoing search" },
   { on = "z", run = "plugin zoxide", desc = "Jump to a directory using zoxide" },
   { on = "Z", run = "plugin fzf", desc = "Jump to a directory or reveal a file using fzf" },

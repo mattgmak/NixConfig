@@ -5,7 +5,7 @@
     initLua = ./init.lua;
   };
 
-  home.packages = with pkgs; [ glow bat fzf ripgrep ];
+  home.packages = with pkgs; [ glow bat fzf ripgrep fd ripgrep-all ];
 
   home.file = let
     baseConfigPath = ".config/yazi";
@@ -31,6 +31,10 @@
       {
         name = "fg";
         pkg = pkgs.callPackage ./plugins/fg.nix { };
+      }
+      {
+        name = "fr";
+        pkg = pkgs.callPackage ./plugins/fr.nix { };
       }
       {
         name = "compress";
