@@ -99,7 +99,10 @@ in {
     serviceConfig.Type = "simple";
   };
   services.fprintd = { enable = true; };
-  security.pam.services.login.fprintAuth = false;
+  security.pam.services.login = {
+    fprintAuth = false;
+    enableGnomeKeyring = true;
+  };
   security.pam.services.gdm-fingerprint =
     lib.mkIf (config.services.fprintd.enable) {
       text = ''
@@ -119,9 +122,19 @@ in {
         session    include                     login
         session    optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
       '';
-      enableGnomeKeyring = true;
     };
   services.gnome.gnome-keyring.enable = true;
+  programs.seahorse.enable = true;
+  security.pam.services = {
+    greet.enableGnomeKeyring = true;
+    greetd-password.enableGnomeKeyring = true;
+  };
+  services.dbus.packages = with pkgs; [ gnome-keyring gcr ];
+
+  services.xserver.displayManager.sessionCommands = ''
+    eval $(gnome-keyring-daemon --start --daemonize --components=ssh,secrets)
+    export SSH_AUTH_SOCK
+  '';
 
   # Set your time zone.
   time.timeZone = "Asia/Hong_Kong";
