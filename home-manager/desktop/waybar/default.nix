@@ -34,7 +34,7 @@
 
         # Module configuration: Left
         "custom/power" = {
-          format = "❄️";
+          format = "";
           tooltip = "Power Menu";
           on-click = "wlogout";
         };
@@ -53,7 +53,7 @@
             "7" = "7";
             "8" = "8";
             "9" = "9";
-            urgent = " ";
+            urgent = "";
           };
         };
         "wlr/taskbar" = {
@@ -85,11 +85,11 @@
         # Module configuration: Right
         pulseaudio = {
           format = "{volume}% {icon} {format_source}";
-          format-bluetooth = "{volume}% {icon}  {format_source}";
-          format-bluetooth-muted = " {icon}   {format_source}";
-          format-muted = " {format_source}";
-          format-source = " {volume}% 󰍬";
-          format-source-muted = " 󰍭";
+          format-bluetooth = "{volume}% {icon} {format_source}";
+          format-bluetooth-muted = "{icon} {format_source}";
+          format-muted = "{format_source}";
+          format-source = "{volume}% 󰍬";
+          format-source-muted = "󰍭";
           format-icons = {
             headphone = "";
             hands-free = "";
@@ -102,18 +102,18 @@
           on-click = "pavucontrol";
         };
         network = {
-          format-wifi = "{essid} ({signalStrength}%)  ";
-          format-ethernet = "{ipaddr}/{cidr}  ";
-          tooltip-format = "{ifname} via {gwaddr}  ";
-          format-linked = "{ifname} (No IP)  ";
-          format-disconnected = "Disconnected ⚠ ";
-          format-alt = "{ifname}: {ipaddr}/{cidr} ";
+          format-wifi = "{essid} ({signalStrength}%) ";
+          format-ethernet = "{ipaddr}/{cidr} 󰈀";
+          tooltip-format = "{ifname} via {gwaddr} 󰈀";
+          format-linked = "{ifname} (No IP) 󰈀";
+          format-disconnected = "Disconnected ⚠";
+          format-alt = "{ifname}: {ipaddr}/{cidr}";
         };
         cpu = {
-          format = "{usage}%  ";
+          format = "{usage}% ";
           tooltip = false;
         };
-        memory = { format = "{}%  "; };
+        memory = { format = "{}% "; };
         backlight = {
           format = "{percent}% {icon}";
           format-icons = [ "" "" "" "" "" "" "" "" "" ];
@@ -124,7 +124,7 @@
             warning = 30;
             critical = 15;
           };
-          format = "{capacity}% {icon} ";
+          format = "{capacity}% {icon}";
           format-charging = "{capacity}% 󰂄";
           format-plugged = "{capacity}% ";
           format-alt = "{time} {icon}";
