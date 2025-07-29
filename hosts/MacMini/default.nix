@@ -30,6 +30,7 @@
     EDITOR = "nvim";
     VISUAL = "nvim";
     DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
+    SHELL = "${pkgs.nushell}/bin/nu";
   };
 
   environment.systemPackages = with pkgs;
