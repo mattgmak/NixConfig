@@ -1,4 +1,4 @@
-{ hostname, username, pkgs }: {
+{ hostname, username, pkgs, ... }: {
   imports = [
     ./terminal/nushell
     ./terminal/wezterm
@@ -23,9 +23,8 @@
     ./desktop/fcitx5
     ./terminal/clipse
     ./desktop/mpv
-    ./terminal/termfilechooser
-    ./stylix.nix
     ./desktop/kdeconnect
+    ./terminal/filepicker
   ] else if hostname == "GoofyWSL" then
     [
 
@@ -60,5 +59,6 @@
       "application/x-extension-xht" = [ "zen-beta.desktop" ];
     };
   };
+
   programs.home-manager.enable = true;
 }

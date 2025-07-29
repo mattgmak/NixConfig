@@ -1,9 +1,6 @@
 { pkgs, inputs, hostname, username, pkgs-for-cursor, config, lib, ... }:
 
 let
-  termfilechooser =
-    (pkgs.callPackage ../packages/xdg-desktop-portal-termfilechooser { });
-
   # Create a module that passes pkgs-for-cursor to cursor-ui-style
   cursorUIStyleWithPkgs = { config, lib, pkgs, ... }: {
     imports = [
@@ -27,8 +24,9 @@ in {
     useUserPackages = true;
     extraSpecialArgs = { inherit inputs hostname username; };
     backupFileExtension = "hm-backup-1";
-    users."${username}" =
-      import ../home-manager/home.nix { inherit hostname username pkgs; };
+    users."${username}" = import ../home-manager/home.nix {
+      inherit hostname username pkgs inputs lib;
+    };
   };
 
   # Configure cursor UI style with the requested settings
@@ -86,7 +84,7 @@ in {
   };
   environment.sessionVariables = {
     NH_OS_FLAKE = "/home/${username}/NixConfig";
-    TERMINAL = "wezterm";
+    TERMINAL = "ghostty";
     BROWSER = "zen";
     GTK_USE_PORTAL = "1";
     # Disaabled for obsidian because no stylus support
@@ -201,7 +199,6 @@ in {
     nitch
     nix-prefetch-github
     nvfetcher
-    termfilechooser
     zenity
     gh
     base16-shell-preview
@@ -213,28 +210,8 @@ in {
     git-credential-manager
     code-cursor
     kdePackages.kdeconnect-kde
+    lazyjournal
   ];
-
-  programs.hyprland = {
-    enable = true;
-    # package = inputs.hyprland.packages.${system}.hyprland;
-    # portalPackage =
-    #   inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
-  };
-
-  xdg = {
-    portal = {
-      enable = true;
-      # xdgOpenUsePortal = true;
-      config = {
-        hyprland = {
-          default = [ "hyprland" "gtk" ];
-          "org.freedesktop.impl.portal.FileChooser" = [ "termfilechooser" ];
-        };
-      };
-      extraPortals = [ pkgs.xdg-desktop-portal-gtk termfilechooser ];
-    };
-  };
 
   # Add flatpak support
   services.flatpak.enable = true;

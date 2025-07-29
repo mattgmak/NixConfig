@@ -34,6 +34,11 @@
     };
 
     mac-app-util.url = "github:hraban/mac-app-util";
+
+    xdg-termfilepickers = {
+      url = "github:Guekka/xdg-desktop-portal-termfilepickers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin
