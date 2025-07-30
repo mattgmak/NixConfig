@@ -213,6 +213,8 @@ in {
     lazyjournal
   ];
 
+  programs.hyprland.enable = true;
+
   # Add flatpak support
   services.flatpak.enable = true;
 }
