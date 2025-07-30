@@ -6,7 +6,7 @@ def main [json: string] {
   let termcmd = $json | get "termcmd"
   let path = $json | get "recommended_path"
 
-  let yazi_args = ["--chooser-file" $out_file $path]
+  let yazi_args = ["--chooser-file" $"\"($out_file)\"" $"\"($path)\""]
 
   if $termcmd ends-with "ghostty" {
     run-external $termcmd "-e" "yazi" ...$yazi_args
