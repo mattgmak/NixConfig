@@ -235,6 +235,7 @@
         "size 1600 900, title:(btop)"
         "float, ${matchPip}"
         "pin, ${matchPip}"
+        "center, floating:1, title:(Cursor)"
       ] ++ (if hostname == "GoofyDesky" then [
         "monitor HDMI-A-5, ${matchPip}"
         "size 100% 40%, ${matchPip}"
