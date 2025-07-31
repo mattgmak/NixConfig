@@ -8,8 +8,6 @@
       quick-terminal-position = "center";
       command = lib.getExe pkgs.nushell;
       keybind = [
-        "ctrl+shift+page_up=move_tab:-1"
-        "ctrl+shift+page_down=move_tab:1"
         "global:super+t=toggle_quick_terminal"
         # "super+alt+shift+j=write_screen_file:open"
         # "super+alt+shift+w=close_all_windows"
@@ -69,8 +67,8 @@
         "ctrl+left=text:x01"
         "ctrl+home=scroll_to_top"
         "ctrl+end=scroll_to_bottom"
-        "shift+page_up=scroll_page_up"
-        "shift+page_down=scroll_page_down"
+        "ctrl+shift+u=scroll_page_up"
+        "ctrl+shift+d=scroll_page_down"
         # "super+enter=toggle_fullscreen"
         # "super+backspace=text:x15"
         # "super+right=esc:f"

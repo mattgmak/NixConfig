@@ -13,7 +13,8 @@ let
 in {
   imports = [
     ../modules/input-remapper.nix
-    ../modules/style
+    ../modules/style/common.nix
+    ../modules/style/linux.nix
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
     cursorUIStyleWithPkgs

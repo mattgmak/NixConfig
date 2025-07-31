@@ -9,7 +9,7 @@
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
     inputs.stylix.darwinModules.stylix
-    ../../modules/style
+    ../../modules/style/common.nix
   ];
 
   users.users.${username} = {
