@@ -111,7 +111,7 @@
         "SUPER, W, exec, ghostty"
         "SUPER, C, exec, vesktop"
         # Focus binds
-        "$mod, R, focuswindow, class:(.*zen.*)"
+        "$mod, R, focuswindow, initialtitle:(Zen Browser)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*ghostty.*)"
         "$mod, C, focuswindow, class:(vesktop)"
@@ -179,7 +179,8 @@
         "fcitx5 -dr"
         "fcitx5-remote -r"
         "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
-        "hyprctl dispatch workspace 1"
+        (lib.mkIf (hostname == "GoofyDesky")
+          "hyprctl dispatch movecursor 1280 720")
         "hyprsunset"
       ];
       xwayland = {
@@ -238,7 +239,7 @@
         "center, floating:1, title:(Cursor)"
       ] ++ (if hostname == "GoofyDesky" then [
         "monitor HDMI-A-5, ${matchPip}"
-        "size 100% 40%, ${matchPip}"
+        "size 100% 32%, ${matchPip}"
         "noinitialfocus, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2)"
         "immediate, class:^(cs2)$"
