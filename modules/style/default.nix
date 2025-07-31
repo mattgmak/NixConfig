@@ -6,8 +6,6 @@
     noto-fonts-emoji
   ];
 
-  stylix.targets.gnome-text-editor.enable = false;
-
   stylix = {
     enable = true;
     polarity = "dark";
@@ -15,11 +13,6 @@
     base16Scheme =
       "${pkgs.base16-schemes}/share/themes/tokyodark-terminal.yaml";
     image = ./beautiful-mountains-landscape.jpg;
-    cursor = pkgs.lib.mkIf pkgs.stdenv.isLinux {
-      package = pkgs.bibata-cursors;
-      name = "Bibata-Modern-Ice";
-      size = 24;
-    };
     fonts = {
       monospace = {
         package = pkgs.nerd-fonts.iosevka-term;
@@ -39,5 +32,14 @@
       };
     };
   };
+  # // (if pkgs.stdenv.isLinux then {
+  #   cursor = {
+  #     package = pkgs.bibata-cursors;
+  #     name = "Bibata-Modern-Ice";
+  #     size = 24;
+  #   };
+  #   targets.gnome-text-editor.enable = false;
+  # } else
+  #   { });
 
 }
