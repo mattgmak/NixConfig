@@ -222,7 +222,7 @@
       # alt - return : open -a WezTerm
 
       # Focus specific applications (similar to your Hyprland focus binds)
-      alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Ghostty") | .id' | head -1)
+      alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Ghostty" or .app=="ghostty") | .id' | head -1)
       alt - e : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Code" or .app=="Cursor") | .id' | head -1)
       alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Zen") | .id' | head -1)
       alt - x : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Xcode") | .id' | head -1)
