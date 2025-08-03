@@ -201,30 +201,5 @@ in {
     ];
 
     nixpkgs.overlays = mkIf cfg.autoApply [ cursorUIOverlay ];
-
-    environment.systemPackages = mkIf cfg.autoApply [
-      (pkgs.writeShellScriptBin "cursor-ui-info" ''
-        echo "Cursor UI Style Information:"
-        echo "  Status: ${if cfg.enable then "Enabled" else "Disabled"}"
-        echo "  Electron Options: ${builtins.toJSON cfg.electron}"
-        echo "  Custom Files: ${toString (length cfg.customFiles)}"
-        ${optionalString (cfg.customFiles != [ ]) ''
-          echo "  Files: ${
-            concatStringsSep ", " (map toString cfg.customFiles)
-          }"''}
-        echo "  Auto-apply overlay: ${if cfg.autoApply then "Yes" else "No"}"
-        echo ""
-        echo "Current Cursor package: $((nix eval --raw '.#nixosConfigurations.${config.networking.hostName}.pkgs.code-cursor.pname' 2>/dev/null) || echo 'Not available')"
-        echo ""
-        echo "To apply changes:"
-        echo "  1. Rebuild your system: sudo nixos-rebuild switch"
-        echo "  2. Completely restart Cursor (close all windows/processes)"
-        echo ""
-        echo "To verify modifications are applied:"
-        echo "  1. Open Cursor"
-        echo "  2. Check if electron options are reflected (frameless window, etc.)"
-        echo "  3. Open Developer Tools to see if custom CSS/JS is loaded"
-      '')
-    ];
   };
 }
