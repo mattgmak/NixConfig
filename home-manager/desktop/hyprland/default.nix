@@ -54,18 +54,18 @@
         "$mod, k, movefocus, d"
         "$mod, l, movefocus, l"
         "$mod, semicolon, movefocus, r"
-        "$mod, UP, movefocus, u"
-        "$mod, DOWN, movefocus, d"
-        "$mod, LEFT, movefocus, l"
-        "$mod, RIGHT, movefocus, r"
+        "$mod, Up, movefocus, u"
+        "$mod, Down, movefocus, d"
+        "$mod, Left, movefocus, l"
+        "$mod, Right, movefocus, r"
         "$mod SHIFT, j, movewindow, u"
         "$mod SHIFT, k, movewindow, d"
         "$mod SHIFT, l, movewindow, l"
         "$mod SHIFT, semicolon, movewindow, r"
-        "$mod SHIFT, UP, movewindow, u"
-        "$mod SHIFT, DOWN, movewindow, d"
-        "$mod SHIFT, LEFT, movewindow, l"
-        "$mod SHIFT, RIGHT, movewindow, r"
+        "$mod SHIFT, Up, movewindow, u"
+        "$mod SHIFT, Down, movewindow, d"
+        "$mod SHIFT, Left, movewindow, l"
+        "$mod SHIFT, Right, movewindow, r"
         "$mod, Tab, focuscurrentorlast"
         "$mod, t, togglefloating"
         "$mod, f, fullscreen"
@@ -119,6 +119,8 @@
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind
         "$mod, Q, exec, wlogout"
+        # Floating terminal bind
+        "SUPER, T, exec, ~/.config/hypr/scripts/floating-terminal.nu"
       ];
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
@@ -131,14 +133,14 @@
         "$mod SHIFT, i, moveactive, 0 20"
         "$mod SHIFT, o, moveactive, -20 0"
         "$mod SHIFT, p, moveactive, 20 0"
-        "$mod, PAGEUP, resizeactive, 0 -20"
-        "$mod, PAGEDOWN, resizeactive, 0 20"
-        "$mod, HOME, resizeactive, -20 0"
-        "$mod, END, resizeactive, 20 0"
-        "$mod SHIFT, PAGEUP, moveactive, 0 -20"
-        "$mod SHIFT, PAGEDOWN, moveactive, 0 20"
-        "$mod SHIFT, HOME, moveactive, -20 0"
-        "$mod SHIFT, END, moveactive, 20 0"
+        "$mod, Prior, resizeactive, 0 -20"
+        "$mod, Next, resizeactive, 0 20"
+        "$mod, Home, resizeactive, -20 0"
+        "$mod, End, resizeactive, 20 0"
+        "$mod SHIFT, Prior, moveactive, 0 -20"
+        "$mod SHIFT, Next, moveactive, 0 20"
+        "$mod SHIFT, Home, moveactive, -20 0"
+        "$mod SHIFT, End, moveactive, 20 0"
         ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%-"
         ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
@@ -153,8 +155,13 @@
         ", preferred, auto-up, 1"
       ];
       workspace = if hostname == "GoofyDesky" then [
-        "name:1, monitor:DP-3"
         "name:Game, monitor:DP-3"
+        "name:1, monitor:DP-3"
+        "name:2, monitor:DP-3"
+        "name:3, monitor:DP-3"
+        "name:4, monitor:HDMI-A-5"
+        "name:5, monitor:HDMI-A-5"
+        "name:6, monitor:HDMI-A-5"
       ] else
         [ ];
 
@@ -229,7 +236,9 @@
         allow_tearing = true;
       };
       cursor = { no_warps = true; };
-      windowrule = let matchPip = "title:^(Picture-in-Picture)$";
+      windowrule = let
+        matchPip = "title:^(Picture-in-Picture)$";
+        matchFloatingTerminal = "title:(floating-terminal)";
       in [
         "float, title:(clipse|bluetui|nmtui|btop)"
         "size 1200 800, title:(clipse|bluetui|nmtui)"
@@ -237,9 +246,15 @@
         "float, ${matchPip}"
         "pin, ${matchPip}"
         "center, floating:1, title:(Cursor)"
+        "float, ${matchFloatingTerminal}"
+        "size 60% 70%, ${matchFloatingTerminal}"
+        "pin, ${matchFloatingTerminal}"
+        "center, ${matchFloatingTerminal}"
+        "stayfocused, ${matchFloatingTerminal}"
       ] ++ (if hostname == "GoofyDesky" then [
         "monitor HDMI-A-5, ${matchPip}"
         "size 100% 32%, ${matchPip}"
+        "move 0 50, ${matchPip}"
         "noinitialfocus, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2)"
         "immediate, class:^(cs2)$"

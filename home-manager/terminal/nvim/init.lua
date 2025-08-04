@@ -12,7 +12,6 @@ vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
 })
 
 -- motion keys (helldivers mappings)
-
 vim.keymap.set({'n', 'v'}, 'j', 'k')
 vim.keymap.set({'n', 'v'}, 'k', 'j')
 vim.keymap.set({'n', 'v'}, 'l', 'h')
