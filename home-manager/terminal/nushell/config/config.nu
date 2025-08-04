@@ -930,8 +930,6 @@ source ~/.nushell-extra/.zoxide.nu
 source ~/.nushell-extra/atuin.nu
 use ~/.nushell-extra/conda.nu
 
-let flakeDir = $'($env.HOME)/NixConfig'
-
 def --env y [...args] {
 	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
 	yazi ...$args --cwd-file $tmp
@@ -950,29 +948,12 @@ def --env q [...args] {
     exit
 }
 
-def --env gbash [...args] {
-    `c:/Program Files/Git/bin/bash.exe` ...$args
-}
-
-def --env nixrb [...args] {
-    sudo nixos-rebuild switch --flake $'($flakeDir)#goofy' -I nixos-config=($flakeDir)/configuration.nix ...$args
-    # sudo nixos-rebuild switch --flake ~/NixConfig#goofy -I nixos-config=~/NixConfig/configuration.nix
-}
-
-def --env --wrapped cu [...flags] {
-    appimage-run ~/CursorAppImage/* --ozone-platform=wayland --enable-wayland-ime=true ...$flags
-}
-
-def --env --wrapped sucu [...flags] {
-    sudo appimage-run $'($env.HOME)/CursorAppImage/*' --user-data-dir=$"($env.HOME)/.config/Cursor" --extensions=$"($env.HOME)/.cursor/extensions" --no-sandbox --ozone-platform=wayland --enable-wayland-ime=true ...$flags
-}
-
-def --env d [target] {
-    nix develop $'($flakeDir)/#($target)'
-}
-
 def --env lg [...args] {
     lazygit ...$args
+}
+
+def --env v [...args] {
+    nvim ...$args
 }
 
 $env.EDITOR = "nvim"
