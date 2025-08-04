@@ -20,6 +20,12 @@ in {
     cursorUIStyleWithPkgs
   ];
 
+  nixpkgs.overlays = [
+    (final: prev: {
+      zen = inputs.zen-browser.packages.${prev.system}.zen-browser;
+    })
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -212,6 +218,7 @@ in {
     code-cursor
     kdePackages.kdeconnect-kde
     lazyjournal
+    zen
   ];
 
   programs.hyprland.enable = true;

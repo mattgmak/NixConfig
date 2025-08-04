@@ -5,7 +5,11 @@
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    # zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    zen-browser = {
+      url = "github:SoumyabrataBanik/flake-zen-browser";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";

@@ -1,6 +1,5 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 let
-  system = pkgs.stdenv.hostPlatform.system;
   orcaSlicerDesktopItem = pkgs.makeDesktopItem {
     name = "orca-slicer-dri";
     desktopName = "OrcaSlicer (DRI)";
@@ -70,7 +69,6 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    inputs.zen-browser.packages."${system}".default
     bitwarden-desktop
     libsForQt5.kdeconnect-kde
     libnotify
