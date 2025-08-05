@@ -219,6 +219,7 @@ in {
     kdePackages.kdeconnect-kde
     lazyjournal
     zen
+    stylua
   ];
 
   programs.hyprland.enable = true;
