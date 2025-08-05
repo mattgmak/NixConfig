@@ -48,16 +48,16 @@
     # xdg-mime query filetype file.type
     defaultApplications = {
       "application/pdf" = [ "okularApplication_pdf.desktop" ];
-      "text/html" = [ "zen-beta.desktop" ];
-      "x-scheme-handler/http" = [ "zen-beta.desktop" ];
-      "x-scheme-handler/https" = [ "zen-beta.desktop" ];
-      "x-scheme-handler/chrome" = [ "zen-beta.desktop" ];
-      "application/x-extension-htm" = [ "zen-beta.desktop" ];
-      "application/x-extension-html" = [ "zen-beta.desktop" ];
-      "application/x-extension-shtml" = [ "zen-beta.desktop" ];
-      "application/xhtml+xml" = [ "zen-beta.desktop" ];
-      "application/x-extension-xhtml" = [ "zen-beta.desktop" ];
-      "application/x-extension-xht" = [ "zen-beta.desktop" ];
+      "text/html" = [ "zen-browser.desktop" ];
+      "x-scheme-handler/http" = [ "zen-browser.desktop" ];
+      "x-scheme-handler/https" = [ "zen-browser.desktop" ];
+      "x-scheme-handler/chrome" = [ "zen-browser.desktop" ];
+      "application/x-extension-htm" = [ "zen-browser.desktop" ];
+      "application/x-extension-html" = [ "zen-browser.desktop" ];
+      "application/x-extension-shtml" = [ "zen-browser.desktop" ];
+      "application/xhtml+xml" = [ "zen-browser.desktop" ];
+      "application/x-extension-xhtml" = [ "zen-browser.desktop" ];
+      "application/x-extension-xht" = [ "zen-browser.desktop" ];
     };
   };
 
