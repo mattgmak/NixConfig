@@ -49,7 +49,8 @@
       "$mod" = "ALT";
       unbind = [ ];
       bind = [
-        "$mod, h, exec, rofi -show drun"
+        "$mod SHIFT, h, exec, rofi -show drun"
+        "$mod, h, exec, sherlock"
         "$mod, j, movefocus, u"
         "$mod, k, movefocus, d"
         "$mod, l, movefocus, l"
@@ -107,9 +108,9 @@
         "SUPER, N, exec, makoctl dismiss -a"
         # App launch binds
         "SUPER, R, exec, zen"
-        "SUPER, E, exec, cursor"
+        "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         "SUPER, W, exec, ghostty"
-        "SUPER, C, exec, vesktop"
+        "SUPER, C, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         # Focus binds
         "$mod, R, focuswindow, initialtitle:(Zen Browser)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
