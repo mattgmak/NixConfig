@@ -26,6 +26,7 @@
     ./desktop/kdeconnect
     ./terminal/filepicker
     ./desktop/sherlock
+    ./terminal/wiremix
   ] else if hostname == "GoofyWSL" then
     [
 

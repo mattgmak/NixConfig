@@ -1,0 +1,10 @@
+keybindings = [
+  { key = { Char = ";" }, action = { SetRelativeVolume = 0.01 } },
+  { key = { Char = "l" }, action = { SetRelativeVolume = -0.01 } },
+  { key = { Char = "k" }, action = "MoveDown" },
+  { key = { Char = "j" }, action = "MoveUp" },
+  { key = { Char = ":" }, action = "TabRight" },
+  { key = { Char = "L" }, action = "TabLeft" },
+  { key = { Char = "h" }, action = "Nothing" },
+  { key = { Char = "H" }, action = "Nothing" },
+]

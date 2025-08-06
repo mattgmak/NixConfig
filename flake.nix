@@ -49,10 +49,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    wiremix = {
+      url = "github:tsowell/wiremix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin
-    , mac-app-util, ... }@inputs:
+  outputs =
+    { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";

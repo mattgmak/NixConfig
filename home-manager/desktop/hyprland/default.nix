@@ -103,6 +103,7 @@
         "SUPER, V, exec, ghostty --title=clipse -e clipse"
         "SUPER, B, exec, ghostty --title=bluetui -e bluetui"
         "SUPER, Q, exec, ghostty --title=btop -e btop"
+        "SUPER, A, exec, ghostty --title=wiremix -e wiremix"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
@@ -241,8 +242,8 @@
         matchPip = "title:^(Picture-in-Picture)$";
         matchFloatingTerminal = "title:(floating-terminal)";
       in [
-        "float, title:(clipse|bluetui|nmtui|btop)"
-        "size 1200 800, title:(clipse|bluetui|nmtui)"
+        "float, title:(clipse|bluetui|nmtui|btop|wiremix)"
+        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix)"
         "size 1600 900, title:(btop)"
         "float, ${matchPip}"
         "pin, ${matchPip}"

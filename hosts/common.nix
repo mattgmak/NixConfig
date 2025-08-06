@@ -220,6 +220,7 @@ in {
     lazyjournal
     zen
     stylua
+    inputs.wiremix.packages.${pkgs.system}.wiremix
   ];
 
   programs.hyprland.enable = true;

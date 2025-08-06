@@ -99,7 +99,7 @@
             car = "";
             default = [ "" "" "" ];
           };
-          on-click = "pavucontrol";
+          on-click = "ghostty --title=wiremix -e wiremix";
         };
         network = {
           format-wifi = "{essid} ({signalStrength}%) ";
