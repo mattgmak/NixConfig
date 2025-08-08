@@ -8,7 +8,7 @@
     ./terminal/git
     ./terminal/direnv
     ./terminal/lazygit
-    ./desktop/vscode-custom
+    ./desktop/cursor-injection
     ./terminal/ghostty
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
     ./terminal/bluetui

@@ -1,23 +1,10 @@
-{ pkgs, inputs, hostname, username, pkgs-for-cursor, config, lib, ... }:
-
-let
-  # Create a module that passes pkgs-for-cursor to cursor-ui-style
-  cursorUIStyleWithPkgs = { config, lib, pkgs, ... }: {
-    imports = [
-      (import ../modules/cursor-ui-style {
-        inherit config lib pkgs;
-        pkgs-for-cursor = pkgs-for-cursor;
-      })
-    ];
-  };
-in {
+{ pkgs, inputs, hostname, username, pkgs-for-cursor, config, lib, ... }: {
   imports = [
     ../modules/input-remapper.nix
     ../modules/style/common.nix
     ../modules/style/linux.nix
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
-    cursorUIStyleWithPkgs
   ];
 
   nixpkgs.overlays = [
@@ -29,22 +16,11 @@ in {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs hostname username; };
+    extraSpecialArgs = { inherit inputs hostname username pkgs-for-cursor; };
     backupFileExtension = "hm-backup-1";
     users."${username}" = import ../home-manager/home.nix {
       inherit hostname username pkgs inputs lib;
     };
-  };
-
-  # Configure cursor UI style with the requested settings
-  programs.cursor-ui-style = {
-    enable = true;
-    autoApply = true; # Re-enable autoApply to use the fixed module overlay
-    electron = {
-      frame = false;
-      titleBarStyle = "hiddenInset";
-    };
-    customFiles = [ ../home-manager/desktop/vscode-custom/vscode.css ];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -215,7 +191,6 @@ in {
     nautilus
     kdePackages.dolphin
     git-credential-manager
-    code-cursor
     kdePackages.kdeconnect-kde
     lazyjournal
     zen
