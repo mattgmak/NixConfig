@@ -45,7 +45,12 @@
       [ inputs.hyprland-plugins.packages.${pkgs.system}.csgo-vulkan-fix ];
 
     sourceFirst = true;
-    settings = {
+    settings = let
+      deskyMonitors = {
+        primary = "DP-3";
+        secondary = "HDMI-A-5";
+      };
+    in {
       "$mod" = "ALT";
       unbind = [ ];
       bind = [
@@ -150,20 +155,20 @@
       ];
 
       monitor = if hostname == "GoofyDesky" then [
-        "DP-3, 2560x1440@240.00Hz, 0x0, 1"
-        "HDMI-A-5, 1920x1080@144.00Hz, -1080x-650, 1, transform, 3"
+        "${deskyMonitors.primary}, 2560x1440@240.00Hz, 0x0, 1"
+        "${deskyMonitors.secondary}, 1920x1080@144.00Hz, -1080x-650, 1, transform, 3"
       ] else [
         "eDP-1, highres, 0x0, 1"
         ", preferred, auto-up, 1"
       ];
       workspace = if hostname == "GoofyDesky" then [
-        "name:Game, monitor:DP-3"
-        "name:1, monitor:DP-3"
-        "name:2, monitor:DP-3"
-        "name:3, monitor:DP-3"
-        "name:4, monitor:HDMI-A-5"
-        "name:5, monitor:HDMI-A-5"
-        "name:6, monitor:HDMI-A-5"
+        "name:Game, monitor:${deskyMonitors.primary}"
+        "name:1, monitor:${deskyMonitors.primary}"
+        "name:2, monitor:${deskyMonitors.primary}"
+        "name:3, monitor:${deskyMonitors.primary}"
+        "name:4, monitor:${deskyMonitors.secondary}"
+        "name:5, monitor:${deskyMonitors.secondary}"
+        "name:6, monitor:${deskyMonitors.secondary}"
       ] else
         [ ];
 
@@ -243,8 +248,8 @@
         matchFloatingTerminal = "title:(floating-terminal)";
       in [
         "float, title:(clipse|bluetui|nmtui|btop|wiremix)"
-        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix)"
-        "size 1600 900, title:(btop)"
+        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix), onworkspace:r[1-3]"
+        "size 1600 900, title:(btop), onworkspace:r[1-3]"
         "float, ${matchPip}"
         "pin, ${matchPip}"
         "center, floating:1, title:(Cursor)"
@@ -254,13 +259,14 @@
         "center, ${matchFloatingTerminal}"
         "stayfocused, ${matchFloatingTerminal}"
       ] ++ (if hostname == "GoofyDesky" then [
-        "monitor HDMI-A-5, ${matchPip}"
+        "monitor ${deskyMonitors.secondary}, ${matchPip}"
         "size 100% 32%, ${matchPip}"
         "move 0 50, ${matchPip}"
         "noinitialfocus, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2)"
         "immediate, class:^(cs2)$"
         "fullscreen, class:^(cs2)$"
+        "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), onworkspace:r[4-6]"
       ] else
         [ ]);
     };
