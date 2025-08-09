@@ -107,7 +107,7 @@
   services.gnome.gnome-keyring.enable = true;
   programs.seahorse.enable = true;
   security.pam.services = {
-    greet.enableGnomeKeyring = true;
+    greetd.enableGnomeKeyring = true;
     greetd-password.enableGnomeKeyring = true;
   };
   services.dbus.packages = with pkgs; [ gnome-keyring gcr ];

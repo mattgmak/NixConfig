@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }: {
+{ inputs, config, pkgs-for-cursor, ... }: {
   imports = [ inputs.sherlock.homeManagerModules.default ];
   home.file.".config/sherlock/icons" = {
     source = ./icons;
@@ -175,7 +175,7 @@
         };
         Cursor = {
           name = "Cursor";
-          icon = "${pkgs.code-cursor}/share/pixmaps/cursor.png";
+          icon = "${pkgs-for-cursor.code-cursor}/share/pixmaps/cursor.png";
           exec =
             "cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime %U";
           keywords = "cursor";
