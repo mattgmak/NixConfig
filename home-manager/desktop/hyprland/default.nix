@@ -109,6 +109,7 @@
         "SUPER, B, exec, ghostty --title=bluetui -e bluetui"
         "SUPER, Q, exec, ghostty --title=btop -e btop"
         "SUPER, A, exec, ghostty --title=wiremix -e wiremix"
+        "SUPER, N, exec, ghostty --title=nmtui -e nmtui"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
