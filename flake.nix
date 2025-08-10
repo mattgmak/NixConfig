@@ -1,5 +1,5 @@
 {
-  description = "Nixos config flake";
+  description = "NixOS config flake";
 
   inputs = {
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
