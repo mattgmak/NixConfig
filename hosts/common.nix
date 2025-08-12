@@ -198,6 +198,25 @@
     inputs.wiremix.packages.${pkgs.system}.wiremix
   ];
 
+  services.syncthing = {
+    enable = true;
+    openDefaultPorts = true;
+    user = username;
+    group = "users";
+    settings = {
+      devices = {
+        phone.id =
+          "LRGIDSH-W6NIW7U-SV62HMC-EMHYALK-RSK7Y5K-OOZK7WI-IEQR6ZU-CGWRWQT";
+      };
+      folders = {
+        Music = {
+          path = "/home/goofy/Music";
+          devices = [ "phone" ];
+        };
+      };
+    };
+  };
+
   programs.hyprland.enable = true;
 
   # Add flatpak support

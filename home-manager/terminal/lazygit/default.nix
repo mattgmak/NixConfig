@@ -1,4 +1,5 @@
 { ... }: {
+  # TODO: get pr open working
   programs.lazygit = {
     enable = true;
     settings = {
