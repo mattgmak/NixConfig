@@ -109,7 +109,7 @@
         "SUPER, B, exec, ghostty --title=bluetui -e bluetui"
         "SUPER, Q, exec, ghostty --title=btop -e btop"
         "SUPER, A, exec, ghostty --title=wiremix -e wiremix"
-        "SUPER, N, exec, ghostty --title=nmtui -e nmtui"
+        "SUPER, M, exec, ghostty --title=nmtui -e nmtui"
         ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
@@ -215,12 +215,12 @@
         # bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
         bezier = "myBezier, 0.10, 0.9, 0.1, 1.05";
         animation = [
-          "windows, 1, 5, myBezier"
-          "windowsOut, 1, 5, myBezier"
+          "windows, 1, 4, myBezier"
+          "windowsOut, 1, 4, myBezier"
           # "windowsOut, 1, 7, default, popin 80%"
           "border, 1, 10, default"
-          "fade, 1, 7, default"
-          "workspaces, 1, 6, default"
+          "fade, 1, 4, default"
+          "workspaces, 1, 3, default"
         ];
       };
 
