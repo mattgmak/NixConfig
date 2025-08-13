@@ -7,6 +7,7 @@
     extraConfig = {
       fetch.prune = true;
       rerere.enabled = true;
+      core.ignorecase = false;
       # 7 days
       # credential.helper = [ "cache --timeout 604800" "oauth" ];
       # credential = {

@@ -8,9 +8,9 @@
     ./terminal/git
     ./terminal/direnv
     ./terminal/lazygit
-    ./desktop/cursor-injection
     ./terminal/ghostty
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
+    ./desktop/cursor-injection
     ./terminal/bluetui
     ./desktop/onedrive
     ./desktop/hyprland

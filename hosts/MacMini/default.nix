@@ -67,6 +67,7 @@
       sourcekit-lsp
       btop
       dua
+      nodejs_20
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
