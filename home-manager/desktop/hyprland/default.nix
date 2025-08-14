@@ -56,6 +56,7 @@
       bind = [
         "$mod SHIFT, h, exec, rofi -show drun"
         "$mod, h, exec, sherlock"
+        "$mod, y, exec, ${config.home.homeDirectory}/.config/sherlock/switch-windows.nu"
         "$mod, j, movefocus, u"
         "$mod, k, movefocus, d"
         "$mod, l, movefocus, l"

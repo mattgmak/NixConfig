@@ -4,6 +4,10 @@
     source = ./icons;
     recursive = true;
   };
+  home.file.".config/sherlock/switch-windows.nu" = {
+    source = ./switch-windows.nu;
+    executable = true;
+  };
   programs.sherlock = {
     enable = true;
     settings = let home = config.home.homeDirectory;
