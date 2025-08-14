@@ -196,6 +196,7 @@
     zen
     stylua
     inputs.wiremix.packages.${pkgs.system}.wiremix
+    ffmpeg
   ];
 
   services.syncthing = {
@@ -203,6 +204,7 @@
     openDefaultPorts = true;
     user = username;
     group = "users";
+    configDir = "/home/${username}/.config/syncthing";
     settings = {
       devices = {
         phone.id =
@@ -210,7 +212,7 @@
       };
       folders = {
         Music = {
-          path = "/home/goofy/Music";
+          path = "/home/${username}/Music";
           devices = [ "phone" ];
         };
       };
