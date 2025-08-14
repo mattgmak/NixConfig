@@ -1,3 +1,10 @@
 { ... }:
 let
-in { home.file = { ".config/nvim/init.lua".source = ./init.lua; }; }
+in {
+  home.file = {
+    ".config/nvim" = {
+      source = ./config;
+      recursive = true;
+    };
+  };
+}
