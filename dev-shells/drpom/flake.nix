@@ -44,13 +44,16 @@
                 androidenv.androidPkgs.platform-tools
               ] else
                 [ ]);
-            NODE_COMPILE_CACHE = "~/.cache/nodejs-compile-cache";
             NODE_OPTIONS = "--experimental-vm-modules";
             BIOME_BINARY = "${biome-pin-pkgs.biome}/bin/biome";
-            ANDROID_HOME = if pkgs.stdenv.isDarwin then
-              "~/Library/Android/sdk"
-            else
-              "~/Android/Sdk";
+            shellHook = ''
+              export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
+              ${if pkgs.stdenv.isDarwin then ''
+                export ANDROID_HOME=~/Library/Android/sdk
+              '' else ''
+                export ANDROID_HOME=~/Android/Sdk
+              ''}
+            '';
           } // pkgs.lib.mkIf pkgs.stdenv.isDarwin {
             DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
           };
