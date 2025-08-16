@@ -176,6 +176,13 @@ in {
       enable = true;
       package = extendedCursor;
       mutableExtensionsDir = true;
+      profiles = {
+        goofy = {
+          userSettings = ./settings.json;
+          keybindings = ./keybindings.json;
+          userMcp = ./mcp.json;
+        };
+      };
     };
   };
 }
