@@ -120,6 +120,8 @@ let
     });
   };
 
+  extendedCursor = (pkgs-for-cursor.extend cursorInjectionOverlay).code-cursor;
+
 in {
   options.programs.cursor-injection = {
     enable = mkEnableOption "Cursor injection";
@@ -169,7 +171,11 @@ in {
     ];
 
     # Apply the overlay to the pinned pkgs-for-cursor instance and use the modified package
-    home.packages =
-      [ (pkgs-for-cursor.extend cursorInjectionOverlay).code-cursor ];
+    # home.packages = [ extendedCursor ];
+    programs.vscode = {
+      enable = true;
+      package = extendedCursor;
+      mutableExtensionsDir = true;
+    };
   };
 }
