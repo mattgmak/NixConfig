@@ -100,7 +100,7 @@ if is_vscode then
   local vscode = require('vscode')
 
   vim.keymap.set('n', '<leader>cr', function() vscode.call('editor.action.rename') end)
-  vim.keymap.set('n', '<leader>cf', function() vscode.call('editor.action.refactor') end)
+  vim.keymap.set({ 'n', 'v' }, '<leader>cf', function() vscode.call('editor.action.refactor') end)
   vim.keymap.set('n', '<leader>d', function() vscode.call('workbench.action.closeActiveEditor') end)
   vim.keymap.set('n', '<leader>,', function() vscode.call('workbench.action.showAllEditors') end)
   vim.keymap.set('n', '<leader>fs', function() vscode.call('workbench.action.findInFiles') end)
@@ -121,7 +121,6 @@ if is_vscode then
   vim.keymap.set('n', '<leader>fl', function() vscode.call('gitlens.views.scm.grouped.focus') end)
   vim.keymap.set('n', '<leader>wc', function() vscode.call('editor.action.dirtydiff.next') end)
   vim.keymap.set('n', '<leader>fo', function() vscode.call('diffEditor.switchSide') end)
-  vim.keymap.set('n', '<leader>ot', function() vscode.call('vscode-wezterm.openTerminal') end)
   vim.keymap.set('n', '<leader>cn', function() vscode.call('notifications.clearAll') end)
   vim.keymap.set('n', '<leader>n', function()
     vscode.call('editor.action.inlineDiffs.nextChange')
