@@ -100,6 +100,7 @@ if is_vscode then
   local vscode = require('vscode')
 
   vim.keymap.set('n', '<leader>cr', function() vscode.call('editor.action.rename') end)
+  vim.keymap.set('n', '<leader>cf', function() vscode.call('editor.action.refactor') end)
   vim.keymap.set('n', '<leader>d', function() vscode.call('workbench.action.closeActiveEditor') end)
   vim.keymap.set('n', '<leader>,', function() vscode.call('workbench.action.showAllEditors') end)
   vim.keymap.set('n', '<leader>fs', function() vscode.call('workbench.action.findInFiles') end)
@@ -203,17 +204,17 @@ if is_vscode then
   vim.keymap.set('n', '<leader>ce', function() end)
 
   -- use undotree to replace vanilla undo/redo
-  local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
-  if undotree then
-    vscode.notify('Using undotree')
-    vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
-    vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
+  -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
+  -- if undotree then
+  --   vscode.notify('Using undotree')
+  --   vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
+  --   vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
 
-    vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
-    vim.api.nvim_create_autocmd('TextChanged', {
-      callback = function() vscode.call('undotree.saveAndAdvance') end,
-    })
-  end
+  --   vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
+  --   vim.api.nvim_create_autocmd('TextChanged', {
+  --     callback = function() vscode.call('undotree.saveAndAdvance') end,
+  --   })
+  -- end
 end
 
 -- flash
