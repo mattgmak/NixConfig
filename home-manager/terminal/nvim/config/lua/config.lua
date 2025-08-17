@@ -214,6 +214,9 @@ if is_vscode then
   --     callback = function() vscode.call('undotree.saveAndAdvance') end,
   --   })
   -- end
+else
+  -- exit
+  vim.keymap.set('n', '<leader>d', '<cmd>q<cr>')
 end
 
 -- flash

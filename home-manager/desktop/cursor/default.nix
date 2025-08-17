@@ -13,4 +13,17 @@
     customCSSFileStubs = [ "custom.css" "test.css" ];
     customJSFileStubs = [ "custom.js" "test.js" ];
   };
+  stylix.targets.vscode.enable = false;
+  programs.vscode = {
+    enable = true;
+    mutableExtensionsDir = true;
+    profiles = {
+      default = {
+        userSettings = import ./settings.nix;
+        keybindings = import ./keybindings.nix;
+        userMcp = import ./mcp.nix;
+      };
+    };
+  };
+
 }

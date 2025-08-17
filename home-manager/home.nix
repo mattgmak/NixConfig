@@ -10,7 +10,7 @@
     ./terminal/lazygit
     ./terminal/ghostty
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
-    ./desktop/cursor-injection
+    ./desktop/cursor
     ./terminal/bluetui
     ./desktop/onedrive
     ./desktop/hyprland

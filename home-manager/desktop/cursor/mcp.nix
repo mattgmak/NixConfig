@@ -1,0 +1,10 @@
+{
+  mcpServers = {
+    nixos = { command = "nix run github:utensils/mcp-nixos --"; };
+    context7 = { url = "https://mcp.context7.com/mcp"; };
+    linear = {
+      command = "npx";
+      args = [ "-y" "mcp-remote" "https://mcp.linear.app/sse" ];
+    };
+  };
+}

@@ -1,5 +1,6 @@
 { inputs, config, pkgs-for-cursor, ... }: {
-  # imports = [ inputs.sherlock.homeManagerModules.default ];
+  imports = [ inputs.sherlock.homeManagerModules.default ];
+  disabledModules = [ "programs/sherlock.nix" ];
   home.file.".config/sherlock/icons" = {
     source = ./icons;
     recursive = true;
