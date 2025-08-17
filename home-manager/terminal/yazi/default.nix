@@ -34,10 +34,6 @@
         pkg = pkgs.callPackage ./plugins/fg.nix { };
       }
       {
-        name = "fr";
-        pkg = pkgs.callPackage ./plugins/fr.nix { };
-      }
-      {
         name = "compress";
         pkg = pkgs.callPackage ./plugins/compress.nix { };
       }

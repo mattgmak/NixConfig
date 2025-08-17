@@ -65,19 +65,19 @@ run = "plugin relative-motions 9"
 desc = "Move in relative steps"
 
 [[mgr.prepend_keymap]]
-on = ["f", "r"]
-run = "plugin fr rg"
-desc = "Search file by content (rg)"
+on = ["f", "d"]
+run = "plugin fg"
+desc = "find file by filename (fd)"
 
 [[mgr.prepend_keymap]]
 on = ["f", "f"]
 run = "plugin fg -- fzf"
-desc = "find file by filename"
+desc = "Fuzzy find file by filename"
 
 [[mgr.prepend_keymap]]
-on = ["f", "a"]
-run = "plugin fr rga"
-desc = "Search file by content (rga)"
+on = ["f", "g"]
+run = "plugin fg -- rg"
+desc = "Find file by content (rg)"
 
 [[mgr.prepend_keymap]]
 on = ["f", "l"]

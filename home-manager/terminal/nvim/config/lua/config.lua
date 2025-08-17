@@ -200,7 +200,7 @@ if is_vscode then
   -- end)
   vim.keymap.set('n', '<leader>k', function() vscode.call('workbench.action.showAllEditorsByMostRecentlyUsed') end)
   vim.keymap.set('n', '<leader>ca', function() vscode.call('workbench.action.closeAllEditors') end)
-  vim.keymap.set('n', '<leader>ce', function() end)
+  vim.keymap.set('n', '<leader>o', function() vscode.call('workbench.action.files.openFile') end)
 
   -- use undotree to replace vanilla undo/redo
   -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')

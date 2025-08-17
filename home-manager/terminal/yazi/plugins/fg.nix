@@ -1,14 +1,16 @@
-{ lib, stdenv, fetchgit, fzf, ripgrep, bat }:
+{ lib, stdenv, fzf, ripgrep, bat }:
 
 stdenv.mkDerivation {
   pname = "yaziPlugins-fg";
-  version = "unstable-2025-07-21";
+  version = "unstable-2025-07-22";
 
-  src = fetchgit {
-    url = "https://gitee.com/DreamMaoMao/fg.yazi.git";
-    rev = "0c6ae0b52a0aa40bb468ca565c34ac413d1f93c1";
-    hash = "sha256-pFljxXAyUfu680+MhbLrI07RcukrPXgmIvtp3f6ZVvY=";
-  };
+  # src = fetchgit {
+  #   url = "https://gitee.com/DreamMaoMao/fg.yazi.git";
+  #   rev = "0c6ae0b52a0aa40bb468ca565c34ac413d1f93c1";
+  #   hash = "sha256-pFljxXAyUfu680+MhbLrI07RcukrPXgmIvtp3f6ZVvY=";
+  # };
+
+  src = ./fg;
 
   buildInputs = [
     fzf # Required dependency
@@ -19,6 +21,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p $out/share/yazi/plugins/fg
     cp -r $src/* $out/share/yazi/plugins/fg/
+    chmod -R +x $out/share/yazi/plugins/fg/
   '';
 
   meta = with lib; {
