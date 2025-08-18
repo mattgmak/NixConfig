@@ -43,6 +43,7 @@ edit = [
 	{ run = 'cursor %*', orphan = true, desc = "cursor", for = "windows" },
 	{ run = 'cursor -w %*', block = true, desc = "cursor (block)", for = "windows" },
 ]
+edit-cursor = [{ run = 'cursor -g "$@"', desc = "cursor", for = "unix" }]
 open = [
 	{ run = 'xdg-open "$1"', desc = "Open", for = "linux" },
 	{ run = 'open "$@"', desc = "Open", for = "macos" },
@@ -75,6 +76,7 @@ rules = [
 	# Text
 	{ mime = "text/*", use = [
 		"edit",
+		"edit-cursor",
 		"reveal",
 	] },
 	# Image
@@ -121,9 +123,24 @@ image_alloc = 536870912  # 512MB
 image_bound = [0, 0]
 suppress_preload = false
 
+[[plugin.prepend_previewers]]
+name = "*.tar*"
+run = 'piper --format=url -- tar tf "$1"'
+
+[[plugin.prepend_previewers]]
+name = "*.md"
+run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"'
+
+[[plugin.prepend_previewers]]
+name = "*/"
+run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"'
+
+[[plugin.append_previewers]]
+name = "*"
+run = 'piper -- hexyl --border=none --terminal-width=$w "$1"'
+
 [plugin]
 
-prepend_previewers = [{ name = "*.md", run = "glow" }]
 fetchers = [
 	# Mimetype
 	{ id = "mime", name = "*", run = "mime", if = "!mime", prio = "high" },
@@ -143,10 +160,10 @@ preloaders = [
 previewers = [
 	{ name = "*/", run = "folder", sync = true },
 	# Code
-	{ mime = "text/*", run = "code" },
-	{ mime = "*/{xml,javascript,x-wine-extension-ini}", run = "code" },
+	{ mime = "text/*", run = 'piper -- bat -p --color=always "$1"' },
+	{ mime = "*/{xml,javascript,x-wine-extension-ini}", run = 'piper -- bat -p --color=always "$1"' },
 	# JSON
-	{ mime = "application/{json,x-ndjson}", run = "json" },
+	{ mime = "application/{json,x-ndjson}", run = 'piper -- bat -p --color=always "$1"' },
 	# Image
 	{ mime = "image/{avif,hei?,jxl,svg+xml}", run = "magick" },
 	{ mime = "image/*", run = "image" },
@@ -163,7 +180,7 @@ previewers = [
 	# Empty file
 	{ mime = "inode/x-empty", run = "empty" },
 	# Fallback
-	{ name = "*", run = "file" },
+	# { name = "*", run = "file" },
 ]
 
 [input]

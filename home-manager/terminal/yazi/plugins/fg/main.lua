@@ -9,7 +9,7 @@ local toggle_ui = ya.sync(function(self)
 end)
 
 local init_ui_data = ya.sync(function(self, file_url)
-  self.opt = { 'nvim', 'helix', 'jump' }
+  self.opt = { 'nvim', 'cursor', 'jump' }
   self.title = 'fg'
   self.title_color = '#82ab3a'
   self.cursor = 0
@@ -42,8 +42,8 @@ local M = {
     { on = '<Esc>', run = 'quit' },
     { on = '<Enter>', run = 'select' },
 
-    { on = 'k', run = 'up' },
-    { on = 'j', run = 'down' },
+    { on = 'j', run = 'up' },
+    { on = 'k', run = 'down' },
 
     { on = '<Up>', run = 'up' },
     { on = '<Down>', run = 'down' },
@@ -58,18 +58,18 @@ end
 function M:layout(area)
   local chunks = ui.Layout()
     :constraints({
-      ui.Constraint.Percentage(10),
-      ui.Constraint.Percentage(80),
-      ui.Constraint.Percentage(10),
+      ui.Constraint.Percentage(25),
+      ui.Constraint.Percentage(50),
+      ui.Constraint.Percentage(25),
     })
     :split(area)
 
   local chunks = ui.Layout()
     :direction(ui.Layout.HORIZONTAL)
     :constraints({
-      ui.Constraint.Percentage(10),
-      ui.Constraint.Percentage(80),
-      ui.Constraint.Percentage(10),
+      ui.Constraint.Percentage(25),
+      ui.Constraint.Percentage(50),
+      ui.Constraint.Percentage(25),
     })
     :split(chunks[2])
 
@@ -222,8 +222,8 @@ function M:entry(job)
 
   if (default_action == 'nvim' or get_option() == 'nvim') and args[1] ~= 'fzf' then
     os.execute('nvim +' .. line_number .. ' -n ' .. file_url)
-  elseif (default_action == 'helix' or get_option() == 'helix') and args[1] ~= 'fzf' then
-    os.execute('helix +' .. line_number .. ' ' .. file_url)
+  elseif (default_action == 'cursor' or get_option() == 'cursor') and args[1] ~= 'fzf' then
+    os.execute('cursor -g ' .. file_url .. ':' .. line_number)
   elseif (default_action == 'jump' or get_option() == 'jump' or args[1] == 'fzf') and file_url ~= '' then
     ya.mgr_emit(file_url:match('[/\\]$') and 'cd' or 'reveal', { file_url })
   else
@@ -236,9 +236,9 @@ function M:reflow() return { self } end
 function M:redraw()
   local rows = {}
 
-  rows[1] = ui.Row({ 'open with nvim' })
-  rows[2] = ui.Row({ 'open with helix' })
-  rows[3] = ui.Row({ 'reach at yazi' })
+  rows[1] = ui.Row({ 'yazi reveal' })
+  rows[2] = ui.Row({ 'cursor open' })
+  rows[3] = ui.Row({ 'nvim open' })
   return {
     ui.Clear(self._area),
     ui.Border(ui.Border.ALL)

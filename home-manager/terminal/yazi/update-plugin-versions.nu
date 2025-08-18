@@ -1,3 +1,4 @@
+#! /usr/bin/env nu
 # Function to extract plugin info from Nix file
 def extract_plugin_info [plugin_name: string] {
     let nix_file = $"plugins/($plugin_name).nix"

@@ -6,7 +6,7 @@
   };
   # TODO: make this work with a plugin https://github.com/junegunn/fzf/issues/2789
 
-  home.packages = with pkgs; [ glow bat fzf ripgrep fd ripgrep-all ];
+  home.packages = with pkgs; [ glow bat fzf ripgrep fd ripgrep-all eza hexyl ];
 
   home.file = let
     baseConfigPath = ".config/yazi";
@@ -14,13 +14,9 @@
     baseOutputPath = "share/yazi/plugins";
     plugins = [
       {
-        name = "glow";
-        pkg = pkgs.callPackage ./plugins/glow.nix { };
+        name = "piper";
+        pkg = pkgs.callPackage ./plugins/piper.nix { };
       }
-      # {
-      #   name = "starship";
-      #   pkg = pkgs.callPackage ./plugins/starship.nix { };
-      # }
       {
         name = "relative-motions";
         pkg = pkgs.callPackage ./plugins/relative-motions.nix { };
