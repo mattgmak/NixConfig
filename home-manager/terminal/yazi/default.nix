@@ -3,8 +3,9 @@
     enable = true;
     enableNushellIntegration = true;
     initLua = ./init.lua;
+    plugins = with pkgs.yaziPlugins; { inherit git; };
   };
-  # TODO: make this work with a plugin https://github.com/junegunn/fzf/issues/2789
+  # TODO: use nixpkgs plugins
 
   home.packages = with pkgs; [ glow bat fzf ripgrep fd ripgrep-all eza hexyl ];
 

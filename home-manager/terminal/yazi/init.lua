@@ -26,6 +26,18 @@ require('fg'):setup({
   default_action = 'menu',
 })
 
+th.git = th.git or {}
+th.git.modified = ui.Style():fg('yellow')
+th.git.deleted = ui.Style():fg('red'):bold()
+th.git.modified_sign = 'M'
+th.git.deleted_sign = 'D'
+th.git.untracked = ui.Style():fg('blue')
+th.git.untracked_sign = 'U'
+th.git.renamed = ui.Style():fg('magenta')
+th.git.renamed_sign = 'R'
+th.git.staged = ui.Style():fg('green')
+require('git'):setup()
+
 -- Add symlink to status bar
 Status:children_add(function(self)
   local h = self._current.hovered
