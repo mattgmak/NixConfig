@@ -107,6 +107,8 @@ $env.PATH = ($env.PATH | append "C:/Program Files/Git/bin")
 $env.PATH = ($env.PATH | append "/home/goofy/.atuin/bin")
 $env.PATH = ($env.PATH | append "/home/goofy/anaconda3/bin")
 
+$env.SHELL = $nu.current-exe
+
 # To load from a custom file you can use:
 # source ($nu.default-config-dir | path join 'custom.nu')
 mkdir ~/.cache/starship

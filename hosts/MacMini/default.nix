@@ -68,6 +68,7 @@
       btop
       dua
       nodejs_20
+      bat
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
