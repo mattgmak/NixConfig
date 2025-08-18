@@ -346,6 +346,17 @@ keymap = [
   # Help
   { on = "~", run = "help", desc = "Open help" },
   { on = "<F1>", run = "help", desc = "Open help" },
+
+  { on = [
+    "g",
+    "f",
+  ], run = 'search_do --via=fd --args="-tf -d9"', desc = "Recursively flatten directories" },
+  { on = "R", run = [
+    "escape --select",
+    "toggle_all",
+    "rename",
+    "escape --select --search",
+  ], desc = "Rename all files" },
 ]
 
 [tasks]
@@ -476,6 +487,7 @@ keymap = [
   # Help
   { on = "~", run = "help", desc = "Open help" },
   { on = "<F1>", run = "help", desc = "Open help" },
+
 ]
 
 [confirm]
