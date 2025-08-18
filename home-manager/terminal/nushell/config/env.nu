@@ -106,6 +106,7 @@ $env.PATH = ($env.PATH | append "/usr/local/cuda/bin")
 $env.PATH = ($env.PATH | append "C:/Program Files/Git/bin")
 $env.PATH = ($env.PATH | append "/home/goofy/.atuin/bin")
 $env.PATH = ($env.PATH | append "/home/goofy/anaconda3/bin")
+$env.PATH = ($env.PATH | append "/usr/local/bin")
 
 $env.SHELL = $nu.current-exe
 
