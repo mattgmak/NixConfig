@@ -1,4 +1,4 @@
-{
+{ hostname }: {
   "editor.suggestSelection" = "first";
   "terminal.integrated.useWslProfiles" = true;
   "eslint.workingDirectories" = [{ "mode" = "auto"; }];
@@ -238,7 +238,8 @@
   "editor.cursorSurroundingLines" = 4;
   "notebook.lineNumbers" = "on";
   "remote.autoForwardPortsSource" = "hybrid";
-  "workbench.iconTheme" = "helium-icon-theme";
+  "workbench.iconTheme" =
+    if hostname == "GoofyDesky" then "symbols" else "helium-icon-theme";
   "workbench.colorTheme" = "Aura Soft Dark";
   "[kotlin]" = { "editor.defaultFormatter" = "cstef.kotlin-formatter"; };
   "editor.lineNumbers" = "relative";

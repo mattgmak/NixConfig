@@ -186,6 +186,12 @@ in {
     size = 16 * 1024;
   }];
 
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";
+    loadModels = [ "deepseek-r1:8b" ];
+  };
+
   system.stateVersion = "24.11";
 
 }

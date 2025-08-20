@@ -1,4 +1,4 @@
-{ ... }: {
+{ hostname, ... }: {
   imports = [ ../../../modules/cursor-injection ];
   home.file = {
     ".cursor/extensions/custom/custom.js".source = ./custom.js;
@@ -19,7 +19,7 @@
     mutableExtensionsDir = true;
     profiles = {
       default = {
-        userSettings = import ./settings.nix;
+        userSettings = import ./settings.nix { inherit hostname; };
         keybindings = import ./keybindings.nix;
         userMcp = import ./mcp.nix;
       };

@@ -271,7 +271,7 @@
     "when" = "workbench.panel.output.active";
   }
   {
-    "key" = "ctrl+";
+    "key" = "ctrl+,";
     "command" = "editor.action.marker.nextInFiles";
     "when" = "editorFocus";
   }
@@ -291,16 +291,16 @@
     "when" = "workbench.panel.markers.view.active";
   }
   {
-    "key" = "ctrl+shift+";
+    "key" = "ctrl+shift+,";
     "command" = "-editor.action.inPlaceReplace.up";
     "when" = "editorTextFocus && !editorReadonly";
   }
   {
-    "key" = "ctrl+";
+    "key" = "ctrl+,";
     "command" = "-workbench.action.openSettings";
   }
   {
-    "key" = "ctrl+shift+";
+    "key" = "ctrl+shift+,";
     "command" = "editor.action.marker.prevInFiles";
     "when" = "editorFocus";
   }
