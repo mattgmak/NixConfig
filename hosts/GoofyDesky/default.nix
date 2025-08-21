@@ -103,6 +103,8 @@ in {
     prismlauncher
     hyperhdr
     orcaSlicerDesktopItem
+    google-chrome
+    osu-lazer-bin
   ];
 
   environment.etc."xdg/mimeapps.list".source = orcaSlicerMimeappsList;
@@ -152,6 +154,7 @@ in {
       qmk_hid
       via
       vial
+      (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
     ]; # packages
   }; # udev
 
