@@ -69,6 +69,8 @@
       dua
       nodejs_20
       bat
+      eza
+      ollama
     ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
 
   nix-homebrew = {
