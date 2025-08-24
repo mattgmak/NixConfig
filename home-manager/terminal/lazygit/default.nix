@@ -1,5 +1,4 @@
-{ ... }: {
-  # TODO: get pr open working
+{ pkgs, ... }: {
   programs.lazygit = {
     enable = true;
     settings = {
@@ -23,6 +22,14 @@
           pager =
             "delta --paging=never --line-numbers --hunk-header-style=omit";
         };
+      };
+      os = {
+        open = if pkgs.stdenv.isDarwin then
+          "open {{filename}}"
+        else
+          "xdg-open {{filename}}";
+        openLink =
+          if pkgs.stdenv.isDarwin then "open {{link}}" else "xdg-open {{link}}";
       };
     };
   };
