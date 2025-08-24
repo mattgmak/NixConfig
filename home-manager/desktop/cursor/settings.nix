@@ -238,8 +238,7 @@
   "editor.cursorSurroundingLines" = 4;
   "notebook.lineNumbers" = "on";
   "remote.autoForwardPortsSource" = "hybrid";
-  "workbench.iconTheme" =
-    if hostname == "GoofyDesky" then "symbols" else "helium-icon-theme";
+  "workbench.iconTheme" = "helium-icon-theme";
   "workbench.colorTheme" = "Aura Soft Dark";
   "[kotlin]" = { "editor.defaultFormatter" = "cstef.kotlin-formatter"; };
   "editor.lineNumbers" = "relative";
@@ -325,4 +324,5 @@
   "biome.requireConfiguration" = true;
   "biome.lsp.trace.server" = "verbose";
   "helium-icon-theme.hidesExplorerArrows" = true;
+  "extensions.autoUpdate" = false;
 }

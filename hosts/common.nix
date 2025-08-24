@@ -11,6 +11,7 @@
     (final: prev: {
       zen = inputs.zen-browser.packages.${prev.system}.zen-browser;
     })
+    inputs.nix4vscode.overlays.default
   ];
 
   home-manager = {
