@@ -949,7 +949,7 @@ def --env q [...args] {
 }
 
 def --env lg [...args] {
-    lazygit ...$args
+    SHELL=bash lazygit ...$args
 }
 
 def --env v [...args] {
