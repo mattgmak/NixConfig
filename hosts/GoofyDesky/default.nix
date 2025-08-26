@@ -1,11 +1,22 @@
 { pkgs, ... }:
 let
+  # orca-slicer-overlay = final: prev: {
+  #   orca-slicer = prev.orca-slicer.overrideAttrs (old: {
+  #     postInstall = (old.postInstall or "") + ''
+  #       mv $out/bin/orca-slicer $out/bin/.orca-slicer-wrapped
+  #       echo "env __GLX_VENDOR_LIBRARY_NAME=mesa __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink WEBKIT_DISABLE_DMABUF_RENDERER=1 $out/bin/.orca-slicer-wrapped" > $out/bin/orca-slicer
+  #       chmod +x $out/bin/orca-slicer
+  #     '';
+  #   });
+  # };
   orcaSlicerDesktopItem = pkgs.makeDesktopItem {
     name = "orca-slicer-dri";
     desktopName = "OrcaSlicer (DRI)";
     genericName = "3D Printing Software";
     icon = "OrcaSlicer";
-    exec = "env GBM_BACKEND=dri ${pkgs.orca-slicer}/bin/orca-slicer %U";
+    # exec = "env GBM_BACKEND=dri ${pkgs.orca-slicer}/bin/orca-slicer %U";
+    exec =
+      "env __GLX_VENDOR_LIBRARY_NAME=mesa __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink WEBKIT_DISABLE_DMABUF_RENDERER=1 ${pkgs.orca-slicer}/bin/orca-slicer %U";
     terminal = false;
     type = "Application";
     mimeTypes = [
@@ -68,6 +79,8 @@ in {
     binfmt = true;
   };
 
+  # nixpkgs.overlays = [ orca-slicer-overlay ];
+
   environment.systemPackages = with pkgs; [
     bitwarden-desktop
     libsForQt5.kdeconnect-kde
@@ -103,6 +116,7 @@ in {
     prismlauncher
     hyperhdr
     orcaSlicerDesktopItem
+    orca-slicer
     google-chrome
     osu-lazer-bin
   ];

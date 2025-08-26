@@ -992,6 +992,7 @@
       ignore = ''
         yazi
         Neovim Wrapper
+        OrcaSlicer
       '';
     };
   };
