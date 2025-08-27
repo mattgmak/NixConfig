@@ -30,7 +30,7 @@
     portalPackage =
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     enable = true;
-    systemd.enable = true;
+    systemd.enable = false;
     systemd.variables = [
       "DISPLAY"
       "HYPRLAND_INSTANCE_SIGNATURE"
@@ -189,15 +189,19 @@
         workspace_swipe_touch = true;
       };
       exec-once = [
-        "hyprpaper"
+        "uwsm app -- hyprpaper"
         "systemctl --user start hyprpolkitagent"
-        "clipse -listen"
-        "fcitx5 -dr"
-        "fcitx5-remote -r"
-        "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh"
+        "uwsm app -- waybar"
+        "uwsm app -- clipse -listen"
+        "uwsm app -- fcitx5 -dr"
+        "uwsm app -- fcitx5-remote -r"
+        (lib.mkIf (hostname != "GoofyDesky")
+          "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh")
         (lib.mkIf (hostname == "GoofyDesky")
           "hyprctl dispatch movecursor 1280 720")
-        "hyprsunset"
+        "uwsm app -- hyprsunset"
+        "hyprctl hyprsunset temperature 4500"
+        (lib.mkIf (hostname == "GoofyDesky") "vesktop")
       ];
       xwayland = {
         enabled = true;
@@ -269,6 +273,7 @@
         "immediate, class:^(cs2)$"
         "fullscreen, class:^(cs2)$"
         "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), onworkspace:r[4-6]"
+        "workspace 4, class:(vesktop)"
       ] else
         [ ]);
     };

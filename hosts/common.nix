@@ -198,6 +198,7 @@
     stylua
     inputs.wiremix.packages.${pkgs.system}.wiremix
     ffmpeg
+    uwsm
   ];
 
   services.syncthing = {
@@ -220,7 +221,10 @@
     };
   };
 
-  programs.hyprland.enable = true;
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
 
   # Add flatpak support
   services.flatpak.enable = true;
