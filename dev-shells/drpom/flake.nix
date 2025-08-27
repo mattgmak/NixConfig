@@ -38,7 +38,7 @@
                 kotlin
                 kotlin-language-server
                 biome-pin-pkgs.biome
-              ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli ])
+              ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli vercel ])
               ++ (if pkgs.stdenv.isLinux then [
                 android-studio
                 androidenv.androidPkgs.platform-tools

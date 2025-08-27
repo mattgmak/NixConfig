@@ -32,7 +32,6 @@
             ms-vsliveshare.vsliveshare
             mkhl.direnv
             usernamehw.errorlens
-            biomejs.biome
           ] ++ pkgs.nix4vscode.forVscodeVersion "1.99.3" [
             "github.vscode-pull-request-github"
             "bbenoist.QML"
@@ -66,6 +65,7 @@
             "formulahendry.auto-close-tag"
             "daltonmenezes.aura-theme"
             "christian-kohler.path-intellisense"
+            "biomejs.biome"
           ];
       };
     };
