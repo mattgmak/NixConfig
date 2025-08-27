@@ -5,6 +5,7 @@
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs-for-osu = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     # zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser = {
       url = "github:SoumyabrataBanik/flake-zen-browser";
@@ -61,8 +62,8 @@
     };
   };
 
-  outputs =
-    { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nix-darwin, ... }@inputs:
+  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nixpkgs-for-osu
+    , nix-darwin, ... }@inputs:
     let
       username = "goofy";
       system = "x86_64-linux";
@@ -71,6 +72,10 @@
         config.allowUnfree = true;
       };
       pkgs-for-cursor = import nixpkgs-for-cursor {
+        inherit system;
+        config.allowUnfree = true;
+      };
+      pkgs-for-osu = import nixpkgs-for-osu {
         inherit system;
         config.allowUnfree = true;
       };
@@ -115,7 +120,8 @@
       nixosConfigurations.${desktopName} = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {
-          inherit inputs username pkgs-stable pkgs-for-cursor system;
+          inherit inputs username pkgs-stable pkgs-for-cursor pkgs-for-osu
+            system;
           hostname = desktopName;
         };
         modules = [ ./hosts/${desktopName} ];

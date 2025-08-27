@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-for-osu, ... }:
 let
   # orca-slicer-overlay = final: prev: {
   #   orca-slicer = prev.orca-slicer.overrideAttrs (old: {
@@ -118,7 +118,7 @@ in {
     orcaSlicerDesktopItem
     orca-slicer
     google-chrome
-    osu-lazer-bin
+    pkgs-for-osu.osu-lazer-bin
   ];
 
   environment.etc."xdg/mimeapps.list".source = orcaSlicerMimeappsList;
