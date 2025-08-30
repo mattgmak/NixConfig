@@ -29,10 +29,10 @@
             sumneko.lua
             tamasfe.even-better-toml
             davidanson.vscode-markdownlint
-            ms-vsliveshare.vsliveshare
             mkhl.direnv
             usernamehw.errorlens
           ] ++ pkgs.nix4vscode.forVscodeVersion "1.99.3" [
+            "ms-vsliveshare.vsliveshare.1.0.5905"
             "github.vscode-pull-request-github"
             "bbenoist.QML"
             "delgan.qml-format"
@@ -57,7 +57,7 @@
             "esbenp.prettier-vscode"
             "ryuta46.multi-command"
             "wholroyd.jinja"
-            # "helgardrichard.helium-icon-theme"
+            "helgardrichard.helium-icon-theme"
             "bierner.emojisense"
             "mikestead.dotenv"
             "aaron-bond.better-comments"
