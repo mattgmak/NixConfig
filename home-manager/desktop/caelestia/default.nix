@@ -11,5 +11,9 @@
     };
   };
 
+  home.file."Pictures/Wallpapers/wallpaper.jpg" = {
+    source = ../../../modules/style/beautiful-mountains-landscape.jpg;
+  };
+
   # home.packages = [ inputs.caelestia-shell.packages.${pkgs.system}.default ];
 }

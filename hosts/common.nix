@@ -1,6 +1,5 @@
 { pkgs, inputs, hostname, username, pkgs-for-cursor, config, lib, ... }: {
   imports = [
-    ../modules/input-remapper.nix
     ../modules/style/common.nix
     ../modules/style/linux.nix
     inputs.home-manager.nixosModules.home-manager

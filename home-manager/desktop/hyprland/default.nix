@@ -53,9 +53,21 @@
     in {
       "$mod" = "ALT";
       unbind = [ ];
+      bindin = [
+        # "Super, catchall, global, caelestia:launcherInterrupt"
+        # "Super, mouse:272, global, caelestia:launcherInterrupt"
+        # "Super, mouse:273, global, caelestia:launcherInterrupt"
+        # "Super, mouse:274, global, caelestia:launcherInterrupt"
+        # "Super, mouse:275, global, caelestia:launcherInterrupt"
+        # "Super, mouse:276, global, caelestia:launcherInterrupt"
+        # "Super, mouse:277, global, caelestia:launcherInterrupt"
+        # "Super, mouse_up, global, caelestia:launcherInterrupt"
+        # "Super, mouse_down, global, caelestia:launcherInterrupt"
+      ];
       bind = [
+        "$mod, h, global, caelestia:launcher"
         "$mod SHIFT, h, exec, rofi -show drun"
-        "$mod, h, exec, sherlock"
+        # "$mod, h, exec, sherlock"
         "$mod, y, exec, ${config.home.homeDirectory}/.config/sherlock/switch-windows.nu"
         "$mod, j, movefocus, u"
         "$mod, k, movefocus, d"
@@ -111,9 +123,11 @@
         "SUPER, Q, exec, ghostty --title=btop -e btop"
         "SUPER, A, exec, ghostty --title=wiremix -e wiremix"
         "SUPER, M, exec, ghostty --title=nmtui -e nmtui"
-        ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
+        # ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
+        "Super Shift, S, global, caelestia:screenshotFreeze"
         "SUPER SHIFT, C, exec, hyprpicker -a"
         "SUPER, N, exec, makoctl dismiss -a"
+        "SUPER, N, global, caelestia:clearNotifs"
         # App launch binds
         "SUPER, R, exec, zen"
         "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
@@ -189,9 +203,9 @@
         workspace_swipe_touch = true;
       };
       exec-once = [
-        "uwsm app -- hyprpaper"
+        # "uwsm app -- hyprpaper"
         "systemctl --user start hyprpolkitagent"
-        "uwsm app -- waybar"
+        # "uwsm app -- waybar"
         "uwsm app -- clipse -listen"
         "uwsm app -- fcitx5 -dr"
         "uwsm app -- fcitx5-remote -r"
@@ -203,13 +217,14 @@
         "uwsm app -- hyprsunset"
         "hyprctl hyprsunset temperature 4500"
         (lib.mkIf (hostname == "GoofyDesky") "vesktop")
+        "gnome-keyring-daemon --start --components=secrets"
       ];
       xwayland = {
         enabled = true;
         force_zero_scaling = true;
       };
       decoration = {
-        rounding = 6;
+        rounding = 10;
         blur = {
           enabled = true;
           size = 3;

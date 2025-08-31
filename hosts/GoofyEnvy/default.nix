@@ -3,6 +3,7 @@ let
 in {
   # Bootloader
   imports = [
+    ../../modules/input-remapper.nix
     ./hardware-configuration.nix
     ../common.nix
     inputs.xremap-flake.nixosModules.default
