@@ -23,12 +23,11 @@
     wl-clipboard
     wlogout
   ];
-
+  xdg.configFile."uwsm/env".source =
+    "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
   wayland.windowManager.hyprland = {
-    package =
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage =
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    package = null;
+    portalPackage = null;
     enable = true;
     systemd.enable = false;
     systemd.variables = [
@@ -293,5 +292,12 @@
       ] else
         [ ]);
     };
+  };
+  xdg.portal = {
+    enable = lib.mkForce true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
+    ];
   };
 }

@@ -6,6 +6,11 @@
   in {
     enable = true;
     package = termfilepickers;
-    config = { terminal_command = [ (lib.getExe pkgs.ghostty) "-e" ]; };
+    config = {
+      terminal_command = [ (lib.getExe pkgs.ghostty) "-e" ];
+      open_file_script_path = ./open.nu;
+      save_file_script_path = ./save.nu;
+      save_files_script_path = ./save.nu;
+    };
   };
 }

@@ -12,20 +12,20 @@
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
     ./desktop/cursor
     ./terminal/bluetui
-    ./desktop/onedrive
+    # ./desktop/onedrive
     ./desktop/hyprland
     ./desktop/waybar
     ./desktop/zen-browser
     ./desktop/wlogout
-    ./desktop/rofi
-    ./desktop/mako
+    # ./desktop/rofi
+    # ./desktop/mako
     ./desktop/input-remapper
     ./desktop/fcitx5
     ./terminal/clipse
     ./desktop/mpv
     ./desktop/kdeconnect
     ./terminal/filepicker
-    ./desktop/sherlock
+    # ./desktop/sherlock
     ./terminal/wiremix
     ./desktop/caelestia
   ] else if hostname == "GoofyWSL" then
