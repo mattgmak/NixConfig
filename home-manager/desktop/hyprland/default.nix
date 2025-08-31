@@ -88,6 +88,7 @@
         "$mod, t, togglefloating"
         "$mod, f, fullscreen"
         "$mod, d, killactive"
+        "$mod, c, centerwindow"
         "$mod SUPER, q, exit"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
@@ -131,12 +132,12 @@
         "SUPER, R, exec, zen"
         "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         "SUPER, W, exec, ghostty"
-        "SUPER, C, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
+        "SUPER, Z, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         # Focus binds
         "$mod, R, focuswindow, initialtitle:(Zen Browser)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*ghostty.*)"
-        "$mod, C, focuswindow, class:(vesktop)"
+        "$mod, Z, focuswindow, class:(vesktop)"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind
@@ -253,8 +254,10 @@
       };
 
       general = {
-        gaps_in = 2.5;
-        gaps_out = 5;
+        # gaps_in = 2.5;
+        # gaps_out = 5;
+        gaps_in = 5;
+        gaps_out = 10;
         resize_on_border = true;
         border_size = if hostname == "GoofyDesky" then 2 else 1;
         "col.active_border" =
