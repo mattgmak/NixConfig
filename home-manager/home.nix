@@ -27,6 +27,7 @@
     ./terminal/filepicker
     ./desktop/sherlock
     ./terminal/wiremix
+    ./desktop/caelestia
   ] else if hostname == "GoofyWSL" then
     [
 

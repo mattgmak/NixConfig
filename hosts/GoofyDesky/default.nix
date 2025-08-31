@@ -83,7 +83,6 @@ in {
 
   environment.systemPackages = with pkgs; [
     bitwarden-desktop
-    libsForQt5.kdeconnect-kde
     libnotify
     obsidian
     protonvpn-gui

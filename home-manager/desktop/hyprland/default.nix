@@ -195,6 +195,7 @@
         "uwsm app -- clipse -listen"
         "uwsm app -- fcitx5 -dr"
         "uwsm app -- fcitx5-remote -r"
+        "uwsm app -- caelestia shell -d"
         (lib.mkIf (hostname != "GoofyDesky")
           "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh")
         (lib.mkIf (hostname == "GoofyDesky")

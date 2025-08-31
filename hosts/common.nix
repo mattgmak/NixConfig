@@ -199,6 +199,7 @@
     inputs.wiremix.packages.${pkgs.system}.wiremix
     ffmpeg
     uwsm
+    kdePackages.kdeconnect-kde
   ];
 
   services.syncthing = {

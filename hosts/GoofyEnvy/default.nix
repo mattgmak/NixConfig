@@ -11,7 +11,6 @@ in {
   environment.systemPackages = with pkgs; [
     bitwarden-desktop
     wezterm
-    libsForQt5.kdeconnect-kde
     libnotify
     obsidian
     webcord
