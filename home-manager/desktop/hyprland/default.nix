@@ -89,7 +89,6 @@
         "$mod, f, fullscreen"
         "$mod, d, killactive"
         "$mod, c, centerwindow"
-        "$mod SUPER, q, exit"
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -115,8 +114,9 @@
         ", XF86AudioNext, exec, playerctl next"
         ", XF86AudioPrev, exec, playerctl previous"
         # Waybar binds
-        "$mod SHIFT, M, exec, pkill waybar || waybar"
-        "$mod, M, exec, pkill -SIGUSR1 waybar"
+        # "$mod SHIFT, M, exec, pkill waybar || waybar"
+        # "$mod, M, exec, pkill -SIGUSR1 waybar"
+        "$mod SHIFT, M, exec, caelestia shell --kill; caelestia shell -d"
         # Utility binds
         "SUPER, V, exec, ghostty --title=clipse -e clipse"
         "SUPER, B, exec, ghostty --title=bluetui -e bluetui"

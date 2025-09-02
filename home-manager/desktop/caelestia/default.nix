@@ -4,7 +4,16 @@
   programs.caelestia = {
     enable = true;
     systemd.enable = false;
-    settings = { };
+    settings = {
+      bar = {
+        workspaces = {
+          activeLabel = " ";
+          occupiedLabel = "  ";
+          occupiedBg = true;
+          label = "  ";
+        };
+      };
+    };
     cli = {
       enable = true;
       settings = { theme.enableGtk = false; };
@@ -15,5 +24,5 @@
     source = ../../../modules/style/beautiful-mountains-landscape.jpg;
   };
 
-  # home.packages = [ inputs.caelestia-shell.packages.${pkgs.system}.default ];
+  home.packages = [ pkgs.quickshell ];
 }

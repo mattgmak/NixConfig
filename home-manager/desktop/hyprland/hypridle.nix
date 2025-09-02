@@ -15,7 +15,7 @@
         }
         {
           timeout = 1800;
-          on-timeout = "loginctl lock-session";
+          on-timeout = "systemctl suspend";
         }
       ];
     };
