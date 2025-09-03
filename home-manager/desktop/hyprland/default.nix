@@ -287,9 +287,9 @@
         "size 100% 32%, ${matchPip}"
         "move 0 50, ${matchPip}"
         "noinitialfocus, ${matchPip}"
-        "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!)"
-        "immediate, class:^(cs2)$"
-        "fullscreen, class:^(cs2)$"
+        "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
+        "immediate, class:^(cs2|steam_app_.*)$"
+        "fullscreen, class:^(cs2|steam_app_.*)$"
         "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), onworkspace:r[4-6]"
         "workspace 4, class:(vesktop)"
       ] else
