@@ -284,8 +284,8 @@
         "stayfocused, ${matchFloatingTerminal}"
       ] ++ (if hostname == "GoofyDesky" then [
         "monitor ${deskyMonitors.secondary}, ${matchPip}"
-        "size 100% 32%, ${matchPip}"
-        "move 0 50, ${matchPip}"
+        "size 986 555, ${matchPip}"
+        "move 72 20, ${matchPip}"
         "noinitialfocus, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
         "immediate, class:^(cs2|steam_app_.*)$"
