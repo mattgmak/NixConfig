@@ -2,9 +2,7 @@
   description = "DrPOM dev shell";
   inputs = {
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
-    biome-pin = {
-      url = "github:nixos/nixpkgs/6b4955211758ba47fac850c040a27f23b9b4008f";
-    };
+    biome-pin = { url = "github:nixos/nixpkgs/nixos-unstable"; };
   };
 
   outputs = { nixpkgs, biome-pin, ... }:
