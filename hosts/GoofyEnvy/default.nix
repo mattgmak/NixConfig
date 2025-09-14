@@ -68,12 +68,6 @@ in {
     '';
   };
 
-  # Add onedrive service
-  services.onedrive = {
-    enable = true;
-    package = pkgs.onedrive;
-  };
-
   services.udev = {
     packages = with pkgs; [
       qmk

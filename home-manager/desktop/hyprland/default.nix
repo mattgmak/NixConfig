@@ -199,8 +199,8 @@
         sensitivity = if hostname == "GoofyDesky" then -0.3 else 0.5;
       };
       gestures = {
-        workspace_swipe = true;
-        workspace_swipe_touch = true;
+        # workspace = true;
+        # workspace_swipe_touch = true;
       };
       exec-once = [
         # "uwsm app -- hyprpaper"
