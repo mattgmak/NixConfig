@@ -118,6 +118,7 @@ in {
     orca-slicer
     google-chrome
     pkgs-for-osu.osu-lazer-bin
+    onedrivegui
   ];
 
   environment.etc."xdg/mimeapps.list".source = orcaSlicerMimeappsList;

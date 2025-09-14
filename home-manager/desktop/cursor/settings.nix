@@ -319,8 +319,7 @@
     "source.fixAll.biome" = "explicit";
     "source.organizeImports.biome" = "explicit";
   };
-  "biome.lsp.bin" =
-    "/nix/store/qfkrpk9swmlcz0snh2a5b3y02y3l7n1w-biome-2.1.2/bin/biome";
+  "biome.lsp.bin" = "biome";
   "biome.requireConfiguration" = true;
   "biome.lsp.trace.server" = "verbose";
   "helium-icon-theme.hidesExplorerArrows" = true;
