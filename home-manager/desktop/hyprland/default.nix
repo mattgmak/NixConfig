@@ -198,10 +198,7 @@
         };
         sensitivity = if hostname == "GoofyDesky" then -0.3 else 0.5;
       };
-      gestures = {
-        # workspace = true;
-        # workspace_swipe_touch = true;
-      };
+      gesture = [ "3, horizontal, workspace" "3, vertical, fullscreen" ];
       exec-once = [
         # "uwsm app -- hyprpaper"
         "systemctl --user start hyprpolkitagent"
