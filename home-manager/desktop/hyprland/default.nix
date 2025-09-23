@@ -63,6 +63,13 @@
         # "Super, mouse_up, global, caelestia:launcherInterrupt"
         # "Super, mouse_down, global, caelestia:launcherInterrupt"
       ];
+      bindl = [
+        # Focus binds
+        "$mod, R, focuswindow, initialtitle:(Zen Browser)"
+        "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
+        "$mod, W, focuswindow, class:(.*ghostty.*)"
+        "$mod, Z, focuswindow, class:(vesktop)"
+      ];
       bind = [
         "$mod, h, global, caelestia:launcher"
         "$mod SHIFT, h, exec, rofi -show drun"
@@ -133,11 +140,6 @@
         "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         "SUPER, W, exec, ghostty"
         "SUPER, Z, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
-        # Focus binds
-        "$mod, R, focuswindow, initialtitle:(Zen Browser)"
-        "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
-        "$mod, W, focuswindow, class:(.*ghostty.*)"
-        "$mod, Z, focuswindow, class:(vesktop)"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind

@@ -2146,16 +2146,16 @@
     "command" = "-editor.emmet.action.expandAbbreviation";
     "when" = "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus";
   }
-  {
-    "key" = "alt+r";
-    "command" = "-toggleFindRegex";
-    "when" = "editorFocus";
-  }
-  {
-    "key" = "alt+w";
-    "command" = "-toggleFindWholeWord";
-    "when" = "editorFocus";
-  }
+  # {
+  #   "key" = "alt+r";
+  #   "command" = "-toggleFindRegex";
+  #   "when" = "editorFocus";
+  # }
+  # {
+  #   "key" = "alt+w";
+  #   "command" = "-toggleFindWholeWord";
+  #   "when" = "editorFocus";
+  # }
   # {
   #   "key" = "tab";
   #   "command" = "tab";
