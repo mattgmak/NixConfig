@@ -2152,9 +2152,55 @@
   #   "when" = "editorFocus";
   # }
   # {
+  #   "key" = "alt+r";
+  #   "command" = "-toggleSearchEditorRegex";
+  #   "when" = "inSearchEditor && searchInputBoxFocus";
+  # }
+  # {
+  #   "key" = "alt+r";
+  #   "command" = "-toggleSearchRegex";
+  #   "when" = "searchViewletFocus";
+  # }
+  # {
+  #   "key" = "alt+r";
+  #   "command" = "-workbench.action.terminal.toggleFindRegex";
+  #   "when" =
+  #     "terminalFindVisible && terminalHasBeenCreated || terminalFindVisible && terminalProcessSupported";
+  # }
+  # {
+  #   "key" = "alt+r";
+  #   "command" = "-composer.toggleFindRegex";
+  #   "when" = "composerFindWidgetFocused";
+  # }
+  # {
+  #   "key" = "alt+d";
+  #   "command" = "-aidebug.autodebugterminal";
+  #   "when" = "terminalFocus";
+  # }
+  # {
   #   "key" = "alt+w";
   #   "command" = "-toggleFindWholeWord";
   #   "when" = "editorFocus";
+  # }
+  # {
+  #   "key" = "alt+w";
+  #   "command" = "-toggleSearchEditorWholeWord";
+  #   "when" = "inSearchEditor && searchInputBoxFocus";
+  # }
+  # {
+  #   "key" = "alt+w";
+  #   "command" = "-toggleSearchWholeWord";
+  #   "when" = "searchViewletFocus" ;
+  # }
+  # {
+  #   "key" = "alt+w";
+  #   "command" = "-workbench.action.terminal.toggleFindWholeWord";
+  #   "when" = "terminalFindVisible && terminalHasBeenCreated || terminalFindVisible && terminalProcessSupported";
+  # }
+  # {
+  #   "key" = "alt+w";
+  #   "command" = "-composer.toggleFindWholeWord";
+  #   "when" = "composerFindWidgetFocused";
   # }
   # {
   #   "key" = "tab";

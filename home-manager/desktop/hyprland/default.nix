@@ -63,7 +63,7 @@
         # "Super, mouse_up, global, caelestia:launcherInterrupt"
         # "Super, mouse_down, global, caelestia:launcherInterrupt"
       ];
-      bindl = [
+      bindlpt = [
         # Focus binds
         "$mod, R, focuswindow, initialtitle:(Zen Browser)"
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
