@@ -76,6 +76,7 @@
           "daltonmenezes.aura-theme"
           "christian-kohler.path-intellisense"
           "biomejs.biome"
+          "pflannery.vscode-versionlens"
         ];
       };
     };
