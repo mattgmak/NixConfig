@@ -199,6 +199,7 @@
     ffmpeg
     uwsm
     kdePackages.kdeconnect-kde
+    qimgv
   ];
 
   services.syncthing = {
