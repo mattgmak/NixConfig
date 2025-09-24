@@ -49,6 +49,10 @@
         primary = "DP-3";
         secondary = "HDMI-A-5";
       };
+      allWorkspacesIndex = lib.map (index: toString index) (lib.range 1 10);
+      primaryWorkspaces = lib.take 5 allWorkspacesIndex; # ["1" "2" "3" "4" "5"]
+      secondaryWorkspaces =
+        lib.drop 5 allWorkspacesIndex; # ["6" "7" "8" "9" "10"]
     in {
       "$mod" = "ALT";
       unbind = [ ];
@@ -96,23 +100,7 @@
         "$mod, f, fullscreen"
         "$mod, d, killactive"
         "$mod, c, centerwindow"
-        "$mod, 1, workspace, 1"
-        "$mod, 2, workspace, 2"
-        "$mod, 3, workspace, 3"
-        "$mod, 4, workspace, 4"
-        "$mod, 5, workspace, 5"
-        "$mod, 6, workspace, 6"
-        "$mod, 7, workspace, 7"
-        "$mod, 8, workspace, 8"
         "$mod, G, workspace, name:Game"
-        "$mod SHIFT, 1, movetoworkspacesilent, 1"
-        "$mod SHIFT, 2, movetoworkspacesilent, 2"
-        "$mod SHIFT, 3, movetoworkspacesilent, 3"
-        "$mod SHIFT, 4, movetoworkspacesilent, 4"
-        "$mod SHIFT, 5, movetoworkspacesilent, 5"
-        "$mod SHIFT, 6, movetoworkspacesilent, 6"
-        "$mod SHIFT, 7, movetoworkspacesilent, 7"
-        "$mod SHIFT, 8, movetoworkspacesilent, 8"
         "$mod SHIFT, G, movetoworkspacesilent, name:Game"
         ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ", XF86AudioMicMute, exec, ~/.config/hypr/scripts/mic-toggle.sh"
@@ -146,7 +134,12 @@
         "$mod, Q, exec, wlogout"
         # Floating terminal bind
         "SUPER, T, exec, ~/.config/hypr/scripts/floating-terminal.nu"
-      ];
+      ] ++ lib.concatMap (index:
+        let key = if index == "10" then "0" else index;
+        in [
+          "$mod, ${key}, workspace, ${index}"
+          "$mod SHIFT, ${key}, movetoworkspacesilent, ${index}"
+        ]) allWorkspacesIndex;
       bindm =
         [ "$mod SHIFT, mouse:272, movewindow" "$mod, mouse:272, resizewindow" ];
       binde = [
@@ -179,15 +172,13 @@
         "eDP-1, highres, 0x0, 1"
         ", preferred, auto-up, 1"
       ];
-      workspace = if hostname == "GoofyDesky" then [
-        "name:Game, monitor:${deskyMonitors.primary}"
-        "name:1, monitor:${deskyMonitors.primary}"
-        "name:2, monitor:${deskyMonitors.primary}"
-        "name:3, monitor:${deskyMonitors.primary}"
-        "name:4, monitor:${deskyMonitors.secondary}"
-        "name:5, monitor:${deskyMonitors.secondary}"
-        "name:6, monitor:${deskyMonitors.secondary}"
-      ] else
+      workspace = if hostname == "GoofyDesky" then
+        [ "name:Game, monitor:${deskyMonitors.primary}" ]
+        ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.primary}")
+        primaryWorkspaces
+        ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.secondary}")
+        secondaryWorkspaces
+      else
         [ ];
 
       input = {
@@ -269,10 +260,18 @@
       windowrule = let
         matchPip = "title:^(Picture-in-Picture)$";
         matchFloatingTerminal = "title:(floating-terminal)";
+        primaryWorkspacesMatcher =
+          "onworkspace:r[${lib.head primaryWorkspaces}-${
+            lib.last primaryWorkspaces
+          }]";
+        secondaryWorkspacesMatcher =
+          "onworkspace:r[${lib.head secondaryWorkspaces}-${
+            lib.last secondaryWorkspaces
+          }]";
       in [
         "float, title:(clipse|bluetui|nmtui|btop|wiremix)"
-        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix), onworkspace:r[1-3]"
-        "size 1600 900, title:(btop), onworkspace:r[1-3]"
+        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix), ${primaryWorkspacesMatcher}"
+        "size 1600 900, title:(btop), ${primaryWorkspacesMatcher}"
         "float, ${matchPip}"
         "pin, ${matchPip}"
         "center, floating:1, title:(Cursor)"
@@ -289,8 +288,8 @@
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
         "immediate, class:^(cs2|steam_app_.*)$"
         "fullscreen, class:^(cs2|steam_app_.*)$"
-        "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), onworkspace:r[4-6]"
-        "workspace 4, class:(vesktop)"
+        "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), ${secondaryWorkspacesMatcher}"
+        "workspace ${lib.head secondaryWorkspaces}, class:(vesktop)"
       ] else
         [ ]);
     };
