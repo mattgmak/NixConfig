@@ -31,7 +31,6 @@ in {
     xorg.xeyes
     kdePackages.okular
     mpv
-    yt-dlp
     qbittorrent
     gparted
     appflowy
