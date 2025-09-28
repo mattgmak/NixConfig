@@ -200,6 +200,7 @@
     uwsm
     kdePackages.kdeconnect-kde
     qimgv
+    pdfarranger
   ];
 
   services.syncthing = {

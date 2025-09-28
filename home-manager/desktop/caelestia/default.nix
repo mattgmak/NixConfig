@@ -13,6 +13,8 @@
           label = "  ";
         };
       };
+      notifs = { actionOnClick = true; };
+      osd = { enableMicrophone = true; };
     };
     cli = {
       enable = true;

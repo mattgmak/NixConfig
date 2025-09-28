@@ -104,10 +104,10 @@
         "$mod SHIFT, G, movetoworkspacesilent, name:Game"
         ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ", XF86AudioMicMute, exec, ~/.config/hypr/scripts/mic-toggle.sh"
-        ", XF86AudioPlay, exec, playerctl play-pause"
-        ", XF86AudioPause, exec, playerctl play-pause"
-        ", XF86AudioNext, exec, playerctl next"
-        ", XF86AudioPrev, exec, playerctl previous"
+        # ", XF86AudioPlay, exec, playerctl play-pause"
+        # ", XF86AudioPause, exec, playerctl play-pause"
+        # ", XF86AudioNext, exec, playerctl next"
+        # ", XF86AudioPrev, exec, playerctl previous"
         # Waybar binds
         # "$mod SHIFT, M, exec, pkill waybar || waybar"
         # "$mod, M, exec, pkill -SIGUSR1 waybar"
@@ -161,8 +161,16 @@
         "$mod SHIFT, End, moveactive, 20 0"
         ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%-"
-        ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-        ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+        # ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
+        # ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+      ];
+      bindl = [
+        ", XF86MonBrightnessUp, global, caelestia:brightnessUp"
+        ", XF86MonBrightnessDown, global, caelestia:brightnessDown"
+        ", XF86AudioPlay, global, caelestia:mediaToggle"
+        ", XF86AudioPause, global, caelestia:mediaToggle"
+        ", XF86AudioNext, global, caelestia:mediaNext"
+        ", XF86AudioPrev, global, caelestia:mediaPrev"
       ];
 
       monitor = if hostname == "GoofyDesky" then [
@@ -191,7 +199,10 @@
         };
         sensitivity = if hostname == "GoofyDesky" then -0.3 else 0.5;
       };
-      gesture = [ "3, horizontal, workspace" "3, vertical, fullscreen" ];
+      gesture = [
+        "3, horizontal, scale: 0.5, workspace"
+        "3, vertical, scale: 0.5, fullscreen"
+      ];
       exec-once = [
         # "uwsm app -- hyprpaper"
         "systemctl --user start hyprpolkitagent"
