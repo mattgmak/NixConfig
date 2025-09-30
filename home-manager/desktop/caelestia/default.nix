@@ -15,6 +15,25 @@
       };
       notifs = { actionOnClick = true; };
       osd = { enableMicrophone = true; };
+      general = {
+        idle = {
+          timeouts = [
+            {
+              timeout = 300;
+              idleAction = "lock";
+            }
+            {
+              timeout = 600;
+              idleAction = "dpms off";
+              returnAction = "dpms on";
+            }
+            {
+              timeout = 900;
+              idleAction = [ "systemctl" "suspend-then-hibernate" ];
+            }
+          ];
+        };
+      };
     };
     cli = {
       enable = true;
