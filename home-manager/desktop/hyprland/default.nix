@@ -73,6 +73,7 @@
         "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
         "$mod, W, focuswindow, class:(.*ghostty.*)"
         "$mod, Z, focuswindow, class:(vesktop)"
+        "$mod, O, focuswindow, class:(OrcaSlicer)"
       ];
       bind = [
         "$mod, h, global, caelestia:launcher"
