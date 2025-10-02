@@ -114,7 +114,7 @@
       split_ratio = "0.50";
 
       # Gaps configuration (matching your Hyprland setup)
-      top_padding = 8;
+      top_padding = 0;
       bottom_padding = 8;
       left_padding = 8;
       right_padding = 8;
@@ -230,6 +230,7 @@
       alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Zen" or .app=="zen") | .id' | head -1)
       alt - x : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Xcode") | .id' | head -1)
       alt - a : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Android Studio") | .id' | head -1)
+      alt - s : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Simulator") | .id' | head -1)
 
       # Balance all windows
       # alt + shift - space : yabai -m space --balance
