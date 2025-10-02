@@ -54,6 +54,14 @@ vim.keymap.set('n', 'x', '"_x', {
   noremap = true,
 })
 
+-- full page scroll rebinds
+vim.keymap.set('n', '<cs-u>', '<c-b>', {
+  noremap = true,
+})
+vim.keymap.set('n', '<cs-d>', '<c-f>', {
+  noremap = true,
+})
+
 -- yank all
 vim.keymap.set('n', '<leader>ya', 'ggyG')
 

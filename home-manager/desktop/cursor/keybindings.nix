@@ -586,6 +586,33 @@
     "when" = "editorTextFocus";
   }
   {
+    "key" = "ctrl+shift+u";
+    "command" = "runCommands";
+    "args" = {
+      "commands" = [
+        { "command" = "vscode-neovim.send"; "args" = "<CS-u>"; }
+        # { "command" = "vscode-neovim.send"; "args" = "zz"; }
+        { "command" = "editorScroll"; "args" = { "to" = "up"; "by" = "page"; }; }
+      ];
+    };
+    "when" = "editorTextFocus";
+  }
+  {
+    "key" = "ctrl+shift+d";
+    "command" = "runCommands";
+    "args" = {
+      "commands" = [
+        { "command" = "vscode-neovim.send"; "args" = "<CS-d>"; }
+        # { "command" = "vscode-neovim.send"; "args" = "zz"; }
+        {
+          "command" = "editorScroll";
+          "args" = { "to" = "down"; "by" = "page"; };
+        }
+      ];
+    };
+    "when" = "editorTextFocus";
+  }
+  {
     "key" = "ctrl+w -";
     "command" = "-workbench.action.decreaseViewHeight";
     "when" = "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
