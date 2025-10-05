@@ -8,9 +8,10 @@
   ];
 
   nixpkgs.overlays = [
-    (final: prev: {
-      zen = inputs.zen-browser.packages.${prev.system}.zen-browser;
-    })
+    # (final: prev: {
+    #   zen = inputs.zen-browser.packages.${prev.system}.zen-browser;
+    # })
+    (final: prev: { ghostty = inputs.ghostty.packages.${prev.system}.default; })
     inputs.nix4vscode.overlays.default
   ];
 
@@ -196,7 +197,7 @@
     git-credential-manager
     kdePackages.kdeconnect-kde
     lazyjournal
-    zen
+    # zen
     stylua
     inputs.wiremix.packages.${pkgs.system}.wiremix
     ffmpeg

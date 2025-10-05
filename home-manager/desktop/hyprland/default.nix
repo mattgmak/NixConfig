@@ -281,25 +281,16 @@
             lib.last secondaryWorkspaces
           }]";
       in [
-        "float, title:(clipse|bluetui|nmtui|btop|wiremix)"
-        "size 1200 800, title:(clipse|bluetui|nmtui|wiremix), ${primaryWorkspacesMatcher}"
-        "size 1600 900, title:(btop), ${primaryWorkspacesMatcher}"
-        "float, ${matchPip}"
-        "pin, ${matchPip}"
-        "center, floating:1, title:(Cursor)"
-        "float, ${matchFloatingTerminal}"
-        "size 60% 70%, ${matchFloatingTerminal}"
-        "pin, ${matchFloatingTerminal}"
-        "center, ${matchFloatingTerminal}"
-        "stayfocused, ${matchFloatingTerminal}"
+        "float, size 1200 800, title:(clipse|bluetui|nmtui|wiremix), ${primaryWorkspacesMatcher}"
+        "float, size 1600 900, title:(btop), ${primaryWorkspacesMatcher}"
+        "pin, float, ${matchPip}"
+        # "center, floating:1, title:(Cursor)"
+        "float, pin, center, stayfocused, size 60% 70%, ${matchFloatingTerminal}"
       ] ++ (if hostname == "GoofyDesky" then [
         "monitor ${deskyMonitors.secondary}, ${matchPip}"
-        "size 986 555, ${matchPip}"
-        "move 72 20, ${matchPip}"
-        "noinitialfocus, ${matchPip}"
+        "noinitialfocus, move 72 20, size 986 555, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
-        "immediate, class:^(cs2|steam_app_.*)$"
-        "fullscreen, class:^(cs2|steam_app_.*)$"
+        "fullscreen, immediate, class:(cs2|steam_app_.*)"
         "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), ${secondaryWorkspacesMatcher}"
         "workspace ${lib.head secondaryWorkspaces}, class:(vesktop)"
       ] else

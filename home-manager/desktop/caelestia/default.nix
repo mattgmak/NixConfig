@@ -1,4 +1,4 @@
-{ inputs, pkgs, config, ... }: {
+{ inputs, pkgs, ... }: {
   imports = [ inputs.caelestia-shell.homeManagerModules.default ];
 
   programs.caelestia = {

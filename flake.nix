@@ -6,9 +6,9 @@
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-osu = { url = "github:nixos/nixpkgs/nixos-unstable"; };
-    # zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser = {
-      url = "github:SoumyabrataBanik/flake-zen-browser";
+      url = "github:0xc000022070/zen-browser-flake";
+      # url = "github:SoumyabrataBanik/flake-zen-browser";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
@@ -67,6 +67,8 @@
     };
 
     nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+
+    ghostty = { url = "github:ghostty-org/ghostty"; };
   };
 
   outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nixpkgs-for-osu
