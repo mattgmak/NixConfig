@@ -1,7 +1,8 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, pkgs-stable, ... }: {
   programs.ghostty = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs.ghostty else pkgs.emptyDirectory;
+    package =
+      if pkgs.stdenv.isLinux then pkgs-stable.ghostty else pkgs.emptyDirectory;
     settings = {
       font-size = 14;
       font-family = "IosevkaTerm Nerd Font";

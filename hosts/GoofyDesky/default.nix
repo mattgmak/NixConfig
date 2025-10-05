@@ -1,4 +1,4 @@
-{ pkgs, pkgs-for-osu, ... }:
+{ pkgs, pkgs-for-osu, inputs, ... }:
 let
   # orca-slicer-overlay = final: prev: {
   #   orca-slicer = prev.orca-slicer.overrideAttrs (old: {
@@ -65,15 +65,27 @@ let
   orcaSlicerMimeappsList =
     pkgs.writeText "orca-slicer-mimeapps.list" mimeappsListContent;
 in {
-  # Bootloader
-  imports = [ ./hardware-configuration.nix ../common.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ../common.nix
+    # inputs.nixpkgs-xr.nixosModules.nixpkgs-xr
+  ];
 
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     localNetworkGameTransfers.openFirewall = true;
+    extraCompatPackages = with pkgs; [ proton-ge-bin ];
   };
+
+  services.wivrn = {
+    enable = true;
+    openFirewall = true;
+    defaultRuntime = true;
+    autoStart = true;
+  };
+
   programs.appimage = {
     enable = true;
     binfmt = true;
@@ -118,6 +130,9 @@ in {
     google-chrome
     pkgs-for-osu.osu-lazer-bin
     onedrivegui
+    bs-manager
+    sidequest
+    android-tools
   ];
 
   environment.etc."xdg/mimeapps.list".source = orcaSlicerMimeappsList;

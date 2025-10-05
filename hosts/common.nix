@@ -1,4 +1,5 @@
-{ pkgs, inputs, hostname, username, pkgs-for-cursor, config, lib, ... }: {
+{ pkgs, inputs, hostname, username, pkgs-for-cursor, pkgs-stable, config, lib
+, ... }: {
   imports = [
     ../modules/style/common.nix
     ../modules/style/linux.nix
@@ -16,7 +17,9 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs hostname username pkgs-for-cursor; };
+    extraSpecialArgs = {
+      inherit inputs hostname username pkgs-for-cursor pkgs-stable;
+    };
     backupFileExtension = "hm-backup-1";
     users."${username}" = import ../home-manager/home.nix {
       inherit hostname username pkgs inputs lib;

@@ -19,17 +19,17 @@
         idle = {
           timeouts = [
             {
-              timeout = 300;
+              timeout = 600;
               idleAction = "lock";
             }
             {
-              timeout = 600;
+              timeout = 900;
               idleAction = "dpms off";
               returnAction = "dpms on";
             }
             {
-              timeout = 900;
-              idleAction = [ "systemctl" "suspend-then-hibernate" ];
+              timeout = 1200;
+              idleAction = [ "systemctl" "suspend" ];
             }
           ];
         };

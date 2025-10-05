@@ -2,7 +2,7 @@
   description = "NixOS config flake";
 
   inputs = {
-    nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-24.11"; };
+    nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-25.05"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-osu = { url = "github:nixos/nixpkgs/nixos-unstable"; };
@@ -65,6 +65,8 @@
       url = "github:caelestia-dots/shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
   };
 
   outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nixpkgs-for-osu
