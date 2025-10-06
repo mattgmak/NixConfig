@@ -949,7 +949,23 @@ def --env q [...args] {
 }
 
 def --env lg [...args] {
-    SHELL=bash lazygit ...$args
+    let lazygit_new_dir_file = $"($env.HOME)/.lazygit/newdir"
+
+    # Set the environment variable for lazygit
+    with-env { LAZYGIT_NEW_DIR_FILE: $lazygit_new_dir_file } {
+        with-env { SHELL: "bash" } {
+            lazygit ...$args
+        }
+    }
+
+    # Check if the newdir file exists and change directory if it does
+    if ($lazygit_new_dir_file | path exists) {
+        let new_dir = (open $lazygit_new_dir_file | str trim)
+        if ($new_dir != "" and $new_dir != $env.PWD) {
+            cd $new_dir
+        }
+        rm -f $lazygit_new_dir_file
+    }
 }
 
 def --env v [...args] {
