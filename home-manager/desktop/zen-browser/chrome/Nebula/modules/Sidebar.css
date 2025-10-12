@@ -6,14 +6,14 @@
     padding-right: 2px !important;
     transform: none !important;
     width: 60px !important;
- }
+  }
 
   #navigator-toolbox:not([zen-sidebar-expanded="true"]) {
     max-width: calc(var(--zen-toolbox-max-width) + 5px) !important;
     min-width: calc(var(--zen-toolbox-max-width) + 5px) !important;
     padding-bottom: var(--zen-toolbox-padding);
-  
-  & #titlebar {
+
+    & #titlebar {
       align-content: center !important;
       justify-content: center !important;
     }
@@ -23,8 +23,8 @@
 /* -------------------------- COMPACT SIDEBAR -------------------------- */
 
 :root[zen-compact-mode="true"] #sidebar {
-    width: var(--nebula-sidebar-width) !important;
-    min-width: var(--nebula-sidebar-width) !important;
+  width: var(--nebula-sidebar-width) !important;
+  min-width: var(--nebula-sidebar-width) !important;
 }
 
 /* Fix for twilight acrylic */
@@ -80,6 +80,7 @@ body:has([zen-compact-mode="true"]) #browser::after {
   left: auto !important;
   right: calc(var(--zen-element-separation) / 0.65) !important;
 }
+
 /* Sidebar on right */
 :root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
   left: auto !important;
@@ -88,18 +89,20 @@ body:has([zen-compact-mode="true"]) #browser::after {
 
 /* Show pseudo background when active/hovered */
 body:has([zen-compact-mode="true"] [zen-user-show=""],
-[zen-compact-mode="true"] #navigator-toolbox[zen-has-hover="true"]) #browser::after {
+  [zen-compact-mode="true"] #navigator-toolbox[zen-has-hover="true"]) #browser::after {
   opacity: 1 !important;
 }
+
 :root[zen-right-side="true"] body:has([zen-compact-mode="true"] [zen-user-show=""],
-[zen-compact-mode="true"] #navigator-toolbox[zen-has-hover="true"]) #browser::after {
+  [zen-compact-mode="true"] #navigator-toolbox[zen-has-hover="true"]) #browser::after {
   opacity: 1 !important;
 }
 
 /* config to remove pseudo bg */
 @media (-moz-pref("nebula-compact-mode-no-sidebar-bg")) {
   body:has([zen-compact-mode="true"]) #browser::after {
-    content: none !important; /* removes the pseudo element */
+    content: none !important;
+    /* removes the pseudo element */
     background-color: transparent !important;
     backdrop-filter: none !important;
     opacity: 0 !important;
@@ -112,49 +115,49 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
 
 @media (-moz-pref("zen.view.compact.hide-tabbar")) {
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  top: calc(var(--zen-element-separation) / 0.99) !important;
-  left: calc(var(--zen-element-separation) / 0.9) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2)) !important;
+    top: calc(var(--zen-element-separation) / 0.99) !important;
+    left: calc(var(--zen-element-separation) / 0.9) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2)) !important;
   }
 
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.685) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
+    top: calc(var(--zen-element-separation) / 0.685) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
   }
 }
 
 @media (-moz-pref("zen.view.compact.hide-toolbar")) {
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  top: calc(var(--zen-element-separation) / 0.99) !important;
-  left: calc(var(--zen-element-separation) / 0.9) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2)) !important;
+    top: calc(var(--zen-element-separation) / 0.99) !important;
+    left: calc(var(--zen-element-separation) / 0.9) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2)) !important;
   }
 
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.685) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
+    top: calc(var(--zen-element-separation) / 0.685) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
   }
 }
 
 @media (-moz-pref("zen.view.compact.hide-tabbar")) and (-moz-pref("zen.view.compact.hide-toolbar")) {
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  top: calc(var(--zen-element-separation) / 0.99) !important;
-  left: calc(var(--zen-element-separation) / 0.9) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2)) !important;
+    top: calc(var(--zen-element-separation) / 0.99) !important;
+    left: calc(var(--zen-element-separation) / 0.9) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2)) !important;
   }
 
   html[zen-single-toolbar="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.685) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
+    top: calc(var(--zen-element-separation) / 0.685) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
   }
 }
 
@@ -162,27 +165,28 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
 
 @media (-moz-pref("zen.view.compact.hide-tabbar")) {
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #titlebar {
-  top: calc(var(--zen-element-separation) / 0.99) !important;
-  left: calc(var(--zen-element-separation) / 0.9) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2)) !important;
+    top: calc(var(--zen-element-separation) / 0.99) !important;
+    left: calc(var(--zen-element-separation) / 0.9) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2)) !important;
   }
 
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.19) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: calc(var(--nebula-sidebar-width)) !important;
-  height: calc(100% - (var(--zen-element-separation) * 7)) !important;
+    top: calc(var(--zen-element-separation) / 0.19) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: calc(var(--nebula-sidebar-width)) !important;
+    height: calc(100% - (var(--zen-element-separation) * 7)) !important;
   }
-  
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.9) !important;
-    }
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.9) !important;
+  }
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.65) !important;
-    }
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.65) !important;
+  }
 }
 
 @media (-moz-pref("zen.view.compact.hide-toolbar")) {
@@ -192,19 +196,20 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
     border-radius: 0 !important;
     backdrop-filter: none !important;
   }
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: unset !important;
+    left: auto !important;
+    right: unset !important;
   }
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: unset !important;
+    left: auto !important;
+    right: unset !important;
   }
 }
 
 @media (-moz-pref("zen.view.compact.hide-tabbar")) and (-moz-pref("zen.view.compact.hide-toolbar")) {
-  html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"])
-  body:has([zen-compact-mode="true"]) #titlebar {
+  html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #titlebar {
     top: calc(var(--zen-element-separation) / 0.99) !important;
     left: calc(var(--zen-element-separation) / 0.9) !important;
     width: calc(var(--nebula-sidebar-width)) !important;
@@ -217,47 +222,48 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
     scale: 1 !important;
   }
 
-  html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"])
-  body:has([zen-compact-mode="true"]) #browser::after {
+  html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #browser::after {
     top: calc(var(--zen-element-separation) / 0.685) !important;
     left: calc(var(--zen-element-separation) / 0.65) !important;
     width: calc(var(--nebula-sidebar-width)) !important;
     height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
   }
-  
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.9) !important;
-   }
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.9) !important;
+  }
+
   html[zen-sidebar-expanded="true"]:not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.65) !important;
-   }
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.65) !important;
+  }
 }
 
 /* -------------------- COLLAPSED TOOLBAR -------------------- */
 
 @media (-moz-pref("zen.view.compact.hide-tabbar")) {
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #titlebar {
-  top: calc(var(--zen-element-separation) / 0.99) !important;
-  left: calc(var(--zen-element-separation) / 0.9) !important;
-  height: calc(100% - (var(--zen-element-separation) * 2)) !important;
+    top: calc(var(--zen-element-separation) / 0.99) !important;
+    left: calc(var(--zen-element-separation) / 0.9) !important;
+    height: calc(100% - (var(--zen-element-separation) * 2)) !important;
   }
 
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.19) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: 65px !important;
-  height: calc(100% - (var(--zen-element-separation) * 6.8)) !important;
+    top: calc(var(--zen-element-separation) / 0.19) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: 65px !important;
+    height: calc(100% - (var(--zen-element-separation) * 6.8)) !important;
   }
-  
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.9) !important;
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.9) !important;
   }
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 1.1) !important;
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 1.1) !important;
   }
 
 }
@@ -269,13 +275,15 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
     border-radius: 0 !important;
     backdrop-filter: none !important;
   }
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: unset !important;
+    left: auto !important;
+    right: unset !important;
   }
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: unset !important;
+    left: auto !important;
+    right: unset !important;
   }
 }
 
@@ -294,18 +302,20 @@ body:has([zen-compact-mode="true"] [zen-user-show=""],
   }
 
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) #browser::after {
-  top: calc(var(--zen-element-separation) / 0.685) !important;
-  left: calc(var(--zen-element-separation) / 0.65) !important;
-  width: 65px !important;
-  height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;  
+    top: calc(var(--zen-element-separation) / 0.685) !important;
+    left: calc(var(--zen-element-separation) / 0.65) !important;
+    width: 65px !important;
+    height: calc(100% - (var(--zen-element-separation) * 2.9)) !important;
   }
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #titlebar {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 0.9) !important;
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 0.9) !important;
   }
+
   html:not([zen-sidebar-expanded="true"]):not([zen-single-toolbar="true"]):root[zen-right-side="true"] body:has([zen-compact-mode="true"]) #browser::after {
-  left: auto !important;
-  right: calc(var(--zen-element-separation) / 1.1) !important;
+    left: auto !important;
+    right: calc(var(--zen-element-separation) / 1.1) !important;
   }
 }
 
@@ -329,15 +339,15 @@ scrollbox {
 
 /* Hide the overflow background gradient */
 .workspace-arrowscrollbox[overflowing] {
-    --zen-scrollbar-overflow-background: transparent !important;
-    background: transparent !important;
+  --zen-scrollbar-overflow-background: transparent !important;
+  background: transparent !important;
 }
 
 /* Also remove any visual overlay pseudo-elements */
 .workspace-arrowscrollbox[overflowing]::before,
 .workspace-arrowscrollbox[overflowing]::after {
-    content: none !important;
-    display: none !important;
+  content: none !important;
+  display: none !important;
 }
 
 /* -------------------------- COMPACT TOPBAR --------------------------- */
@@ -345,6 +355,7 @@ scrollbox {
 @media (-moz-pref("zen.view.compact.hide-toolbar")) {
 
   html:not([zen-single-toolbar="true"]) body:has([zen-compact-mode="true"]) {
+
     /* Disable backdrop-filter when urlbar is open */
     #browser:has(#urlbar[open]) #nav-bar {
       backdrop-filter: none !important;
@@ -413,6 +424,7 @@ scrollbox {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -420,139 +432,139 @@ scrollbox {
 }
 
 findbar {
-    position: fixed !important;
-    top: 30px !important;
-    right: 30px !important;
-    height: 42px !important;
-    z-index: 1000 !important;
-    min-width: 90% !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    padding: 6px 10px !important;
-    background: light-dark(rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.4)) !important;
-    backdrop-filter: blur(32px) saturate(140%) !important;
-    border-radius: 13px !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
-    will-change: transform, opacity;
+  position: fixed !important;
+  top: 30px !important;
+  right: 30px !important;
+  height: 42px !important;
+  z-index: 1000 !important;
+  min-width: 90% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 10px !important;
+  background: light-dark(rgba(255, 255, 255, 0.4), rgba(0, 0, 0, 0.4)) !important;
+  backdrop-filter: blur(32px) saturate(140%) !important;
+  border-radius: 13px !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+  will-change: transform, opacity;
 }
 
 #zen-tabbox-wrapper::before {
-    position: absolute !important;
-    z-index: 0 !important;
-    content: "" !important;
-    background-color: light-dark(rgba(255, 255, 255, 1), rgba(40, 40, 40, 1)) !important;
-    opacity: 0;
-    width: 89%;
-    top: 29px !important;
-    right: 30px;
-    height: 43px !important;
-    bottom: auto !important;
-    border-radius: 13px;
-    visibility: visible !important;
-    transition: opacity 0.2s ease, width 0.5s ease !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  content: "" !important;
+  background-color: light-dark(rgba(255, 255, 255, 1), rgba(40, 40, 40, 1)) !important;
+  opacity: 0;
+  width: 89%;
+  top: 29px !important;
+  right: 30px;
+  height: 43px !important;
+  bottom: auto !important;
+  border-radius: 13px;
+  visibility: visible !important;
+  transition: opacity 0.2s ease, width 0.5s ease !important;
 }
 
-:has(.browserSidebarContainer.deck-selected > .browserContainer > findbar:not([hidden="true"])) #zen-tabbox-wrapper::before {
-    opacity: 1 !important;
-    width: 90.05%;
+:has(.browserSidebarContainer.deck-selected > .browserContainer > findbar:not([hidden])) #zen-tabbox-wrapper::before {
+  opacity: 1 !important;
+  width: 90.05%;
 }
-          
-findbar:not([hidden="true"]) {
-    visibility: visible !important;
-    animation: findbar-show-animation 0.3s ease-out forwards !important;
+
+findbar:not([hidden]) {
+  visibility: visible !important;
+  animation: findbar-show-animation 0.3s ease-out forwards !important;
 }
 
 
-findbar[hidden="true"] {
-    opacity: 0 !important;
-    transform: scale(0.95) !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s !important;
+findbar[hidden] {
+  opacity: 0 !important;
+  transform: scale(0.95) !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s !important;
 }
 
 .findbar-textbox {
-    flex-grow: 1 !important;
-    min-width: 230px !important;
-    background: transparent !important;
-    color: inherit !important;
-    border: none !important;
-    outline: none !important;
-    font-size: 14px !important;
-    padding: 4px 10px !important;
-    box-shadow: none !important;
+  flex-grow: 1 !important;
+  min-width: 230px !important;
+  background: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  outline: none !important;
+  font-size: 14px !important;
+  padding: 4px 10px !important;
+  box-shadow: none !important;
 }
 
 
 findbar toolbarbutton {
-    background: light-dark(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.15)) !important;
-    border-radius: 6.5px !important;
-    transition: background 0.2s ease, transform 0.1s ease-out !important;
+  background: light-dark(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.15)) !important;
+  border-radius: 6.5px !important;
+  transition: background 0.2s ease, transform 0.1s ease-out !important;
 }
 
 findbar .findbar-find-previous,
 findbar .findbar-find-next {
   align-self: center;
-    width: 20px !important;
-    height: 20px !important;
-    padding: 2px !important;
-    font-size: 10px !important;
+  width: 20px !important;
+  height: 20px !important;
+  padding: 2px !important;
+  font-size: 10px !important;
 }
 
 .findbar-find-previous {
-    margin-right: 4px !important;
+  margin-right: 4px !important;
 }
 
 findbar .findbar-close {
-    width: 18px !important;
-    height: 18px !important;
-    padding: 2px !important;
-    font-size: 10px !important;
-    margin-left: auto !important;
+  width: 18px !important;
+  height: 18px !important;
+  padding: 2px !important;
+  font-size: 10px !important;
+  margin-left: auto !important;
 }
 
 findbar toolbarbutton:hover {
-    background: light-dark(rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0.6)) !important;
-    transform: scale(1.05) !important;
+  background: light-dark(rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0.6)) !important;
+  transform: scale(1.05) !important;
 }
 
 findbar toolbarbutton:active {
-    transform: scale(0.92) !important;
+  transform: scale(0.92) !important;
 }
 
 /* -------------------------- BOOKMARKS -------------------------- */
 
 /* Transparent Sidebar Items */
 .sidebar-panel {
-    background: transparent !important;
-    font-weight: 600 !important;
-    opacity: 0.7 !important;
+  background: transparent !important;
+  font-weight: 600 !important;
+  opacity: 0.7 !important;
 }
 
 /* Clean & Transparent Sidebar Box */
 #sidebar-box {
-    background-color: light-dark(rgba(255, 255, 255, 0.11), rgba(0, 0, 0, 0.2)) !important;
-    border: none !important;
+  background-color: light-dark(rgba(255, 255, 255, 0.11), rgba(0, 0, 0, 0.2)) !important;
+  border: none !important;
 }
 
 #sidebar-box #sidebar-header {
-    border-bottom: none !important;
+  border-bottom: none !important;
 }
 
 /* Transparent Sidebar Search Box & View Button */
-#sidebar-search-container > #search-box,
+#sidebar-search-container>#search-box,
 #viewButton {
-    padding: 4px 8px !important;
-    appearance: none !important;
-    background-color: transparent !important;
-    border-radius: 10px !important;
-    border: none !important;
+  padding: 4px 8px !important;
+  appearance: none !important;
+  background-color: transparent !important;
+  border-radius: 10px !important;
+  border: none !important;
 }
 
-#sidebar-search-container > #search-box:hover,
+#sidebar-search-container>#search-box:hover,
 #viewButton:hover,
-#sidebar-search-container > #search-box:active,
+#sidebar-search-container>#search-box:active,
 #viewButton:active {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
 }
