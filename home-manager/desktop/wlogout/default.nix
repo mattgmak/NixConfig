@@ -15,15 +15,15 @@
       }
 
       button {
-        border-radius: 10px;
+        border-radius: 25px;
         border-color: black;
         text-decoration-color: #FFFFFF;
         margin: 10px;
         font-size: 24px;
         color: #FFFFFF;
         background-color: #${config.lib.stylix.colors.base01};
-        border-style: solid;
-        border-width: 5px;
+        border-style: dashed;
+        border-width: 2px;
         border-color: #${config.lib.stylix.colors.base0A};
         background-repeat: no-repeat;
         background-position: center;
@@ -34,36 +34,37 @@
       button:active,
       button:hover {
         border-color: #${config.lib.stylix.colors.base0C};
+        border-style: solid;
         outline-style: none;
       }
 
       #lock {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/lock.png"), url("${imageDir}/lock.png"));
       }
 
       #logout {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/logout.png"), url("${imageDir}/logout.png"));
       }
 
       #suspend {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/suspend.png"), url("${imageDir}/suspend.png"));
       }
 
       #hibernate {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/hibernate.png"), url("${imageDir}/hibernate.png"));
       }
 
       #shutdown {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/shutdown.png"), url("${imageDir}/shutdown.png"));
       }
 
       #reboot {
-        margin: 10px;
+        margin: 5px;
         background-image: image(url("${imageDir}/reboot.png"), url("${imageDir}/reboot.png"));
       }
     '';
