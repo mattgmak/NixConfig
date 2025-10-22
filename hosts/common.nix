@@ -236,6 +236,11 @@
       inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
 
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [ ];
+  };
+
   virtualisation.docker = { enable = true; };
   # Add flatpak support
   services.flatpak.enable = true;
