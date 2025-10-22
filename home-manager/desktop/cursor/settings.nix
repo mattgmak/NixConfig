@@ -324,4 +324,5 @@
   "biome.lsp.trace.server" = "verbose";
   "helium-icon-theme.hidesExplorerArrows" = true;
   "extensions.autoUpdate" = false;
+  "cursor.composer.usageSummaryDisplay" = "always";
 }
