@@ -129,6 +129,8 @@
         "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         "SUPER, W, exec, ghostty"
         "SUPER, Z, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
+        # hyprsunset bind
+        "SUPER, F, exec, hyprctl hyprsunset temperature 4500"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind
