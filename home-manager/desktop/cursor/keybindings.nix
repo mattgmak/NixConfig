@@ -2165,10 +2165,6 @@
     "when" = "activeEditorGroupEmpty && multipleEditorGroups";
   }
   {
-    "key" = "ctrl+e";
-    "command" = "composerMode.background";
-  }
-  {
     "key" = "tab";
     "command" = "-editor.emmet.action.expandAbbreviation";
     "when" = "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus";
