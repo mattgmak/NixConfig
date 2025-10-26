@@ -218,8 +218,7 @@
           "${pkgs.bash}/bin/bash ~/.config/hypr/scripts/battery-notification.sh")
         (lib.mkIf (hostname == "GoofyDesky")
           "hyprctl dispatch movecursor 1280 720")
-        "uwsm app -- hyprsunset"
-        "hyprctl hyprsunset temperature 4500"
+        "uwsm app -- hyprsunset --temperature 4500"
         (lib.mkIf (hostname == "GoofyDesky") "vesktop")
         "gnome-keyring-daemon --start --components=secrets"
       ];

@@ -17,6 +17,8 @@
       osd = { enableMicrophone = true; };
       general = {
         idle = {
+          lockBeforeSleep = true;
+          inhibitWhenAudio = true;
           timeouts = [
             {
               timeout = 600;
@@ -25,7 +27,7 @@
             {
               timeout = 900;
               idleAction = "dpms off";
-              returnAction = "dpms on";
+              returnAction = "dpms on && hyprctl hyprsunset temperature 4500";
             }
             {
               timeout = 1200;
