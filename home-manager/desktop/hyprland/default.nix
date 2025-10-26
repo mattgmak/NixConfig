@@ -292,7 +292,7 @@
         "noinitialfocus, move 72 20, size 986 555, ${matchPip}"
         "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
         "fullscreen, immediate, class:(cs2|steam_app_.*)"
-        "size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), ${secondaryWorkspacesMatcher}"
+        "float, size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), ${secondaryWorkspacesMatcher}"
         "workspace ${lib.head secondaryWorkspaces}, class:(vesktop)"
       ] else
         [ ]);
