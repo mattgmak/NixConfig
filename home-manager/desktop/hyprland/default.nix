@@ -122,8 +122,9 @@
         # ''SUPER SHIFT, S, exec, grim -g "$(slurp -w 0)" - | wl-copy''
         "Super Shift, S, global, caelestia:screenshotFreeze"
         "SUPER SHIFT, C, exec, hyprpicker -a"
-        "SUPER, N, exec, makoctl dismiss -a"
-        "SUPER, N, global, caelestia:clearNotifs"
+        # "SUPER, N, exec, makoctl dismiss -a"
+        "$mod, N, global, caelestia:clearNotifs"
+        "$mod, B, exec, caelestia shell drawers toggle sidebar"
         # App launch binds
         "SUPER, R, exec, zen"
         "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
