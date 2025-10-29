@@ -27,7 +27,7 @@
             {
               timeout = 900;
               idleAction = "dpms off";
-              returnAction = "dpms on && hyprctl hyprsunset temperature 4500";
+              returnAction = "dpms on";
             }
             {
               timeout = 1200;
