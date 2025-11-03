@@ -205,7 +205,10 @@
     kdePackages.kdeconnect-kde
     qimgv
     pdfarranger
+    paprefs
   ];
+
+  programs.dconf.enable = true;
 
   services.syncthing = {
     enable = true;
