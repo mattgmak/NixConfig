@@ -48,6 +48,8 @@
               export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
               ${if pkgs.stdenv.isDarwin then ''
                 export ANDROID_HOME=~/Library/Android/sdk
+                export BUN_INSTALL="$HOME/.bun"
+                export PATH="$BUN_INSTALL/bin:$PATH"
               '' else ''
                 export ANDROID_HOME=~/Android/Sdk
               ''}
