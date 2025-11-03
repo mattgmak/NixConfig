@@ -206,6 +206,7 @@
     qimgv
     pdfarranger
     paprefs
+    pulseaudio-ctl
   ];
 
   programs.dconf.enable = true;
