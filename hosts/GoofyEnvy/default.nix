@@ -115,6 +115,14 @@ in {
     size = 16 * 1024;
   }];
 
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
+    extraCompatPackages = with pkgs; [ proton-ge-bin ];
+  };
+
   system.stateVersion = "24.11";
 
 }

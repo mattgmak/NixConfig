@@ -49,7 +49,10 @@
 
   # Enable networking
   networking.hostName = hostname;
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    plugins = with pkgs; [ networkmanager-openvpn ];
+  };
   networking.firewall = {
     enable = true;
     allowedTCPPorts = [ 80 443 3000 8081 ];
