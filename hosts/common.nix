@@ -207,6 +207,7 @@
     pdfarranger
     paprefs
     pulseaudio-ctl
+    croc
   ];
 
   programs.dconf.enable = true;
