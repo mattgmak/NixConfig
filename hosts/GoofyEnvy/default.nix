@@ -14,7 +14,7 @@ in {
     wezterm
     libnotify
     obsidian
-    webcord
+    vesktop
     protonvpn-gui
     wl-clipboard
     clipse
