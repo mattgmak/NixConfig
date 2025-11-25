@@ -40,10 +40,9 @@ use = "bulk-rename"
 [opener]
 edit = [
 	{ run = '${EDITOR:-vi} "$@"', desc = "$EDITOR", block = true, for = "unix" },
-	{ run = 'cursor %*', orphan = true, desc = "cursor", for = "windows" },
-	{ run = 'cursor -w %*', block = true, desc = "cursor (block)", for = "windows" },
+	{ run = 'cursor %*', orphan = true, desc = "Cursor", for = "windows" },
+	{ run = 'cursor -g "$@"', desc = "Cursor", for = "unix" },
 ]
-edit-cursor = [{ run = 'cursor -g "$@"', desc = "cursor", for = "unix" }]
 open = [
 	{ run = 'xdg-open "$1"', desc = "Open", for = "linux" },
 	{ run = 'open "$@"', desc = "Open", for = "macos" },
@@ -76,7 +75,6 @@ rules = [
 	# Text
 	{ mime = "text/*", use = [
 		"edit",
-		"edit-cursor",
 		"reveal",
 	] },
 	# Image
