@@ -222,6 +222,11 @@ keymap = [
     "n",
   ], run = "copy name_without_ext", desc = "Copy the filename without extension" },
 
+  # Cursor edit
+  { on = [
+    "e",
+  ], run = 'shell -- cursor -g "$@"', desc = "Edit with Cursor" },
+
   # Filter
   { on = "f", run = "filter --smart", desc = "Filter files" },
 
