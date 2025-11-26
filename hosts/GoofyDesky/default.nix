@@ -68,7 +68,7 @@ in {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
-    # inputs.nixpkgs-xr.nixosModules.nixpkgs-xr
+    inputs.nixpkgs-xr.nixosModules.nixpkgs-xr
   ];
 
   programs.steam = {
@@ -83,7 +83,7 @@ in {
     enable = true;
     openFirewall = true;
     defaultRuntime = true;
-    autoStart = true;
+    # autoStart = true;
   };
 
   programs.appimage = {
@@ -133,6 +133,7 @@ in {
     bs-manager
     sidequest
     android-tools
+    kdePackages.wacomtablet
   ];
 
   environment.etc."xdg/mimeapps.list".source = orcaSlicerMimeappsList;
@@ -185,6 +186,8 @@ in {
       (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
     ]; # packages
   }; # udev
+
+  services.xserver.wacom.enable = true;
 
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware = {
