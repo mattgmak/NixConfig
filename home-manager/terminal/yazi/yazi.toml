@@ -41,7 +41,7 @@ use = "bulk-rename"
 edit = [
 	{ run = '${EDITOR:-vi} "$@"', desc = "$EDITOR", block = true, for = "unix" },
 	{ run = 'cursor %*', orphan = true, desc = "Cursor", for = "windows" },
-	{ run = 'cursor -g "$@"', desc = "Cursor", for = "unix" },
+	{ run = '''shell -- bash -c 'f="$1"; f="${f//\(/\\(}"; f="${f//\)/\\)}"; cursor -g "$f"' _ "$@"''', desc = "Cursor", for = "unix" },
 ]
 open = [
 	{ run = 'xdg-open "$1"', desc = "Open", for = "linux" },

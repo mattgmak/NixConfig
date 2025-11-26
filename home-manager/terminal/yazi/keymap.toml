@@ -230,7 +230,7 @@ keymap = [
   # Cursor edit
   { on = [
     "e",
-  ], run = 'shell -- cursor -g "$@"', desc = "Edit with Cursor" },
+  ], run = '''shell -- bash -c 'f="$1"; f="${f//\(/\\(}"; f="${f//\)/\\)}"; cursor -g "$f"' _ "$@"''', desc = "Edit with Cursor" },
 
   # Filter
   { on = "f", run = "filter --smart", desc = "Filter files" },
