@@ -13,8 +13,10 @@
           label = "  ";
         };
       };
+      services = { maxVolume = 1.5; };
       notifs = { actionOnClick = true; };
       osd = { enableMicrophone = true; };
+      utilities = { toasts = { kbLayoutChanged = false; }; };
       general = {
         idle = {
           lockBeforeSleep = true;
@@ -30,7 +32,7 @@
               returnAction = "dpms on";
             }
             {
-              timeout = 1200;
+              timeout = 1800;
               idleAction = [ "systemctl" "suspend" ];
             }
           ];
