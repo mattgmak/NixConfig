@@ -41,7 +41,7 @@
           davidanson.vscode-markdownlint
           mkhl.direnv
           usernamehw.errorlens
-        ] ++ pkgs.nix4vscode.forVscodeVersion "1.99.3" [
+        ] ++ pkgs.nix4vscode.forVscodeVersion "1.105.1" [
           "ms-vsliveshare.vsliveshare.1.0.5905"
           "github.vscode-pull-request-github"
           "bbenoist.QML"
@@ -77,6 +77,7 @@
           "christian-kohler.path-intellisense"
           "biomejs.biome"
           "pflannery.vscode-versionlens"
+          "Benxlabs.storm-search"
         ];
       };
     };

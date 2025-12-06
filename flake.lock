@@ -1306,11 +1306,11 @@
         "systems": "systems_4"
       },
       "locked": {
-        "lastModified": 1761098438,
-        "narHash": "sha256-3hF92gmczdKpZZ8S4dGBKRDZUZ7/u4g/LBXcgGEt20c=",
+        "lastModified": 1764986377,
+        "narHash": "sha256-6yUFkNPyPVo/F8XND/qPTjPxbTsfQZaC3VsgJvkzDic=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "05c85d730af8eacf9f9e5c776956f27eb0666c63",
+        "rev": "73f2d0b85b01dfd0e6e65a39828b32c0d09584c7",
         "type": "github"
       },
       "original": {
