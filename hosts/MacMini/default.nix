@@ -161,10 +161,10 @@
       alt - 0x29 : yabai -m window --focus east  # semicolon key
 
       # Alternative arrow key navigation
-      alt - up : yabai -m window --focus north
-      alt - down : yabai -m window --focus south
-      alt - left : yabai -m window --focus west
-      alt - right : yabai -m window --focus east
+      # alt - up : yabai -m window --focus north
+      # alt - down : yabai -m window --focus south
+      # alt - left : yabai -m window --focus west
+      # alt - right : yabai -m window --focus east
 
       # Move windows (shift + navigation)
       alt + shift - j : yabai -m window --swap north
@@ -173,10 +173,10 @@
       alt + shift - 0x29 : yabai -m window --swap east  # semicolon key
 
       # Alternative arrow key window movement
-      alt + shift - up : yabai -m window --swap north
-      alt + shift - down : yabai -m window --swap south
-      alt + shift - left : yabai -m window --swap west
-      alt + shift - right : yabai -m window --swap east
+      # alt + shift - up : yabai -m window --swap north
+      # alt + shift - down : yabai -m window --swap south
+      # alt + shift - left : yabai -m window --swap west
+      # alt + shift - right : yabai -m window --swap east
 
       # Window management
       alt - f : yabai -m window --toggle zoom-fullscreen

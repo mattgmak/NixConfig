@@ -6,8 +6,8 @@
     environmentVariables = {
       NH_OS_FLAKE =
         pkgs.lib.mkIf pkgs.stdenv.isLinux "/home/${username}/NixConfig";
-      NH_DARWIN_FLAKE =
-        pkgs.lib.mkIf pkgs.stdenv.isDarwin "/Users/${username}/NixConfig";
+      NH_DARWIN_FLAKE = pkgs.lib.mkIf pkgs.stdenv.isDarwin
+        "/Users/${username}/NixConfig#darwinConfigurations.MacMini";
       DEVELOPER_DIR = pkgs.lib.mkIf pkgs.stdenv.isDarwin
         "/Applications/Xcode.app/Contents/Developer";
     };
