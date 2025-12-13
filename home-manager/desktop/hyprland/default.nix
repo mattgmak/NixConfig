@@ -272,29 +272,27 @@
       };
       cursor = { no_warps = true; };
       windowrule = let
-        matchPip = "title:^(Picture-in-Picture)$";
-        matchFloatingTerminal = "title:(floating-terminal)";
+        matchPip = "match:title ^(Picture-in-Picture)$";
+        matchFloatingTerminal = "match:title (floating-terminal)";
         primaryWorkspacesMatcher =
-          "onworkspace:r[${lib.head primaryWorkspaces}-${
+          "match:workspace r[${lib.head primaryWorkspaces}-${
             lib.last primaryWorkspaces
           }]";
         secondaryWorkspacesMatcher =
-          "onworkspace:r[${lib.head secondaryWorkspaces}-${
+          "match:workspace r[${lib.head secondaryWorkspaces}-${
             lib.last secondaryWorkspaces
           }]";
       in [
-        "float, size 1200 800, title:(clipse|bluetui|nmtui|wiremix), ${primaryWorkspacesMatcher}"
-        "float, size 1600 900, title:(btop), ${primaryWorkspacesMatcher}"
-        "pin, float, ${matchPip}"
-        # "center, floating:1, title:(Cursor)"
-        "float, pin, center, stayfocused, size 60% 70%, ${matchFloatingTerminal}"
+        "${primaryWorkspacesMatcher}, match:title (clipse|bluetui|nmtui|wiremix), float on, size 1200 800"
+        "${primaryWorkspacesMatcher}, match:title (btop), float on, size 1600 900"
+        "${matchPip}, pin on, float on"
+        "${matchFloatingTerminal}, float on, pin on, center on, stay_focused on, size 60% 70%"
       ] ++ (if hostname == "GoofyDesky" then [
-        "monitor ${deskyMonitors.secondary}, ${matchPip}"
-        "noinitialfocus, move 72 20, size 986 555, ${matchPip}"
-        "workspace name:Game, class:(org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*)"
-        "fullscreen, immediate, class:(cs2|steam_app_.*)"
-        "float, size 1000 800, title:(btop|clipse|bluetui|nmtui|wiremix), ${secondaryWorkspacesMatcher}"
-        "workspace ${lib.head secondaryWorkspaces}, class:(vesktop)"
+        "${matchPip}, monitor ${deskyMonitors.secondary}, no_initial_focus on, move 72 20, size 986 555"
+        "match:class (org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*), workspace name:Game"
+        "match:class (cs2|steam_app_.*), fullscreen on, immediate on"
+        "${secondaryWorkspacesMatcher}, match:title (btop|clipse|bluetui|nmtui|wiremix), float on, size 1000 800"
+        "match:class (vesktop), workspace ${lib.head secondaryWorkspaces}"
       ] else
         [ ]);
     };
