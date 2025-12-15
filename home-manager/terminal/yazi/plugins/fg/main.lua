@@ -9,7 +9,7 @@ local toggle_ui = ya.sync(function(self)
 end)
 
 local init_ui_data = ya.sync(function(self, file_url)
-  self.opt = { 'nvim', 'cursor', 'jump' }
+  self.opt = { 'cursor', 'jump', 'nvim' }
   self.title = 'fg'
   self.title_color = '#82ab3a'
   self.cursor = 0
@@ -236,8 +236,8 @@ function M:reflow() return { self } end
 function M:redraw()
   local rows = {}
 
-  rows[1] = ui.Row({ 'yazi reveal' })
-  rows[2] = ui.Row({ 'cursor open' })
+  rows[1] = ui.Row({ 'cursor open' })
+  rows[2] = ui.Row({ 'yazi reveal' })
   rows[3] = ui.Row({ 'nvim open' })
   return {
     ui.Clear(self._area),
