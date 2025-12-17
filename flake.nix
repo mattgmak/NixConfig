@@ -85,6 +85,10 @@
         inherit system;
         config.allowUnfree = true;
       };
+      pkgs-for-cursor-darwin = import nixpkgs-for-cursor {
+        system = "aarch64-darwin";
+        config.allowUnfree = true;
+      };
       pkgs-for-osu = import nixpkgs-for-osu {
         inherit system;
         config.allowUnfree = true;
@@ -121,7 +125,8 @@
       };
       darwinConfigurations.${macMiniName} = nix-darwin.lib.darwinSystem {
         specialArgs = {
-          inherit inputs pkgs-stable pkgs-for-cursor;
+          inherit inputs pkgs-stable;
+          pkgs-for-cursor = pkgs-for-cursor-darwin;
           username = "mattgmak";
           hostname = macMiniName;
         };

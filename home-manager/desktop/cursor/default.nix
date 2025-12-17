@@ -22,7 +22,10 @@
         enableUpdateCheck = false;
         enableExtensionUpdateCheck = false;
         userSettings = import ./settings.nix { inherit hostname; };
-        keybindings = import ./keybindings.nix;
+        keybindings = if pkgs.stdenv.isDarwin then
+          import ./keybindings-darwin.nix
+        else
+          import ./keybindings.nix;
         userMcp = import ./mcp.nix;
         extensions = let
           # decorators = {
@@ -78,6 +81,7 @@
           "biomejs.biome"
           "pflannery.vscode-versionlens"
           "Benxlabs.storm-search"
+          "TypeScriptTeam.native-preview"
         ];
       };
     };

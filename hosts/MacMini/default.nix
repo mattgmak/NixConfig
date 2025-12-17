@@ -1,8 +1,10 @@
-{ pkgs, inputs, hostname, username, ... }: {
+{ pkgs, inputs, hostname, username, pkgs-for-cursor, ... }: {
   nixpkgs.hostPlatform = "aarch64-darwin";
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = 6;
   nix = { enable = false; };
+
+  nixpkgs.overlays = [ inputs.nix4vscode.overlays.default ];
 
   imports = [
     # ./common.nix
@@ -20,7 +22,7 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit inputs hostname username; };
+    extraSpecialArgs = { inherit inputs hostname username pkgs-for-cursor; };
     backupFileExtension = "hm-backup";
     users.${username} =
       import ../../home-manager/home.nix { inherit hostname username pkgs; };
