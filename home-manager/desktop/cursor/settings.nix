@@ -325,4 +325,5 @@
   "helium-icon-theme.hidesExplorerArrows" = true;
   "extensions.autoUpdate" = false;
   "cursor.composer.usageSummaryDisplay" = "always";
+  "customizeUI.titleBar" = "frameless";
 }

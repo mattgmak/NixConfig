@@ -261,7 +261,7 @@
     "when" = "workbench.panel.output.active";
   }
   {
-    "key" = "ctrl+";
+    "key" = "ctrl+,";
     "command" = "editor.action.marker.nextInFiles";
     "when" = "editorFocus";
   }
@@ -286,7 +286,7 @@
     "when" = "editorTextFocus && !editorReadonly";
   }
   {
-    "key" = "ctrl+";
+    "key" = "ctrl+,";
     "command" = "-workbench.action.openSettings";
   }
   {
