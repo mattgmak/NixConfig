@@ -1,5 +1,12 @@
 { inputs, pkgs, ... }: {
   imports = [ inputs.caelestia-shell.homeManagerModules.default ];
+  gtk = {
+    enable = true;
+    iconTheme = {
+      name = "Fluent";
+      package = pkgs.fluent-icon-theme;
+    };
+  };
 
   programs.caelestia = {
     enable = true;
