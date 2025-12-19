@@ -176,5 +176,6 @@ in {
     # Apply the overlay to the pinned pkgs-for-cursor instance and use the modified package
     stylix.targets.vscode.enable = false;
     programs.vscode.package = lib.mkForce extendedCursor;
+    home.sessionPath = [ "${extendedCursor}/bin" ];
   };
 }
