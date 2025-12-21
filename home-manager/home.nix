@@ -12,14 +12,12 @@
     ./desktop/cursor
   ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
     ./terminal/bluetui
-    # ./desktop/onedrive
     ./desktop/hyprland
     ./desktop/waybar
     ./desktop/zen-browser
     ./desktop/wlogout
     # ./desktop/rofi
     # ./desktop/mako
-    ./desktop/input-remapper
     ./desktop/fcitx5
     ./terminal/clipse
     ./desktop/mpv
