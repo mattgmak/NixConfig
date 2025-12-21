@@ -231,6 +231,10 @@
           path = "/home/${username}/Music";
           devices = [ "phone" ];
         };
+        Obsidian = {
+          path = "/home/${username}/GoofyObsidian";
+          devices = [ "phone" ];
+        };
       };
     };
   };

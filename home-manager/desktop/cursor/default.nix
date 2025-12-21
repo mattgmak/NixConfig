@@ -82,6 +82,7 @@
           "pflannery.vscode-versionlens"
           "Benxlabs.storm-search"
           "TypeScriptTeam.native-preview"
+          "willasm.obsidian-md-vsc"
         ];
       };
     };
