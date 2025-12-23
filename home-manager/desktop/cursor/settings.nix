@@ -326,4 +326,7 @@
   "extensions.autoUpdate" = false;
   "cursor.composer.usageSummaryDisplay" = "always";
   "customizeUI.titleBar" = "frameless";
+  "[shellscript]" = {
+    "editor.defaultFormatter" = "mads-hartmann.bash-ide-vscode";
+  };
 }

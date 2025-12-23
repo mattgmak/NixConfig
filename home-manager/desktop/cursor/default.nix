@@ -83,6 +83,7 @@
           "Benxlabs.storm-search"
           "TypeScriptTeam.native-preview"
           "willasm.obsidian-md-vsc"
+          "mads-hartmann.bash-ide-vscode"
         ];
       };
     };
