@@ -132,6 +132,8 @@
         "SUPER, Z, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
         # hyprsunset bind
         "SUPER, F, exec, hyprctl hyprsunset temperature 4500"
+        # animation bind
+        "SUPER, G, exec, ~/.config/hypr/scripts/animation-toggle.nu"
         # Input toggle binds
         "SUPER, SPACE, exec, fcitx5-remote -t"
         # Logout bind

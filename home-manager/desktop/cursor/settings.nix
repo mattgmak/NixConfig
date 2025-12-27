@@ -232,9 +232,10 @@
     }
   ];
 
-  "editor.smoothScrolling" = true;
   "terminal.integrated.smoothScrolling" = false;
-  "workbench.list.smoothScrolling" = true;
+  "editor.smoothScrolling" = false;
+  "workbench.list.smoothScrolling" = false;
+  "editor.cursorSmoothCaretAnimation" = "off";
   "editor.cursorSurroundingLines" = 4;
   "notebook.lineNumbers" = "on";
   "remote.autoForwardPortsSource" = "hybrid";
@@ -254,7 +255,6 @@
   "editor.overviewRulerBorder" = false;
   "editor.scrollbar.verticalScrollbarSize" = 20;
   "editor.cursorBlinking" = "solid";
-  "editor.cursorSmoothCaretAnimation" = "on";
   "workbench.editor.showTabs" = "single";
   "breadcrumbs.enabled" = true;
   "workbench.tips.enabled" = false;
