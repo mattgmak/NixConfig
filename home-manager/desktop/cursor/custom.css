@@ -157,6 +157,11 @@
 }
 
 /* Tooltip box style */
+.monaco-resizable-hover {
+  border-radius: 6px !important;
+  border: none !important;
+}
+
 .monaco-editor-hover,
 .monaco-hover {
   box-shadow: 0px 8px 32px rgba(0, 0, 0, .45) !important;
@@ -165,6 +170,13 @@
   border-radius: 6px !important;
   border: none !important;
 }
+
+.monaco-editor-hover,
+.monaco-hover>.monaco-scrollable-element,
+.monaco-hover-content>div {
+  border-radius: 6px !important;
+}
+
 
 .overflowingContentWidgets .monaco-sash {
   background-color: transparent !important;
