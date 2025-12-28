@@ -84,6 +84,8 @@
           "TypeScriptTeam.native-preview"
           "willasm.obsidian-md-vsc"
           "mads-hartmann.bash-ide-vscode"
+          "disaac.zlint-vscode"
+          "ziglang.vscode-zig"
         ];
       };
     };
