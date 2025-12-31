@@ -235,7 +235,7 @@
   "terminal.integrated.smoothScrolling" = false;
   "editor.smoothScrolling" = false;
   "workbench.list.smoothScrolling" = false;
-  "editor.cursorSmoothCaretAnimation" = "off";
+  "editor.cursorSmoothCaretAnimation" = "on";
   "editor.cursorSurroundingLines" = 4;
   "notebook.lineNumbers" = "on";
   "remote.autoForwardPortsSource" = "hybrid";

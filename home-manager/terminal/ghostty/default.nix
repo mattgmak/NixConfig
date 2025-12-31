@@ -1,4 +1,8 @@
 { pkgs, lib, inputs, ... }: {
+  home.file.".config/ghostty/shaders" = {
+    source = ./shaders;
+    recursive = true;
+  };
   programs.ghostty = {
     enable = true;
     package = if pkgs.stdenv.isLinux then
@@ -10,6 +14,8 @@
       font-family = "IosevkaTerm Nerd Font";
       quick-terminal-position = "center";
       command = lib.getExe pkgs.nushell;
+      custom-shader = "shaders/cursor-smear.glsl";
+      cursor-style = "block";
       keybind = [
         "global:super+t=toggle_quick_terminal"
         # "super+alt+shift+j=write_screen_file:open"
