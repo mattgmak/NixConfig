@@ -86,6 +86,7 @@
           "mads-hartmann.bash-ide-vscode"
           "disaac.zlint-vscode"
           "ziglang.vscode-zig"
+          "golang.Go"
         ];
       };
     };
