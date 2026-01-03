@@ -235,7 +235,7 @@
   "terminal.integrated.smoothScrolling" = false;
   "editor.smoothScrolling" = false;
   "workbench.list.smoothScrolling" = false;
-  "editor.cursorSmoothCaretAnimation" = "on";
+  "editor.cursorSmoothCaretAnimation" = "off";
   "editor.cursorSurroundingLines" = 4;
   "notebook.lineNumbers" = "on";
   "remote.autoForwardPortsSource" = "hybrid";
@@ -329,4 +329,5 @@
   "[shellscript]" = {
     "editor.defaultFormatter" = "mads-hartmann.bash-ide-vscode";
   };
+  # "editor.cursorStyle" = "block";
 }
