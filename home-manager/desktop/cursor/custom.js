@@ -110,10 +110,10 @@
 
   // Set the style of the cursor to either a line or block
   // line option use fill() to draw trail, block option use lineTo to draw trail
-  const CursorStyle = "block"; // Options are 'line' or 'block'
+  const CursorStyle = "line"; // Options are 'line' or 'block'
 
   // Set the length of the cursor trail. A higher value may cause lag.
-  const TrailLength = 6; // Recommended value is around 8
+  const TrailLength = 8; // Recommended value is around 8
 
   // Set the polling rate for handling cursor created and destroyed events, in milliseconds.
   const CursorUpdatePollingRate = 500; // Recommended value is around 500

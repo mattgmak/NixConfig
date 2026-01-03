@@ -53,6 +53,8 @@
       primaryWorkspaces = lib.take 5 allWorkspacesIndex; # ["1" "2" "3" "4" "5"]
       secondaryWorkspaces =
         lib.drop 5 allWorkspacesIndex; # ["6" "7" "8" "9" "10"]
+      electronLaunchFlags =
+        "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
     in {
       "$mod" = "ALT";
       unbind = [ ];
@@ -127,9 +129,9 @@
         "$mod, B, exec, caelestia shell drawers toggle sidebar"
         # App launch binds
         "SUPER, R, exec, zen"
-        "SUPER, E, exec, cursor --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
+        "SUPER, E, exec, cursor ${electronLaunchFlags}"
         "SUPER, W, exec, ghostty"
-        "SUPER, Z, exec, vesktop --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime"
+        "SUPER, Z, exec, vesktop ${electronLaunchFlags}"
         # hyprsunset bind
         "SUPER, F, exec, hyprctl hyprsunset temperature 4500"
         # animation bind
@@ -222,7 +224,7 @@
         (lib.mkIf (hostname == "GoofyDesky")
           "hyprctl dispatch movecursor 1280 720")
         "uwsm app -- hyprsunset --temperature 4500"
-        (lib.mkIf (hostname == "GoofyDesky") "vesktop")
+        (lib.mkIf (hostname == "GoofyDesky") "vesktop ${electronLaunchFlags}")
         "gnome-keyring-daemon --start --components=secrets"
       ];
       xwayland = {
