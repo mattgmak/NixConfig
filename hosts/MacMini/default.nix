@@ -116,7 +116,7 @@
       split_ratio = "0.50";
 
       # Gaps configuration (matching your Hyprland setup)
-      top_padding = 0;
+      top_padding = 8;
       bottom_padding = 8;
       left_padding = 8;
       right_padding = 8;
@@ -266,7 +266,10 @@
         autohide = true;
         persistent-apps = [ ];
       };
-      NSGlobalDomain.ApplePressAndHoldEnabled = false;
+      NSGlobalDomain = {
+        ApplePressAndHoldEnabled = false;
+        _HIHideMenuBar = true;
+      };
     };
     primaryUser = username;
   };
