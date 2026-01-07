@@ -104,7 +104,7 @@
     nerd-fonts.iosevka-term
     inter
     noto-fonts-cjk-serif
-    noto-fonts-emoji
+    noto-fonts-color-emoji
   ];
 
   services.yabai = {

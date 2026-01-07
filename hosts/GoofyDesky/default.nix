@@ -1,4 +1,4 @@
-{ pkgs, pkgs-for-osu, inputs, ... }:
+{ pkgs, pkgs-for-osu, pkgs-stable, inputs, ... }:
 let
   # orca-slicer-overlay = final: prev: {
   #   orca-slicer = prev.orca-slicer.overrideAttrs (old: {
@@ -122,7 +122,7 @@ in {
     via
     vial
     kbd
-    vesktop
+    pkgs-stable.vesktop
     prismlauncher
     hyperhdr
     orcaSlicerDesktopItem
@@ -195,7 +195,7 @@ in {
       enable = true;
       extraPackages = with pkgs; [
         nvidia-vaapi-driver
-        vaapiVdpau
+        libva-vdpau-driver
         libvdpau
         libvdpau-va-gl
         vdpauinfo
@@ -206,6 +206,7 @@ in {
     nvidia = {
       open = true;
       powerManagement.enable = true;
+      modesetting.enable = true;
     };
   };
   hardware.bluetooth = {
@@ -222,7 +223,7 @@ in {
 
   services.ollama = {
     enable = true;
-    acceleration = "cuda";
+    package = pkgs.ollama-cuda;
     loadModels = [ "deepseek-r1:8b" ];
   };
 

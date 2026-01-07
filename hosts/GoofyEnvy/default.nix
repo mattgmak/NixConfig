@@ -1,4 +1,4 @@
-{ pkgs, username, inputs, ... }:
+{ pkgs, username, pkgs-stable, inputs, ... }:
 let
 in {
   # Bootloader
@@ -14,7 +14,7 @@ in {
     wezterm
     libnotify
     obsidian
-    vesktop
+    pkgs-stable.vesktop
     protonvpn-gui
     wl-clipboard
     clipse

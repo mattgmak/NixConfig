@@ -3,7 +3,7 @@
     nerd-fonts.iosevka-term
     inter
     noto-fonts-cjk-serif
-    noto-fonts-emoji
+    noto-fonts-color-emoji
   ];
 
   stylix = {
@@ -27,7 +27,7 @@
         name = "Noto Sans CJK HK";
       };
       emoji = {
-        package = pkgs.noto-fonts-emoji;
+        package = pkgs.noto-fonts-color-emoji;
         name = "Noto Color Emoji";
       };
     };

@@ -40,8 +40,9 @@
       "DESKTOP_SESSION"
     ];
 
-    plugins =
-      [ inputs.hyprland-plugins.packages.${pkgs.system}.csgo-vulkan-fix ];
+    plugins = [
+      inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.csgo-vulkan-fix
+    ];
 
     sourceFirst = true;
     settings = let

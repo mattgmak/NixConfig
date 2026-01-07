@@ -6,7 +6,7 @@
   programs.ghostty = {
     enable = true;
     package = if pkgs.stdenv.isLinux then
-      inputs.ghostty.packages.${pkgs.system}.default
+      inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
     else
       pkgs.emptyDirectory;
     settings = {

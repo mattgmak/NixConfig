@@ -44,6 +44,8 @@
           davidanson.vscode-markdownlint
           mkhl.direnv
           usernamehw.errorlens
+          aaron-bond.better-comments
+          jnoortheen.nix-ide
         ] ++ pkgs.nix4vscode.forVscodeVersion "1.105.1" [
           "ms-vsliveshare.vsliveshare.1.0.5905"
           "github.vscode-pull-request-github"
@@ -56,7 +58,7 @@
           "bradlc.vscode-tailwindcss"
           "dbaeumer.vscode-eslint"
           "vscode-icons-team.vscode-icons"
-          "jnoortheen.nix-ide"
+          # "jnoortheen.nix-ide"
           "jeronimoekerdt.color-picker-universal"
           "mylesmurphy.prettify-ts"
           "thenuprojectcontributors.vscode-nushell-lang"
@@ -73,7 +75,6 @@
           # "helgardrichard.helium-icon-theme"
           "bierner.emojisense"
           "mikestead.dotenv"
-          "aaron-bond.better-comments"
           "formulahendry.auto-rename-tag"
           "formulahendry.auto-close-tag"
           "daltonmenezes.aura-theme"

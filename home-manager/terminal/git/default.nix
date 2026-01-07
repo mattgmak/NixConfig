@@ -1,10 +1,11 @@
 { hostname, ... }: {
   programs.git = {
     enable = true;
-    delta = { enable = true; };
-    userName = "mattgmak";
-    userEmail = "u3592095@connect.hku.hk";
-    extraConfig = {
+    settings = {
+      user = {
+        name = "mattgmak";
+        email = "u3592095@connect.hku.hk";
+      };
       fetch.prune = true;
       rerere.enabled = true;
       core.ignorecase = false;
@@ -21,6 +22,10 @@
         "/mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe";
     } else
       { });
+  };
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
   };
   programs.gh = {
     enable = true;

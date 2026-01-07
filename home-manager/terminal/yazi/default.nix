@@ -47,4 +47,14 @@
     "${baseConfigPath}/keymap.toml" = { source = ./keymap.toml; };
     # "${baseConfigPath}/theme.toml" = { source = ./theme.toml; };
   };
+  programs.yazi = {
+    theme = {
+      indicator = {
+        padding = {
+          open = "█";
+          close = "█";
+        };
+      };
+    };
+  };
 }

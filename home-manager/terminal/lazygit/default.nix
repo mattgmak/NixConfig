@@ -1,7 +1,10 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   programs.lazygit = {
     enable = true;
     settings = {
+      # Use my own
+      enableNushellIntegration = lib.mkForce false;
+      shellWrapperName = "lgg";
       keybinding = {
         universal = {
           nextItem-alt = "k";
@@ -17,11 +20,11 @@
       };
       gui = { scrollHeight = 10; };
       git = {
-        paging = {
+        pagers = [{
           colorArg = "always";
           pager =
             "delta --paging=never --line-numbers --hunk-header-style=omit";
-        };
+        }];
       };
       os = {
         open = if pkgs.stdenv.isDarwin then

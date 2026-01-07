@@ -8,7 +8,7 @@
       # fcitx5-with-addons = pkgs.kdePackages.fcitx5-with-addons;
       addons = with pkgs; [
         fcitx5-rime
-        fcitx5-chinese-addons
+        qt6Packages.fcitx5-chinese-addons
         fcitx5-pinyin-zhwiki
         fcitx5-gtk
         fcitx5-rose-pine
