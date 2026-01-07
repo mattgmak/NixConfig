@@ -2,7 +2,8 @@
   {
     "key" = "tab";
     "command" = "editor.emmet.action.expandAbbreviation";
-    "when" = "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus";
+    "when" =
+      "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus";
   }
   {
     "key" = "tab";
@@ -12,12 +13,14 @@
   {
     "key" = "tab";
     "command" = "editor.action.inlineSuggest.commit";
-    "when" = "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible";
+    "when" =
+      "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible";
   }
   {
     "key" = "tab";
     "command" = "workbench.action.terminal.acceptSelectedSuggestion";
-    "when" = "terminalFocus && terminalHasBeenCreated && terminalIsOpen && terminalSuggestWidgetVisible || terminalFocus && terminalIsOpen && terminalProcessSupported && terminalSuggestWidgetVisible";
+    "when" =
+      "terminalFocus && terminalHasBeenCreated && terminalIsOpen && terminalSuggestWidgetVisible || terminalFocus && terminalIsOpen && terminalProcessSupported && terminalSuggestWidgetVisible";
   }
   {
     "key" = "alt+a";
@@ -44,17 +47,20 @@
   {
     "key" = "ctrl+\\";
     "command" = "editor.action.inlineSuggest.trigger";
-    "when" = "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible";
+    "when" =
+      "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible";
   }
   {
     "key" = "alt+\\";
     "command" = "-editor.action.inlineSuggest.trigger";
-    "when" = "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible";
+    "when" =
+      "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible";
   }
   {
     "key" = "ctrl+alt+\\";
     "command" = "-jupyter.selectCellContents";
-    "when" = "editorTextFocus && jupyter.hascodecells && !jupyter.webExtension && !notebookEditorFocused";
+    "when" =
+      "editorTextFocus && jupyter.hascodecells && !jupyter.webExtension && !notebookEditorFocused";
   }
   {
     "key" = "ctrl+alt+\\";
@@ -69,12 +75,14 @@
   {
     "key" = "ctrl+; a";
     "command" = "-jupyter.insertCellAbove";
-    "when" = "editorTextFocus && jupyter.hascodecells && !jupyter.webExtension && !notebookEditorFocused";
+    "when" =
+      "editorTextFocus && jupyter.hascodecells && !jupyter.webExtension && !notebookEditorFocused";
   }
   {
     "key" = "ctrl+enter";
     "command" = "-github.copilot.generate";
-    "when" = "editorTextFocus && github.copilot.activated && !inInteractiveInput && !interactiveEditorFocused";
+    "when" =
+      "editorTextFocus && github.copilot.activated && !inInteractiveInput && !interactiveEditorFocused";
   }
   {
     "key" = "ctrl+l";
@@ -89,7 +97,8 @@
   {
     "key" = "ctrl+shift+\\";
     "command" = "-workbench.action.terminal.focusTabs";
-    "when" = "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus";
+    "when" =
+      "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus";
   }
   {
     "key" = "ctrl+i";
@@ -233,12 +242,14 @@
   {
     "key" = "alt+f";
     "command" = "editor.action.revealDefinition";
-    "when" = "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor";
+    "when" =
+      "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor";
   }
   {
     "key" = "f12";
     "command" = "-editor.action.revealDefinition";
-    "when" = "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor";
+    "when" =
+      "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor";
   }
   {
     "key" = "alt+c";
@@ -424,7 +435,8 @@
   {
     "key" = "ctrl+shift+`";
     "command" = "-workbench.action.terminal.new";
-    "when" = "terminalProcessSupported || terminalWebExtensionContributedProfile";
+    "when" =
+      "terminalProcessSupported || terminalWebExtensionContributedProfile";
   }
   {
     "key" = "ctrl+alt+j";
@@ -442,7 +454,8 @@
   {
     "key" = "ctrl+enter";
     "command" = "-github.copilot.generate";
-    "when" = "editorTextFocus && github.copilot.activated && !commentEditorFocused && !inInteractiveInput && !interactiveEditorFocused";
+    "when" =
+      "editorTextFocus && github.copilot.activated && !commentEditorFocused && !inInteractiveInput && !interactiveEditorFocused";
   }
   {
     "key" = "alt+a";
@@ -477,7 +490,8 @@
   {
     "key" = "ctrl+shift+r";
     "command" = "-editor.action.refactor";
-    "when" = "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
+    "when" =
+      "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
   }
   {
     "key" = "ctrl+shift+r";
@@ -500,7 +514,8 @@
   {
     "key" = "f2";
     "command" = "-workbench.action.terminal.renameActiveTab";
-    "when" = "terminalHasBeenCreated && terminalTabsFocus && terminalTabsSingularSelection || terminalProcessSupported && terminalTabsFocus && terminalTabsSingularSelection";
+    "when" =
+      "terminalHasBeenCreated && terminalTabsFocus && terminalTabsSingularSelection || terminalProcessSupported && terminalTabsFocus && terminalTabsSingularSelection";
   }
   {
     "key" = "ctrl+\\";
@@ -515,20 +530,31 @@
   {
     "key" = "ctrl+u";
     "command" = "-vscode-neovim.ctrl-u";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.u && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.u && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+d";
     "command" = "-vscode-neovim.ctrl-d";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.d && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.d && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+u";
     "command" = "runCommands";
     "args" = {
       "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<C-u>"; }
-        { "command" = "editorScroll"; "args" = { "to" = "up"; "by" = "halfPage"; }; }
+        {
+          "command" = "vscode-neovim.send";
+          "args" = "<C-u>";
+        }
+        {
+          "command" = "editorScroll";
+          "args" = {
+            "to" = "up";
+            "by" = "halfPage";
+          };
+        }
       ];
     };
     "when" = "editorTextFocus";
@@ -538,10 +564,16 @@
     "command" = "runCommands";
     "args" = {
       "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<C-d>"; }
+        {
+          "command" = "vscode-neovim.send";
+          "args" = "<C-d>";
+        }
         {
           "command" = "editorScroll";
-          "args" = { "to" = "down"; "by" = "halfPage"; };
+          "args" = {
+            "to" = "down";
+            "by" = "halfPage";
+          };
         }
       ];
     };
@@ -552,8 +584,17 @@
     "command" = "runCommands";
     "args" = {
       "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<CS-u>"; }
-        { "command" = "editorScroll"; "args" = { "to" = "up"; "by" = "page"; }; }
+        {
+          "command" = "vscode-neovim.send";
+          "args" = "<CS-u>";
+        }
+        {
+          "command" = "editorScroll";
+          "args" = {
+            "to" = "up";
+            "by" = "page";
+          };
+        }
       ];
     };
     "when" = "editorTextFocus";
@@ -563,8 +604,17 @@
     "command" = "runCommands";
     "args" = {
       "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<CS-d>"; }
-        { "command" = "editorScroll"; "args" = { "to" = "down"; "by" = "page"; }; }
+        {
+          "command" = "vscode-neovim.send";
+          "args" = "<CS-d>";
+        }
+        {
+          "command" = "editorScroll";
+          "args" = {
+            "to" = "down";
+            "by" = "page";
+          };
+        }
       ];
     };
     "when" = "editorTextFocus";
@@ -572,27 +622,32 @@
   {
     "key" = "ctrl+w -";
     "command" = "-workbench.action.decreaseViewHeight";
-    "when" = "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
+    "when" =
+      "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
   }
   {
     "key" = "ctrl+w unknown";
     "command" = "-workbench.action.decreaseViewWidth";
-    "when" = "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
+    "when" =
+      "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
   }
   {
     "key" = "ctrl+w unknown";
     "command" = "-workbench.action.increaseViewHeight";
-    "when" = "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
+    "when" =
+      "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
   }
   {
     "key" = "ctrl+w unknown";
     "command" = "-workbench.action.increaseViewWidth";
-    "when" = "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
+    "when" =
+      "!editorTextFocus && !isAuxiliaryWindowFocusedContext && !terminalFocus && neovim.mode != 'cmdline'";
   }
   {
     "key" = "ctrl+w ctrl+w";
     "command" = "-workbench.action.focusNextGroup";
-    "when" = "!editorTextFocus && !filesExplorerFocus && !inSearchEditor && !replaceInputBoxFocus && !searchViewletFocus && !terminalFocus && neovim.mode != 'cmdline'";
+    "when" =
+      "!editorTextFocus && !filesExplorerFocus && !inSearchEditor && !replaceInputBoxFocus && !searchViewletFocus && !terminalFocus && neovim.mode != 'cmdline'";
   }
   {
     "key" = "ctrl+w up";
@@ -662,27 +717,32 @@
   {
     "key" = "ctrl+w";
     "command" = "vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.w && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.w && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+w";
     "command" = "workbench.action.terminal.killEditor";
-    "when" = "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported";
+    "when" =
+      "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported";
   }
   {
     "key" = "ctrl+f4";
     "command" = "-workbench.action.terminal.killEditor";
-    "when" = "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported";
+    "when" =
+      "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported";
   }
   {
     "key" = "f2";
     "command" = "-renameFile";
-    "when" = "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus";
+    "when" =
+      "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus";
   }
   {
     "key" = "f2";
     "command" = "-remote.tunnel.label";
-    "when" = "tunnelViewFocus && tunnelType == 'Forwarded' && tunnelViewMultiSelection == 'undefined'";
+    "when" =
+      "tunnelViewFocus && tunnelType == 'Forwarded' && tunnelViewMultiSelection == 'undefined'";
   }
   {
     "key" = "f2";
@@ -692,12 +752,14 @@
   {
     "key" = "ctrl+c";
     "command" = "-vscode-neovim.escape";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.c && neovim.init && !dirtyDiffVisible && !findWidgetVisible && !inReferenceSearchEditor && !markersNavigationVisible && !notebookCellFocused && !notificationCenterVisible && !parameterHintsVisible && !referenceSearchVisible && neovim.mode == 'normal' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.c && neovim.init && !dirtyDiffVisible && !findWidgetVisible && !inReferenceSearchEditor && !markersNavigationVisible && !notebookCellFocused && !notificationCenterVisible && !parameterHintsVisible && !referenceSearchVisible && neovim.mode == 'normal' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+c";
     "command" = "-vscode-neovim.escape";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.c && neovim.init && neovim.mode != 'normal' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.c && neovim.init && neovim.mode != 'normal' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+p";
@@ -751,17 +813,20 @@
   {
     "key" = "ctrl+i";
     "command" = "-workbench.action.terminal.chat.start";
-    "when" = "inlineChatHasProvider && terminalFocusInAny && terminalHasBeenCreated || inlineChatHasProvider && terminalFocusInAny && terminalProcessSupported";
+    "when" =
+      "inlineChatHasProvider && terminalFocusInAny && terminalHasBeenCreated || inlineChatHasProvider && terminalFocusInAny && terminalProcessSupported";
   }
   {
     "key" = "ctrl+i";
     "command" = "-workbench.action.chat.startVoiceChat";
-    "when" = "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest";
+    "when" =
+      "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress && !terminalChatActiveRequest";
   }
   {
     "key" = "ctrl+i";
     "command" = "-workbench.action.chat.stopListeningAndSubmit";
-    "when" = "inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'view' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'view'";
+    "when" =
+      "inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inChatInput && voiceChatInProgress && scopedVoiceChatInProgress == 'view' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'editor' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'inline' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'quick' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'terminal' || inlineChatFocused && voiceChatInProgress && scopedVoiceChatInProgress == 'view'";
   }
   {
     "key" = "ctrl+i";
@@ -770,7 +835,8 @@
   {
     "key" = "ctrl+i";
     "command" = "-editor.action.triggerSuggest";
-    "when" = "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible";
+    "when" =
+      "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible";
   }
   {
     "key" = "ctrl+alt+up";
@@ -783,22 +849,26 @@
   {
     "key" = "ctrl+u";
     "command" = "workbench.action.terminal.scrollUpPage";
-    "when" = "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
+    "when" =
+      "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
   }
   {
     "key" = "shift+pageup";
     "command" = "-workbench.action.terminal.scrollUpPage";
-    "when" = "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
+    "when" =
+      "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
   }
   {
     "key" = "ctrl+d";
     "command" = "workbench.action.terminal.scrollDownPage";
-    "when" = "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
+    "when" =
+      "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
   }
   {
     "key" = "shift+pagedown";
     "command" = "-workbench.action.terminal.scrollDownPage";
-    "when" = "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
+    "when" =
+      "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive";
   }
   {
     "key" = "ctrl+r";
@@ -806,33 +876,27 @@
   }
   {
     "key" = "down";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
-  }
-  {
-    "key" = "down";
     "command" = "-vscode-neovim.send";
-    "when" = "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
-  }
-  {
-    "key" = "up";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
+    "when" =
+      "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "up";
     "command" = "-vscode-neovim.send";
-    "when" = "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "left";
     "command" = "-vscode-neovim.send";
-    "when" = "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "right";
     "command" = "-vscode-neovim.send";
-    "when" = "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+p";
@@ -872,28 +936,21 @@
   }
   {
     "key" = "ctrl+j";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
+    "command" = "-vscode-neovim.send";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.j && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+j";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.j && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
-  }
-  {
-    "key" = "ctrl+j";
-    "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.j && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
-  }
-  {
-    "key" = "ctrl+u";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.j && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+u";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.u && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.u && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+d";
@@ -911,11 +968,6 @@
     "when" = "textInputFocus";
   }
   {
-    "key" = "ctrl+\\ e";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
-  }
-  {
     "key" = "ctrl+d";
     "command" = "-editor.action.addSelectionToNextFindMatch";
     "when" = "editorFocus";
@@ -929,17 +981,20 @@
   {
     "key" = "ctrl+d";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.d && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.d && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+d";
     "command" = "-notebook.addFindMatchToSelection";
-    "when" = "config.notebook.multiSelect.enabled && notebookCellEditorFocused && activeEditor == 'workbench.editor.notebook'";
+    "when" =
+      "config.notebook.multiSelect.enabled && notebookCellEditorFocused && activeEditor == 'workbench.editor.notebook'";
   }
   {
     "key" = "ctrl+y";
     "command" = "-vscode-neovim.ctrl-y";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.y && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+y";
@@ -1055,12 +1110,14 @@
   {
     "key" = "j";
     "command" = "list.focusUp";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
+    "when" =
+      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
   }
   {
     "key" = "k";
     "command" = "-list.focusUp";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
+    "when" =
+      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
   }
   {
     "key" = "j";
@@ -1070,17 +1127,20 @@
   {
     "key" = "j";
     "command" = "-list.focusDown";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
+    "when" =
+      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
   }
   {
     "key" = "j";
     "command" = "vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.init && focusedView == 'workbench.panel.output' && neovim.mode != 'insert'";
+    "when" =
+      "editorTextFocus && neovim.init && focusedView == 'workbench.panel.output' && neovim.mode != 'insert'";
   }
   {
     "key" = "j";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.init && focusedView == 'workbench.panel.output' && neovim.mode != 'insert'";
+    "when" =
+      "editorTextFocus && neovim.init && focusedView == 'workbench.panel.output' && neovim.mode != 'insert'";
   }
   {
     "key" = "ctrl+s";
@@ -1100,13 +1160,15 @@
     "key" = "space l n";
     "args" = " ln";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space ";
     "args" = " ";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "ctrl+e";
@@ -1117,204 +1179,238 @@
     "key" = "space f f";
     "args" = " ff";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f s";
     "args" = " fs";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f t";
     "args" = " ft";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f x";
     "args" = " fx";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f p";
     "args" = " fp";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space c";
     "args" = " c";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space s";
     "args" = " s";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space d";
     "args" = " d";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space r o";
     "args" = " ro";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space space";
     "args" = "  ";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f c";
     "args" = " fc";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f l";
     "args" = " fl";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space r r";
     "command" = "vscode-neovim.restart";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space s r";
     "args" = " sr";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space w c";
     "args" = " wc";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f o";
     "args" = " wc";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space o t";
     "args" = " ot";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space c n";
     "args" = " cn";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g s y";
     "args" = " gsy";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g s a";
     "args" = " gsa";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g s t";
     "args" = " gst";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g b";
     "args" = " gb";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g c";
     "args" = " gc";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g f";
     "args" = " gf";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g g";
     "args" = " gg";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g m";
     "args" = " gm";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g d";
     "args" = " gd";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space p r";
     "args" = " pr";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j s";
     "args" = " js";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j f";
     "args" = " jf";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j a";
     "args" = " ja";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j c";
     "args" = " jc";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space k";
     "args" = " k";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "backspace";
     "args" = "<BS>";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "ctrl+;";
@@ -1341,12 +1437,14 @@
   {
     "key" = "ctrl+m ;";
     "command" = "aipopup.action.modal.generate";
-    "when" = "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
+    "when" =
+      "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
   }
   {
     "key" = "ctrl+k";
     "command" = "-aipopup.action.modal.generate";
-    "when" = "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
+    "when" =
+      "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
   }
   {
     "key" = "ctrl+b";
@@ -1373,7 +1471,8 @@
   {
     "key" = "ctrl+k ctrl+shift+c";
     "command" = "-java.view.package.copyRelativeFilePath";
-    "when" = "focusedView == 'javaProjectExplorer' && java:serverMode == 'Standard'";
+    "when" =
+      "focusedView == 'javaProjectExplorer' && java:serverMode == 'Standard'";
   }
   {
     "key" = "ctrl+k v";
@@ -1454,7 +1553,8 @@
   {
     "key" = "ctrl+g";
     "command" = "-workbench.action.terminal.goToRecentDirectory";
-    "when" = "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported";
+    "when" =
+      "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported";
   }
   {
     "key" = "ctrl+shift+f";
@@ -1473,22 +1573,26 @@
   {
     "key" = "shift+k";
     "command" = "list.expandSelectionDown";
-    "when" = "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
+    "when" =
+      "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
   }
   {
     "key" = "shift+down";
     "command" = "-list.expandSelectionDown";
-    "when" = "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
+    "when" =
+      "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
   }
   {
     "key" = "shift+j";
     "command" = "list.expandSelectionUp";
-    "when" = "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
+    "when" =
+      "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
   }
   {
     "key" = "shift+up";
     "command" = "-list.expandSelectionUp";
-    "when" = "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
+    "when" =
+      "listFocus && listSupportsMultiselect && !inputFocus && !treestickyScrollFocused";
   }
   {
     "key" = "d";
@@ -1524,7 +1628,8 @@
   {
     "key" = "ctrl+shift+k";
     "command" = "-aipopup.action.modal.generate";
-    "when" = "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
+    "when" =
+      "editorFocus && !composerBarIsVisible && !composerControlPanelIsVisible";
   }
   {
     "key" = "ctrl+shift+k";
@@ -1568,7 +1673,8 @@
   {
     "key" = "ctrl+shift+o";
     "command" = "-editor.action.accessibleViewGoToSymbol";
-    "when" = "accessibilityHelpIsShown && accessibleViewGoToSymbolSupported || accessibleViewGoToSymbolSupported && accessibleViewIsShown";
+    "when" =
+      "accessibilityHelpIsShown && accessibleViewGoToSymbolSupported || accessibleViewGoToSymbolSupported && accessibleViewIsShown";
   }
   {
     "key" = "ctrl+shift+o";
@@ -1599,52 +1705,62 @@
   {
     "key" = "g r";
     "command" = "gitlens.views.scm.grouped.remotes";
-    "when" = "config.gitlens.views.scm.grouped.views.remotes && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.remotes && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
   }
   {
     "key" = "3";
     "command" = "-gitlens.views.scm.grouped.remotes";
-    "when" = "config.gitlens.views.scm.grouped.views.remotes && focusedView == 'gitlens.views.scm.grouped'";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.remotes && focusedView == 'gitlens.views.scm.grouped'";
   }
   {
     "key" = "g s";
     "command" = "gitlens.views.scm.grouped.stashes";
-    "when" = "config.gitlens.views.scm.grouped.views.stashes && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.stashes && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
   }
   {
     "key" = "4";
     "command" = "-gitlens.views.scm.grouped.stashes";
-    "when" = "config.gitlens.views.scm.grouped.views.stashes && focusedView == 'gitlens.views.scm.grouped'";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.stashes && focusedView == 'gitlens.views.scm.grouped'";
   }
   {
     "key" = "g b";
     "command" = "gitlens.views.scm.grouped.branches";
-    "when" = "config.gitlens.views.scm.grouped.views.branches && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.branches && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
   }
   {
     "key" = "2";
     "command" = "-gitlens.views.scm.grouped.branches";
-    "when" = "config.gitlens.views.scm.grouped.views.branches && focusedView == 'gitlens.views.scm.grouped'";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.branches && focusedView == 'gitlens.views.scm.grouped'";
   }
   {
     "key" = "g c";
     "command" = "gitlens.views.scm.grouped.commits";
-    "when" = "config.gitlens.views.scm.grouped.views.commits && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.commits && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
   }
   {
     "key" = "1";
     "command" = "-gitlens.views.scm.grouped.commits";
-    "when" = "config.gitlens.views.scm.grouped.views.commits && focusedView == 'gitlens.views.scm.grouped'";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.commits && focusedView == 'gitlens.views.scm.grouped'";
   }
   {
     "key" = "g p";
     "command" = "gitlens.views.scm.grouped.repositories";
-    "when" = "config.gitlens.views.scm.grouped.views.repositories && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.repositories && focusedView == 'gitlens.views.scm.grouped' && !inputFocus";
   }
   {
     "key" = "8";
     "command" = "-gitlens.views.scm.grouped.repositories";
-    "when" = "config.gitlens.views.scm.grouped.views.repositories && focusedView == 'gitlens.views.scm.grouped'";
+    "when" =
+      "config.gitlens.views.scm.grouped.views.repositories && focusedView == 'gitlens.views.scm.grouped'";
   }
   {
     "key" = "ctrl+p";
@@ -1667,12 +1783,14 @@
   {
     "key" = "ctrl+q";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.q && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.q && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+w";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.w && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.w && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "shift+k";
@@ -1702,7 +1820,8 @@
   {
     "key" = "shift+r";
     "command" = "git.revertSelectedRanges";
-    "when" = "editorFocus && neovim.init && neovim.mode == 'visual' || dirtyDiffVisible";
+    "when" =
+      "editorFocus && neovim.init && neovim.mode == 'visual' || dirtyDiffVisible";
   }
   {
     "key" = "l";
@@ -1794,12 +1913,14 @@
   {
     "key" = "ctrl+f";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.f && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.f && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+f";
     "command" = "-vscode-neovim.ctrl-f";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.f && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.f && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+shift+t";
@@ -1841,27 +1962,32 @@
   {
     "key" = "tab";
     "command" = "-acceptSelectedSuggestion";
-    "when" = "suggestWidgetHasFocusedSuggestion && suggestWidgetVisible && textInputFocus";
+    "when" =
+      "suggestWidgetHasFocusedSuggestion && suggestWidgetVisible && textInputFocus";
   }
   {
     "key" = "tab";
     "command" = "-insertBestCompletion";
-    "when" = "atEndOfWord && textInputFocus && !hasOtherSuggestions && !inSnippetMode && !suggestWidgetVisible && config.editor.tabCompletion == 'on'";
+    "when" =
+      "atEndOfWord && textInputFocus && !hasOtherSuggestions && !inSnippetMode && !suggestWidgetVisible && config.editor.tabCompletion == 'on'";
   }
   {
     "key" = "tab";
     "command" = "-insertNextSuggestion";
-    "when" = "hasOtherSuggestions && textInputFocus && !inSnippetMode && !suggestWidgetVisible && config.editor.tabCompletion == 'on'";
+    "when" =
+      "hasOtherSuggestions && textInputFocus && !inSnippetMode && !suggestWidgetVisible && config.editor.tabCompletion == 'on'";
   }
   {
     "key" = "tab";
     "command" = "-insertSnippet";
-    "when" = "editorTextFocus && hasSnippetCompletions && !editorTabMovesFocus && !inSnippetMode";
+    "when" =
+      "editorTextFocus && hasSnippetCompletions && !editorTabMovesFocus && !inSnippetMode";
   }
   {
     "key" = "ctrl+e";
     "command" = "-vscode-neovim.ctrl-e";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.e && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.e && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+w";
@@ -1870,12 +1996,14 @@
   {
     "key" = "ctrl+right";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.right && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.right && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+right";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.right && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.right && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+i";
@@ -1897,22 +2025,20 @@
   {
     "key" = "ctrl+l";
     "command" = "-workbench.action.chat.newEditSession";
-    "when" = "chatEditingParticipantRegistered && chatIsEnabled && inChat && chatLocation == 'editing-session'";
-  }
-  {
-    "key" = "ctrl+l";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
+    "when" =
+      "chatEditingParticipantRegistered && chatIsEnabled && inChat && chatLocation == 'editing-session'";
   }
   {
     "key" = "ctrl+l";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysNormal.l && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysNormal.l && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+l";
     "command" = "-vscode-neovim.send";
-    "when" = "editorTextFocus && neovim.ctrlKeysInsert.l && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+    "when" =
+      "editorTextFocus && neovim.ctrlKeysInsert.l && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
   {
     "key" = "ctrl+l";
@@ -2064,16 +2190,28 @@
   {
     "key" = "ctrl+.";
     "command" = "editor.action.quickFix";
-    "when" = "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
+    "when" =
+      "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
   }
   {
     "key" = "cmd+.";
     "command" = "-editor.action.quickFix";
-    "when" = "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
+    "when" =
+      "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
   }
   {
     "key" = "k";
     "command" = "-list.focusUp";
     "when" = "notebookEditorFocused && !inputFocus && !notebookOutputFocused";
+  }
+  {
+    "key" = "ctrl+q q";
+    "args" = "<c-q><esc>";
+    "command" = "vscode-neovim.send";
+    "when" = "neovim.init && neovim.mode == 'cmdline'";
+  }
+  {
+    "key" = "ctrl+q";
+    "command" = "-workbench.action.quit";
   }
 ]

@@ -703,6 +703,16 @@
     "when" = "neovim.init && neovim.mode == 'cmdline'";
   }
   {
+     "key" = "ctrl+q q";
+     "args" = "<c-q><esc>";
+     "command" = "vscode-neovim.send";
+     "when" = "neovim.init && neovim.mode == 'cmdline'";
+  }
+  {
+    "key" = "ctrl+q";
+    "command" = "-workbench.action.quit";
+  }
+  {
     "key" = "ctrl+w";
     "command" = "vscode-neovim.send";
     "when" = "editorTextFocus && neovim.ctrlKeysInsert.w && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
@@ -849,18 +859,8 @@
   }
   {
     "key" = "down";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
-  }
-  {
-    "key" = "down";
     "command" = "-vscode-neovim.send";
     "when" = "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
-  }
-  {
-    "key" = "up";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
   }
   {
     "key" = "up";
@@ -948,11 +948,6 @@
   }
   {
     "key" = "ctrl+j";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
-  }
-  {
-    "key" = "ctrl+j";
     "command" = "-vscode-neovim.send";
     "when" = "editorTextFocus && neovim.ctrlKeysInsert.j && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
   }
@@ -960,11 +955,6 @@
     "key" = "ctrl+j";
     "command" = "-vscode-neovim.send";
     "when" = "editorTextFocus && neovim.ctrlKeysNormal.j && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
-  }
-  {
-    "key" = "ctrl+u";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
   }
   {
     "key" = "ctrl+u";
@@ -985,11 +975,6 @@
     "key" = "ctrl+u";
     "command" = "-cursorUndo";
     "when" = "textInputFocus";
-  }
-  {
-    "key" = "ctrl+\\ e";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
   }
   {
     "key" = "ctrl+d";
@@ -2045,11 +2030,6 @@
     "key" = "ctrl+l";
     "command" = "-workbench.action.chat.newEditSession";
     "when" = "chatEditingParticipantRegistered && chatIsEnabled && inChat && chatLocation == 'editing-session'";
-  }
-  {
-    "key" = "ctrl+l";
-    "command" = "-vscode-neovim.send-cmdline";
-    "when" = "neovim.init && neovim.mode == 'cmdline'";
   }
   {
     "key" = "ctrl+l";
