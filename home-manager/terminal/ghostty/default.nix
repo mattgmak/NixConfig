@@ -10,7 +10,7 @@
     else
       pkgs.emptyDirectory;
     settings = {
-      font-size = 14;
+      font-size = if pkgs.stdenv.isLinux then 14 else 20;
       font-family = "IosevkaTerm Nerd Font";
       quick-terminal-position = "center";
       command = lib.getExe pkgs.nushell;
