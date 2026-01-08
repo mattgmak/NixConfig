@@ -330,4 +330,5 @@
     "editor.defaultFormatter" = "mads-hartmann.bash-ide-vscode";
   };
   # "editor.cursorStyle" = "block";
+  "editor.allowVariableFontsInAccessibilityMode" = true;
 }
