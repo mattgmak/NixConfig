@@ -40,7 +40,7 @@ vim.opt.shellpipe =
   '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
 
 -- hot reload this file
-vim.keymap.set('n', '<leader>hr', ':so ~/NixConfig/home-manager/terminal/nvim/config/lua/config.lua<cr>')
+vim.keymap.set('n', '<leader>hr', ':so ~/NixConfig/home-manager/terminal/nvim/config/init.lua<cr>')
 
 -- save
 vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
