@@ -68,7 +68,7 @@ require('lazy').setup({
       vim.keymap.set({ 'n', 'x', 'o' }, '<BS>', '<Plug>(leap)')
       vim.keymap.set({ 'n' }, '<leader><BS>', '<Plug>(leap-from-window)')
       -- vim.keymap.set({ 'n', 'o' }, 'gs', function()
-      vim.keymap.set({ 'o' }, 'r', function()
+      vim.keymap.set({ 'n', 'o' }, 'h', function()
         require('leap.remote').action({
           -- Automatically enter Visual mode when coming from Normal.
           input = vim.fn.mode(true):match('o') and '' or 'v',
