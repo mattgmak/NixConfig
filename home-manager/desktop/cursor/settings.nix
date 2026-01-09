@@ -18,7 +18,7 @@
   "window.customTitleBarVisibility" = "never";
   "workbench.colorCustomizations" = {
     "[Aura Soft Dark]" = {
-      "editor.background" = "#21202e";
+      "editor.background" = "";
       "terminal.background" = "#21202e";
       "activityBar.background" = "#21202e";
       "statusBar.background" = "#21202e";
@@ -30,6 +30,8 @@
       "terminalCursor.foreground" = "#a277ff";
       "editorInlayHint.foreground" = "#afafaf";
       "editor.selectionBackground" = "#68fffa19";
+      "editorCursor.background" = "#21202e";
+      "editorCursor.foreground" = "#b757ca";
       "editor.selectionHighlightBackground" = "#68fffa19";
       "editorLineNumber.foreground" = "#954fa3";
       "editorLineNumber.activeForeground" = "#b757ca";
