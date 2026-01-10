@@ -281,3 +281,7 @@
   border-radius: 6px !important;
   padding: 2px !important;
 }
+
+.split-view-container>.split-view-view:not(:first-child):before {
+  background-color: transparent !important;
+}
