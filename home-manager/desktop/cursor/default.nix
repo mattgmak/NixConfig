@@ -21,7 +21,7 @@
       default = {
         enableUpdateCheck = false;
         enableExtensionUpdateCheck = false;
-        userSettings = import ./settings.nix { inherit hostname; };
+        userSettings = import ./settings.nix { inherit hostname pkgs; };
         keybindings = if pkgs.stdenv.isDarwin then
           import ./keybindings-darwin.nix
         else
@@ -88,6 +88,7 @@
           "disaac.zlint-vscode"
           "ziglang.vscode-zig"
           "golang.Go"
+          "TomRijndorp.find-it-faster"
         ];
       };
     };

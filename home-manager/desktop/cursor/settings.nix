@@ -1,4 +1,4 @@
-{ hostname }: {
+{ hostname, pkgs }: {
   "editor.suggestSelection" = "first";
   "terminal.integrated.useWslProfiles" = true;
   "eslint.workingDirectories" = [{ "mode" = "auto"; }];
@@ -345,4 +345,18 @@
     "Visual" = { "backgroundColor" = "theme.editor.selectionBackground"; };
     "LeapBackdrop" = { "color" = "#696969"; };
   };
+  "find-it-faster.general.useTerminalInEditor" = false;
+  "find-it-faster.general.showMaximizedTerminal" = true;
+  "find-it-faster.general.batTheme" = "Catppuccin Mocha";
+  "find-it-faster.general.shellPathForTerminal" = "${
+      pkgs.writeShellScriptBin "find-it-faster-terminal" ''
+        SHELL=bash ${pkgs.bash}/bin/bash
+      ''
+    }/bin/find-it-faster-terminal";
+  "find-it-faster.findFiles.previewWindowConfig" = "right:50%,border-rounded";
+  "find-it-faster.findWithinFiles.previewCommand" =
+    "line={2} && begin=$( if [[ $line -lt 7 ]]; then echo $((line-1)); else echo 6; fi ) && bat --highlight-line={2} --color=always --line-range $((line-begin)):$((line+50)) {1}";
+  "find-it-faster.findWithinFiles.previewWindowConfig" =
+    "right:50%,border-rounded";
+  "find-it-faster.findWithinFiles.fuzzRipgrepQuery" = true;
 }

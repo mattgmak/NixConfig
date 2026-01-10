@@ -1163,7 +1163,7 @@
     "when" = "sideBarVisible || sideBarFocus";
   }
   {
-    "key" = "ctrl+p";
+    "key" = "ctrl+shift+t";
     # "args" = "<c-g>p";
     # "command" = "vscode-neovim.send";
     "command" = "workbench.action.togglePanel";
