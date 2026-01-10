@@ -16,6 +16,7 @@
       command = lib.getExe pkgs.nushell;
       custom-shader = "shaders/cursor-smear.glsl";
       cursor-style = "block";
+      cursor-color = "#B757CA";
       keybind = [
         "global:super+t=toggle_quick_terminal"
         # "super+alt+shift+j=write_screen_file:open"

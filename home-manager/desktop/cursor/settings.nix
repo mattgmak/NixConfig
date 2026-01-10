@@ -333,4 +333,16 @@
   };
   # "editor.cursorStyle" = "block";
   "editor.allowVariableFontsInAccessibilityMode" = true;
+  "vscode-neovim.highlightGroups.highlights" = {
+    "IncSearch" = {
+      "backgroundColor" = "theme.editor.findMatchBackground";
+      "borderColor" = "theme.editor.findMatchBorder";
+    };
+    "Search" = {
+      "backgroundColor" = "theme.editor.findMatchHighlightBackground";
+      "borderColor" = "theme.editor.findMatchHighlightBorder";
+    };
+    "Visual" = { "backgroundColor" = "theme.editor.selectionBackground"; };
+    "LeapBackdrop" = { "color" = "#696969"; };
+  };
 }

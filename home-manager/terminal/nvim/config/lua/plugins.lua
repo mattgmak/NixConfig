@@ -74,6 +74,7 @@ require('lazy').setup({
           input = vim.fn.mode(true):match('o') and '' or 'v',
         })
       end)
+      vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' })
     end,
   },
   {
