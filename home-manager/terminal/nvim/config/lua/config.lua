@@ -245,7 +245,13 @@ if is_vscode then
   -- end)
   vim.keymap.set('n', '<leader>k', function() vscode.call('workbench.action.showAllEditorsByMostRecentlyUsed') end)
   vim.keymap.set('n', '<leader>ca', function() vscode.call('workbench.action.closeAllEditors') end)
-  vim.keymap.set('n', '<leader>co', function()
+
+  -- window operations
+  vim.keymap.set('n', '<leader>wh', function() vscode.call('workbench.action.splitEditorDown') end)
+  vim.keymap.set('n', '<leader>wv', function() vscode.call('workbench.action.splitEditorRight') end)
+  vim.keymap.set('n', '<leader>wn', function() vscode.call('workbench.action.files.newUntitledFile') end)
+
+  vim.keymap.set('n', '<leader>wo', function()
     vscode.call('workbench.action.closeEditorsInOtherGroups')
     vscode.call('workbench.action.closeOtherEditors')
   end)
@@ -266,6 +272,11 @@ if is_vscode then
 else
   -- exit
   vim.keymap.set('n', '<leader>d', '<cmd>q<cr>')
+  -- window operations
+  vim.keymap.set('n', '<leader>wh', ':split<cr>')
+  vim.keymap.set('n', '<leader>wv', ':vsplit<cr>')
+  vim.keymap.set('n', '<leader>wn', ':enew<cr>')
+  vim.keymap.set('n', '<leader>wo', ':only<cr>')
 end
 
 -- flash
