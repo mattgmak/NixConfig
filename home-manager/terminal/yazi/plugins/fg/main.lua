@@ -5,7 +5,7 @@ local toggle_ui = ya.sync(function(self)
   else
     self.children = Modal:children_add(self, 10)
   end
-  ya.render()
+  ui.render()
 end)
 
 local init_ui_data = ya.sync(function(self, file_url)
@@ -14,7 +14,7 @@ local init_ui_data = ya.sync(function(self, file_url)
   self.title_color = '#82ab3a'
   self.cursor = 0
   self.file_url = file_url and file_url or ''
-  ya.render()
+  ui.render()
 end)
 
 local set_option = ya.sync(function(self, enable)
@@ -33,7 +33,7 @@ local update_cursor = ya.sync(function(self, cursor)
   -- if add opt, need to add change 3th arg.
   -- forexample, 2 mean 3 opt. circle 0 to 2.
   self.cursor = ya.clamp(0, self.cursor + cursor, 2)
-  ya.render()
+  ui.render()
 end)
 
 local M = {
@@ -97,7 +97,7 @@ local function fail(s, ...) ya.notify({ title = 'Fzf', content = string.format(s
 
 function M:entry(job)
   local args = job.args
-  local _permit = ya.hide()
+  local _permit = ui.hide()
   local cwd = state()
   local shell_value = ya.target_family() == 'windows' and 'nu' or os.getenv('SHELL'):match('.*/(.*)')
   local cmd_args = ''
@@ -217,7 +217,7 @@ function M:entry(job)
         end
       end
     end
-    _permit = ya.hide()
+    _permit = ui.hide()
   end
 
   if (default_action == 'nvim' or get_option() == 'nvim') and args[1] ~= 'fzf' then

@@ -43,7 +43,7 @@ local render_motion_setup = ya.sync(function(_)
   if ui.render then
     ui.render()
   else
-    ya.render()
+    ui.render()
   end
 
   Status.motion = function() return ui.Span('') end
@@ -65,7 +65,7 @@ local render_motion = ya.sync(function(_, motion_num, motion_cmd)
   if ui.render then
     ui.render()
   else
-    ya.render()
+    ui.render()
   end
 
   Status.motion = function(self)
@@ -105,7 +105,7 @@ local render_numbers = ya.sync(function(_, mode)
   if ui.render then
     ui.render()
   else
-    ya.render()
+    ui.render()
   end
 
   Entity.number = function(_, index, total, file, hovered)
