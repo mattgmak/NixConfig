@@ -359,4 +359,9 @@
   "find-it-faster.findWithinFiles.previewWindowConfig" =
     "right:50%,border-rounded";
   "find-it-faster.findWithinFiles.fuzzRipgrepQuery" = true;
+  # "find-it-faster.findInActiveFile.previewCommand" =
+  #   "line={2} && begin=$( if [[ $line -lt 7 ]]; then echo $((line-1)); else echo 6; fi ) && bat --highlight-line={2} --color=always --line-range $((line-begin)):$((line+50)) {1}";
+  "find-it-faster.findInActiveFile.previewWindowConfig" =
+    "right:50%,border-rounded";
+  "find-it-faster.findInActiveFile.fuzzRipgrepQuery" = true;
 }

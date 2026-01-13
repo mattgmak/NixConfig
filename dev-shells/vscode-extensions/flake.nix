@@ -28,7 +28,7 @@
             NODE_OPTIONS = "--experimental-vm-modules";
             BIOME_BINARY = "${biome-pin-pkgs.biome}/bin/biome";
             packages = with pkgs;
-              [ nodejs_20 pnpm biome-pin-pkgs.biome yarn ]
+              [ nodejs_20 pnpm biome-pin-pkgs.biome yarn bun ]
               ++ (with pkgs.nodePackages; [ vsce ]);
           };
         });
