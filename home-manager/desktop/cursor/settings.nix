@@ -334,15 +334,15 @@
   # "editor.cursorStyle" = "block";
   "editor.allowVariableFontsInAccessibilityMode" = true;
   "vscode-neovim.highlightGroups.highlights" = {
-    "IncSearch" = {
-      "backgroundColor" = "theme.editor.findMatchBackground";
-      "borderColor" = "theme.editor.findMatchBorder";
-    };
+    "IncSearch" = { "backgroundColor" = "theme.editor.findMatchBackground"; };
+    "CurSearch" = { "backgroundColor" = "theme.editor.findMatchBackground"; };
     "Search" = {
       "backgroundColor" = "theme.editor.findMatchHighlightBackground";
-      "borderColor" = "theme.editor.findMatchHighlightBorder";
     };
-    "Visual" = { "backgroundColor" = "theme.editor.selectionBackground"; };
+    "Substitute" = {
+      "backgroundColor" = "theme.editor.foreground";
+      "color" = "theme.editor.background";
+    };
     "LeapBackdrop" = { "color" = "#696969"; };
   };
   "find-it-faster.general.useTerminalInEditor" = false;
@@ -353,15 +353,13 @@
         SHELL=bash ${pkgs.bash}/bin/bash
       ''
     }/bin/find-it-faster-terminal";
-  "find-it-faster.findFiles.previewWindowConfig" = "right:50%,border-rounded";
-  "find-it-faster.findWithinFiles.previewCommand" =
-    "line={2} && begin=$( if [[ $line -lt 7 ]]; then echo $((line-1)); else echo 6; fi ) && bat --highlight-line={2} --color=always --line-range $((line-begin)):$((line+50)) {1}";
+  "find-it-faster.findFiles.previewWindowConfig" =
+    "right:border-none:50%:+{2}+3/3";
   "find-it-faster.findWithinFiles.previewWindowConfig" =
-    "right:50%,border-rounded";
+    "right:border-none:50%:+{2}+3/3";
   "find-it-faster.findWithinFiles.fuzzRipgrepQuery" = true;
-  # "find-it-faster.findInActiveFile.previewCommand" =
-  #   "line={2} && begin=$( if [[ $line -lt 7 ]]; then echo $((line-1)); else echo 6; fi ) && bat --highlight-line={2} --color=always --line-range $((line-begin)):$((line+50)) {1}";
   "find-it-faster.findInActiveFile.previewWindowConfig" =
-    "right:50%,border-rounded";
+    "right:border-none:50%:+{2}+3/3";
   "find-it-faster.findInActiveFile.fuzzRipgrepQuery" = true;
+  "terminal.integrated.tabs.enabled" = false;
 }

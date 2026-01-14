@@ -236,6 +236,7 @@ if is_vscode then
   vim.keymap.set('n', '<leader>js', function() vscode.call('workbench.action.gotoSymbol') end)
   vim.keymap.set({ 'n', 'v' }, '<leader>jf', function() vscode.call('find-it-faster.findInActiveFile') end)
   vim.keymap.set({ 'n', 'v' }, '<leader>jg', function() vscode.call('find-it-faster.findWithinFiles') end)
+  vim.keymap.set('n', '<leader>jv', function() vscode.call('find-it-faster.resumeSearch') end)
   vim.keymap.set('n', '<leader>ja', function() vscode.call('workbench.action.showAllSymbols') end)
   vim.keymap.set('n', '<leader>jc', function() vscode.call('breadcrumbs.focusAndSelect') end)
   vim.keymap.set('n', '<leader>a', function() vscode.call('editor.action.quickFix') end)

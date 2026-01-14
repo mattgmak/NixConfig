@@ -37,6 +37,7 @@
           #     '';
           #   };
           # };
+          vscodeVersion = "1.105.1";
         in with pkgs.vscode-extensions;
         [
           sumneko.lua
@@ -46,7 +47,7 @@
           usernamehw.errorlens
           aaron-bond.better-comments
           jnoortheen.nix-ide
-        ] ++ pkgs.nix4vscode.forVscodeVersion "1.105.1" [
+        ] ++ pkgs.nix4vscode.forVscodeVersion vscodeVersion [
           "ms-vsliveshare.vsliveshare.1.0.5905"
           "github.vscode-pull-request-github"
           "bbenoist.QML"
@@ -89,6 +90,9 @@
           "ziglang.vscode-zig"
           "golang.Go"
           "TomRijndorp.find-it-faster"
+          "pflannery.vscode-versionlens"
+        ] ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion [
+          # "mattgmak.find-it-faster"
         ];
       };
     };
