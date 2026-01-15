@@ -362,4 +362,5 @@
     "right:border-none:50%:+{2}+3/3";
   "find-it-faster.findInActiveFile.fuzzRipgrepQuery" = true;
   "terminal.integrated.tabs.enabled" = false;
+  "githubPullRequests.commentExpandState" = "collapseAll";
 }

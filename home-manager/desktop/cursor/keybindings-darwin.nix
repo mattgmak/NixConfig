@@ -2214,4 +2214,8 @@
     "key" = "ctrl+q";
     "command" = "-workbench.action.quit";
   }
+  {
+    "key" = "ctrl+shift+t";
+    "command" = "workbench.action.togglePanel";
+  }
 ]
