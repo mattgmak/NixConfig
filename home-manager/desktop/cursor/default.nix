@@ -89,11 +89,10 @@
           "disaac.zlint-vscode"
           "ziglang.vscode-zig"
           "golang.Go"
-          "TomRijndorp.find-it-faster"
+          # "TomRijndorp.find-it-faster"
           "pflannery.vscode-versionlens"
-        ] ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion [
-          # "mattgmak.find-it-faster"
-        ];
+        ] ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion
+        [ "mattgmak.find-it-faster" ];
       };
     };
   };
