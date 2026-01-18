@@ -1434,6 +1434,12 @@
     # "command" = "workbench.action.closeAllEditors";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
+  {
+    "key" = "space j g";
+    "args" = " jg";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
   # End of passthrough
   {
     "key" = "ctrl+;";
