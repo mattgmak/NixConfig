@@ -82,6 +82,7 @@ require('lazy').setup({
     version = '*',
     config = function()
       local gen_ai_spec = require('mini.extra').gen_ai_spec
+      local spec_treesitter = require('mini.ai').gen_spec.treesitter
       require('mini.ai').setup({
         custom_textobjects = {
           B = gen_ai_spec.buffer(),
@@ -89,6 +90,21 @@ require('lazy').setup({
           I = gen_ai_spec.indent(),
           L = gen_ai_spec.line(),
           N = gen_ai_spec.number(),
+          -- Classname textobject (for Tailwind CSS classes)
+          -- Matches space-separated words within quotes
+          -- 'a' includes surrounding space, 'i' is just the word
+          c = {
+            { '%b""', "%b''", '%b``' },
+            -- 'a' includes trailing space(s), 'i' is just the word
+            {
+              '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
+              '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
+              '%s+()()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
+              '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
+            },
+          },
+          -- Tag attribute textobject (for HTML/XML tags)
+          -- T = spec_treesitter({ a = '@tag.attribute.outer', i = '@tag.attribute.inner' }),
         },
       })
       require('mini.surround').setup()
