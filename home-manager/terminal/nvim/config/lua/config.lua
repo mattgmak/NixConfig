@@ -3,6 +3,18 @@ local is_vscode = vim.g.vscode ~= nil
 -- <leader> key
 vim.g.mapleader = ' '
 
+-- lua binds
+vim.keymap.set('n', '<leader>ls', ':so %<cr>')
+vim.keymap.set('n', '<leader>lx', ':.lua<cr>')
+vim.keymap.set('v', '<leader>lx', ':lua<cr>')
+
+-- highlight yank
+vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
+  callback = function() vim.highlight.on_yank({ higroup = 'DiffChange' }) end,
+})
+
 -- INFO: settings to set nushell as the shell for the :! command
 -- --
 -- path to the Nushell executable
@@ -38,9 +50,6 @@ vim.opt.shellquote = ''
 -- NOTE: `ansi strip` removes all ansi coloring from nushell errors
 vim.opt.shellpipe =
   '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
-
--- hot reload this file
-vim.keymap.set('n', '<leader>hr', ':so ~/NixConfig/home-manager/terminal/nvim/config/init.lua<cr>')
 
 -- save
 vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {

@@ -17,22 +17,23 @@
   "window.titleBarStyle" = "native";
   "window.customTitleBarVisibility" = "never";
   "workbench.colorCustomizations" = {
-    "[Aura Soft Dark]" = {
-      "editor.background" = "";
-      "terminal.background" = "#21202e";
-      "activityBar.background" = "#21202e";
-      "statusBar.background" = "#21202e";
-      "editorGroupHeader.tabsBackground" = "#21202e";
-      "tab.inactiveBackground" = "#21202e";
-      "editorSuggestWidget.background" = "#21202e";
-      "sideBar.background" = "#21202e";
-      "titleBar.activeBackground" = "#21202e";
-      "terminalCursor.foreground" = "#a277ff";
+    "[Aura Soft Dark]" = let generalBackground = "#21202e";
+    in {
+      "editor.background" = generalBackground;
+      "terminal.background" = generalBackground;
+      "activityBar.background" = generalBackground;
+      "statusBar.background" = generalBackground;
+      "editorGroupHeader.tabsBackground" = generalBackground;
+      "tab.inactiveBackground" = generalBackground;
+      "editorSuggestWidget.background" = generalBackground;
+      "sideBar.background" = generalBackground;
+      "titleBar.activeBackground" = generalBackground;
+      "terminalCursor.foreground" = "#b757ca";
       "editorInlayHint.foreground" = "#afafaf";
-      "editor.selectionBackground" = "#68fffa19";
       "editorCursor.background" = "#21202e";
       "editorCursor.foreground" = "#b757ca";
-      "editor.selectionHighlightBackground" = "#68fffa19";
+      "editor.selectionBackground" = "#C234FF19";
+      "editor.selectionHighlightBackground" = "#DAA8F019";
       "editorLineNumber.foreground" = "#954fa3";
       "editorLineNumber.activeForeground" = "#b757ca";
     };
