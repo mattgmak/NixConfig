@@ -1,0 +1,61 @@
+/* === BOOKMARK AND HISTORY === */
+
+/* bookmark and history */
+#tabbrowser-tabbox > #sidebar-box {
+  z-index: 1 !important;
+  align-self: center !important;
+  position: absolute !important;
+  height: calc(100% - 37.5px) !important;
+  box-shadow: 4px 4px 8px 0px #00000022 !important;
+  background-color: var(--zen-primary-color) !important;
+  border-radius: var(--na-user-border-radius) !important;
+  border: 1px solid var(--na-color-border) !important;
+  border-color: var(--na-color-border) !important;
+}
+
+/* bookmark and history body */
+#bookmarksPanel,
+#history-panel {
+  background-color: var(--zen-primary-color) !important;
+}
+
+/* bookmark and history remove splitter */
+#sidebar-splitter {
+  display: none !important;
+}
+
+/* bookmark and history expand on right side */
+:root:not([zen-compact-mode="true"]):not([zen-right-side="true"]) #tabbrowser-tabbox>vbox {
+  animation: slideFromRight var(--na-anim-duration) ease !important;
+  right: 24px;
+}
+
+/* bookmark and history expand on left side */
+:root:not([zen-compact-mode="true"])[zen-right-side="true"] #tabbrowser-tabbox>vbox {
+  animation: slideFromLeft var(--na-anim-duration) ease !important;
+  left: 20px;
+}
+
+/* bookmark and history compact mode on right side */
+:root:not([zen-right-side="true"]) #tabbrowser-tabbox>vbox {
+  animation: slideFromRight var(--na-anim-duration) ease !important;
+  right: 18px;
+}
+
+/* bookmark and history compact mode on left side */
+:root[zen-right-side="true"] #tabbrowser-tabbox>vbox {
+  animation: slideFromLeft var(--na-anim-duration) ease !important;
+  left: 10px;
+}
+
+/* @-moz-document url("chrome://global/content/pictureinpicture/player.xhtml") {
+  html, .player-holder {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    background: none !important;
+    content: "";
+  }
+  .player-holder {
+    clip-path: none !important;
+  }
+} */
