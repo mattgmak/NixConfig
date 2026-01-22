@@ -356,10 +356,13 @@ keymap = [
   # Help
   { on = "~", run = "help", desc = "Open help" },
   { on = "<F1>", run = "help", desc = "Open help" },
-
   { on = [
     "g",
     "f",
+  ], run = "follow", desc = "Follow hovered symlink" },
+  { on = [
+    "g",
+    "a",
   ], run = 'search_do --via=fd --args="-tf -d9"', desc = "Recursively flatten directories" },
   { on = "R", run = [
     "escape --select",

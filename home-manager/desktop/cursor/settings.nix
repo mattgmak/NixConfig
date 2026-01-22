@@ -293,7 +293,6 @@
   "git.replaceTagsWhenPull" = true;
   "editor.wordWrap" = "on";
   "workbench.activityBar.location" = "hidden";
-  "window.menuBarVisibility" = "compact";
   "typescript.disableAutomaticTypeAcquisition" = true;
   "typescript.tsserver.log" = "off";
   "gitlens.views.searchAndCompare.files.layout" = "list";

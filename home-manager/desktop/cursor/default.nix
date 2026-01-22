@@ -8,7 +8,14 @@
     enable = true;
     electron = {
       frame = false;
-      titleBarStyle = "hiddenInset";
+      titleBarStyle = "hidden";
+      # titleBarStyle =
+      #   if pkgs.stdenv.isDarwin then "customButtonsOnHover" else "hiddenInset";
+      trafficLightPosition = {
+        x = 10000;
+        y = 10000;
+      };
+
     };
     customCSSFileStubs = [ "custom.css" "test.css" ];
     customJSFileStubs = [ "custom.js" "test.js" ];

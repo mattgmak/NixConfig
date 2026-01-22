@@ -10,38 +10,22 @@ let
     code-cursor = let
       originalCursor = prev.code-cursor;
 
-      # Convert electron options to JSON string (keeping full JSON object syntax)
-      electronOptionsStr =
-        if cfg.electron != { } then builtins.toJSON cfg.electron else "{}";
+      # Convert electron options to comma-separated key:value pairs for injection
+      # This matches the format: key1:value1,key2:value2
+      electronOptionsStr = if cfg.electron != { } then
+        let
+          jsonStr = builtins.toJSON cfg.electron;
+          # Remove the outer braces from the JSON object
+          innerJson =
+            builtins.substring 1 ((builtins.stringLength jsonStr) - 2) jsonStr;
+        in innerJson
+      else
+        "";
 
-      # Create script to inject into main process
-      mainInjectionScript = ''
-        // Cursor UI Style - Electron Options
-        import { app, BrowserWindow } from "electron";
-
-        ${if cfg.electron != { } then ''
-          // Apply electron options by intercepting BrowserWindow creation
-          const electronOptions = ${electronOptionsStr};
-          console.log("Cursor UI Style: Applying electron options:", electronOptions);
-
-          // Store the original BrowserWindow constructor
-          const OriginalBrowserWindow = BrowserWindow;
-
-          // Override BrowserWindow to apply our options
-          function PatchedBrowserWindow(options = {}) {
-            // Merge our electron options with the existing options
-            const mergedOptions = { ...options, ...electronOptions };
-            console.log("Cursor UI Style: Creating BrowserWindow with options:", mergedOptions);
-            return new OriginalBrowserWindow(mergedOptions);
-          }
-
-          // Replace the original BrowserWindow
-          global.BrowserWindow = PatchedBrowserWindow;
-          // module.exports.BrowserWindow = PatchedBrowserWindow;
-          export { PatchedBrowserWindow as BrowserWindow };
-        '' else
-          ""}
-      '';
+      # Extract backgroundColor if present for special handling
+      hasBackgroundColor = cfg.electron ? backgroundColor;
+      backgroundColor =
+        if hasBackgroundColor then cfg.electron.backgroundColor else "";
 
       # Override the original cursor package instead of replacing it entirely
     in originalCursor.overrideAttrs (oldAttrs: {
@@ -77,15 +61,26 @@ let
           echo "Warning: Could not find main.js file in extracted directory"
           find "$extracted_dir" -name "main.js" -type f | head -5
         else
-          # Inject our customizations at the beginning of main.js
-          echo "Injecting cursor customizations into main.js..."
-          {
-            cat "$mainjs_file"
-            echo ""
-            echo '${mainInjectionScript}'
-          } > "$mainjs_file.tmp"
-          mv "$mainjs_file.tmp" "$mainjs_file"
-          echo "Successfully injected customizations into main.js"
+          # Patch main.js by injecting electron options inline
+          echo "Patching main.js with electron options..."
+
+          ${
+            optionalString (electronOptionsStr != "") ''
+              # Inject electron options after experimentalDarkMode:!0
+              echo "Injecting electron options: ${electronOptionsStr}"
+              sed -i 's/experimentalDarkMode:!0/experimentalDarkMode:!0,${electronOptionsStr}/g' "$mainjs_file"
+            ''
+          }
+
+          ${
+            optionalString hasBackgroundColor ''
+              # Replace setBackgroundColor calls with custom color
+              echo "Setting backgroundColor to: ${backgroundColor}"
+              sed -i 's/setBackgroundColor([^)]*);/setBackgroundColor("${backgroundColor}");/g' "$mainjs_file"
+            ''
+          }
+
+          echo "Successfully patched main.js"
         fi
 
         # Also try to find and modify any workbench.html files in extracted directory
