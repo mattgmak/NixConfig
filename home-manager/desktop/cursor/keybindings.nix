@@ -2155,6 +2155,11 @@
     "command" = "-editor.emmet.action.expandAbbreviation";
     "when" = "config.emmet.triggerExpansionOnTab && editorTextFocus && !editorReadonly && !editorTabMovesFocus";
   }
+  {
+    "key" = "ctrl+.";
+    "command" = "hideCodeActionWidget";
+    "when" = "codeActionMenuVisible";
+  }
   # {
   #   "key" = "alt+r";
   #   "command" = "-toggleFindRegex";

@@ -2194,6 +2194,11 @@
       "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
   }
   {
+    "key" = "ctrl+.";
+    "command" = "hideCodeActionWidget";
+    "when" = "codeActionMenuVisible";
+  }
+  {
     "key" = "cmd+.";
     "command" = "-editor.action.quickFix";
     "when" =
@@ -2222,6 +2227,7 @@
     "key" = "space j g";
     "args" = " jg";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
 ]
