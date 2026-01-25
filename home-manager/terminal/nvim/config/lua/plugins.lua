@@ -16,6 +16,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- TODO: move off lazy
 -- Setup lazy.nvim
 require('lazy').setup({
   {
@@ -78,8 +79,44 @@ require('lazy').setup({
     end,
   },
   {
+    'nvim-treesitter/nvim-treesitter',
+    lazy = false,
+    build = ':TSUpdate',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
+    config = function()
+      local ts = require('nvim-treesitter')
+      ts.setup({
+        install_dir = vim.fn.stdpath('data') .. '/site',
+      })
+      ts.install({
+        'jsx',
+        'tsx',
+        'javascript',
+        'typescript',
+        'html',
+        'css',
+        'json',
+        'yaml',
+        'toml',
+        'markdown',
+        'markdown_inline',
+        'zig',
+      }):wait(300000)
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { '<filetype>' },
+        callback = function() vim.treesitter.start() end,
+      })
+      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end,
+  },
+  {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    branch = 'main',
+  },
+  {
     'echasnovski/mini.nvim',
     version = '*',
+    event = 'VeryLazy',
     config = function()
       local gen_ai_spec = require('mini.extra').gen_ai_spec
       local spec_treesitter = require('mini.ai').gen_spec.treesitter
@@ -104,7 +141,8 @@ require('lazy').setup({
             },
           },
           -- Tag attribute textobject (for HTML/XML tags)
-          -- T = spec_treesitter({ a = '@tag.attribute.outer', i = '@tag.attribute.inner' }),
+          -- Requires nvim-treesitter-textobjects plugin
+          T = spec_treesitter({ a = '@attribute.outer', i = '@attribute.inner' }),
         },
       })
       require('mini.surround').setup()

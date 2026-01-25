@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 let
 in {
   home.file = {
@@ -6,5 +6,11 @@ in {
       source = ./config;
       recursive = true;
     };
+  };
+  programs.neovim = {
+    enable = true;
+    withPython3 = true;
+    withNodeJs = true;
+    extraPackages = with pkgs; [ gcc tree-sitter ];
   };
 }

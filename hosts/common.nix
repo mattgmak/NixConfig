@@ -167,7 +167,6 @@
   environment.systemPackages = with pkgs; [
     wget
     git
-    neovim
     chezmoi
     yazi
     appimage-run
