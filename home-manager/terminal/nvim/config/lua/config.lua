@@ -51,6 +51,8 @@ vim.opt.shellquote = ''
 vim.opt.shellpipe =
   '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
 
+vim.o.relativenumber = true
+
 -- save
 vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
   silent = true,
