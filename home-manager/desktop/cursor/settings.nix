@@ -180,38 +180,56 @@
     [ "c" "h" "j" "m" "o" "r" "t" "u" "w" ];
   "multiCommand.commands" = [
     {
-      "command" = "multiCommand.pageUp";
-      "sequence" = [
-        {
-          "command" = "editorScroll";
-          "args" = {
-            "to" = "up";
-            "by" = "halfPage";
-            "value" = 1;
-          };
-        }
-        {
-          "command" = "cursorMove";
-          "args" = { "to" = "viewPortCenter"; };
-        }
-      ];
+      "command" = "multiCommand.halfPageUp";
+      "sequence" = [{
+        "command" = "vscode-neovim.send";
+        "args" = "<C-u>";
+      }
+      # {
+      #   "command" = "editorScroll";
+      #   "args" = {
+      #     "to" = "up";
+      #     "by" = "halfPage";
+      #   };
+      # }
+      # {
+      #   "command" = "cursorMove";
+      #   # "args" = {"to" = "viewPortTop";};
+      #   "args" = {"to" = "viewPortCenter";};
+      #   # "args" = {"to" = "viewPortIfOutside";};
+      # }
+      # {
+      #   "command" = "vscode-neovim.send";
+      #   "args" = "zz";
+      # }
+      # { "command" = "vscode-neovim.send"; "args" = "jk"; }
+        ];
     }
     {
-      "command" = "multiCommand.pageDown";
-      "sequence" = [
-        {
-          "command" = "editorScroll";
-          "args" = {
-            "to" = "down";
-            "by" = "halfPage";
-            "value" = 1;
-          };
-        }
-        {
-          "command" = "cursorMove";
-          "args" = { "to" = "viewPortCenter"; };
-        }
-      ];
+      "command" = "multiCommand.halfPageDown";
+      "sequence" = [{
+        "command" = "vscode-neovim.send";
+        "args" = "<C-d>";
+      }
+      # {
+      #   "command" = "editorScroll";
+      #   "args" = {
+      #     "to" = "down";
+      #     "by" = "halfPage";
+      #   };
+      # }
+      # {
+      #   "command" = "cursorMove";
+      #   # "args" = {"to" = "viewPortBottom";};
+      #   "args" = {"to" = "viewPortCenter";};
+      #   # "args" = {"to" = "viewPortIfOutside";};
+      # }
+      # {
+      #   "command" = "vscode-neovim.send";
+      #   "args" = "zz";
+      # }
+      # { "command" = "vscode-neovim.send"; "args" = "jk"; }
+        ];
     }
     {
       "command" = "multiCommand.halfListUp";

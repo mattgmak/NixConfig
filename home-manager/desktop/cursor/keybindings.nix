@@ -560,29 +560,12 @@
   # }
   {
     "key" = "ctrl+u";
-    "command" = "runCommands";
-    "args" = {
-      "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<C-u>"; }
-        # { "command" = "vscode-neovim.send"; "args" = "zz"; }
-        { "command" = "editorScroll"; "args" = { "to" = "up"; "by" = "halfPage"; }; }
-      ];
-    };
+    "command" = "multiCommand.halfPageUp";
     "when" = "editorTextFocus";
   }
   {
     "key" = "ctrl+d";
-    "command" = "runCommands";
-    "args" = {
-      "commands" = [
-        { "command" = "vscode-neovim.send"; "args" = "<C-d>"; }
-        # { "command" = "vscode-neovim.send"; "args" = "zz"; }
-        {
-          "command" = "editorScroll";
-          "args" = { "to" = "down"; "by" = "halfPage"; };
-        }
-      ];
-    };
+    "command" = "multiCommand.halfPageDown";
     "when" = "editorTextFocus";
   }
   # {
@@ -590,9 +573,14 @@
   #   "command" = "runCommands";
   #   "args" = {
   #     "commands" = [
-  #       { "command" = "vscode-neovim.send"; "args" = "<C-b>"; }
+  #       # { "command" = "vscode-neovim.send"; "args" = "<C-b>"; }
   #       # { "command" = "vscode-neovim.send"; "args" = "zz"; }
   #       { "command" = "editorScroll"; "args" = { "to" = "up"; "by" = "page"; }; }
+  #       {
+  #         "command" = "cursorMove";
+  #         # "args" = {"to" = "viewPortBottom";};
+  #         "args" = {"to" = "viewPortCenter";};
+  #       }
   #     ];
   #   };
   #   "when" = "editorTextFocus";
@@ -602,16 +590,35 @@
   #   "command" = "runCommands";
   #   "args" = {
   #     "commands" = [
-  #       { "command" = "vscode-neovim.send"; "args" = "<C-f>"; }
+  #       # { "command" = "vscode-neovim.send"; "args" = "<C-f>"; }
   #       # { "command" = "vscode-neovim.send"; "args" = "zz"; }
   #       {
   #         "command" = "editorScroll";
   #         "args" = { "to" = "down"; "by" = "page"; };
   #       }
+  #       {
+  #         "command" = "cursorMove";
+  #         # "args" = {"to" = "viewPortBottom";};
+  #         "args" = {"to" = "viewPortCenter";};
+  #       }
   #     ];
   #   };
   #   "when" = "editorTextFocus";
   # }
+  {
+    "key" = "ctrl+shift+u";
+    "command" = "-find-it-faster.findWithinFiles";
+  }
+  {
+    "key" = "ctrl+shift+u";
+    "command" = "-workbench.action.compareEditor.previousChange";
+    "when" = "textCompareEditorVisible";
+  }
+  {
+    "key" = "ctrl+shift+d";
+    "command" = "-workbench.action.compareEditor.nextChange";
+    "when" = "textCompareEditorVisible";
+  }
   {
     "key" = "ctrl+w -";
     "command" = "-workbench.action.decreaseViewHeight";
@@ -1855,18 +1862,8 @@
     "when" = "inKeybindings && inKeybindingsSearch";
   }
   {
-    "key" = "ctrl+shift+d";
-    "command" = "workbench.action.compareEditor.nextChange";
-    "when" = "textCompareEditorVisible";
-  }
-  {
     "key" = "alt+f5";
     "command" = "-workbench.action.compareEditor.nextChange";
-    "when" = "textCompareEditorVisible";
-  }
-  {
-    "key" = "ctrl+shift+u";
-    "command" = "workbench.action.compareEditor.previousChange";
     "when" = "textCompareEditorVisible";
   }
   {
