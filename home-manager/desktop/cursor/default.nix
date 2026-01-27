@@ -1,4 +1,4 @@
-{ hostname, pkgs, ... }: {
+{ hostname, pkgs, pkgs-for-cursor, ... }: {
   imports = [ ../../../modules/cursor-injection ];
   home.file = {
     ".cursor/extensions/custom/custom.js".source = ./custom.js;
@@ -6,6 +6,7 @@
   };
   programs.cursor-injection = {
     enable = true;
+    package = pkgs-for-cursor.code-cursor;
     electron = {
       frame = false;
       titleBarStyle = "hidden";

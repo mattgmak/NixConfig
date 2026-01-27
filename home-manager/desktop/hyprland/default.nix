@@ -54,8 +54,8 @@
       primaryWorkspaces = lib.take 5 allWorkspacesIndex; # ["1" "2" "3" "4" "5"]
       secondaryWorkspaces =
         lib.drop 5 allWorkspacesIndex; # ["6" "7" "8" "9" "10"]
-      cursorLaunchFlags =
-        "--enable-features=UseOzonePlatform --ozone-platform=x11 --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
+      # cursorLaunchFlags =
+      #   "--enable-features=UseOzonePlatform --ozone-platform=x11 --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
       electronLaunchFlags =
         "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
     in {
@@ -132,7 +132,7 @@
         "$mod, B, exec, caelestia shell drawers toggle sidebar"
         # App launch binds
         "SUPER, R, exec, zen"
-        "SUPER, E, exec, cursor ${cursorLaunchFlags}"
+        "SUPER, E, exec, cursor"
         "SUPER, W, exec, ghostty"
         "SUPER, Z, exec, vesktop ${electronLaunchFlags}"
         # hyprsunset bind

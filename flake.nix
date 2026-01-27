@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-25.05"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
-    nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/master"; };
     nixpkgs-for-osu = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
