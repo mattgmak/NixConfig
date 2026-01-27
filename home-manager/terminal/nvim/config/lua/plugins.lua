@@ -75,6 +75,21 @@ require('lazy').setup({
           input = vim.fn.mode(true):match('o') and '' or 'v',
         })
       end)
+
+      require('leap').opts.preview = function(ch0, ch1, ch2)
+        return not (ch1:match('%s') or (ch0:match('%a') and ch1:match('%a') and ch2:match('%a')))
+      end
+
+      -- `on_beacons` hooks into `beacons.light_up_beacons`, the function
+      -- responsible for displaying stuff.
+      require('leap').opts.on_beacons = function(targets, _, _)
+        for _, t in ipairs(targets) do
+          -- Overwrite the `offset` value in all beacons.
+          -- target.beacon looks like: { <offset>, <extmark_opts> }
+          if t.label and t.beacon then t.beacon[1] = 0 end
+        end
+      end
+
       vim.api.nvim_set_hl(0, 'LeapBackdrop', { link = 'Comment' })
     end,
   },
@@ -101,6 +116,7 @@ require('lazy').setup({
         'markdown',
         'markdown_inline',
         'zig',
+        'nix',
       }):wait(300000)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = { '<filetype>' },

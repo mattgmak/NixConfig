@@ -91,7 +91,7 @@
           "biomejs.biome"
           "pflannery.vscode-versionlens"
           "Benxlabs.storm-search"
-          "TypeScriptTeam.native-preview"
+          # "TypeScriptTeam.native-preview"
           "willasm.obsidian-md-vsc"
           "mads-hartmann.bash-ide-vscode"
           "disaac.zlint-vscode"
