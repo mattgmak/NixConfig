@@ -38,7 +38,6 @@
   environment.systemPackages = with pkgs;
     [
       git
-      neovim
       yazi
       fzf
       zoxide
