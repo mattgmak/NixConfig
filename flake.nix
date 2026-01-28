@@ -1,7 +1,8 @@
 {
   description = "NixOS config flake";
-
   inputs = {
+    import-tree.url = "github:vic/import-tree";
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs-stable = { url = "github:nixos/nixpkgs?ref=nixos-25.05"; };
     nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
     nixpkgs-for-cursor = { url = "github:nixos/nixpkgs/master"; };
@@ -72,74 +73,6 @@
     ghostty = { url = "github:ghostty-org/ghostty"; };
   };
 
-  outputs = { nixpkgs, nixpkgs-stable, nixpkgs-for-cursor, nixpkgs-for-osu
-    , nix-darwin, ... }@inputs:
-    let
-      username = "goofy";
-      system = "x86_64-linux";
-      pkgs-stable = import nixpkgs-stable {
-        inherit system;
-        config.allowUnfree = true;
-      };
-      pkgs-for-cursor = import nixpkgs-for-cursor {
-        inherit system;
-        config.allowUnfree = true;
-      };
-      pkgs-for-cursor-darwin = import nixpkgs-for-cursor {
-        system = "aarch64-darwin";
-        config.allowUnfree = true;
-      };
-      pkgs-for-osu = import nixpkgs-for-osu {
-        inherit system;
-        config.allowUnfree = true;
-      };
-      laptopName = "GoofyEnvy";
-      wslName = "GoofyWSL";
-      vmName = "GoofyVM";
-      macMiniName = "MacMini";
-      desktopName = "GoofyDesky";
-    in {
-      nixosConfigurations.${laptopName} = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs username pkgs-stable pkgs-for-cursor system;
-          hostname = laptopName;
-        };
-        modules = [ ./hosts/${laptopName} ];
-      };
-      nixosConfigurations.${wslName} = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs username pkgs-stable pkgs-for-cursor system;
-          hostname = wslName;
-        };
-        modules = [ ./hosts/${wslName} ];
-      };
-      nixosConfigurations.${vmName} = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs username pkgs-stable pkgs-for-cursor system;
-          hostname = vmName;
-        };
-        modules = [ ./hosts/${vmName} ];
-      };
-      darwinConfigurations.${macMiniName} = nix-darwin.lib.darwinSystem {
-        specialArgs = {
-          inherit inputs pkgs-stable;
-          pkgs-for-cursor = pkgs-for-cursor-darwin;
-          username = "mattgmak";
-          hostname = macMiniName;
-        };
-        modules = [ ./hosts/${macMiniName} ];
-      };
-      nixosConfigurations.${desktopName} = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit inputs username pkgs-stable pkgs-for-cursor pkgs-for-osu
-            system;
-          hostname = desktopName;
-        };
-        modules = [ ./hosts/${desktopName} ];
-      };
-    };
+  outputs = { import-tree, flake-parts, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./dendritic);
 }
