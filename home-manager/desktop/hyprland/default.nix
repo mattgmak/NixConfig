@@ -294,8 +294,8 @@
         "${primaryWorkspacesMatcher}, match:title (btop), float on, size 1600 900, center on, stay_focused on, pin on"
         "${matchPip}, pin on, float on"
         "${matchFloatingTerminal}, float on, pin on, center on, stay_focused on, size 1200 800"
-        "match:class (Cursor|zen.*), focus_on_activate on"
-        "match:class (Cursor), match:float true, center on"
+        "match:class ([Cc]ursor|zen.*), focus_on_activate on"
+        "match:class ([Cc]ursor), match:float true, center on"
       ] ++ (if hostname == "GoofyDesky" then [
         "${matchPip}, monitor ${deskyMonitors.secondary}, no_initial_focus on, center on, size 986 555"
         "match:class (org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*), workspace name:Game"
