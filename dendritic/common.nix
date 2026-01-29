@@ -15,9 +15,10 @@
           inherit inputs hostname username pkgs-for-cursor pkgs-stable;
         };
         backupFileExtension = "hm-backup-1";
-        users."${username}" = import ../home-manager/home.nix {
-          inherit hostname username pkgs inputs lib;
-        };
+        users.${username} = self.homeConfigurations.main;
+        # users."${username}" = import ../home-manager/home.nix {
+        #   inherit hostname username pkgs inputs lib;
+        # };
       };
 
       nix = {
