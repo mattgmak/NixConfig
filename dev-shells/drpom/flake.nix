@@ -1,7 +1,7 @@
 {
   description = "DrPOM dev shell";
   inputs = {
-    nixpkgs = { url = "github:nixos/nixpkgs/nixos-unstable"; };
+    nixpkgs = { url = "github:nixos/nixpkgs/master"; };
     biome-pin = { url = "github:nixos/nixpkgs/nixos-unstable"; };
   };
 
@@ -28,7 +28,7 @@
           default = pkgs.mkShell {
             packages = with pkgs;
               [
-                nodejs_20
+                nodejs_24
                 browser
                 deno
                 pnpm
@@ -36,7 +36,7 @@
                 kotlin
                 kotlin-language-server
                 biome-pin-pkgs.biome
-              ] ++ (with pkgs.nodePackages; [ firebase-tools eas-cli vercel ])
+              ] ++ (with pkgs.nodePackages; [ eas-cli vercel ])
               ++ (if pkgs.stdenv.isLinux then [
                 android-studio
                 androidenv.androidPkgs.platform-tools

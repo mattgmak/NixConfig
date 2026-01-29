@@ -87,9 +87,13 @@
   "javascript.updateImportsOnFileMove.enabled" = "always";
   "[typescriptreact]" = {
     "editor.defaultFormatter" = "esbenp.prettier-vscode";
+    "editor.inlayHints.enabled" = "off";
   };
   "git.openRepositoryInParentFolders" = "never";
-  "[typescript]" = { "editor.defaultFormatter" = "esbenp.prettier-vscode"; };
+  "[typescript]" = {
+    "editor.defaultFormatter" = "esbenp.prettier-vscode";
+    "editor.inlayHints.enabled" = "off";
+  };
   "task.problemMatchers.neverPrompt" = { "shell" = true; };
   "gitlens.advanced.messages" = { "suppressCreatePullRequestPrompt" = true; };
   "typescript.suggest.paths" = false;

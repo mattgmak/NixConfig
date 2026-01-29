@@ -6,7 +6,7 @@ in {
       system = "aarch64-darwin";
       inherit inputs hostname;
       inherit (self.legacyPackages.${system}) pkgs-stable pkgs-for-cursor;
-      inherit (self.constants) username;
+      username = "mattgmak";
     };
     modules = [ self.darwinModules.${hostname} self.nixpkgsConfig ];
   };
