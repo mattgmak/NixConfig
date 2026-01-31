@@ -9,11 +9,7 @@
         inherit system;
         config.allowUnfree = true;
       };
-      pkgs-for-osu = import inputs.nixpkgs-for-osu {
-        inherit system;
-        config.allowUnfree = true;
-      };
-    in { inherit pkgs-stable pkgs-for-cursor pkgs-for-osu; };
+    in { inherit pkgs-stable pkgs-for-cursor; };
   };
   flake.nixpkgsConfig = { config, ... }: {
     nixpkgs.pkgs =

@@ -1,42 +1,40 @@
 { inputs, self, withSystem, ... }: {
   flake = {
-    nixosConfigurations.GoofyDesky = withSystem "x86_64-linux"
+    nixosConfigurations.GoofyEnvy = withSystem "x86_64-linux"
       ({ config, inputs', ... }:
         inputs.nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs inputs';
-            inherit (config) packages;
             inherit (self.constants) username;
             inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
-            hostname = self.constants.desktopName;
+            inherit (config) packages;
+            hostname = self.constants.laptopName;
           };
           modules = [
             self.nixosModules.common
-            self.nixosModules.GoofyDesky
-            self.nixosModules.GoofyDeskyHardware
-            self.nixosModules.orca-slicer
+            self.nixosModules.GoofyEnvy
+            self.nixosModules.GoofyEnvyHardware
             self.nixosModules.steam
           ];
         });
 
-    homeConfigurations.GoofyDesky = {
+    homeConfigurations.GoofyEnvy = {
       imports = [ self.homeModules.main self.homeModules.zen-browser-legacy ];
     };
 
-    nixosModules.GoofyDesky = { pkgs, pkgs-stable, username, packages, ... }: {
-      imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
-
-      home-manager.users.${username} = self.homeConfigurations.GoofyDesky;
-
-      programs.appimage = {
-        enable = true;
-        binfmt = true;
-      };
+    nixosModules.GoofyEnvy = { pkgs, username, pkgs-stable, ... }: {
+      # Bootloader
+      imports = [
+        ../../modules/input-remapper.nix
+        inputs.xremap-flake.nixosModules.default
+      ];
 
       environment.systemPackages = with pkgs; [
         bitwarden-desktop
+        wezterm
         libnotify
         obsidian
+        pkgs-stable.vesktop
         protonvpn-gui
         wl-clipboard
         clipse
@@ -62,51 +60,31 @@
         via
         vial
         kbd
-        pkgs-stable.vesktop
-        prismlauncher
-        hyperhdr
-        google-chrome
-        onedrivegui
-        android-tools
-        kdePackages.wacomtablet
-        packages.osu-lazer-bin
+        zoom-us
       ];
 
       boot = {
         loader = {
-          grub = {
-            enable = true;
-            devices = [ "nodev" ];
-            efiSupport = true;
-            useOSProber = true;
-          };
+          systemd-boot.enable = true;
           efi.canTouchEfiVariables = true;
         };
         supportedFilesystems = [ "ntfs" ];
       };
 
-      fileSystems."/mnt/windows/c" = {
-        # device = "/dev/nvme1n1p4";
-        device = "/dev/disk/by-uuid/FC880B87880B401E";
-        fsType = "ntfs";
-        options = [ "defaults" "nofail" ];
-      };
-
-      fileSystems."/mnt/windows/d" = {
-        # device = "/dev/sdb2";
-        device = "/dev/disk/by-uuid/F6025F5D025F21C3";
-        fsType = "ntfs";
-        options = [ "defaults" "nofail" ];
-      };
-
-      systemd.services.hyperhdr = {
-        enable = true;
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          User = "goofy";
-          Group = "dialout";
-          ExecStart = "${pkgs.hyperhdr}/bin/hyperhdr";
-        };
+      services.xremap = {
+        userName = username;
+        withHypr = true;
+        # Map CapsLock to Escape
+        yamlConfig = ''
+          modmap:
+            - name: "CapsLock"
+              remap:
+                CapsLock: esc
+          keymap:
+            - name: "Super-u"
+              remap:
+                Super-u: NumLock
+        '';
       };
 
       services.udev = {
@@ -116,32 +94,35 @@
           qmk_hid
           via
           vial
-          (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
         ]; # packages
       }; # udev
 
-      services.xserver.wacom.enable = true;
-
-      services.xserver.videoDrivers = [ "nvidia" ];
-      hardware = {
-        graphics = {
-          enable = true;
-          extraPackages = with pkgs; [
-            nvidia-vaapi-driver
-            libva-vdpau-driver
-            libvdpau
-            libvdpau-va-gl
-            vdpauinfo
-            libva
-            libva-utils
-          ];
-        };
-        nvidia = {
-          open = true;
-          powerManagement.enable = true;
-          modesetting.enable = true;
-        };
+      # Enable CUPS to print documents.
+      services.printing = {
+        enable = true;
+        drivers = with pkgs; [
+          gutenprint
+          hplip
+          splix
+          cups-kyocera
+          foomatic-db
+          foomatic-db-engine
+          foomatic-db-ppds
+          cups-filters
+        ];
+        # Enable browsing of printers that are shared on the network
+        browsing = true;
+        allowFrom = [ "all" ];
+        listenAddresses = [ "*:631" ];
+        defaultShared = true;
       };
+      services.avahi = {
+        enable = true;
+        nssmdns4 = true;
+        openFirewall = true;
+      };
+
+      hardware.graphics.enable = true;
       hardware.bluetooth = {
         enable = true;
         powerOnBoot = true;
@@ -154,37 +135,38 @@
         size = 16 * 1024;
       }];
 
-      services.ollama = {
+      programs.steam = {
         enable = true;
-        package = pkgs.ollama-cuda;
-        loadModels = [ "deepseek-r1:8b" ];
+        remotePlay.openFirewall = true;
+        dedicatedServer.openFirewall = true;
+        localNetworkGameTransfers.openFirewall = true;
+        extraCompatPackages = with pkgs; [ proton-ge-bin ];
       };
 
       system.stateVersion = "24.11";
-
     };
 
     # Do not modify this module!  It was generated by ‘nixos-generate-config’
     # and may be overwritten by future invocations.  Please make changes
     # to /etc/nixos/configuration.nix instead.
-    nixosModules.GoofyDeskyHardware = { config, lib, modulesPath, ... }: {
+    nixosModules.GoofyEnvyHardware = { config, lib, modulesPath, ... }: {
       imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
       boot.initrd.availableKernelModules =
-        [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
+        [ "nvme" "xhci_pci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
       boot.initrd.kernelModules = [ ];
-      boot.kernelModules = [ "kvm-intel" ];
+      boot.kernelModules = [ "kvm-amd" ];
       boot.extraModulePackages = [ ];
 
       fileSystems."/" = {
-        device = "/dev/disk/by-uuid/b75e7142-2009-46cb-84f6-99cfb2b14191";
+        device = "/dev/disk/by-uuid/20cc20dd-3f6d-493c-bf10-ea258033d04d";
         fsType = "ext4";
       };
 
       fileSystems."/boot" = {
-        device = "/dev/disk/by-uuid/867A-3EC6";
+        device = "/dev/disk/by-uuid/CB08-1C0D";
         fsType = "vfat";
-        options = [ "fmask=0077" "dmask=0077" ];
+        options = [ "fmask=0022" "dmask=0022" ];
       };
 
       swapDevices = [ ];
@@ -194,11 +176,10 @@
       # still possible to use this option, but it's recommended to use it in conjunction
       # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
       networking.useDHCP = lib.mkDefault true;
-      # networking.interfaces.enp5s0.useDHCP = lib.mkDefault true;
       # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
 
       nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-      hardware.cpu.intel.updateMicrocode =
+      hardware.cpu.amd.updateMicrocode =
         lib.mkDefault config.hardware.enableRedistributableFirmware;
     };
 

@@ -30,11 +30,7 @@
         # ./desktop/sherlock
         ../home-manager/terminal/wiremix
         ../home-manager/desktop/caelestia
-      ] else if hostname == "GoofyWSL" then
-        [
-
-        ]
-      else
+      ] else
         [ ]);
       home = {
         username = username;
