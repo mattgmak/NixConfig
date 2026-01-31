@@ -16,6 +16,7 @@
             self.nixosModules.GoofyDeskyHardware
             self.nixosModules.orca-slicer
             self.nixosModules.steam
+            self.nixosModules.vr
           ];
         });
 

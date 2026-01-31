@@ -285,3 +285,8 @@
 .split-view-container>.split-view-view:not(:first-child):before {
   background-color: transparent !important;
 }
+
+.monaco-workbench .part.editor>.content .editor-group-container>.title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item:before {
+  height: auto !important;
+  padding: 0 4px !important;
+}
