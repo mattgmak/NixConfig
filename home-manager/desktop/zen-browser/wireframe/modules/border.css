@@ -1,0 +1,258 @@
+/* === BORDER === */
+
+/* === OUTER BROWSER BORDER FIX === */
+/* Force zero border-radius on all possible browser container elements */
+:root,
+#main-window,
+#navigator-toolbox,
+#titlebar,
+#TabsToolbar,
+.browserContainer,
+#appcontent,
+#browser,
+.browserSidebarContainer,
+#zen-tabbox-wrapper,
+#zen-appcontent-wrapper,
+body,
+body > hbox,
+#zen-main-app {
+  border-radius: 0px;
+ border-radius: 0;
+}
+
+/* Specifically target the outermost window elements */
+window,
+#main-window,
+:root[sizemode="normal"],
+:root[sizemode="maximized"] {
+  border-radius: 0px !important;
+  border-radius: 0 !important;
+}
+
+/* Ensure the main browser area has sharp corners */
+#browser {
+  border-radius: 0px !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  overflow: clip !important;
+  padding: 0px !important;
+}
+
+body > hbox {
+  border-radius: 0px !important;
+  /* background: var(--na-color-bg) !important; */
+}
+
+/* window border on maximize */
+:root[sizemode="maximized"] #browser {
+  border: 2px solid var(--na-color-border) !important;
+}
+
+/* window border on minimize */
+:root[sizemode="normal"] #browser {
+  border: 2px solid var(--na-color-border) !important;
+  border-radius: var(--na-window-border-radius) !important;
+  outline: none !important;
+  outline-offset: 0px !important;
+}
+
+:root[inDOMFullscreen="true"] #browser {
+  border: 0 !important;
+  border-radius: 0px !important;
+  outline: none !important;
+  outline-offset: 0px !important;
+}
+
+/* Ensure all browser elements have squared corners */
+:root #browser,
+:root body * {
+  border-radius: 0;
+}
+
+
+:root[sizemode="normal"] #zen-browser-background {
+  border-radius: var(--na-window-border-radius) !important;
+}
+
+/* window border on spit tabs */
+:root:has(#tabbrowser-tabpanels [zen-split]) .deck-selected {
+  border-radius: 0px !important;
+  border: 2px solid var(--na-color-border) !important;
+}
+
+:root:has(#tabbrowser-tabpanels [zen-split]) .browserSidebarContainer {
+  border-radius: 0px !important;
+}
+
+/* content window border radius */
+.browserSidebarContainer {
+  border-radius: 0px !important;
+}
+
+/* content window border size on RIGHT side tabbar */
+:root[zen-right-side="true"]:not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+  border: 2px solid var(--na-color-border) !important;
+  border-radius: var(--na-border-radius) !important;
+}
+
+/* content window border size on LEFT side tabbar */
+:root:not([zen-right-side="true"]):not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+  border: 2px solid var(--na-color-border) !important;
+  border-radius: var(--na-border-radius) !important;
+}
+
+/* remove content window border on split tabs*/
+:root:has(#tabbrowser-tabpanels [zen-split]) #zen-tabbox-wrapper {
+  border: none !important;
+}
+
+/* content window bottom margin on SINGLE-TOOLBAR mode */
+/* @media (-moz-bool-pref: "zen.view.use-single-toolbar") {
+  :root[zen-sidebar-expanded="true"]:not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+    margin-bottom: var(--na-window-margin) !important;
+  }
+} */
+
+@media (-moz-bool-pref: "zen.view.use-single-toolbar"){
+  @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
+    :root[zen-sidebar-expanded="true"]:not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+      margin-bottom: calc( var(--na-window-margin) - 10px ) !important;
+    }
+  }
+}
+
+/* content window + address bar */
+#zen-appcontent-wrapper {
+  /* background-color: var(--na-color-bg) !important; */
+  border-radius: 0px !important;
+/*   margin: 0px !important; */
+  padding: 0px !important;
+}
+
+/* window */
+#zen-tabbox-wrapper {
+ box-shadow: none !important;
+  /*! background-color: var(--na-color-bg) !important; */
+  overflow: clip !important;
+ padding: 0px !important;
+ border-radius: 0px !important;
+}
+
+/* Apply the user-defined border radius */
+:root[zen-right-side="true"]:not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+  border-radius: var(--na-user-border-radius) !important;
+}
+
+:root:not([zen-right-side="true"]):not([zen-compact-mode="true"]):not([inDOMFullscreen="true"]) #zen-tabbox-wrapper {
+  border-radius: var(--na-user-border-radius) !important;
+}
+
+@media (-moz-bool-pref: "zen.view.use-single-toolbar") {
+  :root:has(#tabbrowser-tabpanels [zen-split])[zen-compact-mode="true"][zen-sidebar-expanded="true"] #zen-tabbox-wrapper {
+    margin: var(--na-window-margin) !important;
+ }
+
+  :root:has(#tabbrowser-tabpanels [zen-split])[zen-compact-mode="true"]:not([zen-sidebar-expanded="true"]) #zen-tabbox-wrapper {
+    margin-inline: var(--na-window-margin) !important;
+    margin-top: var(--na-window-margin) !important;
+    margin-bottom: 0px !important;
+ }
+}
+
+@media (-moz-bool-pref: "zen.view.use-single-toolbar") {
+  :root:has(#tabbrowser-tabpanels [zen-split])[zen-compact-mode="true"] #zen-tabbox-wrapper {
+    margin: var(--na-window-margin) !important;
+  }
+}
+
+:root[zen-compact-mode="true"] #zen-tabbox-wrapper {
+  border-top: 1px solid var(--na-color-border) !important;
+  margin: 0px !important;
+}
+
+@media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
+  :root[zen-compact-mode="true"] #zen-tabbox-wrapper {
+    border-bottom: 1px solid var(--na-color-border) !important;
+    margin: 0px !important;
+  }
+}
+
+/* === Webview Border Radius Pref === */
+@media (-moz-pref("wireframe.webview.border_radius", 0)) {
+  :root {
+    --na-user-border-radius: 0px;
+  }
+}
+
+@media (-moz-pref("wireframe.webview.border_radius", 4)) {
+  :root {
+    --na-user-border-radius: 4px;
+  }
+}
+
+@media (-moz-pref("wireframe.webview.border_radius", 8)) {
+  :root {
+    --na-user-border-radius: 8px;
+  }
+}
+
+@media (-moz-pref("wireframe.webview.border_radius", 12)) {
+  :root {
+    --na-user-border-radius: 12px;
+  }
+}
+
+@media (-moz-pref("wireframe.webview.border_radius", 16)) {
+  :root {
+    --na-user-border-radius: 16px;
+  }
+}
+
+@media (-moz-pref("wireframe.webview.border_radius", 20)) {
+  :root {
+    --na-user-border-radius: 20px;
+  }
+}
+
+/* === Window border radius pref === */
+@media (-moz-pref("wireframe.window.border_radius", 0)) {
+  :root {
+    --na-window-border-radius: 0px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 4)) {
+  :root {
+    --na-window-border-radius: 4px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 8)) {
+  :root {
+    --na-window-border-radius: 8px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 12)) {
+  :root {
+    --na-window-border-radius: 12px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 16)) {
+  :root {
+    --na-window-border-radius: 16px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 20)) {
+  :root {
+    --na-window-border-radius: 20px;
+  }
+}
+
+@media (-moz-pref("wireframe.window.border_radius", 24)) {
+  :root {
+    --na-window-border-radius: 24px;
+  }
+}

@@ -1,0 +1,14 @@
+/* Wireframe Theme for Zen Browser */
+/* Import modular CSS files */
+
+@import url("modules/variables.css");
+@import url("modules/animations.css");
+@import url("modules/panel.css");
+@import url("modules/sidebar.css");
+@import url("modules/bottombar.css");
+@import url("modules/bookmarks.css");
+@import url("modules/border.css");
+@import url("modules/findbar.css");
+@import url("modules/window-controls.css");
+@import url("modules/status-panel.css");
+@import url("modules/font.css");

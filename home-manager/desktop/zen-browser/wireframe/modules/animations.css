@@ -1,0 +1,61 @@
+/* === ANIMATION === */
+
+@keyframes urlbar-loading {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+    transform: translateY(15%);
+  }
+}
+
+@keyframes slideUpExpand {
+  from {
+    transform: translateY(25%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpAdressBar {
+  from {
+    transform: translateY(15%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideFromRight {
+  from {
+    transform: translateX(-15%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideFromLeft {
+  from {
+    transform: translateX(15%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}

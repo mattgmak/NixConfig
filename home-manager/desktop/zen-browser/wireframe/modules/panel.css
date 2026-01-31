@@ -1,0 +1,19 @@
+/* === PANEL/POPUP === */
+
+panelview {
+  border-radius: 0px !important;
+  border: 1px solid var(--na-color-border) !important;
+  background-color: var(--na-color-bg) !important;
+  color: var(--na-color-text) !important;
+}
+
+panelview #unified-extensions-area {
+  padding-block: 10px !important;
+}
+
+/* hide extension panel header */
+/* #unified-extensions-view box.panel-header,
+#unified-extensions-description,
+#unified-extensions-messages-container {
+  display: none !important;
+} */

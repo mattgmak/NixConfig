@@ -1,0 +1,23 @@
+/* hide bottom left status bar when link is hovered*/
+#statuspanel {
+  padding: 10px !important;
+}
+
+#statuspanel>label {
+  padding: 8px !important;
+  border: 1px solid var(--na-color-border) !important;
+  border-radius: var(--na-user-border-radius) !important;
+  background: var(--zen-primary-color) !important;
+  color: var(--zen-primary-text) !important;
+}
+
+.browser-toolbar {
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+@media (-moz-pref("wireframe.statusbar.disable")){
+  #statuspanel {
+    display: none !important;
+  }
+}
