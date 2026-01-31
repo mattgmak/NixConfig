@@ -70,7 +70,10 @@
     nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
 
     # ghostty = { url = "github:ghostty-org/ghostty?ref=v1.1.3"; };
-    ghostty = { url = "github:ghostty-org/ghostty"; };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs = { import-tree, flake-parts, ... }@inputs:

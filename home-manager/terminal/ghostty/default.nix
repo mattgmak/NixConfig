@@ -10,8 +10,8 @@
     else
       pkgs.emptyDirectory;
     settings = {
-      font-size = if pkgs.stdenv.isLinux then 14 else 20;
-      font-family = "IosevkaTerm Nerd Font";
+      font-size = 14;
+      font-family = [ "IosevkaTerm Nerd Font" "Noto Color Emoji" ];
       quick-terminal-position = "center";
       command = lib.getExe pkgs.nushell;
       custom-shader = "shaders/cursor-smear.glsl";
@@ -93,4 +93,6 @@
       ];
     };
   };
+
+  stylix.targets.ghostty.fonts.enable = false;
 }
