@@ -19,7 +19,6 @@
         ../home-manager/terminal/bluetui
         ../home-manager/desktop/hyprland
         ../home-manager/desktop/waybar
-        ../home-manager/desktop/zen-browser
         ../home-manager/desktop/wlogout
         # ./desktop/rofi
         # ./desktop/mako
