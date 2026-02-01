@@ -1,6 +1,6 @@
 {
-  programs = {
-    direnv = {
+  flake.homeModules.direnv = {
+    programs.direnv = {
       enable = true;
       enableNushellIntegration = true;
       enableBashIntegration = true;

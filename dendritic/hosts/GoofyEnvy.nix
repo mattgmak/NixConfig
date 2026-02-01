@@ -29,6 +29,8 @@
         inputs.xremap-flake.nixosModules.default
       ];
 
+      home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
+
       environment.systemPackages = with pkgs; [
         bitwarden-desktop
         wezterm
@@ -68,7 +70,6 @@
           systemd-boot.enable = true;
           efi.canTouchEfiVariables = true;
         };
-        supportedFilesystems = [ "ntfs" ];
       };
 
       services.xremap = {
@@ -80,6 +81,9 @@
             - name: "CapsLock"
               remap:
                 CapsLock: esc
+            - name: "RightAlt to Backspace"
+              remap:
+                KEY_RIGHTALT: KEY_BACKSPACE
           keymap:
             - name: "Super-u"
               remap:
@@ -134,14 +138,6 @@
         device = "/swapfile";
         size = 16 * 1024;
       }];
-
-      programs.steam = {
-        enable = true;
-        remotePlay.openFirewall = true;
-        dedicatedServer.openFirewall = true;
-        localNetworkGameTransfers.openFirewall = true;
-        extraCompatPackages = with pkgs; [ proton-ge-bin ];
-      };
 
       system.stateVersion = "24.11";
     };

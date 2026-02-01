@@ -11,6 +11,8 @@ in {
     modules = [ self.darwinModules.${hostname} self.nixpkgsConfig ];
   };
 
+  flake.homeConfigurations.MacMini = { imports = [ self.homeModules.main ]; };
+
   flake.darwinModules.${hostname} =
     { pkgs, hostname, username, pkgs-for-cursor, ... }: {
       nixpkgs.hostPlatform = "aarch64-darwin";
@@ -37,9 +39,7 @@ in {
           inherit inputs hostname username pkgs-for-cursor;
         };
         backupFileExtension = "hm-backup";
-        users.${username} = import ../../home-manager/home.nix {
-          inherit hostname username pkgs;
-        };
+        users.${username} = self.homeConfigurations.MacMini;
       };
 
       environment.variables = {

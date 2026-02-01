@@ -1,18 +1,16 @@
 { inputs, self, ... }: {
   imports = [ inputs.home-manager.flakeModules.home-manager ];
   flake = {
-    homeConfigurations.main = { imports = [ self.homeModules.main ]; };
-
     homeModules.main = { hostname, username, pkgs, ... }: {
       imports = [
-        ../home-manager/terminal/nushell
+        self.homeModules.nushell
         ../home-manager/terminal/wezterm
         ../home-manager/terminal/nvim
-        ../home-manager/terminal/starship
+        self.homeModules.starship
         ../home-manager/terminal/yazi
-        ../home-manager/terminal/git
-        ../home-manager/terminal/direnv
-        ../home-manager/terminal/lazygit
+        self.homeModules.git
+        self.homeModules.direnv
+        self.homeModules.lazygit
         ../home-manager/terminal/ghostty
         ../home-manager/desktop/cursor
       ] ++ (if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then [
@@ -26,7 +24,7 @@
         ../home-manager/terminal/clipse
         ../home-manager/desktop/mpv
         ../home-manager/desktop/kdeconnect
-        ../home-manager/terminal/filepicker
+        self.homeModules.filepicker
         # ./desktop/sherlock
         ../home-manager/terminal/wiremix
         ../home-manager/desktop/caelestia
