@@ -152,7 +152,7 @@ require('lazy').setup({
             {
               '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
               '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
-              '%s+()()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
+              '()%s+()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
               '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
             },
           },

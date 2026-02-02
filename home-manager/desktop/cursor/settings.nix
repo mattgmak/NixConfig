@@ -1,4 +1,4 @@
-{ hostname, pkgs }: {
+{ pkgs, ... }: {
   "editor.suggestSelection" = "first";
   "terminal.integrated.useWslProfiles" = true;
   "eslint.workingDirectories" = [{ "mode" = "auto"; }];
@@ -111,7 +111,10 @@
   "editor.bracketPairColorization.enabled" = true;
   "window.zoomLevel" = 1;
   "redhat.telemetry.enabled" = true;
-  "files.associations" = { "*.rmd" = "markdown"; };
+  "files.associations" = {
+    "*.rmd" = "markdown";
+    "*.css" = "tailwindcss";
+  };
   "editor.inlineSuggest.suppressSuggestions" = true;
   "update.mode" = "none";
   "errorLens.enabledDiagnosticLevels" = [ "error" "info" "warning" ];
