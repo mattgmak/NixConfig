@@ -57,7 +57,7 @@ in {
           zoxide
           starship
           ripgrep
-          nixfmt-classic
+          nixfmt
           atuin
           nixd
           nh

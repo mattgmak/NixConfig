@@ -170,7 +170,7 @@
           ripgrep
           zip
           unzip
-          nixfmt-classic
+          nixfmt
           atuin
           nixd
           kitty
