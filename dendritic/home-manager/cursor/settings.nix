@@ -462,5 +462,6 @@
       "find-it-faster.findInActiveFile.fuzzRipgrepQuery" = true;
       "terminal.integrated.tabs.enabled" = false;
       "githubPullRequests.commentExpandState" = "collapseAll";
+      "typescript.native-preview.goMemLimit" = "2GiB";
     };
 }

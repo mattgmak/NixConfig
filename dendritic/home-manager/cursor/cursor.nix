@@ -114,6 +114,7 @@
                 "golang.Go"
                 # "TomRijndorp.find-it-faster"
                 "pflannery.vscode-versionlens"
+                "expo.vscode-expo-tools"
               ]
               ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion [ "mattgmak.find-it-faster" ];
           };
