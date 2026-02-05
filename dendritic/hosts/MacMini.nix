@@ -1,6 +1,8 @@
 { inputs, self, ... }:
-let hostname = self.constants.macMiniName;
-in {
+let
+  hostname = self.constants.macMiniName;
+in
+{
   flake.darwinConfigurations.${hostname} = inputs.nix-darwin.lib.darwinSystem {
     specialArgs = rec {
       system = "aarch64-darwin";
@@ -8,16 +10,30 @@ in {
       inherit (self.legacyPackages.${system}) pkgs-stable pkgs-for-cursor;
       username = "mattgmak";
     };
-    modules = [ self.darwinModules.${hostname} self.nixpkgsConfig ];
+    modules = [
+      self.darwinModules.${hostname}
+      self.nixpkgsConfig
+    ];
   };
 
-  flake.homeConfigurations.MacMini = { imports = [ self.homeModules.main ]; };
+  flake.homeConfigurations.MacMini = {
+    imports = [ self.homeModules.main ];
+  };
 
   flake.darwinModules.${hostname} =
-    { pkgs, hostname, username, pkgs-for-cursor, ... }: {
+    {
+      pkgs,
+      hostname,
+      username,
+      pkgs-for-cursor,
+      ...
+    }:
+    {
       nixpkgs.hostPlatform = "aarch64-darwin";
       system.stateVersion = 6;
-      nix = { enable = false; };
+      nix = {
+        enable = false;
+      };
 
       imports = [
         # ./common.nix
@@ -36,7 +52,12 @@ in {
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = {
-          inherit inputs hostname username pkgs-for-cursor;
+          inherit
+            inputs
+            hostname
+            username
+            pkgs-for-cursor
+            ;
         };
         backupFileExtension = "hm-backup";
         users.${username} = self.homeConfigurations.MacMini;
@@ -49,7 +70,8 @@ in {
         SHELL = "${pkgs.nushell}/bin/nu";
       };
 
-      environment.systemPackages = with pkgs;
+      environment.systemPackages =
+        with pkgs;
         [
           git
           yazi
@@ -86,7 +108,13 @@ in {
           bat
           eza
           ollama
-        ] ++ (with pkgs.darwin; [ file_cmds text_cmds developer_cmds ]);
+          stylua
+        ]
+        ++ (with pkgs.darwin; [
+          file_cmds
+          text_cmds
+          developer_cmds
+        ]);
 
       nix-homebrew = {
         enable = true;
@@ -194,7 +222,7 @@ in {
           # alt + shift - right : yabai -m window --swap east
 
           # Window management
-          alt - f : yabai -m window --toggle zoom-fullscreen
+          alt - f : yabai -m window --toggle windowed-fullscreen
           alt - t : yabai -m window --toggle float
           alt - d : yabai -m window --close
           alt - tab : yabai -m space --focus recent
@@ -246,6 +274,7 @@ in {
           alt - x : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Xcode") | .id' | head -1)
           alt - a : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Android Studio") | .id' | head -1)
           alt - s : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Simulator") | .id' | head -1)
+          alt - c : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Google Chrome") | .id' | head -1)
 
           # Balance all windows
           # alt + shift - space : yabai -m space --balance

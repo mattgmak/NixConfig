@@ -115,6 +115,7 @@
                 # "TomRijndorp.find-it-faster"
                 "pflannery.vscode-versionlens"
                 "expo.vscode-expo-tools"
+                "CodeRabbit.coderabbit-vscode"
               ]
               ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion [ "mattgmak.find-it-faster" ];
           };

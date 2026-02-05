@@ -42,6 +42,8 @@
             "editor.selectionHighlightBackground" = "#DAA8F019";
             "editorLineNumber.foreground" = "#954fa3";
             "editorLineNumber.activeForeground" = "#b757ca";
+            "editorBracketMatch.border" = "#23384300";
+            "editorBracketMatch.background" = "#57A7CA5F";
           };
       };
       "explorer.confirmDelete" = false;
@@ -328,7 +330,6 @@
       "editor.guides.indentation" = false;
       "editor.renderWhitespace" = "none";
       "editor.renderLineHighlight" = "none";
-      "editor.matchBrackets" = "never";
       "editor.lightbulb.enabled" = "off";
       "editor.showFoldingControls" = "never";
       "editor.scrollbar.horizontal" = "hidden";
@@ -463,5 +464,6 @@
       "terminal.integrated.tabs.enabled" = false;
       "githubPullRequests.commentExpandState" = "collapseAll";
       "typescript.native-preview.goMemLimit" = "2GiB";
+      "editor.guides.highlightActiveBracketPair" = true;
     };
 }
