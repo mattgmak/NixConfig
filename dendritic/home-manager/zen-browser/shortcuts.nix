@@ -246,19 +246,6 @@
       disabled = false;
     }
     {
-      id = null;
-      key = "";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
       id = "key_fullZoomReset";
       key = "0";
       keycode = null;
@@ -272,60 +259,8 @@
       disabled = false;
     }
     {
-      id = null;
-      key = "";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      key = "=";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
       id = "key_fullZoomEnlarge";
       key = "+";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      key = "";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      key = "_";
       keycode = null;
       modifiers = {
         control = false;
@@ -441,30 +376,6 @@
       disabled = false;
     }
     {
-      id = null;
-      keycode = "VK_F3";
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = true;
-        meta = false;
-        accel = false;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      keycode = "VK_F3";
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = false;
-      };
-      disabled = false;
-    }
-    {
       id = "key_findPrevious";
       key = "g";
       keycode = null;
@@ -568,19 +479,6 @@
       disabled = false;
     }
     {
-      id = null;
-      key = "}";
-      keycode = null;
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = true;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
       id = "key_togglePictureInPicture";
       key = "k";
       keycode = "";
@@ -630,18 +528,6 @@
       disabled = false;
     }
     {
-      id = null;
-      keycode = "VK_F5";
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = true;
-      };
-      disabled = false;
-    }
-    {
       id = "showAllHistoryKb";
       key = "h";
       keycode = null;
@@ -651,18 +537,6 @@
         shift = true;
         meta = false;
         accel = true;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      keycode = "VK_F5";
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = false;
-        meta = false;
-        accel = false;
       };
       disabled = false;
     }
@@ -696,30 +570,6 @@
       modifiers = {
         control = false;
         alt = true;
-        shift = false;
-        meta = false;
-        accel = false;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      keycode = "VK_BACK";
-      modifiers = {
-        control = false;
-        alt = false;
-        shift = true;
-        meta = false;
-        accel = false;
-      };
-      disabled = false;
-    }
-    {
-      id = null;
-      keycode = "VK_BACK";
-      modifiers = {
-        control = false;
-        alt = false;
         shift = false;
         meta = false;
         accel = false;

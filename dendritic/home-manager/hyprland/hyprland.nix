@@ -145,7 +145,7 @@
               "$mod, N, global, caelestia:clearNotifs"
               "$mod, B, exec, caelestia shell drawers toggle sidebar"
               # App launch binds
-              "SUPER, R, exec, zen"
+              "SUPER, R, exec, zen-beta"
               "SUPER, E, exec, cursor"
               "SUPER, W, exec, ghostty"
               "SUPER, Z, exec, vesktop ${electronLaunchFlags}"

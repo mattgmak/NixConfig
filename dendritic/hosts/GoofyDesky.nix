@@ -1,207 +1,252 @@
-{ inputs, self, withSystem, ... }: {
+{
+  inputs,
+  self,
+  withSystem,
+  ...
+}:
+{
   flake = {
-    nixosConfigurations.GoofyDesky = withSystem "x86_64-linux"
-      ({ config, inputs', ... }:
-        inputs.nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs inputs';
-            inherit (config) packages;
-            inherit (self.constants) username;
-            inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
-            hostname = self.constants.desktopName;
-          };
-          modules = [
-            self.nixosModules.common
-            self.nixosModules.GoofyDesky
-            self.nixosModules.GoofyDeskyHardware
-            self.nixosModules.orca-slicer
-            self.nixosModules.steam
-            self.nixosModules.vr
-          ];
-        });
+    nixosConfigurations.GoofyDesky = withSystem "x86_64-linux" (
+      { config, inputs', ... }:
+      inputs.nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs inputs';
+          inherit (config) packages;
+          inherit (self.constants) username;
+          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
+          hostname = self.constants.desktopName;
+        };
+        modules = [
+          self.nixosModules.common
+          self.nixosModules.GoofyDesky
+          self.nixosModules.GoofyDeskyHardware
+          self.nixosModules.orca-slicer
+          self.nixosModules.steam
+          self.nixosModules.vr
+        ];
+      }
+    );
 
     homeConfigurations.GoofyDesky = {
-      imports = [ self.homeModules.main self.homeModules.zen-browser-legacy ];
+      imports = [
+        self.homeModules.main
+        self.homeModules.zen-browser
+      ];
     };
 
-    nixosModules.GoofyDesky = { pkgs, pkgs-stable, username, packages, ... }: {
-      imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
+    nixosModules.GoofyDesky =
+      {
+        pkgs,
+        pkgs-stable,
+        username,
+        packages,
+        ...
+      }:
+      {
+        imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
 
-      home-manager.users.${username} = self.homeConfigurations.GoofyDesky;
+        home-manager.users.${username} = self.homeConfigurations.GoofyDesky;
 
-      programs.appimage = {
-        enable = true;
-        binfmt = true;
-      };
-
-      environment.systemPackages = with pkgs; [
-        bitwarden-desktop
-        libnotify
-        obsidian
-        protonvpn-gui
-        wl-clipboard
-        clipse
-        pulseaudio-ctl
-        brightnessctl
-        playerctl
-        bluetui
-        networkmanagerapplet
-        overskride
-        wev
-        evtest
-        btop
-        chromium
-        xorg.xeyes
-        kdePackages.okular
-        mpv
-        qbittorrent
-        gparted
-        appflowy
-        qmk
-        qmk-udev-rules
-        qmk_hid
-        via
-        vial
-        kbd
-        pkgs-stable.vesktop
-        prismlauncher
-        hyperhdr
-        google-chrome
-        onedrivegui
-        android-tools
-        kdePackages.wacomtablet
-        packages.osu-lazer-bin
-      ];
-
-      boot = {
-        loader = {
-          grub = {
-            enable = true;
-            devices = [ "nodev" ];
-            efiSupport = true;
-            useOSProber = true;
-          };
-          efi.canTouchEfiVariables = true;
+        programs.appimage = {
+          enable = true;
+          binfmt = true;
         };
-        supportedFilesystems = [ "ntfs" ];
-      };
 
-      fileSystems."/mnt/windows/c" = {
-        # device = "/dev/nvme1n1p4";
-        device = "/dev/disk/by-uuid/FC880B87880B401E";
-        fsType = "ntfs";
-        options = [ "defaults" "nofail" ];
-      };
-
-      fileSystems."/mnt/windows/d" = {
-        # device = "/dev/sdb2";
-        device = "/dev/disk/by-uuid/F6025F5D025F21C3";
-        fsType = "ntfs";
-        options = [ "defaults" "nofail" ];
-      };
-
-      systemd.services.hyperhdr = {
-        enable = true;
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          User = "goofy";
-          Group = "dialout";
-          ExecStart = "${pkgs.hyperhdr}/bin/hyperhdr";
-        };
-      };
-
-      services.udev = {
-        packages = with pkgs; [
+        environment.systemPackages = with pkgs; [
+          bitwarden-desktop
+          libnotify
+          obsidian
+          protonvpn-gui
+          wl-clipboard
+          clipse
+          pulseaudio-ctl
+          brightnessctl
+          playerctl
+          bluetui
+          networkmanagerapplet
+          overskride
+          wev
+          evtest
+          btop
+          chromium
+          xorg.xeyes
+          kdePackages.okular
+          mpv
+          qbittorrent
+          gparted
+          appflowy
           qmk
-          qmk-udev-rules # the only relevant
+          qmk-udev-rules
           qmk_hid
           via
           vial
-          (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
-        ]; # packages
-      }; # udev
+          kbd
+          pkgs-stable.vesktop
+          prismlauncher
+          hyperhdr
+          google-chrome
+          onedrivegui
+          android-tools
+          kdePackages.wacomtablet
+          packages.osu-lazer-bin
+        ];
 
-      services.xserver.wacom.enable = true;
+        boot = {
+          loader = {
+            grub = {
+              enable = true;
+              devices = [ "nodev" ];
+              efiSupport = true;
+              useOSProber = true;
+            };
+            efi.canTouchEfiVariables = true;
+          };
+          supportedFilesystems = [ "ntfs" ];
+        };
 
-      services.xserver.videoDrivers = [ "nvidia" ];
-      hardware = {
-        graphics = {
-          enable = true;
-          extraPackages = with pkgs; [
-            nvidia-vaapi-driver
-            libva-vdpau-driver
-            libvdpau
-            libvdpau-va-gl
-            vdpauinfo
-            libva
-            libva-utils
+        fileSystems."/mnt/windows/c" = {
+          # device = "/dev/nvme1n1p4";
+          device = "/dev/disk/by-uuid/FC880B87880B401E";
+          fsType = "ntfs";
+          options = [
+            "defaults"
+            "nofail"
           ];
         };
-        nvidia = {
-          open = true;
-          powerManagement.enable = true;
-          modesetting.enable = true;
+
+        fileSystems."/mnt/windows/d" = {
+          # device = "/dev/sdb2";
+          device = "/dev/disk/by-uuid/F6025F5D025F21C3";
+          fsType = "ntfs";
+          options = [
+            "defaults"
+            "nofail"
+          ];
         };
+
+        systemd.services.hyperhdr = {
+          enable = true;
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            User = "goofy";
+            Group = "dialout";
+            ExecStart = "${pkgs.hyperhdr}/bin/hyperhdr";
+          };
+        };
+
+        services.udev = {
+          packages = with pkgs; [
+            qmk
+            qmk-udev-rules # the only relevant
+            qmk_hid
+            via
+            vial
+            (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
+          ]; # packages
+        }; # udev
+
+        services.xserver.wacom.enable = true;
+
+        services.xserver.videoDrivers = [ "nvidia" ];
+        hardware = {
+          graphics = {
+            enable = true;
+            extraPackages = with pkgs; [
+              nvidia-vaapi-driver
+              libva-vdpau-driver
+              libvdpau
+              libvdpau-va-gl
+              vdpauinfo
+              libva
+              libva-utils
+            ];
+          };
+          nvidia = {
+            open = true;
+            powerManagement.enable = true;
+            modesetting.enable = true;
+          };
+        };
+        hardware.bluetooth = {
+          enable = true;
+          powerOnBoot = true;
+          settings = {
+            General = {
+              Enable = "Source,Sink,Media,Socket";
+            };
+          };
+        };
+        services.blueman.enable = true;
+
+        swapDevices = [
+          {
+            device = "/swapfile";
+            size = 16 * 1024;
+          }
+        ];
+
+        services.ollama = {
+          enable = true;
+          package = pkgs.ollama-cuda;
+          loadModels = [ "deepseek-r1:8b" ];
+        };
+
+        system.stateVersion = "24.11";
+
       };
-      hardware.bluetooth = {
-        enable = true;
-        powerOnBoot = true;
-        settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
-      };
-      services.blueman.enable = true;
-
-      swapDevices = [{
-        device = "/swapfile";
-        size = 16 * 1024;
-      }];
-
-      services.ollama = {
-        enable = true;
-        package = pkgs.ollama-cuda;
-        loadModels = [ "deepseek-r1:8b" ];
-      };
-
-      system.stateVersion = "24.11";
-
-    };
 
     # Do not modify this module!  It was generated by ‘nixos-generate-config’
     # and may be overwritten by future invocations.  Please make changes
     # to /etc/nixos/configuration.nix instead.
-    nixosModules.GoofyDeskyHardware = { config, lib, modulesPath, ... }: {
-      imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+    nixosModules.GoofyDeskyHardware =
+      {
+        config,
+        lib,
+        modulesPath,
+        ...
+      }:
+      {
+        imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-      boot.initrd.availableKernelModules =
-        [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" ];
-      boot.initrd.kernelModules = [ ];
-      boot.kernelModules = [ "kvm-intel" ];
-      boot.extraModulePackages = [ ];
+        boot.initrd.availableKernelModules = [
+          "xhci_pci"
+          "ahci"
+          "nvme"
+          "usbhid"
+          "usb_storage"
+          "sd_mod"
+        ];
+        boot.initrd.kernelModules = [ ];
+        boot.kernelModules = [ "kvm-intel" ];
+        boot.extraModulePackages = [ ];
 
-      fileSystems."/" = {
-        device = "/dev/disk/by-uuid/b75e7142-2009-46cb-84f6-99cfb2b14191";
-        fsType = "ext4";
+        fileSystems."/" = {
+          device = "/dev/disk/by-uuid/b75e7142-2009-46cb-84f6-99cfb2b14191";
+          fsType = "ext4";
+        };
+
+        fileSystems."/boot" = {
+          device = "/dev/disk/by-uuid/867A-3EC6";
+          fsType = "vfat";
+          options = [
+            "fmask=0077"
+            "dmask=0077"
+          ];
+        };
+
+        swapDevices = [ ];
+
+        # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+        # (the default) this is the recommended approach. When using systemd-networkd it's
+        # still possible to use this option, but it's recommended to use it in conjunction
+        # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+        networking.useDHCP = lib.mkDefault true;
+        # networking.interfaces.enp5s0.useDHCP = lib.mkDefault true;
+        # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
+
+        nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+        hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       };
-
-      fileSystems."/boot" = {
-        device = "/dev/disk/by-uuid/867A-3EC6";
-        fsType = "vfat";
-        options = [ "fmask=0077" "dmask=0077" ];
-      };
-
-      swapDevices = [ ];
-
-      # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-      # (the default) this is the recommended approach. When using systemd-networkd it's
-      # still possible to use this option, but it's recommended to use it in conjunction
-      # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-      networking.useDHCP = lib.mkDefault true;
-      # networking.interfaces.enp5s0.useDHCP = lib.mkDefault true;
-      # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
-
-      nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-      hardware.cpu.intel.updateMicrocode =
-        lib.mkDefault config.hardware.enableRedistributableFirmware;
-    };
 
   };
 }
