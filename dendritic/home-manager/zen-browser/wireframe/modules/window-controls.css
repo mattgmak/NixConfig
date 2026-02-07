@@ -28,7 +28,7 @@
     min-height: 16px !important;
     min-width: 16px !important;
     align-self: center;
-    margin-right: 9px !important;
+    margin-right: 5px !important;
     border-radius: 0px !important;
     border: 0px solid rgb(0 0 0 / 10%);
     transition: all 100ms;
@@ -39,7 +39,7 @@
     background-color: var(--zen-toolbar-element-bg) !important;
     content: none !important;
     scale: 1 !important;
-    border: 1px solid var(--na-color-border) !;
+    border: 1.1px solid var(--zen-toolbar-element-bg) !important;
     /*border: 0px solid #8B8000 !important;*/
   }
 
@@ -56,7 +56,7 @@
     content: none !important;
     /*  background-color: #FE6254 !important;*/
     scale: 1 !important;
-    border: 0.1px solid var(--zen-toolbar-element-bg) !important;
+    border: 1.1px solid var(--zen-toolbar-element-bg) !important;
     background-color: var(--zen-toolbar-element-bg) !important;
     /* border: 0px solid #f44336 !important;
       /* For SVG icons */
@@ -175,8 +175,30 @@
   }
 }
 
+@media (-moz-bool-pref: "wireframe.controls.reverse") {
+  @media not (-moz-bool-pref: "wireframe.macos.controls") {
+    .titlebar-min,
+    .titlebar-max,
+    .titlebar-close {
+      margin-right: 5px !important;
+    }
+  }
+}
+
+@media (-moz-bool-pref: "wireframe.macos.controls") {
+  @media (-moz-bool-pref: "wireframe.controls.reverse") {
+    .titlebar-buttonbox-container {
+      margin-right: 0px !important;
+    }
+
+    #zen-appcontent-navbar-container {
+      margin-right: 0px !important;
+    }
+  }
+}
+
 /* adjust height for top urlbar and buttons in sidebar */
-@media not (-moz-bool-pref: "zen.view.use-single-toolbar") {
+@media not (-moz-pref("zen.view.use-single-toolbar")) {
   @media (-moz-bool-pref: "wireframe.urlbar.position.top") {
     #zen-sidebar-top-buttons {
       margin-top: -4px !important;

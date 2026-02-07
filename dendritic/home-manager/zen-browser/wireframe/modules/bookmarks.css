@@ -6,17 +6,9 @@
   align-self: center !important;
   position: absolute !important;
   height: calc(100% - 37.5px) !important;
-  box-shadow: 4px 4px 8px 0px #00000022 !important;
   background-color: var(--zen-primary-color) !important;
   border-radius: var(--na-user-border-radius) !important;
-  border: 1px solid var(--na-color-border) !important;
-  border-color: var(--na-color-border) !important;
-}
-
-/* bookmark and history body */
-#bookmarksPanel,
-#history-panel {
-  background-color: var(--zen-primary-color) !important;
+  border: 1px solid light-dark(black, white) !important;
 }
 
 /* bookmark and history remove splitter */
@@ -59,3 +51,8 @@
     clip-path: none !important;
   }
 } */
+
+/* === BOOKMARKS TOOLBAR === */
+#zen-appcontent-navbar-container #import-button{
+  display: none !important;
+}

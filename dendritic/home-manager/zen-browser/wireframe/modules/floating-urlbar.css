@@ -1,0 +1,2005 @@
+/* FLOATING URLBAR */
+/* #urlbar[open] .urlbar-input{
+  font-size: 1em !important;
+} */
+
+/* URLBAR COLORS */
+#urlbar[breakout-extend] :root:has(.urlbar-page-action[open]) #urlbar-background,
+#urlbar[breakout-extend] .urlbar-background,
+#urlbar[breakout-extend] #urlbar-container {
+/*   background-color: var(--zen-primary-color) !important; */
+  color: var(--toolbar-textcolor) !important;
+}
+
+#urlbar[open] .urlbar-background {
+  border-radius: var(--na-urlbar-border-radius) !important;
+  background: var(--zen-primary-color) !important;
+}
+
+#urlbar[open] {
+  border-radius: var(--na-urlbar-border-radius) !important;
+  overflow: hidden !important;
+}
+
+/* ====== FLOATING TRANSPARENT URLBAR ====== */
+@media(-moz-pref("wireframe.urlbar.blurred")){
+  #urlbar[open] .urlbar-background {
+    background: var(--zen-main-browser-background) !important;
+    opacity: var(--zen-background-opacity) !important;
+}
+
+
+  #urlbar[open] {
+    backdrop-filter: blur(24px) brightness(0.55) !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar.border","wireframe")){
+  #urlbar[open] .urlbar-background {
+    outline: 2px solid var(--na-color-border) !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar.border","macos")){
+#urlbar[open]{ 
+  box-shadow: 
+    /* --- corner mask: prevents edge halo bleeding --- */ 
+    inset 0 0 0 1px rgba(255,255,255,0.22), 
+    /* --- curved metal highlight (top + edges) --- */ 
+    inset 0 0 0 2px rgba(255,255,255,0.32), 
+    /* --- inner soft falloff depth --- */ 
+    inset 0 0 8px 3px rgba(0,0,0,0.08), 
+    /* --- machined outer rim --- */ 
+    0 0 0 1.5px rgba(0,0,0,0.25), 
+    /* --- outer structure ring / subtle glow --- */ 
+    0 3px 6px rgba(0,0,0,0.20)
+  }
+}
+
+
+/* #urlbar[breakout-extend] .urlbar-background {
+  outline: 2px solid var(--na-color-border) !important;
+} */
+
+
+#urlbar .urlbarView-row {
+  color: var(--toolbar-textcolor) !important;
+  color-scheme: unset !important;
+}
+
+/* bottombar left icon padding */
+:root[zen-compact-mode="false"] #urlbar-container:not(:has(#urlbar[breakout][breakout-extend])) #identity-icon-box {
+  padding-inline: 6px !important;
+}
+
+:root[zen-compact-mode="true"] #urlbar-container:not(:has(#urlbar[breakout][breakout-extend])) #identity-icon-box {
+  padding-inline: 4px !important;
+}
+
+/* splitter for urlbar input */
+.urlbarView-body-inner {
+  border-top: none !important;
+  border-bottom: 1px solid var(--toolbar-textcolor) !important;
+}
+
+/* urlbar loading text */
+#urlbar>.urlbar-input-container>.urlbar-input-box::before {
+  content: "wireframing..." !important;
+  padding-inline: 10px !important;
+  animation: slideUpAdressBar var(--na-anim-duration) ease;
+  animation-play-state: paused;
+  transition: opacity 0.6s;
+  align-self: center;
+  visibility: collapse !important;
+  opacity: 0;
+}
+
+#urlbar:not([breakout-extend]) .urlbar-input-container>.urlbar-input-box>input {
+  opacity: 1 !important;
+  transition: opacity 0.6s;
+}
+
+#main-window:has(.tabbrowser-tab[selected][busy]) #urlbar:not([breakout-extend]) .urlbar-input-container>.urlbar-input-box>input {
+  transition: opacity 3s ease;
+  opacity: 0 !important;
+}
+
+#main-window:has(.tabbrowser-tab[selected][busy]) #urlbar:not([breakout-extend]) .urlbar-input-container>.urlbar-input-box::before {
+  animation-play-state: running;
+  visibility: visible !important;
+  opacity: 1;
+}
+
+#urlbar {
+  color: var(--toolbar-textcolor) !important;
+}
+
+/* changed urlbar box shadow */
+#urlbar[open] .urlbar-background{
+  box-shadow: none !important;
+}
+
+/* === TABBOX ANIMATIONS FOR URLBAR POP UP === */
+
+/* base for tabbox animations */
+#zen-tabbox-wrapper {
+  position: relative;
+  transform: scale(1);
+  opacity: 1;
+  filter: none;
+  transition:
+    transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.25s linear,
+    filter 0.25s ease;
+  will-change: transform, opacity, filter;
+}
+
+/* fast */
+/* #zen-tabbox-wrapper {
+  transition:
+    transform 0.18s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.18s linear,
+    filter 0.18s ease;
+  will-change: transform, opacity, filter;
+} */
+
+/* Hard Shift */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Hard Shift")) {
+  #zen-tabbox-wrapper {
+    transition:
+      transform 0.12s cubic-bezier(0.6, 0, 0.4, 1),
+      filter 0.12s linear,
+      opacity 0.12s linear;
+    transform-origin: center;
+  }
+
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    transform: scale(0.97) translateZ(0);
+    opacity: 0.82;
+    filter: brightness(0.95) contrast(1.15);
+  }
+
+}
+
+
+/* Lights off */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Lights Off")){
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    transform: scale(0.985);
+    opacity: 0.94;
+    filter: brightness(0.3) contrast(0.9) saturate(1.1) blur(0.4px) hue-rotate(-3deg);
+  }
+}
+
+
+/* Pushed away */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Pushed Away")){
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    transform: rotateY(6deg) scale(0.97);
+    opacity: 0.88;
+    filter: brightness(0.95) contrast(0.9) blur(1.2px);
+  }
+}
+
+/* Soft Fade */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Soft Fade")){
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    transform: scale(0.98);
+    opacity: 0.85;
+    filter: brightness(1.3) contrast(0.9) saturate(0.7);
+  }
+}
+
+
+/* Film Grain Blur */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Film Grain Blur")){
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    transform: scale(0.97);
+    opacity: 0.9;
+    filter: brightness(0.95) contrast(0.85) saturate(0.9) blur(1.2px);
+  }
+}
+
+/* FLASH BANG */
+@media (-moz-pref("wireframe.urlbar-focus.effect","Flash Bang")){
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    animation: nullBlink 0.18s ease-in-out;
+  }
+  @keyframes nullBlink {
+    0% { opacity: 1; }
+    40% { opacity: 0; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+}
+
+/* CRT Snap */
+@media (-moz-pref("wireframe.urlbar-focus.effect","CRT Snap")){
+  #zen-tabbox-wrapper {
+    will-change: transform, opacity;
+    transition:
+      transform 0.22s cubic-bezier(0.33, 1, 0.68, 1),
+      opacity 0.22s linear;
+      filter 0.22 linear;
+  }
+
+  :root:has(#urlbar[open]) #zen-tabbox-wrapper {
+    animation: crtSnap 0.18s ease-in-out forwards;
+  }
+
+  @keyframes crtSnap {
+    0% { transform: scale(1); opacity: 1; }
+    40% { transform: scale(0.9) skewY(2deg); opacity: 0.4; filter: contrast(1.2); }
+    100% { transform: scale(0.95); opacity: 0.85; filter: contrast(1); }
+  }
+}
+
+/* tabbox content border radius change based on gap */
+:root:has(#urlbar[open]){
+  @media not (-moz-pref("wireframe.nogaps.enabled")){
+  #tabbrowser-tabpanels > hbox{
+    border-radius: var(--na-user-border-radius) !important;
+    transition: border-radius 0.18s linear !important;
+  }
+}
+
+  @media (-moz-pref("wireframe.nogaps.enabled")){
+    #tabbrowser-tabpanels > hbox{
+      border-radius: var(--na-window-border-radius) !important;
+      transition: border-radius 0.18s linear !important;
+    }
+  }
+}
+
+@keyframes webviewPop {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: none;
+  }
+  100% {
+    transform: translateY(8px) scale(0.99);
+    opacity: 0.92;
+    filter: brightness(0.95);
+  }
+}
+
+@keyframes webviewReset {
+  0% {
+    transform: translateY(8px) scale(0.99);
+    opacity: 0.92;
+    filter: brightness(0.95);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: none;
+  }
+}
+
+
+/* MULTI-TOOLBAR */
+
+:root:not([zen-single-toolbar="true"]) {
+/*   #urlbar[open]{
+    animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  } */
+
+  /* SLIM */
+  @media (-moz-pref("wireframe.urlbar.style","slim")){
+  /* move the navbar out from sidebar so url can have the same bahavior as other toolbar mode */
+    [zen-compact-mode="true"] {
+      #urlbar-container:has(#urlbar[open]) {
+        position: fixed !important;
+        top: auto !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        z-index: 10000 !important;
+      }
+    }
+
+    /* expanded urlbar */
+    #urlbar {
+      top: auto !important;
+    }
+
+    /* urlbar uses webview border radius */
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+    #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+        transform-origin: center bottom !important;
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: auto !important;
+        bottom: 62.5px !important;
+    }
+
+/*     #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show]) #urlbar[open]{
+      animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+    } */
+
+    @media (-moz-pref("wireframe.urlbar.position.top")) {
+      #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+        transform-origin: center top !important;
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        bottom: auto !important;
+        top: 62.5px !important;
+      }
+    }
+
+    /* floating urlbar position for compact sidebar */
+    :root[zen-compact-mode="true"]:not([zen-right-side="true"]) {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: auto !important;
+            bottom: 62.5px !important;
+        }
+    }
+
+    :root[zen-compact-mode="true"][zen-right-side="true"] {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: auto !important;
+            bottom: 62.5px !important;
+        }
+    }
+
+    #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])
+        #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+/*         animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; */
+        transform-origin: center bottom !important;
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: auto !important;
+        bottom: 62.5px !important;
+    }
+
+    /* move urlbar input to bottom*/
+    #urlbar > .urlbar-input-container {
+        order: 1 !important;
+    }
+
+    @media (-moz-pref("wireframe.urlbar.position.top")){
+      #urlbar > .urlbar-input-container {
+        order: 0 !important;
+      }
+    }
+
+    /* navbar padding */
+    .urlbar-input-container {
+        padding-inline: 2px !important;
+    }
+
+    /* expanded urlbar items padding */
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar {
+/*       font-size: 1em !important; */
+      height: fit-content !important;
+      padding-inline: 2px !important;
+      padding-block: 2px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-box {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-container {
+      height: fit-content !important;
+      margin: 0px !important;
+      padding-block: 12px !important;
+      padding-inline: 17px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #identity-box,
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results>.urlbarView-row>.urlbarView-row-inner>.urlbarView-url {
+      margin-inline: 0px !important;
+    }
+
+/*     #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results {
+      font-size: 1em !important;
+    } */
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) .urlbarView-results div {
+      margin: 0px !important;
+      padding-block: 2px !important;
+      padding-inline: 6px !important;
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+  /* Hide urlbar results */
+    /* urlbar search result type icon (site that you bookmark will have star on the right side) */
+    .urlbarView-row>.urlbarView-row-inner .urlbarView-type-icon {
+      margin: 0px !important;
+      position: absolute !important;
+      right: 15px !important;
+    }
+
+    /* urlbar search result */
+    .urlbarView-body-inner {
+      display: none !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) {
+      display: list-item !important;
+    }
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] {
+      border-radius: var(--na-border-radius) !important;
+      background-color: var(--na-color-text) !important;
+    } */
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover {
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+      color: var(--na-color-bg) !important;
+    } */
+
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    /* urlbar search engine and bookmark search mode */
+    .search-one-offs {
+      border: none !important;
+      display: none !important;
+    }
+
+    .search-one-offs .search-panel-one-offs-container {
+      padding: 8px !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) {
+      border-bottom: 1px solid var(--na-color-text) !important;
+      padding-inline: 5px !important;
+      padding-block: 12px !important;
+      display: list-item !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .search-panel-one-offs-header {
+      display: none !important;
+      visibility: collapse !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    /* urlbar search engine and bookmark search mode indicator */
+    #urlbar-search-mode-indicator,
+    #urlbar-label-box {
+      align-self: center !important;
+      height: fit-content !important;
+      padding-block: 4px !important;
+      padding-left: 6px !important;
+      padding-right: 2px !important;
+    }
+  }
+
+  /* SLIM CENTER */
+    @media (-moz-pref("wireframe.urlbar.style","slim(center)")){
+    /* move the navbar out from sidebar so url can have the same bahavior as other toolbar mode */
+    [zen-compact-mode="true"] {
+      #urlbar-container:has(#urlbar[open]) {
+        position: fixed !important;
+        top: auto !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        z-index: 10000 !important;
+      }
+    }
+
+    /* expanded urlbar */
+    #urlbar {
+      top: 30% !important;
+    }
+
+    /* urlbar uses webview border radius */
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+    /* urlbar behavior on expanded single-toolbar mode*/
+    :root:not(
+            [zen-right-side="true"]
+        )[zen-sidebar-expanded="true"][zen-compact-mode="true"] {
+        #urlbar-container:has(#urlbar[open]) {
+            left: 0 !important;
+            right: auto !important;
+            margin-inline: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show]
+            #urlbar-container:hover {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )
+            #urlbar {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )[zen-has-hover]
+            #urlbar:not(:hover) {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"]))
+            #urlbar {
+            margin-left: 0px !important;
+        }
+    }
+
+    :root[zen-right-side="true"][zen-sidebar-expanded="true"][zen-compact-mode="true"] {
+        #urlbar-container:has(#urlbar[open]) {
+            left: auto !important;
+            right: 0 !important;
+            margin-inline: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show]
+            #urlbar-container:hover {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )
+            #urlbar {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )[zen-has-hover]
+            #urlbar:not(:hover) {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"]))
+            #urlbar {
+            margin-right: 0px !important;
+        }
+    }
+
+    #urlbar[open] {
+      min-width: var(--na-urlbar-width) !important;
+      max-width: var(--na-urlbar-width) !important;
+      left: 50% !important;
+/*       animation: slideFromBottom 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; */
+      /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+      right: auto !important;
+      top: 30% !important;
+    }
+
+/*     @media not (-moz-pref("zen.view.use-single-toolbar")) {
+      #urlbar[open]{
+        animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+      }
+    } */
+
+    /* floating urlbar position for compact sidebar */
+    :root[zen-compact-mode="true"]:not([zen-right-side="true"]) {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: 30% !important;
+        }
+    }
+
+    :root[zen-compact-mode="true"][zen-right-side="true"] {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: 30% !important;
+        }
+    }
+
+    #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])
+        #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+/*         animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; */
+        /*! transform-origin: center bottom !important; */
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: 30% !important;
+    }
+
+    /* move urlbar input to bottom*/
+    /* removed this for center slim */
+  /*   #urlbar > .urlbar-input-container {
+        order: 1 !important;
+    } */
+
+    /* navbar padding */
+    .urlbar-input-container {
+        padding-inline: 2px !important;
+    }
+
+    /* expanded urlbar items padding */
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar {
+/*       font-size: 1em !important; */
+      height: fit-content !important;
+      padding-inline: 2px !important;
+      padding-block: 2px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-box {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-container {
+      height: fit-content !important;
+      margin: 0px !important;
+      padding-block: 12px !important;
+      padding-inline: 17px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #identity-box,
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results>.urlbarView-row>.urlbarView-row-inner>.urlbarView-url {
+      margin-inline: 0px !important;
+    }
+
+/*     #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results {
+      font-size: 1em !important;
+    } */
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) .urlbarView-results div {
+      margin: 0px !important;
+      padding-block: 2px !important;
+      padding-inline: 6px !important;
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+  /* Hide urlbar results */
+    /* urlbar search result type icon (site that you bookmark will have star on the right side) */
+    .urlbarView-row>.urlbarView-row-inner .urlbarView-type-icon {
+      margin: 0px !important;
+      position: absolute !important;
+      right: 15px !important;
+    }
+
+    /* urlbar search result */
+    .urlbarView-body-inner {
+      display: none !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) {
+      display: list-item !important;
+    }
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] {
+      border-radius: var(--na-border-radius) !important;
+      background-color: var(--na-color-text) !important;
+    } */
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover {
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+      color: var(--na-color-bg) !important;
+    } */
+
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    /* urlbar search engine and bookmark search mode */
+    .search-one-offs {
+      border: none !important;
+      display: none !important;
+    }
+
+    .search-one-offs .search-panel-one-offs-container {
+      padding: 8px !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) {
+      border-bottom: 1px solid var(--na-color-text) !important;
+      padding-inline: 5px !important;
+      padding-block: 12px !important;
+      display: list-item !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .search-panel-one-offs-header {
+      display: none !important;
+      visibility: collapse !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    /* urlbar search engine and bookmark search mode indicator */
+    #urlbar-search-mode-indicator,
+    #urlbar-label-box {
+      align-self: center !important;
+      height: fit-content !important;
+      padding-block: 4px !important;
+      padding-left: 6px !important;
+      padding-right: 2px !important;
+    }
+  }
+
+  /* FULL */
+  @media (-moz-pref("wireframe.urlbar.style","full")){
+    #urlbar[open] {
+      min-width: var(--na-urlbar-width) !important;
+      max-width: var(--na-urlbar-width) !important;
+    }
+
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #identity-box,
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    }
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+  }
+}
+
+/* single toolbar */
+#navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]) {
+
+  @media (-moz-pref("wireframe.urlbar.style","slim")){
+  /* move the navbar out from sidebar so url can have the same bahavior as other toolbar mode */
+    [zen-compact-mode="true"] {
+      #urlbar-container:has(#urlbar[open]) {
+        position: fixed !important;
+        top: auto !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        z-index: 10000 !important;
+      }
+    }
+
+    /* expanded urlbar */
+    #urlbar {
+      top: auto !important;
+    }
+
+    /* urlbar uses webview border radius */
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+    #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+/*         animation: slideFromBottom 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; */
+        transform-origin: center bottom !important;
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: auto !important;
+        bottom: 62.5px !important;
+    }
+
+    /* floating urlbar position for compact sidebar */
+    :root[zen-compact-mode="true"]:not([zen-right-side="true"]) {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: auto !important;
+            bottom: 62.5px !important;
+        }
+    }
+
+    :root[zen-compact-mode="true"][zen-right-side="true"] {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: auto !important;
+            bottom: 62.5px !important;
+        }
+    }
+
+    #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])
+        #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+        animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+        transform-origin: center bottom !important;
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: auto !important;
+        bottom: 62.5px !important;
+    }
+
+    /* move urlbar input to bottom*/
+    #urlbar > .urlbar-input-container {
+        order: 1 !important;
+    }
+
+    /* navbar padding */
+    .urlbar-input-container {
+        padding-inline: 2px !important;
+    }
+
+    /* expanded urlbar items padding */
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar {
+/*       font-size: 1em !important; */
+      height: fit-content !important;
+      padding-inline: 2px !important;
+      padding-block: 2px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-box {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-container {
+      height: fit-content !important;
+      margin: 0px !important;
+      padding-block: 12px !important;
+      padding-inline: 17px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #identity-box,
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results>.urlbarView-row>.urlbarView-row-inner>.urlbarView-url {
+      margin-inline: 0px !important;
+    }
+
+/*     #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results {
+      font-size: 1em !important;
+    } */
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) .urlbarView-results div {
+      margin: 0px !important;
+      padding-block: 2px !important;
+      padding-inline: 6px !important;
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+  /* Hide urlbar results */
+    /* urlbar search result type icon (site that you bookmark will have star on the right side) */
+    .urlbarView-row>.urlbarView-row-inner .urlbarView-type-icon {
+      margin: 0px !important;
+      position: absolute !important;
+      right: 15px !important;
+    }
+
+    /* urlbar search result */
+    .urlbarView-body-inner {
+      display: none !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) {
+      display: list-item !important;
+    }
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] {
+      border-radius: var(--na-border-radius) !important;
+      background-color: var(--na-color-text) !important;
+    } */
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover {
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+      color: var(--na-color-bg) !important;
+    } */
+
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    /* urlbar search engine and bookmark search mode */
+    .search-one-offs {
+      border: none !important;
+      display: none !important;
+    }
+
+    .search-one-offs .search-panel-one-offs-container {
+      padding: 8px !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) {
+      border-bottom: 1px solid var(--na-color-text) !important;
+      padding-inline: 5px !important;
+      padding-block: 12px !important;
+      display: list-item !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .search-panel-one-offs-header {
+      display: none !important;
+      visibility: collapse !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    /* urlbar search engine and bookmark search mode indicator */
+    #urlbar-search-mode-indicator,
+    #urlbar-label-box {
+      align-self: center !important;
+      height: fit-content !important;
+      padding-block: 4px !important;
+      padding-left: 6px !important;
+      padding-right: 2px !important;
+    }
+  }
+
+  /* === SLIM CENTER URLBAR === */
+
+  @media (-moz-pref("wireframe.urlbar.style","slim(center)")){
+    /* move the navbar out from sidebar so url can have the same bahavior as other toolbar mode */
+    [zen-compact-mode="true"] {
+      #urlbar-container:has(#urlbar[open]) {
+        position: fixed !important;
+        top: auto !important;
+        height: 40px !important;
+        min-height: 40px !important;
+        min-width: 100vw !important;
+        max-width: 100vw !important;
+        bottom: 0px !important;
+        left: 0px !important;
+        z-index: 10000 !important;
+      }
+    }
+
+    /* expanded urlbar */
+    #urlbar {
+      top: auto !important;
+    }
+
+    /* urlbar uses webview border radius */
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+    /* urlbar behavior on expanded single-toolbar mode*/
+    :root:not(
+            [zen-right-side="true"]
+        )[zen-sidebar-expanded="true"][zen-compact-mode="true"] {
+        #urlbar-container:has(#urlbar[open]) {
+            left: 0 !important;
+            right: auto !important;
+            margin-inline: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show]
+            #urlbar-container:hover {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )
+            #urlbar {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )[zen-has-hover]
+            #urlbar:not(:hover) {
+            margin-left: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"]))
+            #urlbar {
+            margin-left: 0px !important;
+        }
+    }
+
+    :root[zen-right-side="true"][zen-sidebar-expanded="true"][zen-compact-mode="true"] {
+        #urlbar-container:has(#urlbar[open]) {
+            left: auto !important;
+            right: 0 !important;
+            margin-inline: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show]
+            #urlbar-container:hover {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )
+            #urlbar {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not(
+                [zen-user-show]
+            )[zen-has-hover]
+            #urlbar:not(:hover) {
+            margin-right: 0px !important;
+        }
+
+        #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"]))
+            #urlbar {
+            margin-right: 0px !important;
+        }
+    }
+
+    #urlbar[open] {
+      min-width: var(--na-urlbar-width) !important;
+      max-width: var(--na-urlbar-width) !important;
+      left: 50% !important;
+/*       animation: slideFromBottom 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important; */
+      /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+      right: auto !important;
+      top: 35% !important;
+    }
+
+/*     @media not (-moz-pref("zen.view.use-single-toolbar")) {
+      #urlbar[open]{
+        animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+      }
+    } */
+
+    /* floating urlbar position for compact sidebar */
+    :root[zen-compact-mode="true"]:not([zen-right-side="true"]) {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: 35% !important;
+        }
+    }
+
+    :root[zen-compact-mode="true"][zen-right-side="true"] {
+        #urlbar[open] {
+            min-width: var(--na-urlbar-width) !important;
+            max-width: var(--na-urlbar-width) !important;
+            left: 50% !important;
+            /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+            right: auto !important;
+            display: flex !important;
+            flex-direction: column !important;
+            top: 35% !important;
+        }
+    }
+
+    #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])
+        #urlbar[open] {
+        min-width: var(--na-urlbar-width) !important;
+        max-width: var(--na-urlbar-width) !important;
+        left: 50% !important;
+        animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+        /*! transform-origin: center bottom !important; */
+        /*   transform: translateX(-50%) !important; */ /*removed becasue the animation handles it*/
+        right: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: 35% !important;
+    }
+
+    /* move urlbar input to bottom*/
+    /* removed this for center slim */
+  /*   #urlbar > .urlbar-input-container {
+        order: 1 !important;
+    } */
+
+    /* navbar padding */
+    .urlbar-input-container {
+        padding-inline: 2px !important;
+    }
+
+    /* expanded urlbar items padding */
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar {
+/*       font-size: 1em !important; */
+      height: fit-content !important;
+      padding-inline: 2px !important;
+      padding-block: 2px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-box {
+      margin: 0px !important;
+      padding: 0px !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-container {
+      height: fit-content !important;
+      margin: 0px !important;
+      padding-block: 8px !important;
+      padding-inline: 8px !important;
+    }
+
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results>.urlbarView-row>.urlbarView-row-inner>.urlbarView-url {
+      margin-inline: 0px !important;
+    }
+
+/*     #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results {
+      font-size: 1em !important;
+    } */
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+
+    #urlbar-container:has(#urlbar[breakout-extend]) .urlbarView-results div {
+      margin: 0px !important;
+      padding-block: 0px !important;
+      padding-inline: 0px !important;
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+  /* Hide urlbar results */
+    /* urlbar search result type icon (site that you bookmark will have star on the right side) */
+    .urlbarView-row>.urlbarView-row-inner .urlbarView-type-icon {
+      margin: 0px !important;
+      position: absolute !important;
+      right: 15px !important;
+    }
+
+    /* urlbar search result */
+    .urlbarView-body-inner {
+      display: none !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) {
+      display: list-item !important;
+    }
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] {
+      border-radius: var(--na-border-radius) !important;
+      background-color: var(--na-color-text) !important;
+    } */
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover {
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+    /* .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+      color: var(--na-color-bg) !important;
+    } */
+
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-title {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row[selected] .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row:hover .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    .urlbarView-body-inner:has(.urlbarView-row[selected]) .urlbarView-row .urlbarView-action {
+      border-radius: var(--na-border-radius-small) !important;
+      padding-inline: 6px !important;
+    }
+
+    /* urlbar search engine and bookmark search mode */
+    .search-one-offs {
+      border: none !important;
+      display: none !important;
+    }
+
+    .search-one-offs .search-panel-one-offs-container {
+      padding: 8px !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) {
+      border-bottom: 1px solid var(--na-color-text) !important;
+      padding-inline: 5px !important;
+      padding-block: 12px !important;
+      display: list-item !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .search-panel-one-offs-header {
+      display: none !important;
+      visibility: collapse !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover {
+      border-radius: var(--na-border-radius-small) !important;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item[selected] hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    .search-one-offs:has(.searchbar-engine-one-off-item[selected]) .searchbar-engine-one-off-item:hover hbox {
+      animation: slideUpAdressBar var(--na-anim-duration) ease;
+    }
+
+    /* urlbar search engine and bookmark search mode indicator */
+    #urlbar-search-mode-indicator,
+    #urlbar-label-box {
+      align-self: center !important;
+      height: fit-content !important;
+      padding-block: 4px !important;
+      padding-left: 6px !important;
+      padding-right: 2px !important;
+    }
+  }
+
+  @media (-moz-pref("wireframe.urlbar.style","full")){
+    #urlbar[open] {
+      min-width: 500px !important;
+      max-width: 500px !important;
+    }
+
+    @media not (-moz-pref("zen.view.use-single-toolbar")) {
+      #urlbar[open]{
+        animation: slideFromBottomfloat 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+      }
+    }
+
+    .urlbar-background{
+      border-radius: var(--na-urlbar-border-radius) !important;
+    }
+
+  /*   #urlbar-container:has(#urlbar[breakout-extend]) #identity-box,
+    #urlbar-container:has(#urlbar[breakout-extend]) #page-action-buttons,
+    #urlbar-container:has(#urlbar[breakout-extend]) #tracking-protection-icon-container,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-go-button,
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-anon-search-settings {
+     display: none !important;
+    } */
+    
+    #urlbar-container:has(#urlbar[breakout-extend]) #urlbar .urlbar-input-container {
+      padding-block: 0px !important;
+      padding-inline: 8px !important;
+    }
+    
+    #urlbar-container:has(#urlbar[breakout-extend]) .urlbarView-results div {
+      margin: 0px !important;
+      padding-block: 0px !important;
+      padding-inline: 0px !important;
+      border-radius: var(--na-tab-border-radius) !important;
+    }
+
+    /* Hide/style website icons based on preferences */
+    @media (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+        display: none !important;
+      }
+    }
+
+    @media not (-moz-bool-pref: "wireframe.urlbar.icons.hide") {
+      @media (-moz-bool-pref: "wireframe.urlbar.icons.greyscale") {
+        #urlbar-container:has(#urlbar[breakout-extend]) #urlbar-results img {
+          filter: grayscale(100%) !important;
+        }
+      }
+    }
+  }
+}
+
+@media (-moz-pref("zen.view.use-single-toolbar")) {
+  :root[zen-sidebar-expanded="true"] .urlbar-page-action,
+  :root[zen-sidebar-expanded="true"] #tracking-protection-icon-container {
+    margin-left: 0px !important;
+ }
+
+ @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
+   #nav-bar {
+     order: 1 !important;
+     margin-bottom: 10px !important;
+   }
+ }
+
+/* === URLBAR OPENING ANIMATIONS === */
+
+/* base variable for X offset */
+:root {
+  --urlbar-x: -50%;
+}
+
+:root[zen-floating-urlbar="true"]{
+    --urlbar-x: 0%;
+}
+
+#navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show]) {
+  --urlbar-x: 0%;
+}
+
+
+/* === Default (Slide From Bottom) === */
+@media (-moz-pref("wireframe.urlbar-open.effect", "Slide from Bottom")) {
+  @keyframes slide-from-bottom {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(80px) scale(0.96);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-4px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: slide-from-bottom 0.18s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  }
+}
+
+
+/* === Magnetic Rise === */
+@media (-moz-pref("wireframe.urlbar-open.effect", "Magnetic Rise")) {
+  @keyframes magneticRise {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(60px) scale(0.95);
+      filter: blur(2px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-6px) scale(1.03);
+      filter: blur(0.3px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: magneticRise 0.18s cubic-bezier(0.33, 1, 0.68, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "PopCorn")) {
+  @keyframes PopCorn {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(20px) scale(0.85) rotate(1deg);
+      filter: brightness(0.7) contrast(1.3);
+    }
+    40% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-4px) scale(1.05);
+      filter: brightness(1.1);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: PopCorn 0.33s cubic-bezier(0.7, 0, 0.3, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Drop Off")) {
+  @keyframes DropOff {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(-60px) scale(1.05);
+      filter: blur(1px) brightness(1.1);
+    }
+    70% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(6px);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: DropOff 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Neon Flash")) {
+  @keyframes neonFlash {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) scale(0.96);
+      filter: brightness(2.5) contrast(1.5);
+    }
+    40% {
+      opacity: 1;
+      filter: brightness(1.2);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: neonFlash 0.22s cubic-bezier(0.6, 0, 0.4, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Soft Warp")) {
+  @keyframes softWarp {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) scale(1.12) skewX(6deg);
+      filter: blur(4px) brightness(1.4);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) scale(0.98) skewX(-2deg);
+      filter: blur(1px);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: softWarp 0.26s cubic-bezier(0.33, 1, 0.68, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Unfold")) {
+  @keyframes Unfold {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) rotateX(-90deg) scaleY(0.8);
+      transform-origin: top;
+      filter: blur(2px);
+    }
+    70% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) rotateX(10deg) scaleY(1.02);
+      transform-origin: top;
+      filter: blur(0.3px);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) rotateX(0deg) scaleY(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: Unfold 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Glitch Phase")) {
+  @keyframes glitchPhase {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(60px) scale(0.9) skewX(12deg);
+      filter: hue-rotate(90deg) saturate(2);
+    }
+    20% {
+      transform: translateX(calc(var(--urlbar-x) + 6px)) translateY(-6px) skewX(-8deg);
+      filter: contrast(2) hue-rotate(-40deg);
+    }
+    40% {
+      transform: translateX(calc(var(--urlbar-x) - 4px)) translateY(2px) skewX(4deg);
+      filter: brightness(1.4);
+    }
+    70% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-2px) scale(1.02);
+      filter: none;
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1);
+    }
+  }
+
+  #urlbar[open] {
+    animation: glitchPhase 0.4s steps(4) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Orbit Entry")) {
+  @keyframes orbitEntry {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(100px) rotate(540deg) scale(0.2);
+      filter: blur(3px) brightness(1.5);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-10px) rotate(-20deg) scale(1.1);
+      filter: blur(0.6px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(0) rotate(0deg) scale(1);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: orbitEntry 0.6s cubic-bezier(0.2, 0.8, 0.4, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Slam Up")) {
+  @keyframes slamUp {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(100px) scale(0.95) rotate(-3deg);
+    }
+    50% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(-6px) scale(1.05) rotate(2deg);
+    }
+    80% {
+      transform: translateX(var(--urlbar-x)) translateY(2px) scale(0.98);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) translateY(0) scale(1) rotate(0deg);
+    }
+  }
+
+  #urlbar[open] {
+    animation: slamUp 0.25s cubic-bezier(0.3, 1.5, 0.6, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Slinky Drop")) {
+  @keyframes slinkyDrop {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--urlbar-x)) translateY(-120px) scaleY(1.4) rotateX(60deg);
+      filter: blur(1.5px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(var(--urlbar-x)) translateY(8px) scaleY(0.9) rotateX(-5deg);
+    }
+    100% {
+      transform: translateX(var(--urlbar-x)) translateY(0) scaleY(1) rotateX(0deg);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    animation: slinkyDrop 0.65s cubic-bezier(0.25, 1.2, 0.5, 1) forwards !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar-open.effect", "Plane Shift")) {
+  @keyframes depthSurge {
+    0% {
+      opacity: 0;
+      transform: perspective(700px)
+                 translateX(var(--urlbar-x))
+                 translateY(70px)
+                 translateZ(-2800px)
+                 rotateX(55deg)
+                 scale(0.9);
+      transform-origin: top center;
+      filter: blur(6px) brightness(1.2);
+    }
+    50% {
+      opacity: 1;
+      transform: perspective(700px)
+                 translateX(var(--urlbar-x))
+                 translateY(15px)
+                 translateZ(80px)
+                 rotateX(42deg)
+                 scale(0.88);
+      filter: blur(1px);
+    }
+    100% {
+      opacity: 1;
+      transform: perspective(700px)
+                 translateX(var(--urlbar-x))
+                 translateY(0)
+                 translateZ(0)
+                 rotateX(36deg)
+                 scale(0.88);
+      filter: none;
+    }
+  }
+
+  #urlbar[open] {
+    transform-origin: top center;
+    transform-style: preserve-3d;
+    transform: perspective(700px) rotateX(36deg);
+    animation: depthSurge 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    backface-visibility: hidden;
+  }
+
+  /* === Base Depth + Perspective Setup === */
+  #urlbar[open],
+  #urlbar[open] .urlbarView {
+    overflow: visible !important;
+    perspective: 1200px !important;
+    transform-style: preserve-3d !important;
+  }
+
+  /* Results list — the only one allowed to clip and scroll */
+  #urlbar[open] .urlbarView-results {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-height: auto !important; /* tweak visible height */
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    position: relative;
+    z-index: 1;
+    mask-image: linear-gradient(to bottom,
+      rgba(0,0,0,1) 90%,
+      rgba(0,0,0,0)); /* subtle fade-out */
+  }
+
+  /* Smooth container boundaries */
+  .urlbarView {
+    overflow: hidden !important;
+    clip-path: inset(0 round 8px);
+  }
+
+  /* === Result Row Styling === */
+  .urlbarView-row {
+    position: relative;
+    transform: rotateX(36deg) translateZ(0);
+    transform-origin: center;
+    backface-visibility: hidden;
+    will-change: transform, filter;
+    transition:
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      filter 0.25s ease,
+      background-color 0.25s ease;
+    filter: brightness(0.95);
+    z-index: 2;
+  }
+
+  /* Hover: gentle 3D lift, not aggressive */
+  .urlbarView-row:hover {
+    z-index: 999;
+    transform: rotateX(30deg) translateZ(20px) scale(1.015);
+    filter: brightness(1.05)
+            drop-shadow(0 8px 10px rgba(0, 0, 0, 0.22));
+    background-color: color-mix(in srgb,
+      var(--toolbar-bgcolor) 85%,
+      white 15%);
+  }
+
+  /* Reset after hover */
+  .urlbarView-row:not(:hover) {
+    transform: rotateX(36deg) translateZ(0) scale(1);
+    filter: brightness(0.95);
+  }
+
+}
+
+
+@keyframes slideFromBottommulti {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(80px) scale(0.96);
+    }
+    60% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-4px) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+        filter: none;
+    }
+}
+  
+/* UrlBar border radius pref options */
+@media (-moz-pref("wireframe.urlbar.border_radius", 0)) {
+    :root {
+        --na-urlbar-border-radius: 0px;
+    }
+}
+
+@media (-moz-pref("wireframe.urlbar.border_radius", 4)) {
+    :root {
+        --na-urlbar-border-radius: 4px;
+    }
+}
+
+@media (-moz-pref("wireframe.urlbar.border_radius", 8)) {
+    :root {
+        --na-urlbar-border-radius: 8px;
+    }
+}
+
+@media (-moz-pref("wireframe.urlbar.border_radius", 12)) {
+    :root {
+        --na-urlbar-border-radius: 12px;
+    }
+}
+
+@media (-moz-pref("wireframe.urlbar.border_radius", 16)) {
+    :root {
+        --na-urlbar-border-radius: 16px;
+    }
+}
+
+@media (-moz-pref("wireframe.urlbar.border_radius", 20)) {
+    :root {
+        --na-urlbar-border-radius: 20px;
+    }
+}
+  
+@media (-moz-pref("wireframe.urlbar.border_radius", 24)) {
+    :root {
+        --na-urlbar-border-radius: 24px;
+    }
+}

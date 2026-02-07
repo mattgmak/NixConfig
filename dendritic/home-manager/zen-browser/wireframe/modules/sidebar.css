@@ -1,5 +1,7 @@
 /* === SIDEBAR === */
 
+
+
 /* === SIDEBAR - SINGLE TOOLBAR === */
 
 #titlebar:before{
@@ -10,63 +12,77 @@
   border-radius: var(--na-user-border-radius) !important;
 }
 
-#zen-toolbar-background {
+.zen-toolbar-background {
   border-radius: var(--na-user-border-radius) !important;
 }
 
-#zen-toolbar-background{
-  &::before, &::after{
+
+.zen-toolbar-background {
+  &, &::before, &::after {
     border-radius: var(--na-user-border-radius) !important;
   }
 }
 
 /* expanded docked sidebar LEFT side mode */
 :root:not([zen-right-side])[zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-  margin-left: 16px !important;
-  margin-bottom: 32px !important;
-  margin-top: 6px !important;
+  /*! margin-left: 16px !important; */
+  /*! margin-bottom: 32px !important; */
+  /*! margin-top: 6px !important; */
 }
 
 @media not (-moz-bool-pref: "zen.view.experimental-force-window-controls-left"){
   :root:not([zen-right-side])[zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
     margin-left: 16px !important;
-    margin-bottom: 6px !important;
-    margin-top: 32px !important;
+    /*! margin-bottom: 6px !important; */
+    /*! margin-top: 32px !important; */
   }
+}
+
+/* === Border between sidebar and webview for nogaps mod */
+@media (-moz-pref("wireframe.nogaps.enabled")){
+    @media (-moz-pref("wireframe.nogaps.border.enabled")){
+        :root:not([zen-right-side],[zen-compact-mode="true"])[zen-sidebar-expanded="true"] #zen-sidebar-splitter {
+          border-right: 2px solid var(--na-color-border) !important;
+        }
+
+        :root:not([zen-compact-mode="true"])[zen-right-side][zen-sidebar-expanded="true"] #zen-sidebar-splitter {
+          border-left: 2px solid var(--na-color-border) !important;
+        }
+    }
 }
 
   /* expanded docked sidebar RIGHT side mode */
   :root[zen-right-side][zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-right: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+    /*! margin-right: 16px !important; */
+    /*! margin-bottom: 32px !important; */
+    /*! margin-top: 6px !important; */
   }
 
 @media not (-moz-bool-pref: "zen.view.experimental-force-window-controls-left"){
   :root[zen-right-side][zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-right: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+/*     margin-right: 16px !important; */
+/*     margin-bottom: 32px !important; */
+/*     margin-top: 6px !important; */
   }
 }
 
 @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
   /* expanded docked sidebar LEFT side mode */
   :root:not([zen-right-side])[zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-left: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+    /*! margin-left: 16px !important; */
+    /*! margin-bottom: 32px !important; */
+    /*! margin-top: 6px !important; */
   }
 
   /* expanded docked sidebar RIGHT side mode */
   :root[zen-right-side][zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-right: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+    /*! margin-right: 16px !important; */
+    /*! margin-bottom: 32px !important; */
+    /*! margin-top: 6px !important; */
   }
 }
 
-@media (-moz-bool-pref: "zen.view.use-single-toolbar") {
+@media (-moz-pref("zen.view.use-single-toolbar")) {
   @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
     #zen-appcontent-navbar-wrapper::before {
       content: "";
@@ -74,28 +90,13 @@
       left: 0;
       right: 0;
       bottom: -10px;
-      height: 40px; /* ← increases hover hitbox */
+      height: 20px; /* ← increases hover hitbox */
     }
   }
 
-    :root[zen-compact-mode="true"]:not([inDOMFullscreen="true"]) #zen-appcontent-navbar-wrapper {
-      /*padding-block: 10px !important; */
-      margin-block: -5px !important;
-      transition: margin-block var(--na-anim-duration) ease !important;
-    }
 
-  @media (-moz-bool-pref: "wireframe.urlbar.position.top"){
-    #zen-appcontent-navbar-wrapper::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: -10px;
-      height: 40px; /* ← increases hover hitbox */
-    }
-  }
 
-      :root:has(#customization-content-container:hover),
+/*       :root:has(#customization-content-container:hover),
       :root:has(toolbarpaletteitem:active),
       :root:has(#zen-appcontent-navbar-container:hover),
       :root:has(.titlebar-buttonbox-container:hover),
@@ -103,7 +104,7 @@
       :root:has(#zen-appcontent-navbar-wrapper:hover) #zen-appcontent-navbar-wrapper {
         margin-block: 0px !important;
       }
-
+ */
       :root[zen-sidebar-expanded="true"] {
 
       /* keep it visible if any of these areas are hovered / active */
@@ -139,16 +140,18 @@
       opacity: 0 !important;
       transition: opacity var(--na-anim-duration) normal !important;
     }
+    
+    #nav-bar-overflow-button{
+      opacity: 0 !important;
+      transition: opacity var(--na-anim-duration) normal !important;
+    }
 
     :has(#zen-sidebar-top-buttons:hover) #zen-sidebar-top-buttons-customization-target>* {
       opacity: 1 !important;
     }
-  }
-
-  @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
-    #nav-bar {
-      order: 1 !important;
-      margin-bottom: 10px !important;
+    
+    :has(#zen-sidebar-top-buttons:hover) #nav-bar-overflow-button{
+      opacity: 1 !important;
     }
   }
 
@@ -163,98 +166,8 @@
       #navigator-toolbox {
         margin-bottom: 16px !important;
       }
-
-      /* move the navbar out from sidebar so url can have the same bahavior as other toolbar mode */
-      #urlbar-container:has(#urlbar[open]) {
-        position: fixed !important;
-        top:  auto !important;
-        height: 40px !important;
-        min-height: 40px !important;
-        min-width: 100vw !important;
-        max-width: 100vw !important;
-        bottom: 0px !important;
-        left: 0px !important;
-        z-index: 10000 !important;
-      }
     }
   }
-
-  /* urlbar behavior on expanded single-toolbar mode*/
-    :root:not([zen-right-side="true"])[zen-sidebar-expanded="true"][zen-compact-mode="true"] {
-      #urlbar-container:has(#urlbar[open]) {
-        left: 0 !important;
-        right: auto !important;
-        margin-inline: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show] #urlbar-container:hover {
-        margin-left: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show]) #urlbar {
-        margin-left: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])[zen-has-hover] #urlbar:not(:hover) {
-        margin-left: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"])) #urlbar {
-        margin-left: 0px !important;
-      }
-    }
-
-    :root[zen-right-side="true"][zen-sidebar-expanded="true"][zen-compact-mode="true"] {
-      #urlbar-container:has(#urlbar[open]) {
-        left: auto !important;
-        right: 0 !important;
-        margin-inline: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"])[zen-user-show] #urlbar-container:hover {
-        margin-right: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show]) #urlbar {
-        margin-right: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[zen-floating-urlbar="true"]):not([zen-user-show])[zen-has-hover] #urlbar:not(:hover) {
-        margin-right: 0px !important;
-      }
-
-      #navigator-toolbox:has(#urlbar[open]:not([zen-floating-urlbar="true"])) #urlbar {
-        margin-right: 0px !important;
-      }
-    }
-}
-
-/* expanded urlbar */
-#urlbar {
-  top: auto !important;
-}
-
-#urlbar[open] {
-  min-width: var(--na-urlbar-width) !important;
-  max-width: var(--na-urlbar-width) !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  right: auto !important;
-  display: flex !important;
-  flex-direction: column !important;
-  top: auto !important;
-  bottom: 62.5px !important;
-}
-
-/* move urlbar input to bottom*/
-#urlbar>.urlbar-input-container {
-  order: 1 !important;
-}
-
-/* navbar padding */
-.urlbar-input-container {
-  padding-inline: 2px !important;
-}
 
 /* === SIDEBAR - MULTIPLE TOOLBAR === */
 
@@ -267,37 +180,11 @@
     margin-bottom: 2px !important; /* to match bottombar */
   }
 
-/* docked sidebar */
-:root:not([zen-compact-mode="true"]) #navigator-toolbox {
-  /* background: var(--na-color-bg) !important; */
-  padding: 0px !important;
-  margin: 0px !important;
-}
-
-/* reduced height of floating sidebar for multiple/collapse toolbar */
-@media not (-moz-bool-pref: "zen.view.use-single-toolbar"){
-  :root[zen-compact-mode="true"] #navigator-toolbox {
-    height: calc(100% - 48px) !important;
-    align-self: center !important;
-    margin-top: 20px !important;
-  }
-}
-
-@media not (-moz-bool-pref: "zen.view.use-single-toolbar"){
-  @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
-    :root[zen-compact-mode="true"] #navigator-toolbox {
-      height: calc(100% - 48px) !important;
-      align-self: center !important;
-      margin-top: 0px !important;
-    }
-  }
-}
-
-@media (-moz-bool-pref: "zen.view.use-single-toolbar"){
+/* @media (-moz-pref("zen.view.use-single-toolbar")) {
   :root[zen-compact-mode="true"] #navigator-toolbox {
     margin-top: 10px !important;
   }
-}
+} */
 
 :root:not([zen-sidebar-expanded="true"]):not([zen-compact-mode="true"]) #navigator-toolbox {
  min-width: 50px !important;
@@ -308,57 +195,88 @@
   min-width: 90px !important;
 }
 
-/* expanded docked sidebar LEFT side mode */
-:root:not([zen-right-side])[zen-sidebar-expanded="true"]:not([zen-compact-mode="true"]) #navigator-toolbox {
- /* background: var(--na-color-bg) !important; */
-  padding-right: 4px !important;
-  padding-left: 8px !important;
-  padding-top: 5px !important;
-}
 
-/* expanded docked sidebar RIGHT side mode */
-:root[zen-right-side][zen-sidebar-expanded="true"]:not([zen-compact-mode="true"]) #navigator-toolbox {
-  /* background: var(--na-color-bg) !important; */
-  padding-right: 8px !important;
-  padding-left: 4px !important;
-  padding-top: 5px !important;
-}
 
-/* ==== COMPACT MODE ==== */
+/* ==== COMPACT SIDEBAR - MULTI-TOOLBAR ==== */
 
 :root:not([zen-sidebar-expanded="true"]) #zen-sidebar-top-buttons {
   margin-bottom: 6px !important;
 }
 
-@media not (-moz-bool-pref: "zen.view.use-single-toolbar") {
-  /* expanded docked sidebar LEFT side mode */
-  :root:not([zen-right-side])[zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-left: 16px !important;
-    margin-bottom: 6px !important;
-    margin-top: 32px !important;
+@media not (-moz-pref("wireframe.urlbar.position.top")){
+  :root:not([zen-single-toolbar="true"])[zen-compact-mode="true"] #navigator-toolbox{
+    height: calc(100% - 56px) !important;
+    margin-top: 0 !important;
+    top: 20px !important;
   }
-
-  /* expanded docked sidebar RIGHT side mode */
-  :root[zen-right-side][zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-right: 16px !important;
-    margin-bottom: 6px !important;
-    margin-top: 32px !important;
+  :root:not([zen-single-toolbar="true"])[zen-compact-mode="true"] #titlebar{
+    height: calc(100% - 20px) !important;
+  }
+  
+  :root:not([zen-single-toolbar="true"]):not([zen-right-side])[zen-compact-mode="true"] #titlebar{
+    margin-left: 20px !important;
+  }
+  
+  :root:not([zen-single-toolbar="true"])[zen-right-side][zen-compact-mode="true"] #titlebar{
+    margin-right: 20px !important;
   }
 }
 
-@media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
-  /* expanded docked sidebar LEFT side mode */
-  :root:not([zen-right-side])[zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-left: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+@media (-moz-pref("wireframe.urlbar.position.top")){
+  :root:not([zen-single-toolbar="true"])[zen-compact-mode="true"] #navigator-toolbox{
+    height: calc(100% - 56px) !important;
+    margin-top: 0 !important;
   }
+  :root:not([zen-single-toolbar="true"])[zen-compact-mode="true"] #titlebar{
+    height: calc(100% - 20px) !important;
+  }
+  
+  :root:not([zen-single-toolbar="true"]):not([zen-right-side])[zen-compact-mode="true"] #titlebar{
+    margin-left: 20px !important;
+  }
+  
+  :root:not([zen-single-toolbar="true"])[zen-right-side][zen-compact-mode="true"] #titlebar{
+    margin-right: 20px !important;
+  }
+}
 
-  /* expanded docked sidebar RIGHT side mode */
-  :root[zen-right-side][zen-sidebar-expanded="true"][zen-compact-mode="true"] #titlebar {
-    margin-right: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+/* ==== COMPACT SIDEBAR - SINGLE-TOOLBAR ==== */
+
+@media not (-moz-pref("wireframe.urlbar.position.top")){
+  :root[zen-single-toolbar="true"][zen-compact-mode="true"] #navigator-toolbox{
+    height: calc(100% - 24px) !important;
+    margin-top: 0 !important;
+    top: 22px !important;
+  }
+  :root[zen-single-toolbar="true"][zen-compact-mode="true"] #titlebar{
+    height: calc(100% - 20px) !important;
+  }
+  
+  :root[zen-single-toolbar="true"]:not([zen-right-side])[zen-compact-mode="true"] #titlebar{
+    margin-left: 20px !important;
+  }
+  
+  :root[zen-single-toolbar="true"][zen-right-side][zen-compact-mode="true"] #titlebar{
+    margin-right: 20px !important;
+  }
+}
+
+@media (-moz-pref("wireframe.urlbar.position.top")){
+  :root[zen-single-toolbar="true"][zen-compact-mode="true"] #navigator-toolbox{
+    height: calc(100% - 24px) !important;
+    margin-top: 0 !important;
+    top: 22px !important;
+  }
+  :root[zen-single-toolbar="true"][zen-compact-mode="true"] #titlebar{
+    height: calc(100% - 20px) !important;
+  }
+  
+  :root[zen-single-toolbar="true"]:not([zen-right-side])[zen-compact-mode="true"] #titlebar{
+    margin-left: 20px !important;
+  }
+  
+  :root[zen-single-toolbar="true"][zen-right-side][zen-compact-mode="true"] #titlebar{
+    margin-right: 20px !important;
   }
 }
 
@@ -368,6 +286,31 @@
   border-radius: var(--na-user-border-radius) !important;
 }
 
+/* Hide tabbar when there are no active tabs */
+/* Credits to ivaon */
+@media (-moz-pref("wireframe.compact-sidebar.hide")){
+  :root[zen-compact-mode="true"] {
+    @media -moz-pref('zen.view.compact.hide-tabbar') or -moz-pref('zen.view.use-single-toolbar') {
+      &:not([zen-compact-animating]) {
+        #navigator-toolbox[zen-has-empty-tab] {
+          left: calc(-1 * var(--actual-zen-sidebar-width) + var(--zen-element-separation) / 2 + 1px) !important;
+          :root[zen-right-side='true'] & {
+            right: calc(-1 * var(--actual-zen-sidebar-width) + var(--zen-element-separation) / 2 + 1px) !important;
+            left: auto !important;
+          }
+          &[zen-has-hover="true"] {
+            left: calc(var(--zen-compact-float)/-2) !important;
+            :root[zen-right-side='true'] & {
+              right: calc(var(--zen-compact-float)/-2) !important;
+              left: auto !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 /* === COLLAPSED COMPACT === */
 
 :root[zen-compact-mode="true"] #titlebar {
@@ -375,52 +318,271 @@
   border-radius: var(--na-user-border-radius) !important;
 }
 
-@media not (-moz-bool-pref: "zen.view.use-single-toolbar") {
+@media (-moz-pref("zen.view.compact.hide-tabbar")) {
   :root:not([zen-right-side])[zen-compact-mode="true"] #titlebar{
-    margin-left: 16px !important;
-    margin-bottom: 6px !important;
-    margin-top: 32px !important;
+    /*! margin-left: 16px !important; */
+    /*! margin-bottom: 6px !important; */
+    /*! margin-top: 32px !important; */
   }
 
   :root[zen-right-side][zen-compact-mode="true"] #titlebar{
-    margin-right: 16px !important;
-    margin-bottom: 6px !important;
-    margin-top: 32px !important;
+/*     margin-right: 16px !important; */
+/*     margin-bottom: 6px !important; */
+/*     margin-top: 32px !important; */
   }
 }
 
 @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
   :root:not([zen-right-side])[zen-compact-mode="true"] #titlebar{
-    margin-left: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+    /*! margin-left: 16px !important; */
+    /*! margin-bottom: 32px !important; */
+    /*! margin-top: 6px !important; */
   }
 
   :root[zen-right-side][zen-compact-mode="true"] #titlebar{
-    margin-right: 16px !important;
-    margin-bottom: 32px !important;
-    margin-top: 6px !important;
+/*     margin-right: 16px !important; */
+/*     margin-bottom: 32px !important; */
+/*     margin-top: 6px !important; */
   }
 }
 
-/* === sidebar content === */
+/* box shadow for compact sidebar */
+/* :root:not([zen-compact-mod="false"]) #titlebar{
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px !important;
+} */
+
+/* === SIDEBAR CONTENT === */
 
 #titlebar {
-  /* background: var(--na-color-bg) !important; */
+  /*! background: var(--na-color-bg) !important; */
 /*   padding-inline: 0px !important; */
   padding-bottom: 3px !important;
   border-radius: var(--na-user-border-radius) !important;
 }
 
-@media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
+/* @media not (-moz-bool-pref: "wireframe.urlbar.position.top"){
   #titlebar{
     padding-top: 10px !important;
   }
+} */
+
+/* === WORKSPACE INDICATOR REVEAL ON HOVER === */
+
+@media (-moz-pref("wireframe.workspace.icon.hide")){
+    #titlebar .zen-current-workspace-indicator-stack {
+      visibility: collapse !important;
+      opacity: 0.0 !important;
+      transform: translateX(-4px) scale(0.92);
+      transition:
+        opacity 0.22s ease,
+        transform 0.26s cubic-bezier(.25,.8,.25,1) !important;
+      pointer-events: none;
+    }
+    
+    #titlebar .zen-current-workspace-indicator > label{
+      font-size: var(--wireframe-font-size) !important;
+      margin-left: -10px !important;
+      transition: margin-left 0.26s cubic-bezier(.25,.8,.25,1) !important;
+    }
+    
+    .zen-current-workspace-indicator:before{
+      background: transparent !important;
+    }
+    
+    :root:has(#titlebar .zen-current-workspace-indicator:hover){
+      #titlebar .zen-current-workspace-indicator-stack{
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: translateX(0) scale(1);
+      }
+      
+      #titlebar .zen-current-workspace-indicator > label{
+        margin-left: 0px !important;
+      }
+    }
 }
 
+/* container adjustments */
+.zw-mode-container {
+  font-size: 13px;
+  padding: 0 4px;
+}
+
+/* edit button */
+.zw-edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--toolbar-color);
+  padding: 0 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.zen-current-workspace-indicator:hover .zw-edit-btn {
+  opacity: 1;
+}
+
+/* menu */
+.zw-menu {
+  position: absolute;
+  top: 24px;
+  right: 0;
+  background: color-mix(in srgb, var(--toolbar-bgcolor) 70%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: 8px;
+  padding: 4px 0;
+  display: none;
+  z-index: 999999;
+}
+
+.zw-menu.show {
+  display: block;
+}
+
+.zw-menu div {
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.zw-menu div:hover {
+  background: color-mix(in srgb, var(--toolbarbutton-active-bgcolor) 50%, transparent);
+}
+
+
+/* === SIDEBAR FOOT BUTTON REVEAL ON HOVER === */
+
+@media (-moz-pref("wireframe.sidebar-foot.hide")) {
+
+    #zen-sidebar-foot-buttons {
+      opacity: 0 !important;
+      transform: translateY(10px) !important;
+      transition: opacity 0.15s ease, transform 0.15s ease !important;
+    }
+
+    #navigator-toolbox:hover #zen-sidebar-foot-buttons {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    :root:has(#downloadsPanel-multiView .panel-viewcontainer[panelopen="true"]) #zen-sidebar-foot-buttons {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+  
+  /* media player shift */
+  @media(-moz-pref("wireframe.workspace-switch.fan")){
+    #zen-media-controls-toolbar{
+      transform: translateY(48px) !important;
+      transition: transform 0.15s ease !important;
+    }
+
+    #navigator-toolbox:hover #zen-media-controls-toolbar{
+      transform: translateY(0) !important;
+    }
+  }
+  
+  @media not (-moz-pref("wireframe.workspace-switch.fan")){
+    #zen-media-controls-toolbar{
+      transform: translateY(42px) !important;
+      transition: transform 0.15s ease !important;
+    }
+
+    #navigator-toolbox:hover #zen-media-controls-toolbar{
+      transform: translateY(0) !important;
+    }
+  }
+}
+
+
+/* ===  NEW TAB === */
+
+#tabs-newtab-button{
+  border-radius: var(--na-tab-border-radius) !important;
+}
+
+/* === Changed new tab label === */
+
+@media (-moz-pref("wireframe.new-tab.label")){
+  #tabs-newtab-button .toolbarbutton-text::before {
+    content: "Where to?"; 
+  }
+
+  #tabs-newtab-button[in-urlbar="true"] .toolbarbutton-text::before {
+    content: "okay, spill"; 
+  }
+}
+
+/* === NEW TAB REVEAL ON HOVER ANIMATION === */
+
+@media (-moz-pref("wireframe.new-tab.reveal.animation")){
+  /* Base hidden state */
+  #tabs-newtab-button:not([in-urlbar="true"]) .toolbarbutton-text {
+    opacity: 0 !important;
+    visibility: collapse !important;
+    max-width: 0;
+    overflow: hidden;
+    transition: opacity .22s ease, max-width .22s ease;
+  }
+
+  /* Hover reveal */
+  #tabs-newtab-button:not([in-urlbar="true"]):hover .toolbarbutton-text {
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-width: 100px;
+  }
+
+  /* Slide icon left on hover */
+  #tabs-newtab-button:not([in-urlbar="true"]) .toolbarbutton-icon {
+    transition: transform .25s ease;
+  }
+
+  #tabs-newtab-button:not([in-urlbar="true"]):hover .toolbarbutton-icon {
+    transform: translateX(-6px);
+  }
+
+  #tabs-newtab-button:not([in-urlbar="true"]) .toolbarbutton-icon {
+    transition: transform .25s cubic-bezier(.25, .1, .25, 1);
+    transform-origin: center;
+  }
+
+  /* Hover: slide + rotate */
+  #tabs-newtab-button:not([in-urlbar="true"]):hover .toolbarbutton-icon {
+    transform: translateX(-6px) rotate(180deg);
+  }
+}
+
+/* sidebar border */
+
 :root[zen-compact-mode="true"] #titlebar {
+  outline: none !important;
   border: 1px solid var(--na-color-border) !important;
-  border-color: var(--na-color-border) !important;
+  border-color: var(--toolbox-textcolor) !important;
+}
+
+/* === macos border for compact sidebar === */
+
+@media (-moz-pref("wireframe.macos.border")){
+  :root[zen-compact-mode="true"] #titlebar{
+    border: none !important;
+  }
+  
+  :root[zen-compact-mode="true"] #titlebar::before{
+    box-shadow: 
+      /* --- corner mask: prevents edge halo bleeding --- */ 
+      inset 0 0 0 1px rgba(255,255,255,0.22), 
+      /* --- curved metal highlight (top + edges) --- */ 
+      inset 0 0 0 2px rgba(255,255,255,0.32), 
+      /* --- inner soft falloff depth --- */ 
+      inset 0 0 8px 3px rgba(0,0,0,0.08), 
+      /* --- machined outer rim --- */ 
+      0 0 0 1.5px rgba(0,0,0,0.25), 
+      /* --- outer structure ring / subtle glow --- */ 
+      0 1.5px 3px rgba(0,0,0,0.20), 
+      /* --- soft Sonoma glow (barely visible, premium) --- */ 
+      0 0 22px 3px color-mix(in srgb, var(--zen-primary-color) 40%, transparent); 
+  } 
 }
 
 #zen-browser-tabs-wrapper stack {
@@ -428,22 +590,30 @@
 }
 
 /* tabs hover animation */
-.tabbrowser-tab:hover .tab-label-container,
-.tabbrowser-tab:hover .tab-icon-stack {
-  animation: slideUpAdressBar var(--na-anim-duration) ease;
+@media (-moz-bool-pref:"wireframe.tab-hover.animation"){
+  .tabbrowser-tab:hover .tab-label-container,
+  .tabbrowser-tab:hover .tab-icon-stack {
+    animation: slideUpAdressBar var(--na-anim-duration) ease;
+  }
 }
 
 /* focused tab */
 .tabbrowser-tab[selected]:not([zen-essential]) label {
-  color: var(--na-color-bg) !important;
+/*   color: var(--na-color-bg) !important; */
   border-radius: var(--na-tab-border-radius) !important;
 }
 
-/* invert selected tab icon color */
-.tabbrowser-tab[selected] .tab-reset-button,
-.tabbrowser-tab[selected] .tab-close-button,
-.tabbrowser-tab[selected]:not([zen-essential]) img {
+/* invert selected tab reset/close button */
+/* .tabbrowser-tab[selected] .tab-reset-button,
+.tabbrowser-tab[selected] .tab-close-button {
   filter: invert(100%) sepia(100%) brightness(120%) contrast(100%);
+} */
+
+/* invert selected tab icon img */
+@media (-moz-bool-pref:"wireframe.tab-icon.invert"){
+  .tabbrowser-tab[selected]:not([zen-essential]) img {
+    filter: invert(100%) sepia(100%) brightness(120%) contrast(100%);
+  }
 }
 
 /* hover border radius change for close button and reset button*/
@@ -471,7 +641,7 @@
   }
 }
 
-#navigator-toolbox[zen-sidebar-expanded="true"] {
+/* #navigator-toolbox[zen-sidebar-expanded="true"] {
   & #TabsToolbar-customization-target {
     & > :is(toolbaritem, toolbarbutton):not(#search-container):not(#zen-workspaces-button), & #tabbrowser-arrowscrollbox-periphery > toolbarbutton {
       width: 100% !important;
@@ -480,7 +650,7 @@
       padding-right: var(--toolbarbutton-inner-padding) !important;
     }
   }
-}
+} */
 
 .tab-background { border-radius: var(--na-user-border-radius) !important; }
 
@@ -503,9 +673,14 @@
 }
 
 /* selected tab background */
-.tabbrowser-tab[selected]:not([zen-essential])>stack>vbox {
+/* .tabbrowser-tab[selected]:not([zen-essential])>stack>vbox {
   background: var(--na-color-text) !important;
-}
+} */
+
+/* active tab rename text fix */
+/* #tab-label-input{
+  color: var(--na-color-bg) !important;
+} */
 
 .tabbrowser-tab .tab-background:not([zen-essential])::before{
   background: rgba(0,0,0,0.2) !important;
@@ -515,7 +690,7 @@
 
 /* unfocused tabs */
 .tabbrowser-tab:not([zen-essential]) {
-  color: var(--na-color-text) !important;
+/*   color: var(--na-color-text) !important; */
   border-radius: var(--na-tab-border-radius) !important;
 }
 
@@ -533,20 +708,110 @@ zen-folder {
   }
 }
 
+
 /* Border radius of essentials */
 .tabbrowser-tab:has([zen-essential]) .tab-background{
   border-radius: var(--na-essen-border-radius) !important;
 }
 
+/* Essentials Spacing */
+.zen-essentials-container{
+  gap: var(--wf-essentials-gap, 4px) !important;
+}
+
+/* macos style border for essentials */
+@media (-moz-pref("wireframe.essen.borders", "macos-all")){
+  .tabbrowser-tab:has([zen-essential]) .tab-background::after{
+    position: absolute;
+    inset: 2px;
+    content: "";
+    border-radius: var(--na-essen-border-radius) !important;
+    box-shadow: 
+      /* --- corner mask: prevents edge halo bleeding --- */ 
+      inset 0 0 0 1px rgba(255,255,255,0.22), 
+      /* --- curved metal highlight (top + edges) --- */ 
+      inset 0 0 0 2px rgba(255,255,255,0.32), 
+      /* --- inner soft falloff depth --- */ 
+      inset 0 0 4px 1.5px rgba(0,0,0,0.08), 
+      /* --- machined outer rim --- */ 
+      0 0 0 1px rgba(0,0,0,0.25), 
+      /* --- outer structure ring / subtle glow --- */ 
+      0 2px 3px rgba(0,0,0,0.20)  
+  }
+}
+
+@media (-moz-pref("wireframe.essen.borders", "macos-active")){
+  .tabbrowser-tab[selected]:has([zen-essential]) .tab-background::after{
+    position: absolute;
+    inset: 2px;
+    content: "";
+    border-radius: var(--na-essen-border-radius) !important;
+    box-shadow: 
+      /* --- corner mask: prevents edge halo bleeding --- */ 
+      inset 0 0 0 1px rgba(255,255,255,0.22), 
+      /* --- curved metal highlight (top + edges) --- */ 
+      inset 0 0 0 2px rgba(255,255,255,0.32), 
+      /* --- inner soft falloff depth --- */ 
+      inset 0 0 4px 1.5px rgba(0,0,0,0.08), 
+      /* --- machined outer rim --- */ 
+      0 0 0 1px rgba(0,0,0,0.25), 
+      /* --- outer structure ring / subtle glow --- */ 
+      0 2px 3px rgba(0,0,0,0.20)  
+  }
+}
+
+/* macostyle border for tabs */
+@media (-moz-pref("wireframe.tab.borders", "macos-all")){
+  .tabbrowser-tab:not([zen-essential]) .tab-stack::after{
+    position: absolute;
+    z-index: -1 !important;
+    inset: 2px;
+    content: "";
+    border-radius: var(--na-tab-border-radius) !important;
+    box-shadow: 
+      /* --- corner mask: prevents edge halo bleeding --- */ 
+      inset 0 0 0 1px rgba(255,255,255,0.22), 
+      /* --- curved metal highlight (top + edges) --- */ 
+      inset 0 0 0 2px rgba(255,255,255,0.32), 
+      /* --- inner soft falloff depth --- */ 
+      inset 0 0 4px 1.5px rgba(0,0,0,0.08), 
+      /* --- machined outer rim --- */ 
+      0 0 0 1px rgba(0,0,0,0.25), 
+      /* --- outer structure ring / subtle glow --- */ 
+      0 2px 3px rgba(0,0,0,0.20)  
+  }
+}
+
+@media (-moz-pref("wireframe.tab.borders", "macos-active")){
+  .tabbrowser-tab[selected]:not([zen-essential]) .tab-stack::after{
+    position: absolute;
+    z-index: -1 !important;
+    inset: 2px;
+    content: "";
+    border-radius: var(--na-tab-border-radius) !important;
+    box-shadow: 
+      /* --- corner mask: prevents edge halo bleeding --- */ 
+      inset 0 0 0 1px rgba(255,255,255,0.22), 
+      /* --- curved metal highlight (top + edges) --- */ 
+      inset 0 0 0 2px rgba(255,255,255,0.32), 
+      /* --- inner soft falloff depth --- */ 
+      inset 0 0 4px 1.5px rgba(0,0,0,0.08), 
+      /* --- machined outer rim --- */ 
+      0 0 0 1px rgba(0,0,0,0.25), 
+      /* --- outer structure ring / subtle glow --- */ 
+      0 2px 3px rgba(0,0,0,0.20)  
+  }
+}
+
 /* workspace hover */
-:root[zen-sidebar-expanded="true"] #zen-current-workspace-indicator:hover::before {
+/* :root[zen-sidebar-expanded="true"] #zen-current-workspace-indicator:hover::before {
   background: var(--na-color-text) !important;
   border-radius: var(--na-border-radius) !important;
 }
 
 :root[zen-sidebar-expanded="true"] #zen-current-workspace-indicator:hover>#zen-current-workspace-indicator-name {
   color: var(--na-color-bg) !important;
-}
+} */
 
 /* sidebar bottom icon padding and direction */
 #zen-sidebar-icons-wrapper {
@@ -567,12 +832,6 @@ zen-folder {
   opacity: 1 !important;
 }
 
-/* @media (-moz-pref: "wireframe.compact.siderbar.transparent") {
-  :root[zen-compact-mode="true"] #navigator-toolbox {
-    background: var(--zen-primary-color)  !important;
-  }
-} */
-
 /* Pref to disable navigation buttons */
 @media (-moz-pref("wireframe.navigation.hide")){
   #back-button{
@@ -585,9 +844,59 @@ zen-folder {
 
 /* === AUDIO INDICATOR == */
 
-.tab-audio-button {
-  color: var(--zen-primary-color) !important;
+/* .tab-audio-button {
+  color: var(--na-color-bg) !important;
 }
+ */
+/* === TRANSPARENT COMPACT SIDEBAR === */
+@media (-moz-pref("wireframe.compact.sidebar.transparent")){
+  :root[zen-compact-mode="true"] #titlebar::before{
+    content: "";
+    inset: 0;
+    position: absolute;
+    pointer-events: none;
+    backdrop-filter: blur(24px) brightness(1.15) !important;
+  }
+  
+  :root[zen-compact-mode="true"] #zen-sidebar-top-buttons{
+    z-index: 1 !important;
+  }
+
+  :root[zen-compact-mode="true"] .zen-toolbar-background {
+    background: var(--zen-main-browser-background) !important;
+    opacity: 0.5 !important;
+  }
+}
+
+/* === FOLDER STYLING === */
+@media (-moz-pref("wireframe.folders","border")){
+  zen-folder {
+    border-radius: var(--na-tab-border-radius) !important;
+    position: relative !important; /* needed for the outline pseudo */
+  }
+
+  zen-folder:not([collapsed]){
+    border-radius: var(--na-tab-border-radius) !important;
+    transition: all 0.18s ease !important;
+    outline: 2px solid var(--zen-toolbar-element-bg) !important;
+    outline-offset: -4px !important;
+  }
+}
+
+@media (-moz-pref("wireframe.folders","background")){
+  zen-folder {
+    border-radius: var(--na-tab-border-radius) !important;
+    position: relative !important; /* needed for the outline pseudo */
+  }
+
+  zen-folder:not([collapsed]){
+    background: var(--zen-toolbar-element-bg) !important;
+    border-radius: var(--na-tab-border-radius) !important;
+    transition: all 0.18s ease !important;
+  }
+}
+
+/* ======= MEDIA QUERIES FOR PREFERENCES ======== */
 
 /* Pref for tab and folder border radius */
 @media (-moz-pref("wireframe.tab.border_radius",0)){
@@ -678,6 +987,6 @@ zen-folder {
 
 @media (-moz-pref("wireframe.essentials.border_radius",50)){
   :root{
-    --na-essen-border-radius: 50% !important;
+    --na-essen-border-radius: 100px !important;
   }
 }

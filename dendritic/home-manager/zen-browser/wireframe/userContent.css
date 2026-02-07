@@ -1,5 +1,4 @@
 @-moz-document url("about:privatebrowsing") {
-
   @media (prefers-color-scheme: light) {
     :root {
       --na-color-text: rgba(54, 20, 192, 1);
@@ -53,15 +52,15 @@
 }
 
 @-moz-document url("about:newtab"), url("about:blank"), url("about:privatebrowsing") {
-
-  html, body {
+  html,
+  body {
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
   #root,
- .container {
+  .container {
     display: none;
   }
 
@@ -76,10 +75,10 @@
     height: 100%;
     align-content: center;
     text-align: center;
-    content: '░░▒▒▓▓';
+    content: "░░▒▒▓▓";
     /* '░░▒▒▓▓' */
     visibility: visible;
-    background-image: '';
+    background-image: "";
     /* url(loading.gif) */
     background-size: 5em;
     background-repeat: no-repeat;
@@ -87,7 +86,7 @@
   }
 }
 
-@media (-moz-pref("wireframe.blank.content")){
+@media (-moz-pref("wireframe.blank.content")) {
   @-moz-document url("about:newtab"), url("about:home"), url("about:blank"), url("about:privatebrowsing") {
     body::before {
       content: "";

@@ -11,6 +11,7 @@
   --na-window-border-radius: 0px; /* Pref var for window border radius */
   --na-tab-border-radius: 0px; /* Pref var for tabs and folders border radius */
   --na-essen-border-radius: 0px; /* Pref var for essentials border radius */
+  --na-urlbar-border-radius: 16px; /* Pref var for floating urlbar */
   --na-anim-duration: 0.3s;
   --na-urlbar-width: 40vw; /* vw: viewport or your browser width, 100vw means 100% browser width */
 }

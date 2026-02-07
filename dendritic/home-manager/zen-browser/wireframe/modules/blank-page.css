@@ -1,0 +1,209 @@
+@media (-moz-pref("wireframe.blank.theme", 0)) {
+    :root {
+        --na-blank-bg: rgba(30, 30, 31, 0.75);
+    }
+}
+
+@media (-moz-pref("wireframe.blank.theme", 1)) {
+    :root {
+        --na-blank-bg: rgba(255, 255, 255, 0.75);
+    }
+}
+
+@media (-moz-pref("wireframe.blank.theme", 2)) {
+    :root {
+        --na-blank-bg: rgba(30, 30, 31, 0);
+    }
+}
+
+/* === Empty-tab logo: colorable without touching the bg or PiP === */
+
+.browserStack::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--wf-blank-logo-size, 150px) !important;
+    height: var(--wf-blank-logo-size, 150px) !important;
+    opacity: 0 !important; /* hidden by default */
+    transition: opacity 0.18s ease !important; /* smooth fade */
+    transition-delay: 0.33s ease !important; /* added delay */
+    pointer-events: none !important;
+    z-index: 1 !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+}
+
+/* ensure the tab content container is a positioned container for the pseudo */
+#browser:has([zen-empty-tab="true"][selected="true"]) .browserStack {
+    position: relative !important;
+    z-index: 0 !important;
+    background-color: var(--na-blank-bg) !important;
+    background-image: none !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 150px !important;
+}
+
+/* blank logo on pseudo element */
+#browser:has([zen-empty-tab="true"][selected="true"]) .browserStack::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--wf-blank-logo-size, 150px) !important;
+    height: var(--wf-blank-logo-size, 150px) !important;
+    background-image: var(
+        --wf-blank-logo,
+        url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/wireframe.svg")
+    ) !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+    pointer-events: none !important; /* don’t block clicks */
+    z-index: 1 !important; /* over bg, below UI */
+    opacity: var(--wf-blank-logo-opacity, 0.75) !important;
+    transition:
+        filter 0.25s ease,
+        opacity 0.25s ease !important;
+    filter: var(--zen-logo-filter, none) !important;
+}
+
+/* blank logo reduced opacity on inactive window */
+#browser:has([zen-empty-tab="true"][selected="true"]) .browserStack:-moz-window-inactive::before {
+  opacity: 0.45 !important;
+}
+
+
+/* THEME FILTERS — only affect the logo pseudo, NOT the bg or PiP */
+@media (-moz-pref("wireframe.blank.theme", 0)) {
+    :root {
+        --zen-logo-filter: invert(1) hue-rotate(180deg);
+    }
+}
+@media (-moz-pref("wireframe.blank.theme", 1)) {
+    :root {
+        --zen-logo-filter: invert(0);
+    }
+}
+@media (-moz-pref("wireframe.blank.theme", 2)) {
+    :root {
+        --zen-logo-filter: invert(1);
+    }
+}
+
+/* === Logo Options (switchable via wireframe.blank.logo) === */
+
+@media (-moz-pref("wireframe.blank.logo",0)) {
+    :root {
+        --wf-blank-logo: none;
+    }
+
+    #browser:has([zen-empty-tab="true"][selected="true"]) .browserStack::before {
+        display: none !important;
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","wireframe")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/wireframe.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","checks")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/checks.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","starlight")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/starlight.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","rings")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/rings.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","waves")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/3fc526f18c92ae9aacb2372a4655f478aceb333e/elements/waves.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","globe")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/globe.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","smiley")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/smiley.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","y2k-star")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/3fc526f18c92ae9aacb2372a4655f478aceb333e/elements/y2k-stars.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","y2k-smiley")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/3fc526f18c92ae9aacb2372a4655f478aceb333e/elements/y2k-smiley.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","asterisk")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/3fc526f18c92ae9aacb2372a4655f478aceb333e/elements/asterisk.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","arrow")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/dea3ee388719e68fec4ac403b852728b64015101/elements/arrow.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","barcode")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/barcode.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","globe-alt")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/globe-2.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","sad-face")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/sad.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","y2k-globe")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/463d91c69f361853f3a6b71a67b1980f79319922/elements/y2k-earth.svg");
+    }
+}
+
+@media (-moz-pref("wireframe.blank.logo","marty-supreme")) {
+    :root {
+        --wf-blank-logo: url("https://raw.githubusercontent.com/SehajveerSingh2005/zen-wireframe-2.0/985805e2d24aad964449f1d6a6da8614799b530e/elements/MARTY-SUPREME.svg");
+    }
+
+    /* Disabling filter for Marty Supreme */
+    :root {
+        --zen-logo-filter: none;
+    }
+}

@@ -320,7 +320,7 @@
             keyboardShortcuts = self.zenBrowserShortcuts;
             # Fails activation on schema changes to detect potential regressions
             # Find this in about:config or prefs.js of your profile
-            keyboardShortcutsVersion = 13;
+            keyboardShortcutsVersion = 14;
 
             userChrome = ./wireframe/userChrome.css;
             userContent = ./wireframe/userContent.css;
