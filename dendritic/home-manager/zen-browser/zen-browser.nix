@@ -284,6 +284,12 @@
               "zen.workspaces.container-specific-essentials-enabled" = true;
               "zen.workspaces.indicator-position" = "top";
               "zen.workspaces.show-workspace-indicator" = false;
+
+              "wireframe.urlbar.position.top" = true;
+              "wireframe.webview.border_radius" = 16;
+              "wireframe.window.border_radius" = 16;
+              "wireframe.tab.border_radius" = 16;
+              "wireframe.essentials.border_radius" = 16;
             };
 
             search = {
