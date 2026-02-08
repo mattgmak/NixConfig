@@ -1,0 +1,6 @@
+@-moz-document url-prefix("https://codeberg.org")
+{
+  * {
+    font-family: "IosevkaTerm Nerd Font Propo" !important;
+  }
+}

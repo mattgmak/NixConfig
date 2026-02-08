@@ -50,6 +50,7 @@
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
           enable = true;
+          darwinDefaultsId = "app.zen-browser.zen";
           nativeMessagingHosts = [ pkgs.firefoxpwa ];
           policies =
             let
@@ -104,6 +105,7 @@
                 "sponsorBlocker@ajay.app" = "sponsorblock";
                 # "uBlock0@raymondhill.net" = "ublock-origin";
                 "vimium-c@gdh1995.cn" = "vimium-c";
+                "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = "styl-us";
               };
             };
           profiles.default = rec {

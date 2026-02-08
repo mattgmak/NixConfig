@@ -17,7 +17,10 @@ in
   };
 
   flake.homeConfigurations.MacMini = {
-    imports = [ self.homeModules.main ];
+    imports = [
+      self.homeModules.main
+      self.homeModules.zen-browser
+    ];
   };
 
   flake.darwinModules.${hostname} =

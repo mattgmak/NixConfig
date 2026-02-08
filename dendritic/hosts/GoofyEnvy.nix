@@ -1,183 +1,220 @@
-{ inputs, self, withSystem, ... }: {
+{
+  inputs,
+  self,
+  withSystem,
+  ...
+}:
+{
   flake = {
-    nixosConfigurations.GoofyEnvy = withSystem "x86_64-linux"
-      ({ config, inputs', ... }:
-        inputs.nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs inputs';
-            inherit (self.constants) username;
-            inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
-            inherit (config) packages;
-            hostname = self.constants.laptopName;
-          };
-          modules = [
-            self.nixosModules.common
-            self.nixosModules.GoofyEnvy
-            self.nixosModules.GoofyEnvyHardware
-            self.nixosModules.steam
-          ];
-        });
+    nixosConfigurations.GoofyEnvy = withSystem "x86_64-linux" (
+      { config, inputs', ... }:
+      inputs.nixpkgs.lib.nixosSystem {
+        specialArgs = {
+          inherit inputs inputs';
+          inherit (self.constants) username;
+          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
+          inherit (config) packages;
+          hostname = self.constants.laptopName;
+        };
+        modules = [
+          self.nixosModules.common
+          self.nixosModules.GoofyEnvy
+          self.nixosModules.GoofyEnvyHardware
+          self.nixosModules.steam
+        ];
+      }
+    );
 
     homeConfigurations.GoofyEnvy = {
-      imports = [ self.homeModules.main self.homeModules.zen-browser-legacy ];
+      imports = [
+        self.homeModules.main
+        self.homeModules.zen-browser
+      ];
     };
 
-    nixosModules.GoofyEnvy = { pkgs, username, pkgs-stable, ... }: {
-      # Bootloader
-      imports = [
-        ../../modules/input-remapper.nix
-        inputs.xremap-flake.nixosModules.default
-      ];
+    nixosModules.GoofyEnvy =
+      {
+        pkgs,
+        username,
+        pkgs-stable,
+        ...
+      }:
+      {
+        # Bootloader
+        imports = [
+          ../../modules/input-remapper.nix
+          inputs.xremap-flake.nixosModules.default
+        ];
 
-      home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
+        home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
 
-      environment.systemPackages = with pkgs; [
-        bitwarden-desktop
-        wezterm
-        libnotify
-        obsidian
-        pkgs-stable.vesktop
-        protonvpn-gui
-        wl-clipboard
-        clipse
-        pulseaudio-ctl
-        brightnessctl
-        playerctl
-        bluetui
-        networkmanagerapplet
-        overskride
-        wev
-        evtest
-        btop
-        chromium
-        xorg.xeyes
-        kdePackages.okular
-        mpv
-        qbittorrent
-        gparted
-        appflowy
-        qmk
-        qmk-udev-rules
-        qmk_hid
-        via
-        vial
-        kbd
-        zoom-us
-      ];
-
-      boot = {
-        loader = {
-          systemd-boot.enable = true;
-          efi.canTouchEfiVariables = true;
-        };
-      };
-
-      services.xremap = {
-        userName = username;
-        withHypr = true;
-        # Map CapsLock to Escape
-        yamlConfig = ''
-          modmap:
-            - name: "CapsLock"
-              remap:
-                CapsLock: esc
-            - name: "RightAlt to Backspace"
-              remap:
-                KEY_RIGHTALT: KEY_BACKSPACE
-          keymap:
-            - name: "Super-u"
-              remap:
-                Super-u: NumLock
-        '';
-      };
-
-      services.udev = {
-        packages = with pkgs; [
+        environment.systemPackages = with pkgs; [
+          bitwarden-desktop
+          wezterm
+          libnotify
+          obsidian
+          pkgs-stable.vesktop
+          protonvpn-gui
+          wl-clipboard
+          clipse
+          pulseaudio-ctl
+          brightnessctl
+          playerctl
+          bluetui
+          networkmanagerapplet
+          overskride
+          wev
+          evtest
+          btop
+          chromium
+          xorg.xeyes
+          kdePackages.okular
+          mpv
+          qbittorrent
+          gparted
+          appflowy
           qmk
-          qmk-udev-rules # the only relevant
+          qmk-udev-rules
           qmk_hid
           via
           vial
-        ]; # packages
-      }; # udev
-
-      # Enable CUPS to print documents.
-      services.printing = {
-        enable = true;
-        drivers = with pkgs; [
-          gutenprint
-          hplip
-          splix
-          cups-kyocera
-          foomatic-db
-          foomatic-db-engine
-          foomatic-db-ppds
-          cups-filters
+          kbd
+          zoom-us
         ];
-        # Enable browsing of printers that are shared on the network
-        browsing = true;
-        allowFrom = [ "all" ];
-        listenAddresses = [ "*:631" ];
-        defaultShared = true;
-      };
-      services.avahi = {
-        enable = true;
-        nssmdns4 = true;
-        openFirewall = true;
-      };
 
-      hardware.graphics.enable = true;
-      hardware.bluetooth = {
-        enable = true;
-        powerOnBoot = true;
-        settings = { General = { Enable = "Source,Sink,Media,Socket"; }; };
+        boot = {
+          loader = {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
+          };
+        };
+
+        services.xremap = {
+          userName = username;
+          withHypr = true;
+          # Map CapsLock to Escape
+          yamlConfig = ''
+            modmap:
+              - name: "CapsLock"
+                remap:
+                  CapsLock: esc
+              - name: "RightAlt to Backspace"
+                remap:
+                  KEY_RIGHTALT: KEY_BACKSPACE
+            keymap:
+              - name: "Super-u"
+                remap:
+                  Super-u: NumLock
+          '';
+        };
+
+        services.udev = {
+          packages = with pkgs; [
+            qmk
+            qmk-udev-rules # the only relevant
+            qmk_hid
+            via
+            vial
+          ]; # packages
+        }; # udev
+
+        # Enable CUPS to print documents.
+        services.printing = {
+          enable = true;
+          drivers = with pkgs; [
+            gutenprint
+            hplip
+            splix
+            cups-kyocera
+            foomatic-db
+            foomatic-db-engine
+            foomatic-db-ppds
+            cups-filters
+          ];
+          # Enable browsing of printers that are shared on the network
+          browsing = true;
+          allowFrom = [ "all" ];
+          listenAddresses = [ "*:631" ];
+          defaultShared = true;
+        };
+        services.avahi = {
+          enable = true;
+          nssmdns4 = true;
+          openFirewall = true;
+        };
+
+        hardware.graphics.enable = true;
+        hardware.bluetooth = {
+          enable = true;
+          powerOnBoot = true;
+          settings = {
+            General = {
+              Enable = "Source,Sink,Media,Socket";
+            };
+          };
+        };
+        services.blueman.enable = true;
+
+        swapDevices = [
+          {
+            device = "/swapfile";
+            size = 16 * 1024;
+          }
+        ];
+
+        system.stateVersion = "24.11";
       };
-      services.blueman.enable = true;
-
-      swapDevices = [{
-        device = "/swapfile";
-        size = 16 * 1024;
-      }];
-
-      system.stateVersion = "24.11";
-    };
 
     # Do not modify this module!  It was generated by ‘nixos-generate-config’
     # and may be overwritten by future invocations.  Please make changes
     # to /etc/nixos/configuration.nix instead.
-    nixosModules.GoofyEnvyHardware = { config, lib, modulesPath, ... }: {
-      imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+    nixosModules.GoofyEnvyHardware =
+      {
+        config,
+        lib,
+        modulesPath,
+        ...
+      }:
+      {
+        imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-      boot.initrd.availableKernelModules =
-        [ "nvme" "xhci_pci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
-      boot.initrd.kernelModules = [ ];
-      boot.kernelModules = [ "kvm-amd" ];
-      boot.extraModulePackages = [ ];
+        boot.initrd.availableKernelModules = [
+          "nvme"
+          "xhci_pci"
+          "usb_storage"
+          "sd_mod"
+          "rtsx_pci_sdmmc"
+        ];
+        boot.initrd.kernelModules = [ ];
+        boot.kernelModules = [ "kvm-amd" ];
+        boot.extraModulePackages = [ ];
 
-      fileSystems."/" = {
-        device = "/dev/disk/by-uuid/20cc20dd-3f6d-493c-bf10-ea258033d04d";
-        fsType = "ext4";
+        fileSystems."/" = {
+          device = "/dev/disk/by-uuid/20cc20dd-3f6d-493c-bf10-ea258033d04d";
+          fsType = "ext4";
+        };
+
+        fileSystems."/boot" = {
+          device = "/dev/disk/by-uuid/CB08-1C0D";
+          fsType = "vfat";
+          options = [
+            "fmask=0022"
+            "dmask=0022"
+          ];
+        };
+
+        swapDevices = [ ];
+
+        # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+        # (the default) this is the recommended approach. When using systemd-networkd it's
+        # still possible to use this option, but it's recommended to use it in conjunction
+        # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+        networking.useDHCP = lib.mkDefault true;
+        # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
+
+        nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+        hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
       };
-
-      fileSystems."/boot" = {
-        device = "/dev/disk/by-uuid/CB08-1C0D";
-        fsType = "vfat";
-        options = [ "fmask=0022" "dmask=0022" ];
-      };
-
-      swapDevices = [ ];
-
-      # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-      # (the default) this is the recommended approach. When using systemd-networkd it's
-      # still possible to use this option, but it's recommended to use it in conjunction
-      # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-      networking.useDHCP = lib.mkDefault true;
-      # networking.interfaces.wlo1.useDHCP = lib.mkDefault true;
-
-      nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-      hardware.cpu.amd.updateMicrocode =
-        lib.mkDefault config.hardware.enableRedistributableFirmware;
-    };
 
   };
 }
