@@ -2,12 +2,12 @@
 {
   flake = {
     homeModules.zen-browser-legacy =
-      { pkgs, ... }:
+      { pkgs, lib, ... }:
       {
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
           enable = true;
-          nativeMessagingHosts = [ pkgs.firefoxpwa ];
+          nativeMessagingHosts = lib.mkIf pkgs.stdenv.isLinux [ pkgs.firefoxpwa ];
           policies = {
             Preferences =
               let
@@ -45,13 +45,13 @@
       };
 
     homeModules.zen-browser =
-      { pkgs, ... }:
+      { pkgs, lib, ... }:
       {
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
           enable = true;
           darwinDefaultsId = "app.zen-browser.zen";
-          nativeMessagingHosts = [ pkgs.firefoxpwa ];
+          nativeMessagingHosts = lib.mkIf pkgs.stdenv.isLinux [ pkgs.firefoxpwa ];
           policies =
             let
               mkExtensionSettings = builtins.mapAttrs (
@@ -319,10 +319,10 @@
               };
             };
 
-            keyboardShortcuts = self.zenBrowserShortcuts;
+            keyboardShortcuts = lib.mkIf pkgs.stdenv.isLinux self.zenBrowserShortcuts;
             # Fails activation on schema changes to detect potential regressions
             # Find this in about:config or prefs.js of your profile
-            keyboardShortcutsVersion = 14;
+            keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 14;
 
             userChrome = ./wireframe/userChrome.css;
             userContent = ./wireframe/userContent.css;
@@ -355,14 +355,19 @@
           };
         };
 
-        home.file.".zen/default/chrome/modules" = {
-          source = ./wireframe/modules;
-          recursive = true;
-        };
-        home.file.".zen/default/chrome/preferences.json" = {
-          source = ./wireframe/preferences.json;
-        };
-
+        home.file =
+          let
+            configDir = if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles/" else ".zen/";
+          in
+          {
+            "${configDir}/default/chrome/modules" = {
+              source = ./wireframe/modules;
+              recursive = true;
+            };
+            "${configDir}/default/chrome/preferences.json" = {
+              source = ./wireframe/preferences.json;
+            };
+          };
       };
   };
 }
