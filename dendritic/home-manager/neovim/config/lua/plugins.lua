@@ -118,10 +118,12 @@ require('lazy').setup({
         'zig',
         'nix',
       }):wait(300000)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = { '<filetype>' },
-        callback = function() vim.treesitter.start() end,
-      })
+      if not is_vscode then
+        vim.api.nvim_create_autocmd('FileType', {
+          pattern = { '<filetype>' },
+          callback = function() vim.treesitter.start() end,
+        })
+      end
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end,
   },
@@ -164,7 +166,7 @@ require('lazy').setup({
       require('mini.surround').setup()
     end,
   },
-  { "actionshrimp/direnv.nvim", opts = {} },
+  { 'actionshrimp/direnv.nvim', opts = {} },
   {
     'MagicDuck/grug-far.nvim',
     enabled = not is_vscode,
@@ -176,7 +178,7 @@ require('lazy').setup({
       require('grug-far').setup({
         -- options, see Configuration section below
         -- there are no required options atm
-      });
-    end
+      })
+    end,
   },
 })
