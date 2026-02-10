@@ -36,6 +36,7 @@
             # "super+alt+i=inspector:toggle"
             "ctrl+shift+w=close_tab"
             "ctrl+shift+t=new_tab"
+            "ctrl+shift+p=toggle_command_palette"
             # "super+alt+up=goto_split:up"
             # "super+alt+down=goto_split:down"
             # "super+alt+right=goto_split:right"
@@ -50,7 +51,7 @@
             # "super+shift+j=write_screen_file:paste"
             "ctrl+shift+v=paste_from_selection"
             # "super+shift+w=close_window"
-            # "super+shift+comma=reload_config"
+            "ctrl+shift+comma=reload_config"
             "ctrl+page_up=previous_tab"
             "ctrl+page_down=next_tab"
             # "super+shift+up=jump_to_prompt:-1"
@@ -102,6 +103,7 @@
             "shift+end=adjust_selection:end"
             "shift+page_up=adjust_selection:page_up"
             "shift+page_down=adjust_selection:page_down"
+
           ];
         };
       };
