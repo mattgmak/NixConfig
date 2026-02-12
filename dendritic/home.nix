@@ -21,6 +21,7 @@
           self.homeModules.lazygit
           self.homeModules.ghostty
           self.homeModules.cursor
+          self.homeModules.carapace
         ]
         ++ (
           if (hostname == "GoofyEnvy" || hostname == "GoofyDesky") then
