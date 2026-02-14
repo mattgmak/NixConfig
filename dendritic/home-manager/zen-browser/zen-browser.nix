@@ -292,6 +292,7 @@
               "wireframe.window.border_radius" = 16;
               "wireframe.tab.border_radius" = 16;
               "wireframe.essentials.border_radius" = 16;
+              "wireframe.pip.border_radius" = 10;
             };
 
             search = {
@@ -324,8 +325,8 @@
             # Find this in about:config or prefs.js of your profile
             keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 14;
 
-            userChrome = ./wireframe/userChrome.css;
-            userContent = ./wireframe/userContent.css;
+            userChrome = ./zen-wireframe-2/userChrome.css;
+            userContent = ./zen-wireframe-2/userContent.css;
 
             containersForce = true;
             pinsForce = true;
@@ -361,11 +362,12 @@
           in
           {
             "${configDir}/default/chrome/modules" = {
-              source = ./wireframe/modules;
+              source = ./zen-wireframe-2/modules;
               recursive = true;
             };
-            "${configDir}/default/chrome/preferences.json" = {
-              source = ./wireframe/preferences.json;
+            "${configDir}/default/chrome/elements" = {
+              source = ./zen-wireframe-2/elements;
+              recursive = true;
             };
           };
       };
