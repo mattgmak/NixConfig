@@ -98,10 +98,20 @@
               - name: "CapsLock"
                 remap:
                   CapsLock: esc
-              - name: "RightAlt to Backspace"
+              - name: "RightAlt Nav Layer"
                 remap:
-                  KEY_RIGHTALT: KEY_BACKSPACE
+                  RightAlt:
+                    skip_key_event: true
+                    press: { set_mode: nav }
+                    release: { set_mode: default }
             keymap:
+              - name: "Nav Layer Mappings"
+                mode: nav
+                remap:
+                  j: up
+                  k: down
+                  l: left
+                  semicolon: right
               - name: "Super-u"
                 remap:
                   Super-u: NumLock
