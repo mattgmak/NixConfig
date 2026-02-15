@@ -112,6 +112,8 @@
                   k: down
                   l: left
                   semicolon: right
+                  m: pageup
+                  comma: pagedown
               - name: "Super-u"
                 remap:
                   Super-u: NumLock

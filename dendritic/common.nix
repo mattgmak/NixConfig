@@ -1,7 +1,18 @@
-{ inputs, self, ... }: {
+{ inputs, self, ... }:
+{
   flake = {
-    nixosModules.common = { pkgs, hostname, username, pkgs-for-cursor
-      , pkgs-stable, config, lib, ... }: {
+    nixosModules.common =
+      {
+        pkgs,
+        hostname,
+        username,
+        pkgs-for-cursor,
+        pkgs-stable,
+        config,
+        lib,
+        ...
+      }:
+      {
         imports = [
           ../modules/style/common.nix
           ../modules/style/linux.nix
@@ -13,7 +24,13 @@
           useGlobalPkgs = true;
           useUserPackages = true;
           extraSpecialArgs = {
-            inherit inputs hostname username pkgs-for-cursor pkgs-stable;
+            inherit
+              inputs
+              hostname
+              username
+              pkgs-for-cursor
+              pkgs-stable
+              ;
           };
           backupFileExtension = "hm-backup-1";
         };
@@ -31,7 +48,10 @@
               "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
             ];
             warn-dirty = false;
-            experimental-features = [ "nix-command" "flakes" ];
+            experimental-features = [
+              "nix-command"
+              "flakes"
+            ];
           };
           gc = {
             automatic = true;
@@ -48,8 +68,19 @@
         };
         networking.firewall = {
           enable = true;
-          allowedTCPPorts = [ 80 443 3000 8081 8082 3210 ];
-          allowedUDPPorts = [ 80 443 3210 ];
+          allowedTCPPorts = [
+            80
+            443
+            3000
+            8081
+            8082
+            3210
+          ];
+          allowedUDPPorts = [
+            80
+            443
+            3210
+          ];
           allowedTCPPortRanges = [
             # KDEConnect
             {
@@ -73,44 +104,51 @@
           # Disaabled for obsidian because no stylus support
           # NIXOS_OZONE_WL = "1";
         };
-        environment.shells = with pkgs; [ nushell bash ];
+        environment.shells = with pkgs; [
+          nushell
+          bash
+        ];
 
         systemd.services.fprintd = {
           wantedBy = [ "multi-user.target" ];
           serviceConfig.Type = "simple";
         };
-        services.fprintd = { enable = true; };
+        services.fprintd = {
+          enable = true;
+        };
         security.pam.services.login = {
           fprintAuth = false;
           enableGnomeKeyring = true;
         };
-        security.pam.services.gdm-fingerprint =
-          lib.mkIf (config.services.fprintd.enable) {
-            text = ''
-              auth       required                    pam_shells.so
-              auth       requisite                   pam_nologin.so
-              auth       requisite                   pam_faillock.so      preauth
-              auth       required                    ${pkgs.fprintd}/lib/security/pam_fprintd.so
-              auth       optional                    pam_permit.so
-              auth       required                    pam_env.so
-              auth       [success=ok default=1]      ${pkgs.gdm}/lib/security/pam_gdm.so
-              auth       optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so
+        security.pam.services.gdm-fingerprint = lib.mkIf (config.services.fprintd.enable) {
+          text = ''
+            auth       required                    pam_shells.so
+            auth       requisite                   pam_nologin.so
+            auth       requisite                   pam_faillock.so      preauth
+            auth       required                    ${pkgs.fprintd}/lib/security/pam_fprintd.so
+            auth       optional                    pam_permit.so
+            auth       required                    pam_env.so
+            auth       [success=ok default=1]      ${pkgs.gdm}/lib/security/pam_gdm.so
+            auth       optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so
 
-              account    include                     login
+            account    include                     login
 
-              password   required                    pam_deny.so
+            password   required                    pam_deny.so
 
-              session    include                     login
-              session    optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
-            '';
-          };
+            session    include                     login
+            session    optional                    ${pkgs.gnome-keyring}/lib/security/pam_gnome_keyring.so auto_start
+          '';
+        };
         services.gnome.gnome-keyring.enable = true;
         programs.seahorse.enable = true;
         security.pam.services = {
           greetd.enableGnomeKeyring = true;
           greetd-password.enableGnomeKeyring = true;
         };
-        services.dbus.packages = with pkgs; [ gnome-keyring gcr ];
+        services.dbus.packages = with pkgs; [
+          gnome-keyring
+          gcr
+        ];
 
         services.xserver.displayManager.sessionCommands = ''
           eval $(gnome-keyring-daemon --start --daemonize --components=ssh,secrets)
@@ -150,8 +188,14 @@
         users.users.${username} = {
           isNormalUser = true;
           description = "Goofy";
-          extraGroups =
-            [ "networkmanager" "wheel" "adbusers" "input" "kvm" "dialout" ];
+          extraGroups = [
+            "networkmanager"
+            "wheel"
+            "adbusers"
+            "input"
+            "kvm"
+            "dialout"
+          ];
           shell = pkgs.nushell;
         };
 
@@ -203,6 +247,7 @@
           paprefs
           pulseaudio-ctl
           croc
+          devbox
         ];
 
         programs.dconf.enable = true;
@@ -215,8 +260,7 @@
           configDir = "/home/${username}/.config/syncthing";
           settings = {
             devices = {
-              phone.id =
-                "LRGIDSH-W6NIW7U-SV62HMC-EMHYALK-RSK7Y5K-OOZK7WI-IEQR6ZU-CGWRWQT";
+              phone.id = "LRGIDSH-W6NIW7U-SV62HMC-EMHYALK-RSK7Y5K-OOZK7WI-IEQR6ZU-CGWRWQT";
             };
             folders = {
               Music = {
@@ -234,8 +278,7 @@
         programs.hyprland = {
           enable = true;
           withUWSM = true;
-          package =
-            inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+          package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
           portalPackage =
             inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
         };
@@ -245,7 +288,9 @@
           # libraries = with pkgs; [ ];
         };
 
-        virtualisation.docker = { enable = true; };
+        virtualisation.docker = {
+          enable = true;
+        };
         # Add flatpak support
         services.flatpak.enable = true;
       };
