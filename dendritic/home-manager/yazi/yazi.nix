@@ -72,6 +72,7 @@
             source = ./keymap.toml;
           };
           # "${baseConfigPath}/theme.toml" = { source = ./theme.toml; };
+          "${baseConfigPath}/scripts/cursor-open.nu".source = ./scripts/cursor-open.nu;
         };
       programs.yazi = {
         theme = {
