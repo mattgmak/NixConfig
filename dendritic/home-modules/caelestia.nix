@@ -1,6 +1,7 @@
+{ inputs, ... }:
 {
   flake.homeModules.caelestia =
-    { inputs, pkgs, ... }:
+    { pkgs, ... }:
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
       gtk = {

@@ -1,9 +1,12 @@
 {
+  inputs,
+  ...
+}:
+{
   flake.homeModules.ghostty =
     {
       pkgs,
       lib,
-      inputs,
       ...
     }:
     {

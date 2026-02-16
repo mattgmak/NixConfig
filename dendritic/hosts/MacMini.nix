@@ -17,9 +17,20 @@ in
   };
 
   flake.homeConfigurations.MacMini = {
-    imports = [
-      self.homeModules.main
-      self.homeModules.zen-browser
+    imports = with self.homeModules; [
+      darwin-home
+      zen-browser
+      nushell
+      wezterm
+      neovim
+      starship
+      yazi
+      git
+      direnv
+      lazygit
+      ghostty
+      cursor
+      carapace
     ];
   };
 

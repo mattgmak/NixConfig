@@ -28,10 +28,32 @@
     );
 
     homeConfigurations.GoofyDesky = {
-      imports = [
-        self.homeModules.main
-        self.homeModules.zen-browser
-        self.homeModules.cs2
+      imports = with self.homeModules; [
+        nixos-home
+        zen-browser
+        cs2
+        nushell
+        wezterm
+        neovim
+        starship
+        yazi
+        git
+        direnv
+        lazygit
+        ghostty
+        cursor
+        carapace
+        bluetui
+        hyprland
+        # waybar
+        wlogout
+        fcitx5
+        mpv
+        kdeconnect
+        filepicker
+        wiremix
+        caelestia
+        xdg
       ];
     };
 

@@ -1,4 +1,4 @@
-{ self, ... }:
+{ inputs, self, ... }:
 {
   flake.homeModules.hyprland =
     {
@@ -6,7 +6,6 @@
       lib,
       config,
       hostname,
-      inputs,
       ...
     }:
     {

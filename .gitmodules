@@ -1,3 +1,3 @@
 [submodule "zen-wireframe-2"]
-	path = dendritic/home-manager/zen-browser/zen-wireframe-2
+	path = dendritic/home-modules/zen-browser/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0

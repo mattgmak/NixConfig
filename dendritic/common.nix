@@ -25,7 +25,6 @@
           useUserPackages = true;
           extraSpecialArgs = {
             inherit
-              inputs
               hostname
               username
               pkgs-for-cursor
@@ -236,7 +235,6 @@
           git-credential-manager
           kdePackages.kdeconnect-kde
           lazyjournal
-          # zen
           stylua
           inputs.wiremix.packages.${pkgs.stdenv.hostPlatform.system}.wiremix
           ffmpeg

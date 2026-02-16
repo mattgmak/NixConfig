@@ -26,9 +26,31 @@
     );
 
     homeConfigurations.GoofyEnvy = {
-      imports = [
-        self.homeModules.main
-        self.homeModules.zen-browser
+      imports = with self.homeModules; [
+        nixos-home
+        zen-browser
+        nushell
+        wezterm
+        neovim
+        starship
+        yazi
+        git
+        direnv
+        lazygit
+        ghostty
+        cursor
+        carapace
+        bluetui
+        hyprland
+        # waybar
+        wlogout
+        fcitx5
+        mpv
+        kdeconnect
+        filepicker
+        wiremix
+        caelestia
+        xdg
       ];
     };
 
