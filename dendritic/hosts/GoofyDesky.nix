@@ -31,6 +31,7 @@
       imports = [
         self.homeModules.main
         self.homeModules.zen-browser
+        self.homeModules.cs2
       ];
     };
 
