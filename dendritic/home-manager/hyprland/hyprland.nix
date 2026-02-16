@@ -282,9 +282,7 @@
 
             plugin = {
               csgo-vulkan-fix = {
-                res_w = 2560;
-                res_h = 1440;
-                class = "cs2";
+                vkfix-app = "cs2, 2560, 1440";
               };
             };
 
