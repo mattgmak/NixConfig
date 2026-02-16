@@ -93,7 +93,7 @@ in
           base16-shell-preview
           lazygit
           wezterm
-          jq # Required for yabai window focusing scripts
+          jq
           mas
           direnv
           git-credential-manager
@@ -151,154 +151,102 @@ in
         noto-fonts-color-emoji
       ];
 
-      services.yabai = {
+      services.aerospace = {
         enable = true;
-        config = {
-          # Layout and appearance
-          layout = "bsp";
-          auto_balance = "off";
-          split_ratio = "0.50";
+        settings = {
+          "config-version" = 2;
+          "default-root-container-layout" = "tiles";
+          "default-root-container-orientation" = "auto";
+          "enable-normalization-flatten-containers" = true;
+          "enable-normalization-opposite-orientation-for-nested-containers" = true;
+          "accordion-padding" = 30;
 
-          # Gaps configuration (matching your Hyprland setup)
-          top_padding = 8;
-          bottom_padding = 8;
-          left_padding = 8;
-          right_padding = 8;
-          window_gap = 5;
+          "key-mapping"."preset" = "qwerty";
 
-          # Window management
-          window_placement = "second_child";
-          window_topmost = "off";
-          window_shadow = "on";
-          window_opacity = "off";
-          window_opacity_duration = "0.0";
-          active_window_opacity = "1.0";
-          normal_window_opacity = "0.90";
+          # Match prior yabai gap behavior as closely as possible.
+          gaps = {
+            inner = {
+              horizontal = 5;
+              vertical = 5;
+            };
+            outer = {
+              left = 0;
+              bottom = 0;
+              top = 0;
+              right = 0;
+            };
+          };
 
-          # Window borders (optional - can be disabled)
-          window_border = "off";
-          window_border_width = 2;
-          active_window_border_color = "0xff775759";
-          normal_window_border_color = "0xff555555";
+          mode.main.binding = {
+            # Focus navigation (matching previous j/k/l/; directional mapping)
+            "alt-j" = "focus up";
+            "alt-k" = "focus down";
+            "alt-l" = "focus left";
+            "alt-semicolon" = "focus right";
 
-          # Mouse settings
-          mouse_follows_focus = "off";
-          focus_follows_mouse = "off";
-          mouse_modifier = "fn";
-          mouse_action1 = "move";
-          mouse_action2 = "resize";
-          mouse_drop_action = "swap";
+            # Swap windows
+            "alt-shift-j" = "swap up";
+            "alt-shift-k" = "swap down";
+            "alt-shift-l" = "swap left";
+            "alt-shift-semicolon" = "swap right";
 
-          # General settings
-          external_bar = "off";
-          menubar_opacity = "1.0";
-          window_animation_duration = "0.0";
+            # Window management
+            "alt-f" = "fullscreen";
+            "alt-t" = "layout floating tiling";
+            "alt-d" = "close";
+
+            # Workspace switching
+            "alt-0" = "workspace 0";
+            "alt-1" = "workspace 1";
+            "alt-2" = "workspace 2";
+            "alt-3" = "workspace 3";
+            "alt-4" = "workspace 4";
+            "alt-5" = "workspace 5";
+            "alt-6" = "workspace 6";
+            "alt-7" = "workspace 7";
+            "alt-8" = "workspace 8";
+            "alt-9" = "workspace 9";
+
+            # Move windows to workspaces
+            "alt-shift-0" = "move-node-to-workspace --focus-follows-window 0";
+            "alt-shift-1" = "move-node-to-workspace --focus-follows-window 1";
+            "alt-shift-2" = "move-node-to-workspace --focus-follows-window 2";
+            "alt-shift-3" = "move-node-to-workspace --focus-follows-window 3";
+            "alt-shift-4" = "move-node-to-workspace --focus-follows-window 4";
+            "alt-shift-5" = "move-node-to-workspace --focus-follows-window 5";
+            "alt-shift-6" = "move-node-to-workspace --focus-follows-window 6";
+            "alt-shift-7" = "move-node-to-workspace --focus-follows-window 7";
+            "alt-shift-8" = "move-node-to-workspace --focus-follows-window 8";
+            "alt-shift-9" = "move-node-to-workspace --focus-follows-window 9";
+
+            # Resize windows (closest AeroSpace equivalents)
+            "alt-u" = "resize height -50";
+            "alt-i" = "resize height +50";
+            "alt-o" = "resize width -50";
+            "alt-p" = "resize width +50";
+            "alt-shift-u" = "resize height +50";
+            "alt-shift-i" = "resize height -50";
+            "alt-shift-o" = "resize width +50";
+            "alt-shift-p" = "resize width -50";
+
+            # Focus key apps
+            "alt-w" = "exec-and-forget osascript -e 'tell application \"Ghostty\" to activate'";
+            "alt-e" = "exec-and-forget osascript -e 'tell application \"Cursor\" to activate'";
+            "alt-r" = "exec-and-forget osascript -e 'tell application \"Zen\" to activate'";
+            "alt-x" = "exec-and-forget osascript -e 'tell application \"Xcode\" to activate'";
+            "alt-a" = "exec-and-forget osascript -e 'tell application \"Android Studio\" to activate'";
+            "alt-s" = "exec-and-forget osascript -e 'tell application \"Simulator\" to activate'";
+            "alt-c" = "exec-and-forget osascript -e 'tell application \"Google Chrome\" to activate'";
+
+          };
+
+          on-window-detected = [
+            {
+              "if".app-id = "com.mitchellh.ghostty";
+              run = "layout floating";
+            }
+          ];
         };
-
-      };
-
-      services.skhd = {
-        enable = true;
-        skhdConfig = ''
-          # Focus navigation (matching your Hyprland jkl; layout)
-          alt - j : yabai -m window --focus north
-          alt - k : yabai -m window --focus south
-          alt - l : yabai -m window --focus west
-          alt - 0x29 : yabai -m window --focus east  # semicolon key
-
-          # Alternative arrow key navigation
-          # alt - up : yabai -m window --focus north
-          # alt - down : yabai -m window --focus south
-          # alt - left : yabai -m window --focus west
-          # alt - right : yabai -m window --focus east
-
-          # Move windows (shift + navigation)
-          alt + shift - j : yabai -m window --swap north
-          alt + shift - k : yabai -m window --swap south
-          alt + shift - l : yabai -m window --swap west
-          alt + shift - 0x29 : yabai -m window --swap east  # semicolon key
-
-          # Alternative arrow key window movement
-          # alt + shift - up : yabai -m window --swap north
-          # alt + shift - down : yabai -m window --swap south
-          # alt + shift - left : yabai -m window --swap west
-          # alt + shift - right : yabai -m window --swap east
-
-          # Window management
-          alt - f : yabai -m window --toggle windowed-fullscreen
-          alt - t : yabai -m window --toggle float
-          alt - d : yabai -m window --close
-          alt - tab : yabai -m space --focus recent
-
-          # Workspace switching (1-8 like your Hyprland config)
-          alt - 1 : yabai -m space --focus 1
-          alt - 2 : yabai -m space --focus 2
-          alt - 3 : yabai -m space --focus 3
-          alt - 4 : yabai -m space --focus 4
-          alt - 5 : yabai -m space --focus 5
-          alt - 6 : yabai -m space --focus 6
-          alt - 7 : yabai -m space --focus 7
-          alt - 8 : yabai -m space --focus 8
-
-          # Move windows to workspaces (shift + number)
-          alt + shift - 1 : yabai -m window --space 1; yabai -m space --focus 1
-          alt + shift - 2 : yabai -m window --space 2; yabai -m space --focus 2
-          alt + shift - 3 : yabai -m window --space 3; yabai -m space --focus 3
-          alt + shift - 4 : yabai -m window --space 4; yabai -m space --focus 4
-          alt + shift - 5 : yabai -m window --space 5; yabai -m space --focus 5
-          alt + shift - 6 : yabai -m window --space 6; yabai -m space --focus 6
-          alt + shift - 7 : yabai -m window --space 7; yabai -m space --focus 7
-          alt + shift - 8 : yabai -m window --space 8; yabai -m space --focus 8
-
-          # Layout controls
-          # alt - s : yabai -m space --layout stack
-          # alt - w : yabai -m space --layout bsp
-          # alt - e : yabai -m space --layout float
-
-          # Resize windows (matching your Hyprland u/i/o/p layout)
-          alt - u : yabai -m window --resize top:0:-20
-          alt - i : yabai -m window --resize bottom:0:20
-          alt - o : yabai -m window --resize left:-20:0
-          alt - p : yabai -m window --resize right:20:0
-
-          # Alternative resize with shift (move windows)
-          alt + shift - u : yabai -m window --resize top:0:20
-          alt + shift - i : yabai -m window --resize bottom:0:-20
-          alt + shift - o : yabai -m window --resize left:20:0
-          alt + shift - p : yabai -m window --resize right:-20:0
-
-          # Application launchers (similar to your Hyprland super key bindings)
-          # alt - return : open -a WezTerm
-
-          # Focus specific applications (similar to your Hyprland focus binds)
-          alt - w : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Ghostty" or .app=="ghostty") | .id' | head -1)
-          alt - e : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Code" or .app=="Cursor") | .id' | head -1)
-          alt - r : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Zen" or .app=="zen") | .id' | head -1)
-          alt - x : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Xcode") | .id' | head -1)
-          alt - a : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Android Studio") | .id' | head -1)
-          alt - s : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Simulator") | .id' | head -1)
-          alt - c : yabai -m window --focus $(yabai -m query --windows | jq '.[] | select(.app=="Google Chrome") | .id' | head -1)
-
-          # Balance all windows
-          # alt + shift - space : yabai -m space --balance
-
-          # Rotate tree
-          # alt + shift - r : yabai -m space --rotate 90
-
-          # Mirror tree y-axis
-          # alt + shift - y : yabai -m space --mirror y-axis
-
-          # Mirror tree x-axis
-          # alt + shift - x : yabai -m space --mirror x-axis
-
-          # Create new space and follow focus
-          alt - n : yabai -m space --create && \
-                             index="$(yabai -m query --spaces --display | jq 'map(select(."is-native-fullscreen" == false))[-1].index')" && \
-                             yabai -m space --focus "$index"
-
-          # Destroy current space
-          alt + shift - q : yabai -m space --destroy
-        '';
       };
 
       system = {
