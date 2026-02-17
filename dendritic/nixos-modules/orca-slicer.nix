@@ -1,5 +1,6 @@
 {
-  flake.nixosModules.orca-slicer = { pkgs, ... }:
+  flake.nixosModules.orca-slicer =
+    { pkgs, ... }:
     let
       orcaSlicerDesktopItem = pkgs.makeDesktopItem {
         name = "orca-slicer-dri";
@@ -7,8 +8,7 @@
         genericName = "3D Printing Software";
         icon = "OrcaSlicer";
         # exec = "env GBM_BACKEND=dri ${pkgs.orca-slicer}/bin/orca-slicer %U";
-        exec =
-          "env __GLX_VENDOR_LIBRARY_NAME=mesa __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink WEBKIT_DISABLE_DMABUF_RENDERER=1 ${pkgs.orca-slicer}/bin/orca-slicer %U";
+        exec = "env __GLX_VENDOR_LIBRARY_NAME=mesa __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json MESA_LOADER_DRIVER_OVERRIDE=zink GALLIUM_DRIVER=zink WEBKIT_DISABLE_DMABUF_RENDERER=1 ${pkgs.orca-slicer}/bin/orca-slicer %U";
         terminal = false;
         type = "Application";
         mimeTypes = [
@@ -19,7 +19,11 @@
           "application/x-amf"
           "x-scheme-handler/orcaslicer"
         ];
-        categories = [ "Graphics" "3DGraphics" "Engineering" ];
+        categories = [
+          "Graphics"
+          "3DGraphics"
+          "Engineering"
+        ];
         keywords = [
           "3D"
           "Printing"
@@ -54,12 +58,13 @@
         application/x-amf=orca-slicer-dri.desktop;
       '';
 
-      orcaSlicerMimeappsList =
-        pkgs.writeText "orca-slicer-mimeapps.list" mimeappsListContent;
-    in {
+      orcaSlicerMimeappsList = pkgs.writeText "orca-slicer-mimeapps.list" mimeappsListContent;
+    in
+    {
       environment.systemPackages = with pkgs; [
         orca-slicer
         orcaSlicerDesktopItem
+        nanum # for fixing https://github.com/OrcaSlicer/OrcaSlicer/issues/11641
       ];
       environment.etc."xdg/mimeapps.list" = {
         source = orcaSlicerMimeappsList;
