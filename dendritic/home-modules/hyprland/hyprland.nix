@@ -281,7 +281,14 @@
 
             plugin = {
               csgo-vulkan-fix = {
-                vkfix-app = "cs2, 2560, 1440";
+                fix_mouse = true;
+                res_w = 2560;
+                res_h = 1440;
+                class = "SDL Application";
+                vkfix-app = [
+                  "cs2, 2560, 1440"
+                  "SDL Application, 2560, 1440"
+                ];
               };
             };
 
@@ -319,7 +326,7 @@
                   [
                     "${matchPip}, monitor ${deskyMonitors.secondary}, no_initial_focus on, center on, size 986 555"
                     "match:class (org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*), workspace name:Game"
-                    "match:class (cs2|steam_app_.*), fullscreen on, immediate on"
+                    "match:class (cs2|steam_app_.*), immediate on"
                     "${secondaryWorkspacesMatcher}, match:title (btop|clipse|bluetui|nmtui|wiremix), float on, size 1000 800, center on, stay_focused on, pin on"
                     "match:class (vesktop), workspace ${lib.head secondaryWorkspaces}"
                   ]
