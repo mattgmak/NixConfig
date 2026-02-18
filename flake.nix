@@ -82,6 +82,8 @@
     };
 
     nix-gaming.url = "github:fufexan/nix-gaming";
+
+    yazi.url = "github:sxyazi/yazi";
   };
 
   outputs =

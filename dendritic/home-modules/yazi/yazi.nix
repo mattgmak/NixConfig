@@ -1,14 +1,25 @@
-{ self, ... }:
+{ self, inputs, ... }:
 {
   flake.homeModules.yazi =
     { pkgs, ... }:
     {
       programs.yazi = {
         enable = true;
+        package = inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
+          _7zz = pkgs._7zz-rar; # Support for RAR extraction
+        };
         enableNushellIntegration = true;
         initLua = ./init.lua;
         plugins = with pkgs.yaziPlugins; {
           inherit git;
+        };
+        theme = {
+          indicator = {
+            padding = {
+              open = "█";
+              close = "█";
+            };
+          };
         };
       };
       # TODO: use nixpkgs plugins
@@ -74,15 +85,5 @@
           # "${baseConfigPath}/theme.toml" = { source = ./theme.toml; };
           "${baseConfigPath}/scripts/cursor-open.nu".source = ./scripts/cursor-open.nu;
         };
-      programs.yazi = {
-        theme = {
-          indicator = {
-            padding = {
-              open = "█";
-              close = "█";
-            };
-          };
-        };
-      };
     };
 }

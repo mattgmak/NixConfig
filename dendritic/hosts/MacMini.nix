@@ -88,7 +88,6 @@ in
         with pkgs;
         [
           git
-          yazi
           fzf
           zoxide
           starship
