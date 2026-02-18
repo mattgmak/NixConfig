@@ -246,6 +246,7 @@
           pulseaudio-ctl
           croc
           devbox
+          go
         ];
 
         programs.dconf.enable = true;
@@ -269,9 +270,13 @@
                 path = "/home/${username}/GoofyObsidian";
                 devices = [ "phone" ];
               };
+              OfflineMedia = {
+                path = "/home/${username}/OfflineMedia";
+                devices = [ "phone" ];
+              };
             };
           };
-        };
+        }; # syncthing
 
         programs.hyprland = {
           enable = true;
