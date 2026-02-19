@@ -64,7 +64,7 @@
       {
         # Bootloader
         imports = [
-          ../../modules/input-remapper.nix
+          self.nixosModules.inputRemapper
           inputs.xremap-flake.nixosModules.default
         ];
 

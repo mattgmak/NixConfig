@@ -72,7 +72,7 @@
       };
 
       home.file."Pictures/Wallpapers/wallpaper.jpg" = {
-        source = ../../modules/style/beautiful-mountains-landscape.jpg;
+        source = ../nixos-modules/style/beautiful-mountains-landscape.jpg;
       };
 
       home.packages = [ pkgs.quickshell ];

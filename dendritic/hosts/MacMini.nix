@@ -50,11 +50,12 @@ in
       };
 
       imports = [
-        # ./common.nix
         inputs.home-manager.darwinModules.home-manager
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.stylix.darwinModules.stylix
-        ../../modules/style/common.nix
+        self.fonts
+        self.stylixCommon
+        # self.darwinModules.stylixCursor
       ];
 
       users.users.${username} = {
