@@ -8,7 +8,7 @@
       ...
     }:
     {
-      imports = [ ../../../modules/cursor-injection ];
+      imports = [ self.homeModules.cursorInjection ];
       home.file = {
         ".cursor/extensions/custom/custom.js".source = ./custom.js;
         ".cursor/extensions/custom/custom.css".source = ./custom.css;

@@ -356,6 +356,8 @@
           };
         };
 
+        stylix.targets.zen-browser.enable = false;
+
         home.file =
           let
             configDir = if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles/" else ".zen/";

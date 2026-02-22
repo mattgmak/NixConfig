@@ -12,18 +12,18 @@ A Home Manager module that provides comprehensive customization capabilities for
 - **Transparency**: Make windows transparent or semi-transparent
 - **Window Properties**: Control rounded corners, opacity, size constraints, etc.
 - **Build-time Modifications**: Changes are applied during Nix build, making them persistent
-- **Pinned Version Support**: Works with pinned Cursor versions via separate nixpkgs instances
+- **Custom Package Support**: Works with pinned or custom Cursor builds via `programs.cursor-injection.package`
 
 ## How It Works
 
-This module creates a modified version of the Cursor package by:
+This module creates a modified Cursor package by:
 
-1. Using a nixpkgs overlay to modify the `code-cursor` package
+1. Taking `programs.cursor-injection.package` (defaults to `pkgs.code-cursor`)
 2. Extracting the Cursor installation during build
 3. Locating the main Electron process file (`main.js`) and `workbench.html` files
 4. Injecting custom Electron BrowserWindow options into the main process
 5. Injecting CSS and JavaScript file stubs into HTML templates
-6. Creating a new package with all modifications applied
+6. Returning an overridden package with all modifications applied
 
 The approach is safer than runtime file modification because:
 
@@ -36,25 +36,24 @@ The approach is safer than runtime file modification because:
 
 ### Home Manager Configuration (Recommended)
 
-1. Import the module in your home-manager configuration:
+1. Import the module in your Home Manager configuration:
 
 ```nix
-# In your home-manager/home.nix
+# In your home-manager/home.nix (or module list)
 {
   imports = [
     # ... other imports
-    ./desktop/cursor-injection
+    # If using this repo's flake module export:
+    inputs.self.homeModules.cursorInjection
   ];
 }
 ```
 
-2. Create a home-manager cursor-injection module:
+1. Configure custom files and options:
 
 ```nix
-# In home-manager/desktop/cursor-injection/default.nix
-{ ... }: {
-  imports = [ ../../../modules/cursor-injection ];
-
+# In a Home Manager module
+{ pkgs-for-cursor, ... }: {
   # Create custom CSS/JS files in ~/.cursor/extensions/custom/
   home.file = {
     ".cursor/extensions/custom/custom.css".source = ./custom.css;
@@ -63,6 +62,8 @@ The approach is safer than runtime file modification because:
 
   programs.cursor-injection = {
     enable = true;
+    # Optional: use a pinned/custom cursor package
+    package = pkgs-for-cursor.code-cursor;
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";
@@ -73,7 +74,7 @@ The approach is safer than runtime file modification because:
 }
 ```
 
-3. Rebuild your Home Manager configuration:
+1. Rebuild your Home Manager configuration:
 
 ```bash
 home-manager switch
@@ -94,6 +95,12 @@ sudo nixos-rebuild switch
 - **Type**: attribute set
 - **Default**: {}
 - **Description**: Electron BrowserWindow options to apply to Cursor's main process
+
+### `programs.cursor-injection.package`
+
+- **Type**: package
+- **Default**: `pkgs.code-cursor`
+- **Description**: Cursor package used as the base before injection (use this for pinned nixpkgs/package variants)
 
 ### `programs.cursor-injection.customCSSFileStubs`
 
@@ -240,14 +247,14 @@ electron = {
 { pkgs-for-cursor, ... }: {
   programs.cursor-injection = {
     enable = true;
+    package = pkgs-for-cursor.code-cursor;
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";
     };
   };
 
-  # The module automatically uses pkgs-for-cursor.extend to apply overlays
-  # No additional configuration needed
+  # Injection is applied to the package specified above
 }
 ```
 
@@ -276,10 +283,13 @@ electron = {
 
 ### Checking Applied Modifications
 
-The module will show warnings during build indicating what modifications were applied:
+The build log includes messages from the injection step, for example:
 
-```
-cursor-injection: Injected custom CSS/JS into extracted Cursor contents via overlay
+```text
+Injecting cursor customizations...
+Patching main.js with electron options...
+Successfully patched main.js
+Cursor injection complete on extracted directory.
 ```
 
 ### Reverting Changes
@@ -312,26 +322,26 @@ If you encounter build errors:
 1. Check that your electron options are valid JSON
 2. Ensure all string values are properly quoted
 3. Verify the cursor package is available in your nixpkgs
-4. If using `pkgs-for-cursor`, ensure it's properly passed to the module
+4. If using a pinned Cursor package, set `programs.cursor-injection.package` explicitly
 5. Check that CSS/JS file paths are correct
 
 ## Comparison with VSCode Extensions
 
-| Feature | VSCode Extensions | This Module |
-|---------|------------------|-------------|
-| File Modification | Runtime | Build-time |
-| CSS/JS Injection | Extension-based | Direct HTML injection |
-| Persistence | Requires backup management | Automatic via Nix |
-| Rollback | Manual script | Disable module |
-| Permissions | Needs write access | No runtime permissions needed |
-| Safety | Risk of corruption | Isolated in Nix store |
-| Version Pinning | Not supported | Full nixpkgs overlay support |
+|Feature|VSCode Extensions|This Module|
+|---|---|---|
+|File Modification|Runtime|Build-time|
+|CSS/JS Injection|Extension-based|Direct HTML injection|
+|Persistence|Requires backup management|Automatic via Nix|
+|Rollback|Manual script|Disable module|
+|Permissions|Needs write access|No runtime permissions needed|
+|Safety|Risk of corruption|Isolated in Nix store|
+|Version Pinning|Not supported|Supported via `programs.cursor-injection.package`|
 
 ## File Structure
 
 When using this module, your file structure should look like:
 
-```
+```text
 ~/.cursor/extensions/custom/
 ├── custom.css          # Your custom CSS
 ├── custom.js           # Your custom JavaScript

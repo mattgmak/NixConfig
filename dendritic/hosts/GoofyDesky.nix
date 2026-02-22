@@ -164,7 +164,7 @@
             qmk_hid
             via
             vial
-            (pkgs.callPackage ../../modules/final-mouse-udev-rules.nix { })
+            self.packages.${pkgs.stdenv.hostPlatform.system}.finalMouseUdevRules
           ]; # packages
         }; # udev
 
