@@ -8,7 +8,8 @@
           imageDir = "/etc/profiles/per-user/${config.home.username}/share/wlogout/icons";
         in
         {
-          ".config/wlogout/style.css".text = /* css */ ''
+          ".config/wlogout/style.css".text = ''
+            /* css */
             * {
               background-image: none;
               box-shadow: none;
