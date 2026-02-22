@@ -239,7 +239,7 @@
             ];
             exec-once = [
               # "uwsm app -- hyprpaper"
-              "systemctl --user start hyprpolkitagent"
+              "systemctl --user enable --now hyprpolkitagent.service"
               # "uwsm app -- waybar"
               "uwsm app -- clipse -listen"
               "uwsm app -- fcitx5 -dr"

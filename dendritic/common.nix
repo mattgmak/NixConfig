@@ -92,6 +92,8 @@
       services.fprintd = {
         enable = true;
       };
+
+      security.polkit.enable = true;
       security.pam.services.login = {
         fprintAuth = false;
         enableGnomeKeyring = true;
