@@ -125,6 +125,13 @@ image_bound = [10000, 10000]
 suppress_preload = false
 
 [plugin]
+
+prepend_previewers = [
+	{ url = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
+	{ url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
+	{ url = "*/", run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"' },
+]
+
 fetchers = [
 	# Mimetype
 	{ id = "mime", url = "*/", run = "mime.dir", prio = "high" },
@@ -165,8 +172,8 @@ preloaders = [
 previewers = [
 	{ url = "*/", run = "folder" },
 	# Code
-	{ mime = "text/*", run = "code" },
-	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = "code" },
+	{ mime = "text/*", run = 'piper -- bat -p --color=always "$1"' },
+	{ mime = "application/{mbox,javascript,wine-extension-ini}", run = 'piper -- bat -p --color=always "$1"' },
 	# JSON
 	{ mime = "application/{json,ndjson}", run = "json" },
 	# Image
