@@ -327,6 +327,7 @@
                     "${matchPip}, monitor ${deskyMonitors.secondary}, no_initial_focus on, center on, size 986 555"
                     "match:class (org.prismlauncher.PrismLauncher|steam|Minecraft.*|cs2|osu!|steam_app_.*), workspace name:Game"
                     "match:class (cs2|steam_app_.*), immediate on"
+                    "match:class (steam_app_.*), fullscreen on"
                     "${secondaryWorkspacesMatcher}, match:title (btop|clipse|bluetui|nmtui|wiremix), float on, size 1000 800, center on, stay_focused on, pin on"
                     "match:class (vesktop), workspace ${lib.head secondaryWorkspaces}"
                   ]
