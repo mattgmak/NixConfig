@@ -94,10 +94,6 @@
       };
 
       security.polkit.enable = true;
-      security.pam.services.login = {
-        fprintAuth = false;
-        enableGnomeKeyring = true;
-      };
       security.pam.services.gdm-fingerprint = lib.mkIf (config.services.fprintd.enable) {
         text = ''
           auth       required                    pam_shells.so
@@ -120,18 +116,20 @@
       services.gnome.gnome-keyring.enable = true;
       programs.seahorse.enable = true;
       security.pam.services = {
-        greetd.enableGnomeKeyring = true;
-        greetd-password.enableGnomeKeyring = true;
+        # greetd.enableGnomeKeyring = true;
+        # greetd-password.enableGnomeKeyring = true;
+        login = {
+          fprintAuth = false;
+          enableGnomeKeyring = true;
+        };
+        gdm.enableGnomeKeyring = true;
+        gdm-password.enableGnomeKeyring = true;
+        hyprlock.enableGnomeKeyring = true;
       };
       services.dbus.packages = with pkgs; [
         gnome-keyring
         gcr
       ];
-
-      services.xserver.displayManager.sessionCommands = ''
-        eval $(gnome-keyring-daemon --start --daemonize --components=ssh,secrets)
-        export SSH_AUTH_SOCK
-      '';
 
       # Set your time zone.
       time.timeZone = "Asia/Hong_Kong";
