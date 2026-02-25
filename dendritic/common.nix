@@ -171,6 +171,7 @@
           "input"
           "kvm"
           "dialout"
+          "docker"
         ];
         shell = pkgs.nushell;
       };
@@ -223,6 +224,7 @@
         croc
         devbox
         go
+        lazydocker
       ];
 
       programs.dconf.enable = true;

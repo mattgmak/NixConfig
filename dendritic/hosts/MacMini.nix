@@ -123,6 +123,7 @@ in
           eza
           ollama
           stylua
+          lazydocker
         ]
         ++ (with pkgs.darwin; [
           file_cmds
