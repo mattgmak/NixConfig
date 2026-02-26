@@ -123,7 +123,7 @@ in
           eza
           ollama
           stylua
-          lazydocker
+          podman-tui
         ]
         ++ (with pkgs.darwin; [
           file_cmds
@@ -154,6 +154,7 @@ in
         brews = [
           "xcode-build-server"
           "podman"
+          "podman-compose"
         ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };

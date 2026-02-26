@@ -225,7 +225,7 @@
         croc
         devbox
         go
-        lazydocker
+        podman-tui
       ];
 
       programs.dconf.enable = true;
