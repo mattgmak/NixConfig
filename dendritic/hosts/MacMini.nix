@@ -151,7 +151,10 @@ in
           "chromium"
           "ghostty"
         ];
-        brews = [ "xcode-build-server" ];
+        brews = [
+          "xcode-build-server"
+          "podman"
+        ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };
       };
