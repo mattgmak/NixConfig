@@ -172,6 +172,7 @@
           "kvm"
           "dialout"
           "docker"
+          "podman"
         ];
         shell = pkgs.nushell;
       };
@@ -242,8 +243,11 @@
         # libraries = with pkgs; [ ];
       };
 
-      virtualisation.docker = {
+      virtualisation.podman = {
+        containers.enable = true;
         enable = true;
+        dockerCompat = true;
+        defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.
       };
       # Add flatpak support
       services.flatpak.enable = true;
