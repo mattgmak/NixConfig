@@ -51,6 +51,7 @@
         wiremix
         caelestia
         xdg
+        udiskie
       ];
     };
 

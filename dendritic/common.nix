@@ -226,7 +226,11 @@
         devbox
         go
         podman-tui
+        ventoy
       ];
+
+      services.gvfs.enable = true;
+      services.udisks2.enable = true;
 
       programs.dconf.enable = true;
 
@@ -244,7 +248,6 @@
       };
 
       virtualisation.podman = {
-        containers.enable = true;
         enable = true;
         dockerCompat = true;
         defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.

@@ -6,5 +6,6 @@
     vmName = "GoofyVM";
     macMiniName = "MacMini";
     desktopName = "GoofyDesky";
+    serverName = "Goofeus";
   };
 }
