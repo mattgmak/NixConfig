@@ -72,6 +72,12 @@
             electronLaunchFlags = "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
           in
           {
+            binds = {
+              scroll_event_delay = 100;
+            };
+            scrolling = {
+              column_width = 0.7;
+            };
             "$mod" = "ALT";
             unbind = [ ];
             bindin = [
@@ -104,6 +110,10 @@
               "$mod, semicolon, movefocus, r"
               "$mod, Up, movefocus, u"
               "$mod, Down, movefocus, d"
+              "$mod SUPER, Up, layoutmsg, move -col"
+              "$mod SUPER, Down, layoutmsg, move +col"
+              "$mod, mouse_up, layoutmsg, move +col"
+              "$mod, mouse_down, layoutmsg, move -col"
               "$mod, Left, movefocus, l"
               "$mod, Right, movefocus, r"
               "$mod SHIFT, j, movewindow, u"
@@ -217,11 +227,17 @@
                 ];
             workspace =
               if hostname == "GoofyDesky" then
-                [ "name:Game, monitor:${deskyMonitors.primary}" ]
-                ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.primary}") primaryWorkspaces
-                ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.secondary}") secondaryWorkspaces
+                [
+                  "name:Game, monitor:${deskyMonitors.primary}"
+                  "name:1, monitor:${deskyMonitors.primary}, layout:monocle"
+                  "name:6, monitor:${deskyMonitors.secondary}, layout:scrolling, layoutopt:direction:down"
+                ]
+                ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.primary}") (lib.drop 1 primaryWorkspaces)
+                ++ lib.map (index: "name:${index}, monitor:${deskyMonitors.secondary}") (
+                  lib.drop 1 secondaryWorkspaces
+                )
               else
-                [ ];
+                [ "name:1, layout:monocle" ];
 
             input = {
               kb_layout = "us";
