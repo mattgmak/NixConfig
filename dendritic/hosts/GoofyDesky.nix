@@ -98,6 +98,7 @@
           mpv
           qbittorrent
           gparted
+          tparted
           appflowy
           qmk
           qmk-udev-rules

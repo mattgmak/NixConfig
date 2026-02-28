@@ -13,7 +13,7 @@
     inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit inputs inputs';
-        inherit (self.constants) username;
+        username = "nixos";
         hostname = self.constants.serverName;
       };
       modules = [
@@ -44,17 +44,17 @@
         useUserPackages = true;
         extraSpecialArgs = {
           inherit
-            hostname
             username
+            hostname
             ;
         };
         backupFileExtension = "hm-backup-1";
       };
 
-      home-manager.users.${self.constants.username} = self.homeConfigurations.minimalIso;
+      home-manager.users.nixos = self.homeConfigurations.minimalIso;
 
       environment.sessionVariables = {
-        NH_OS_FLAKE = "/home/${self.constants.username}/NixConfig";
+        NH_OS_FLAKE = "/home/${username}/NixConfig";
       };
       environment.shells = with pkgs; [
         nushell
@@ -68,9 +68,8 @@
       i18n.defaultLocale = "en_HK.UTF-8";
 
       # Define a user account. Don't forget to set a password with 'passwd'.
-      users.users.${self.constants.username} = {
+      users.users.nixos = {
         isNormalUser = true;
-        description = "Goofy";
         extraGroups = [
           "networkmanager"
           "wheel"
@@ -92,7 +91,7 @@
         enable = true;
         wheelNeedsPassword = false;
       };
-      networking.hostName = self.constants.serverName;
+      networking.hostName = hostname;
       networking.networkmanager = {
         enable = true;
         plugins = with pkgs; [ networkmanager-openvpn ];
