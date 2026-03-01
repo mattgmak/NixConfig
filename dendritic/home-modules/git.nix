@@ -32,10 +32,6 @@
             { }
         );
       };
-      programs.delta = {
-        enable = true;
-        enableGitIntegration = true;
-      };
       programs.gh = {
         enable = true;
         hosts = {

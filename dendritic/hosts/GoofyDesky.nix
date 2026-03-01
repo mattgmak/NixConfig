@@ -38,6 +38,7 @@
         starship
         yazi
         git
+        delta
         direnv
         lazygit
         ghostty
