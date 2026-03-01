@@ -40,8 +40,6 @@
           carapace
         ];
         home = {
-          inherit (self.constants) username;
-          homeDirectory = "/home/${self.constants.username}";
           stateVersion = "24.05";
         };
       };
@@ -50,7 +48,7 @@
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = {
-          inherit (self.constants) username;
+          # inherit (self.constants) username;
           hostname = "droid";
         };
         backupFileExtension = "hm-backup-1";
