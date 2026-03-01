@@ -86,8 +86,8 @@
     yazi.url = "github:sxyazi/yazi";
 
     nix-on-droid = {
-      url = "github:nix-community/nix-on-droid/release-24.05";
-      # url = "github:nix-community/nix-on-droid/master";
+      # url = "github:nix-community/nix-on-droid/release-24.05";
+      url = "github:nix-community/nix-on-droid/master";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -106,7 +106,10 @@
     flake
     // {
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = flake.legacyPackages.aarch64-linux.pkgs-unstable;
+        pkgs = import inputs.nixpkgs {
+          system = "aarch64-linux";
+          config.allowUnfree = true;
+        };
         modules = [ flake.nixOnDroidConfiguration ];
       };
     };
