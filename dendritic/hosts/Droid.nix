@@ -28,25 +28,33 @@
         unzip
       ];
 
-      home-manager.config =
-        { username, ... }:
-        {
-          imports = with self.homeModules; [
-            nushell
-            neovim
-            starship
-            yazi
-            git
-            direnv
-            lazygit
-            carapace
-          ];
-          home = {
-            inherit username;
-            homeDirectory = "/home/${username}";
-            stateVersion = "24.05";
-          };
+      home-manager.config = {
+        imports = with self.homeModules; [
+          nushell
+          neovim
+          starship
+          yazi
+          git
+          direnv
+          lazygit
+          carapace
+        ];
+        home = {
+          inherit (self.constants) username;
+          homeDirectory = "/home/${self.constants.username}";
+          stateVersion = "24.05";
         };
+      };
+
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
+        extraSpecialArgs = {
+          inherit (self.constants) username;
+          hostname = "droid";
+        };
+        backupFileExtension = "hm-backup-1";
+      };
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
       environment.etcBackupExtension = ".bak";
