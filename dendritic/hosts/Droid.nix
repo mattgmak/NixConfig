@@ -35,6 +35,8 @@
           starship
           yazi
           git
+          delta
+          gh
           direnv
           lazygit
           carapace
@@ -65,6 +67,7 @@
         experimental-features = nix-command flakes
       '';
 
+      terminal.font = "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/IosevkaTermNerdFontMono-Regular.ttf";
       # Set your time zone
       time.timeZone = "Asia/Hong_Kong";
     };
