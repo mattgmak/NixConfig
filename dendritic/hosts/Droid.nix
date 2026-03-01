@@ -28,19 +28,25 @@
         unzip
       ];
 
-      home-manager.config = {
-        imports = with self.homeModules; [
-          nixos-home
-          nushell
-          neovim
-          starship
-          yazi
-          git
-          direnv
-          lazygit
-          carapace
-        ];
-      };
+      home-manager.config =
+        { username, ... }:
+        {
+          imports = with self.homeModules; [
+            nushell
+            neovim
+            starship
+            yazi
+            git
+            direnv
+            lazygit
+            carapace
+          ];
+          home = {
+            inherit username;
+            homeDirectory = "/home/${username}";
+            stateVersion = "24.05";
+          };
+        };
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
       environment.etcBackupExtension = ".bak";
