@@ -27,6 +27,7 @@ in
       yazi
       git
       delta
+      gh
       direnv
       lazygit
       ghostty
