@@ -2,7 +2,7 @@
   flake.homeModules.starship = {
     programs.starship = {
       enable = true;
-      enableNushellIntegration = false;
+      enableNushellIntegration = true;
       # Jetpack preset
       # settings = {
       #   add_newline = true;
