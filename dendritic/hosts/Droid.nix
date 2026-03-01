@@ -56,7 +56,7 @@
         backupFileExtension = "hm-backup-1";
       };
 
-      user.username = self.constants.username;
+      user.userName = self.constants.username;
       user.shell = "${pkgs.nushell}/bin/nu";
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
