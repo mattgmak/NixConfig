@@ -50,11 +50,13 @@
         useGlobalPkgs = true;
         useUserPackages = true;
         extraSpecialArgs = {
-          # inherit (self.constants) username;
+          inherit (self.constants) username;
           hostname = "droid";
         };
         backupFileExtension = "hm-backup-1";
       };
+
+      user.username = self.constants.username;
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
       environment.etcBackupExtension = ".bak";
