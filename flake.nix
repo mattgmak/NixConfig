@@ -84,9 +84,28 @@
     nix-gaming.url = "github:fufexan/nix-gaming";
 
     yazi.url = "github:sxyazi/yazi";
+
+    nix-on-droid = {
+      url = "github:nix-community/nix-on-droid/release-24.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { import-tree, flake-parts, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./dendritic);
+    {
+      import-tree,
+      flake-parts,
+      nix-on-droid,
+      ...
+    }@inputs:
+    let
+      flake = flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./dendritic);
+    in
+    flake
+    // {
+      nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = flake.legacyPackages.aarch64-linux.pkgs-unstable;
+        modules = [ flake.nixOnDroidConfiguration ];
+      };
+    };
 }

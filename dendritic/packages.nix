@@ -13,9 +13,13 @@
             inherit system;
             config.allowUnfree = true;
           };
+          pkgs-unstable = import inputs.nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
         in
         {
-          inherit pkgs-stable pkgs-for-cursor;
+          inherit pkgs-stable pkgs-for-cursor pkgs-unstable;
         };
     };
   flake.nixpkgsConfig =
