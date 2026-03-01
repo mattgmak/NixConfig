@@ -69,6 +69,14 @@
       nix.extraOptions = ''
         experimental-features = nix-command flakes
       '';
+      nix = {
+        substituters = [
+          "https://yazi.cachix.org"
+        ];
+        trustedPublicKeys = [
+          "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
+        ];
+      };
 
       terminal.font = "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/IosevkaTermNerdFontMono-Regular.ttf";
       # Set your time zone
