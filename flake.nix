@@ -106,10 +106,7 @@
     flake
     // {
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = import inputs.nixpkgs {
-          system = "aarch64-linux";
-          config.allowUnfree = true;
-        };
+        pkgs = flake.legacyPackages.aarch64-linux.pkgs-unstable;
         modules = [ flake.nixOnDroidConfiguration ];
       };
     };

@@ -1,13 +1,19 @@
-{ self, ... }:
+{ self, inputs, ... }:
 {
   flake.nixOnDroidConfiguration =
     { config, pkgs, ... }:
     {
+      imports = [ inputs.stylix.nixOnDroidModules.stylix ];
+
+      stylix = {
+        overlays.enable = false;
+# enable = true;
+      };
       # Simply install just the packages
       environment.packages = with pkgs; [
         # User-facing stuff that you really really want to have
-        neovim # or some other editor, e.g. nano or neovim
-        git
+        # neovim # or some other editor, e.g. nano or neovim
+        # git
         # Some common stuff that people expect to have
         procps
         killall
@@ -26,7 +32,12 @@
         xz
         zip
         unzip
+        zoxide
+	which
+	atuin
+        openssh
       ];
+
 
       home-manager.config = {
         imports = with self.homeModules; [
@@ -41,6 +52,9 @@
           lazygit
           carapace
         ];
+        programs.ssh = {
+          enable = true;
+        };
         home = {
           stateVersion = "24.05";
         };
@@ -78,7 +92,7 @@
         ];
       };
 
-      terminal.font = "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/IosevkaTermNerdFontMono-Regular.ttf";
+      terminal.font = "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/NerdFonts/IosevkaTerm/IosevkaTermNerdFontMono-Regular.ttf";
       # Set your time zone
       time.timeZone = "Asia/Hong_Kong";
     };
