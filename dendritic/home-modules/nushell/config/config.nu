@@ -979,3 +979,20 @@ $env.CONDA_NO_PROMPT = true
 $env.config.hooks.pre_prompt = (
     $env.config.hooks.pre_prompt | append (source ~/.nushell-extra/direnv.nu)
 )
+
+# zellij
+def start_zellij [] {
+  if 'ZELLIJ' not-in ($env | columns) {
+    if 'ZELLIJ_AUTO_ATTACH' in ($env | columns) and $env.ZELLIJ_AUTO_ATTACH == 'true' {
+      zellij attach -c
+    } else {
+      zellij
+    }
+
+    if 'ZELLIJ_AUTO_EXIT' in ($env | columns) and $env.ZELLIJ_AUTO_EXIT == 'true' {
+      exit
+    }
+  }
+}
+
+start_zellij

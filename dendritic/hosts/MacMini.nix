@@ -33,6 +33,7 @@ in
       ghostty
       cursor
       carapace
+      zellij
     ];
   };
 
