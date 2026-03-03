@@ -54,6 +54,7 @@
         caelestia
         xdg
         udiskie
+        zellij
       ];
     };
 

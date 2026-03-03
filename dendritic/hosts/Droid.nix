@@ -7,7 +7,7 @@
 
       stylix = {
         overlays.enable = false;
-# enable = true;
+        # enable = true;
       };
       # Simply install just the packages
       environment.packages = with pkgs; [
@@ -33,11 +33,10 @@
         zip
         unzip
         zoxide
-	which
-	atuin
+        which
+        atuin
         openssh
       ];
-
 
       home-manager.config = {
         imports = with self.homeModules; [
@@ -51,6 +50,7 @@
           direnv
           lazygit
           carapace
+          zellij
         ];
         programs.ssh = {
           enable = true;

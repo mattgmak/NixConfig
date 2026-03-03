@@ -325,8 +325,10 @@
             # Find this in about:config or prefs.js of your profile
             keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 14;
 
-            userChrome = ./zen-wireframe-2/userChrome.css;
-            userContent = ./zen-wireframe-2/userContent.css;
+            /*
+              userChrome = ./zen-wireframe-2/userChrome.css;
+                       userContent = ./zen-wireframe-2/userContent.css;
+            */
 
             containersForce = true;
             pinsForce = true;
@@ -370,6 +372,12 @@
             "${configDir}/default/chrome/elements" = {
               source = ./zen-wireframe-2/elements;
               recursive = true;
+            };
+            "${configDir}/default/chrome/userChrome.css" = {
+              source = ./zen-wireframe-2/userChrome.css;
+            };
+            "${configDir}/default/chrome/userContent.css" = {
+              source = ./zen-wireframe-2/userContent.css;
             };
           };
       };
