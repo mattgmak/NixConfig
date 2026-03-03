@@ -34,7 +34,7 @@
         nushell
         neovim
         starship
-        # yazi
+        yazi
         git
         delta
         gh
