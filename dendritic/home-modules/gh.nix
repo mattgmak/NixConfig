@@ -2,16 +2,6 @@
   flake.homeModules.gh = {
     programs.gh = {
       enable = true;
-      hosts = {
-        "github.com" = {
-          git_protocol = "https";
-          users = {
-            mattgmak = {
-              user = "mattgmak";
-            };
-          };
-        };
-      };
       settings = {
         # The current version of the config schema
         version = 1;
