@@ -325,13 +325,10 @@
             # Find this in about:config or prefs.js of your profile
             keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 16;
 
-            /*
-              userChrome = ./zen-wireframe-2/userChrome.css;
-                       userContent = ./zen-wireframe-2/userContent.css;
-            */
+            userChrome = ./zen-wireframe-2/userChrome.css;
+            userContent = ./zen-wireframe-2/userContent.css;
 
             containersForce = true;
-            pinsForce = true;
             containers = {
               Personal = {
                 color = "pink";
@@ -345,6 +342,7 @@
               };
             };
 
+            pinsForce = false;
             pins = {
               "Whatsapp" = {
                 id = "8af62707-0722-4049-9801-bedced343333";
@@ -362,7 +360,8 @@
 
         home.file =
           let
-            configDir = if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles/" else ".zen/";
+            configDir =
+              if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles" else ".config/zen";
           in
           {
             "${configDir}/default/chrome/modules" = {
@@ -372,12 +371,6 @@
             "${configDir}/default/chrome/elements" = {
               source = ./zen-wireframe-2/elements;
               recursive = true;
-            };
-            "${configDir}/default/chrome/userChrome.css" = {
-              source = ./zen-wireframe-2/userChrome.css;
-            };
-            "${configDir}/default/chrome/userContent.css" = {
-              source = ./zen-wireframe-2/userContent.css;
             };
           };
       };
