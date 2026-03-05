@@ -16,13 +16,13 @@
           inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
           hostname = self.constants.desktopName;
         };
-        modules = [
-          self.nixosModules.common
-          self.nixosModules.GoofyDesky
-          self.nixosModules.GoofyDeskyHardware
-          self.nixosModules.orca-slicer
-          self.nixosModules.steam
-          self.nixosModules.vr
+        modules = with self.nixosModules; [
+          common
+          GoofyDesky
+          GoofyDeskyHardware
+          orca-slicer
+          steam
+          vr
         ];
       }
     );
