@@ -305,34 +305,22 @@
                   urls = [
                     {
                       template = "https://mynixos.com/search?q={searchTerms}";
-                      params = [
-                        {
-                          name = "query";
-                          value = "searchTerms";
-                        }
-                      ];
                     }
                   ];
 
-                  icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-                  definedAliases = [ "@nx" ]; # Keep in mind that aliases defined here only work if they start with "@"
+                  icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake-white.svg";
+                  definedAliases = [ "@nx" ];
                 };
                 nixossearch = {
                   name = "NixOS Search";
                   urls = [
                     {
                       template = "https://search.nixos.org/packages?channel=unstable&query={searchTerms}";
-                      params = [
-                        {
-                          name = "query";
-                          value = "searchTerms";
-                        }
-                      ];
                     }
                   ];
 
                   icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-                  definedAliases = [ "@np" ]; # Keep in mind that aliases defined here only work if they start with "@"
+                  definedAliases = [ "@np" ];
                 };
               };
             };
