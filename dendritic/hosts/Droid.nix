@@ -50,7 +50,7 @@
           direnv
           lazygit
           carapace
-          zellij
+          tmux
         ];
         programs.ssh = {
           enable = true;
