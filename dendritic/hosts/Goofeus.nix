@@ -40,6 +40,7 @@
         gh
         direnv
         lazygit
+        tmux
       ];
     };
 

@@ -34,6 +34,7 @@ in
       cursor
       carapace
       zellij
+      tmux
     ];
   };
 

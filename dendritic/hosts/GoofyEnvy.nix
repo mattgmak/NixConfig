@@ -55,6 +55,7 @@
         xdg
         udiskie
         zellij
+        tmux
       ];
     };
 
