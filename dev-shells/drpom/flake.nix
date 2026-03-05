@@ -50,6 +50,8 @@
                   kotlin-language-server
                   biome-pin-pkgs.biome
                   jq
+                  rclone
+                  mise
                 ]
                 ++ (with pkgs.nodePackages; [
                   eas-cli
