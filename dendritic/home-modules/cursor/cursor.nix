@@ -117,6 +117,7 @@
                 "expo.vscode-expo-tools"
                 "CodeRabbit.coderabbit-vscode"
                 "atomicspirit.nix-embedded-highlighter"
+                "timonwong.shellcheck"
               ]
               ++ pkgs.nix4vscode.forOpenVsxVersion vscodeVersion [ "mattgmak.find-it-faster" ];
           };
