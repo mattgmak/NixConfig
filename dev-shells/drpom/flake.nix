@@ -52,6 +52,7 @@
                   jq
                   rclone
                   mise
+                  postgresql
                 ]
                 ++ (with pkgs.nodePackages; [
                   eas-cli
