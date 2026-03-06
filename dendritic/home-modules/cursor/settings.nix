@@ -465,5 +465,29 @@
       "githubPullRequests.commentExpandState" = "collapseAll";
       "typescript.native-preview.goMemLimit" = "2GiB";
       "editor.guides.highlightActiveBracketPair" = true;
+      "shellcheck.ignorePatterns" = {
+        "**/*.csh" = true;
+        "**/*.cshrc" = true;
+        "**/*.fish" = true;
+        "**/*.login" = true;
+        "**/*.logout" = true;
+        "**/*.tcsh" = true;
+        "**/*.tcshrc" = true;
+        "**/*.xonshrc" = true;
+        "**/*.xsh" = true;
+        "**/*.zsh" = true;
+        "**/*.zshrc" = true;
+        "**/zshrc" = true;
+        "**/*.zprofile" = true;
+        "**/zprofile" = true;
+        "**/*.zlogin" = true;
+        "**/zlogin" = true;
+        "**/*.zlogout" = true;
+        "**/zlogout" = true;
+        "**/*.zshenv" = true;
+        "**/zshenv" = true;
+        "**/*.zsh-theme" = true;
+        "**/.env*" = true;
+      };
     };
 }
