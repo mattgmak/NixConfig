@@ -35,6 +35,7 @@ in
       carapace
       zellij
       tmux
+      worktrunk
     ];
   };
 
