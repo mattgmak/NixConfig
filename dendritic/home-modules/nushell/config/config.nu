@@ -996,3 +996,17 @@ $env.config.hooks.pre_prompt = (
 # }
 
 # start_zellij
+
+def --env t [] {
+    tmux start
+    tmux source-file ~/.config/tmux/tmux.conf
+    tmux attach
+}
+
+# tmux
+def start_tmux [] {
+    if 'TMUX' not-in ($env | columns) {
+        t
+    }
+}
+start_tmux

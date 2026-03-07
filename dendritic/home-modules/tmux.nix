@@ -33,13 +33,32 @@
           set -g @sessionx-custom-paths-subdirectories 'false'
           set -g @sessionx-filter-current 'false'
           set -g @continuum-restore 'on'
+          set -g @continuum-boot 'on'
           set -g @resurrect-strategy-nvim 'session'
-          set -g @catppuccin_window_status_style "rounded"
-          set -g @catppuccin_window_number_position "right"
-          set -g @catppuccin_window_text "#W"
+
+          # set -g @catppuccin_flavor 'mocha'
+
+          set -g @catppuccin_status_background "none"
+
+          set -g @catppuccin_window_status_style "custom"
+          set -g @catppuccin_window_left_separator "#[bg=default,fg=#{@thm_surface_0}]#[bg=#{@thm_overlay_2},fg=#{@thm_surface_0}]"
+          # set -g @catppuccin_window_middle_separator "#[bg=#{@thm_surface_0},fg=#{@thm_overlay_2}]"
+          set -g @catppuccin_window_middle_separator ""
+          set -g @catppuccin_window_right_separator "#[bg=default,fg=#{@thm_overlay_2}]"
+          set -g @catppuccin_window_text "#W "
           set -g @catppuccin_window_number "#I"
-          set -g @catppuccin_window_current_text "#W#{?window_zoomed_flag,(),}"
+
+          set -g @catppuccin_window_current_left_separator "#[bg=default,fg=#{@thm_surface_1}]"
+          # set -g @catppuccin_window_current_middle_separator "#[bg=#{@thm_surface_1},fg=#{@thm_mauve}]#[bg=#{@thm_mauve},fg=#{@thm_bg}]"
+          set -g @catppuccin_window_current_middle_separator ""
+          set -g @catppuccin_window_current_right_separator "#[bg=default,fg=#{@thm_mauve}]"
+          set -g @catppuccin_window_number_position "right"
+          set -g @catppuccin_window_current_text "#W#{?window_zoomed_flag,(),} "
+          set -g @catppuccin_window_current_number "#I"
+
           set -g @catppuccin_status_left_separator  " "
+          # set -g @catppuccin_status_middle_separator "#[bg=#{@thm_surface_0}]"
+          set -g @catppuccin_status_middle_separator ""
           set -g @catppuccin_status_right_separator " "
           set -g @catppuccin_status_fill "icon"
           set -g @catppuccin_status_connect_separator "no"
@@ -47,7 +66,8 @@
           set -g status-right-length 100
           set -g status-left "#{E:@catppuccin_status_session}"
           set -g status-right "#{E:@catppuccin_status_directory}"
-          set -g @catppuccin_directory_text "#{b:pane_current_path}"
+          set -g @catppuccin_directory_text " #{b:pane_current_path}"
+          bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible

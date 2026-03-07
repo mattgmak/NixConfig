@@ -50,6 +50,7 @@
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
           enable = true;
+          suppressXdgMigrationWarning = true;
           darwinDefaultsId = "app.zen-browser.zen";
           nativeMessagingHosts = lib.mkIf pkgs.stdenv.isLinux [ pkgs.firefoxpwa ];
           policies =

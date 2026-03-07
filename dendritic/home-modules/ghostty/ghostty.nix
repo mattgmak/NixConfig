@@ -24,7 +24,7 @@
         settings = {
           font-size = 14;
           font-family = [
-            "IosevkaTerm Nerd Font"
+            "IosevkaTerm Nerd Font Propo"
             "Noto Color Emoji"
           ];
           quick-terminal-position = "center";
