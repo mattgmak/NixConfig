@@ -478,16 +478,6 @@
     "command" = "-supermaven.maven";
   }
   {
-    "key" = "k";
-    "command" = "list.focusDown";
-    "when" = "listFocus";
-  }
-  {
-    "key" = "j";
-    "command" = "list.focusUp";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
     "key" = "ctrl+shift+r";
     "command" = "-editor.action.refactor";
     "when" =
@@ -1053,7 +1043,7 @@
     "command" = "-aiFeedback.action.open";
   }
   {
-    "key" = "k";
+    "key" = "j";
     "command" = "selectNextCodeAction";
     "when" = "codeActionMenuVisible";
   }
@@ -1063,7 +1053,7 @@
     "when" = "codeActionMenuVisible";
   }
   {
-    "key" = "j";
+    "key" = "k";
     "command" = "selectPrevCodeAction";
     "when" = "codeActionMenuVisible";
   }
@@ -1081,54 +1071,6 @@
     "key" = "ctrl+down";
     "command" = "-selectNextCodeAction";
     "when" = "codeActionMenuVisible";
-  }
-  {
-    "key" = "k";
-    "command" = "editor.action.scrollDownHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "-editor.action.scrollDownHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "editor.action.scrollUpHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-editor.action.scrollUpHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-list.focusUp";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
-    "key" = "j";
-    "command" = "list.focusUp";
-    "when" =
-      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-list.focusUp";
-    "when" =
-      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "-list.focusDown";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
-    "key" = "j";
-    "command" = "-list.focusDown";
-    "when" =
-      "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
   }
   {
     "key" = "j";
@@ -1932,12 +1874,12 @@
     "when" = "breadcrumbsPossible && breadcrumbsVisible";
   }
   {
-    "key" = "l";
+    "key" = "h";
     "command" = "breadcrumbs.focusPrevious";
     "when" = "breadcrumbsActive";
   }
   {
-    "key" = ";";
+    "key" = "l";
     "command" = "breadcrumbs.focusNext";
     "when" = "breadcrumbsActive";
   }
@@ -2205,7 +2147,7 @@
       "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
   }
   {
-    "key" = "k";
+    "key" = "j";
     "command" = "-list.focusUp";
     "when" = "notebookEditorFocused && !inputFocus && !notebookOutputFocused";
   }

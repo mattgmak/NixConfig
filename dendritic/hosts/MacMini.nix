@@ -199,17 +199,17 @@ in
           };
 
           mode.main.binding = {
-            # Focus navigation (matching previous j/k/l/; directional mapping)
-            "alt-j" = "focus up";
-            "alt-k" = "focus down";
-            "alt-l" = "focus left";
-            "alt-semicolon" = "focus right";
+            # Focus navigation (Vim-style hjkl directional mapping)
+            "alt-h" = "focus left";
+            "alt-j" = "focus down";
+            "alt-k" = "focus up";
+            "alt-l" = "focus right";
 
             # Swap windows
-            "alt-shift-j" = "swap up";
-            "alt-shift-k" = "swap down";
-            "alt-shift-l" = "swap left";
-            "alt-shift-semicolon" = "swap right";
+            "alt-shift-h" = "swap left";
+            "alt-shift-j" = "swap down";
+            "alt-shift-k" = "swap up";
+            "alt-shift-l" = "swap right";
 
             # Window management
             "alt-f" = "fullscreen";

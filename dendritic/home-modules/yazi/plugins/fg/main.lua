@@ -42,8 +42,8 @@ local M = {
     { on = '<Esc>', run = 'quit' },
     { on = '<Enter>', run = 'select' },
 
-    { on = 'j', run = 'up' },
-    { on = 'k', run = 'down' },
+    { on = 'j', run = 'down' },
+    { on = 'k', run = 'up' },
 
     { on = '<Up>', run = 'up' },
     { on = '<Down>', run = 'down' },

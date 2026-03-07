@@ -59,10 +59,10 @@ vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
 })
 
 -- motion keys
-vim.keymap.set({ 'n', 'v' }, 'j', 'k')
-vim.keymap.set({ 'n', 'v' }, 'k', 'j')
-vim.keymap.set({ 'n', 'v' }, 'l', 'h')
-vim.keymap.set({ 'n', 'v' }, ';', 'l')
+-- vim.keymap.set({ 'n', 'v' }, 'j', 'k')
+-- vim.keymap.set({ 'n', 'v' }, 'k', 'j')
+-- vim.keymap.set({ 'n', 'v' }, 'l', 'h')
+-- vim.keymap.set({ 'n', 'v' }, ';', 'l')
 
 -- repeat previous f, t, F, T movement
 vim.keymap.set('n', "'", ';')
@@ -101,12 +101,6 @@ vim.keymap.set('n', 'x', '"_x', {
   noremap = true,
 })
 
--- yank all
-vim.keymap.set('n', '<leader>ya', 'ggyG')
-
--- visual all
-vim.keymap.set('n', '<leader>va', 'ggVG')
-
 if is_vscode then
   -- vim.notify = vscode.notify
   -- vscode-multi-cursor
@@ -124,11 +118,11 @@ if is_vscode then
 
   local cursors = require('vscode-multi-cursor')
 
-  vim.keymap.set({ 'n', 'x', 'i' }, '<c-y>', function() cursors.addSelectionToNextFindMatch() end, {
+  vim.keymap.set({ 'n', 'x', 'i' }, '<c-h>', function() cursors.addSelectionToNextFindMatch() end, {
     silent = true,
   })
 
-  vim.keymap.set({ 'n', 'x', 'i' }, '<cs-y>', function() cursors.addSelectionToPreviousFindMatch() end, {
+  vim.keymap.set({ 'n', 'x', 'i' }, '<cs-h>', function() cursors.addSelectionToPreviousFindMatch() end, {
     silent = true,
   })
 
@@ -139,7 +133,7 @@ if is_vscode then
   vim.keymap.set('n', 'mcm', cursors.cancel, {
     silent = true,
   })
-  vim.keymap.set('n', '<c-y>', 'mciw*:nohl<cr>', {
+  vim.keymap.set('n', '<c-h>', 'mciw*:nohl<cr>', {
     remap = true,
     silent = true,
   })

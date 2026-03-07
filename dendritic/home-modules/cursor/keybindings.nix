@@ -491,16 +491,6 @@
     "command" = "-supermaven.maven";
   }
   {
-    "key" = "k";
-    "command" = "list.focusDown";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
-    "key" = "j";
-    "command" = "list.focusUp";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
     "key" = "ctrl+shift+r";
     "command" = "-editor.action.refactor";
     "when" = "editorHasCodeActionsProvider && textInputFocus && !editorReadonly";
@@ -1066,7 +1056,7 @@
     "command" = "-aiFeedback.action.open";
   }
   {
-    "key" = "k";
+    "key" = "j";
     "command" = "selectNextCodeAction";
     "when" = "codeActionMenuVisible";
   }
@@ -1076,7 +1066,7 @@
     "when" = "codeActionMenuVisible";
   }
   {
-    "key" = "j";
+    "key" = "k";
     "command" = "selectPrevCodeAction";
     "when" = "codeActionMenuVisible";
   }
@@ -1094,56 +1084,6 @@
     "key" = "ctrl+down";
     "command" = "-selectNextCodeAction";
     "when" = "codeActionMenuVisible";
-  }
-  {
-    "key" = "k";
-    "command" = "editor.action.scrollDownHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "-editor.action.scrollDownHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "editor.action.scrollUpHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-editor.action.scrollUpHover";
-    "when" = "editorHoverFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-list.focusUp";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
-    "key" = "j";
-    "command" = "list.focusUp";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
-  }
-  {
-    "key" = "k";
-    "command" = "-list.focusUp";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "-list.focusDown";
-    "when" = "listFocus && !inputFocus";
-  }
-  {
-    "key" = "k";
-    "command" = "list.focusDown";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
-  }
-  {
-    "key" = "j";
-    "command" = "-list.focusDown";
-    "when" = "notebookEditorFocused && !inputFocus && !notebookOutputInputFocused";
   }
   {
     "key" = "j";
@@ -1449,21 +1389,21 @@
   }
   # End of passthrough
   {
-    "key" = "ctrl+;";
-    "command" = "workbench.action.focusRightGroup";
-  }
-  {
-    "key" = "ctrl+l";
+    "key" = "ctrl+h";
     "command" = "workbench.action.focusLeftGroup";
   }
   {
-    "key" = "ctrl+k";
+    "key" = "ctrl+j";
     "command" = "workbench.action.navigateDown";
     "when" = "!terminalFocus";
   }
   {
-    "key" = "ctrl+j";
+    "key" = "ctrl+k";
     "command" = "workbench.action.navigateUp";
+  }
+  {
+    "key" = "ctrl+l";
+    "command" = "workbench.action.focusRightGroup";
   }
   {
     "key" = "ctrl+l";
@@ -1708,20 +1648,20 @@
     "when" = "terminalFocus && terminalHasBeenCreated";
   }
   {
+    "key" = "ctrl+shift+h";
+    "command" = "workbench.action.moveEditorToLeftGroup";
+  }
+  {
     "key" = "ctrl+shift+j";
-    "command" = "workbench.action.moveEditorToAboveGroup";
-  }
-  {
-    "key" = "ctrl+shift+;";
-    "command" = "workbench.action.moveEditorToRightGroup";
-  }
-  {
-    "key" = "ctrl+shift+k";
     "command" = "workbench.action.moveEditorToBelowGroup";
   }
   {
+    "key" = "ctrl+shift+k";
+    "command" = "workbench.action.moveEditorToAboveGroup";
+  }
+  {
     "key" = "ctrl+shift+l";
-    "command" = "workbench.action.moveEditorToLeftGroup";
+    "command" = "workbench.action.moveEditorToRightGroup";
   }
   {
     "key" = "ctrl+m i";
@@ -1933,12 +1873,12 @@
     "when" = "breadcrumbsPossible && breadcrumbsVisible";
   }
   {
-    "key" = "l";
+    "key" = "h";
     "command" = "breadcrumbs.focusPrevious";
     "when" = "breadcrumbsActive";
   }
   {
-    "key" = ";";
+    "key" = "l";
     "command" = "breadcrumbs.focusNext";
     "when" = "breadcrumbsActive";
   }
