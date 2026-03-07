@@ -32,6 +32,7 @@
           set -g @sessionx-zoxide-mode 'on'
           set -g @sessionx-custom-paths-subdirectories 'false'
           set -g @sessionx-filter-current 'false'
+
           set -g @continuum-restore 'on'
           set -g @continuum-boot 'on'
           set -g @resurrect-strategy-nvim 'session'
@@ -67,6 +68,11 @@
           set -g status-left "#{E:@catppuccin_status_session}"
           set -g status-right "#{E:@catppuccin_status_directory}"
           set -g @catppuccin_directory_text " #{b:pane_current_path}"
+
+          set -g @fuzzback-bind j
+          set -g @fuzzback-popup 1
+          set -g @fuzzback-popup-size '90%'
+
           bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
         '';
         plugins = with pkgs.tmuxPlugins; [
@@ -79,7 +85,7 @@
           # tmux-floax
           tmux-fzf
           fzf-tmux-url
-          tmux-thumbs
+          fuzzback
         ];
       };
       stylix.targets.tmux.enable = false;
