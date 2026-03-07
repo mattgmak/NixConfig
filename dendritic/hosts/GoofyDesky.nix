@@ -59,6 +59,7 @@
         udiskie
         zellij
         tmux
+        self.homeModules."whisper-dictation"
         worktrunk
       ];
     };
@@ -67,6 +68,7 @@
       {
         pkgs,
         pkgs-stable,
+        inputs,
         username,
         packages,
         ...
@@ -75,6 +77,7 @@
         imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
 
         home-manager.users.${username} = self.homeConfigurations.GoofyDesky;
+        home-manager.extraSpecialArgs = { inherit inputs; };
 
         programs.appimage = {
           enable = true;

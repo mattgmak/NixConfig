@@ -57,6 +57,7 @@
         zellij
         tmux
         worktrunk
+        whisper-dictation
       ];
     };
 

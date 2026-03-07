@@ -100,10 +100,8 @@
               "$mod, O, focuswindow, class:(OrcaSlicer)"
             ];
             bind = [
-              "$mod, h, global, caelestia:launcher"
-              "$mod SHIFT, h, exec, rofi -show drun"
-              # "$mod, h, exec, sherlock"
-              "$mod, y, exec, ${config.home.homeDirectory}/.config/sherlock/switch-windows.nu"
+              "$mod, m, global, caelestia:launcher"
+              "$mod SHIFT, m, exec, rofi -show drun"
               "$mod, h, movefocus, l"
               "$mod, j, movefocus, d"
               "$mod, k, movefocus, u"
