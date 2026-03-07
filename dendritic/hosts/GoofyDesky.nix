@@ -59,6 +59,7 @@
         udiskie
         zellij
         tmux
+        worktrunk
       ];
     };
 

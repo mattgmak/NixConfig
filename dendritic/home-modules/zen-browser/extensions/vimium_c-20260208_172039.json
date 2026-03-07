@@ -25,6 +25,8 @@
     "map m Marks.activateCreateMode swap",
     "map h Marks.activateGotoMode swap",
     "map s Vomnibar.activateTabs",
+    "map J nextTab",
+    "map K previousTab",
     ""
   ],
   "userDefinedCss": [
