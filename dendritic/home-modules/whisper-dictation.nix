@@ -116,7 +116,7 @@
 
       xdg.configFile."whisper-dictation/config.yaml".text = ''
         hotkey:
-          key: h
+          key: period
           modifiers:
             - super
         whisper:
@@ -128,7 +128,7 @@
           theme: dark
         processing:
           remove_filler_words: true
-          auto_capitalize: true
+          auto_capitalize: false
           auto_punctuate: false
       '';
     };
