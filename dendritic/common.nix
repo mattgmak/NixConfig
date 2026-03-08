@@ -73,7 +73,7 @@
       environment.sessionVariables = {
         NH_OS_FLAKE = "/home/${username}/NixConfig";
         TERMINAL = "ghostty";
-        BROWSER = "zen";
+        BROWSER = "zen-beta";
         GTK_USE_PORTAL = "1";
         # Disaabled for obsidian because no stylus support
         # NIXOS_OZONE_WL = "1";
