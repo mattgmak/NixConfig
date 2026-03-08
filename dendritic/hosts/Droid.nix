@@ -65,7 +65,7 @@
         useUserPackages = true;
         extraSpecialArgs = {
           inherit (self.constants) username;
-          hostname = "droid";
+          hostname = "Droid";
         };
         backupFileExtension = "hm-backup-1";
       };

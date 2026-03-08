@@ -1,6 +1,6 @@
 {
   flake.homeModules.tmux =
-    { pkgs, ... }:
+    { pkgs, hostname, ... }:
     {
       programs.tmux = {
         enable = true;
@@ -88,6 +88,7 @@
           fuzzback
         ];
       };
+    } // ( if hostname != "Droid" then {
       stylix.targets.tmux.enable = false;
-    };
+    } else {} );
 }
