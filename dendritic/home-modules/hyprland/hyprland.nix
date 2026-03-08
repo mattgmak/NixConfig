@@ -167,6 +167,8 @@
               "$mod, Q, exec, wlogout"
               # Floating terminal bind
               "SUPER, T, exec, ~/.config/hypr/scripts/floating-terminal.nu"
+              # Window switcher bind
+              "$mod, Comma, exec, ~/.config/hypr/scripts/window-switcher.nu"
             ]
             ++ lib.concatMap (
               index:
@@ -329,12 +331,13 @@
                 secondaryWorkspacesMatcher = "match:workspace r[${lib.head secondaryWorkspaces}-${lib.last secondaryWorkspaces}]";
               in
               [
-                "${primaryWorkspacesMatcher}, match:title (clipse|bluetui|nmtui|wiremix), float on, size 1200 800, center on, stay_focused on, pin on"
+                "${primaryWorkspacesMatcher}, match:title (clipse|bluetui|nmtui|wiremix|window-switcher), float on, size 1200 800, center on, stay_focused on, pin on"
                 "${primaryWorkspacesMatcher}, match:title (btop), float on, size 1600 900, center on, stay_focused on, pin on"
                 "${matchPip}, pin on, float on"
                 "${matchFloatingTerminal}, float on, pin on, center on, stay_focused on, size 1200 800"
                 "match:class ([Cc]ursor|zen.*), focus_on_activate on"
                 "match:class ([Cc]ursor), match:float true, center on"
+                "match:title (window-switcher), no_anim on"
               ]
               ++ (
                 if hostname == "GoofyDesky" then

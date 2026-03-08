@@ -7,8 +7,6 @@
       username,
       pkgs-for-cursor,
       pkgs-stable,
-      config,
-      lib,
       ...
     }:
     {
@@ -226,7 +224,7 @@
         devbox
         go
         podman-tui
-        ventoy
+        jq
       ];
 
       services.gvfs.enable = true;
