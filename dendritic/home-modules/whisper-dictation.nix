@@ -1,9 +1,9 @@
+{ inputs, ... }:
 {
   flake.homeModules.whisper-dictation =
     {
       pkgs,
       lib,
-      inputs,
       ...
     }:
     let

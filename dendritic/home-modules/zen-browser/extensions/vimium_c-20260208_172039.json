@@ -23,7 +23,7 @@
     "unmap <c-e>",
     "shortcut userCustomized1 command=\"reopenTab\"",
     "map m Marks.activateCreateMode swap",
-    "map h Marks.activateGotoMode swap",
+    "map a Marks.activateGotoMode swap",
     "map s Vomnibar.activateTabs",
     "map J nextTab",
     "map K previousTab",
