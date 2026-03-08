@@ -102,6 +102,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    tree-sitter = {
+      url = "github:tree-sitter/tree-sitter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   outputs =

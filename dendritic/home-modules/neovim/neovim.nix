@@ -1,6 +1,7 @@
-{
+{ inputs, ... }: {
   flake.homeModules.neovim =
     { pkgs, ... }:
+    let treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default; in
     {
       # home.file = {
       #   ".config/nvim" = {
@@ -18,11 +19,11 @@
         '';
         extraPackages = with pkgs; [
           gcc
-          tree-sitter
+          treesitterPkg
         ];
       };
       home.packages = with pkgs; [
-        tree-sitter
+        treesitterPkg
       ];
     };
 }

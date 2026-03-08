@@ -36,6 +36,7 @@
         which
         atuin
         openssh
+        curlMinimal
       ];
 
       home-manager.config = {

@@ -2115,6 +2115,7 @@
         "nixpkgs-xr": "nixpkgs-xr",
         "sherlock": "sherlock",
         "stylix": "stylix",
+        "tree-sitter": "tree-sitter",
         "whisper-dictation": "whisper-dictation",
         "wiremix": "wiremix",
         "worktrunk": "worktrunk",
@@ -2507,6 +2508,26 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
+        "type": "github"
+      }
+    },
+    "tree-sitter": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772616770,
+        "narHash": "sha256-nhCSpwU63DFztaiGeMIuJz9BxKRDXEXAvJCBuC3WhMk=",
+        "owner": "tree-sitter",
+        "repo": "tree-sitter",
+        "rev": "cf302b07d1cae984068b7eb44a6e44529566a8c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "tree-sitter",
+        "repo": "tree-sitter",
         "type": "github"
       }
     },
