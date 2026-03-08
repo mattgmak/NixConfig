@@ -15,7 +15,7 @@ let menu_file = (mktemp | str trim)
 let result_file = (mktemp | str trim)
 $numbered_lines | str join "\n" | save -f $menu_file
 
-^ghostty --font-size=18  --title=window-switcher -e sh -lc $"cat '($menu_file)' | fzf --layout=reverse --delimiter '\t' --with-nth 2.. > '($result_file)'"
+^ghostty --font-size=18  --title=window-switcher -e sh -lc $"cat '($menu_file)' | fzf --layout=reverse --delimiter '\t' --cycle --with-nth 2.. > '($result_file)'"
 
 rm $menu_file
 let selected = (open $result_file)
