@@ -75,8 +75,10 @@
               set -g status-left-length 100
               set -g status-right-length 100
               set -g status-left "#{E:@catppuccin_status_session}"
-              set -g status-right "#{E:@catppuccin_status_directory}"
+              set -g status-right "#{E:@catppuccin_status_directory}#{E:@catppuccin_status_application}#{E:@catppuccin_status_date_time}"
               set -g @catppuccin_directory_text " #{b:pane_current_path}"
+              set -g @catppuccin_directory_icon "󰉋 "
+              set -g @catppuccin_date_time_text " %H:%M"
             '';
           }
           {
