@@ -997,16 +997,12 @@ $env.config.hooks.pre_prompt = (
 
 # start_zellij
 
-def --env t [] {
-    tmux start
-    tmux source-file ~/.config/tmux/tmux.conf
-    tmux attach
-}
-
-# tmux
-def start_tmux [] {
-    if 'TMUX' not-in ($env | columns) {
-        t
+# Auto-start tmux
+if "TMUX" not-in $env and (which tmux | is-not-empty) {
+    let config_file_flag = "-f ~/.config/tmux/tmux.conf"
+    try {
+        tmux attach $config_file_flag
+    } catch {
+        tmux new-session $config_file_flag
     }
 }
-start_tmux
