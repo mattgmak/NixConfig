@@ -19,8 +19,11 @@
       stylix = {
         enable = true;
         polarity = "dark";
-        # rebecca, paraiso, mellow-purple
-        base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyodark-terminal.yaml";
+        # base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyodark-terminal.yaml";
+        base16Scheme = "${pkgs.base16-schemes}/share/themes/da-one-ocean.yaml";
+        # base16Scheme = "${pkgs.base16-schemes}/share/themes/eldritch.yaml";
+        # base16Scheme = "${pkgs.base16-schemes}/share/themes/gigavolt.yaml";
+        # base16Scheme = "${pkgs.base16-schemes}/share/themes/moonlight.yaml";
         image = ./beautiful-mountains-landscape.jpg;
         fonts = {
           monospace = {
