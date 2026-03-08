@@ -25,6 +25,8 @@
           # set -g @floax-bind 'p'
           # set -g @floax-change-path 'true'
           bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
+          bind-key -T copy-mode-vi v send-keys -X begin-selection
+          bind-key -T copy-mode-vi C-v send-keys -X rectangle-on \; send -X begin-selection
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible
@@ -113,7 +115,13 @@
           }
         ];
       };
-    } // ( if hostname != "Droid" then {
-      stylix.targets.tmux.enable = false;
-    } else {} );
+    }
+    // (
+      if hostname != "Droid" then
+        {
+          stylix.targets.tmux.enable = false;
+        }
+      else
+        { }
+    );
 }
