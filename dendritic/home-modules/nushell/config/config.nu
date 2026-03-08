@@ -999,10 +999,5 @@ $env.config.hooks.pre_prompt = (
 
 # Auto-start tmux
 if "TMUX" not-in $env and (which tmux | is-not-empty) {
-    let config_file_flag = "-f ~/.config/tmux/tmux.conf"
-    try {
-        tmux attach $config_file_flag
-    } catch {
-        tmux new-session $config_file_flag
-    }
+    tmux
 }

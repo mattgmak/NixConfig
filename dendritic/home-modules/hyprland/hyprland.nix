@@ -337,7 +337,7 @@
                 "${matchFloatingTerminal}, float on, pin on, center on, stay_focused on, size 1200 800"
                 "match:class ([Cc]ursor|zen.*), focus_on_activate on"
                 "match:class ([Cc]ursor), match:float true, center on"
-                "match:title (window-switcher), no_anim on"
+                "match:title (window-switcher|clipse), no_anim on"
               ]
               ++ (
                 if hostname == "GoofyDesky" then
