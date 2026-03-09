@@ -19,6 +19,9 @@
               filters = "is:open involves:@me -author:@me";
             }
           ];
+          preview = {
+            width = 0.5;
+          };
           pager.diff = "diffnav";
         };
       };
