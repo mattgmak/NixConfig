@@ -129,6 +129,7 @@ in
           ollama
           stylua
           podman-tui
+          go
         ]
         ++ (with pkgs.darwin; [
           file_cmds
