@@ -16,11 +16,11 @@
           inherit (config) packages;
           hostname = self.constants.laptopName;
         };
-        modules = [
-          self.nixosModules.common
-          self.nixosModules.GoofyEnvy
-          self.nixosModules.GoofyEnvyHardware
-          self.nixosModules.steam
+        modules = with self.nixosModules; [
+          common
+          GoofyEnvy
+          GoofyEnvyHardware
+          steam
         ];
       }
     );
@@ -58,6 +58,7 @@
         tmux
         worktrunk
         whisper-dictation
+        gh-dash
       ];
     };
 

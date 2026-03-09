@@ -61,6 +61,7 @@
         tmux
         self.homeModules."whisper-dictation"
         worktrunk
+        gh-dash
       ];
     };
 

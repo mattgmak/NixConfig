@@ -36,6 +36,7 @@ in
       zellij
       tmux
       worktrunk
+      gh-dash
     ];
   };
 
