@@ -238,7 +238,7 @@ if is_vscode then
   vim.keymap.set('n', '<leader>jc', function() vscode.call('breadcrumbs.focusAndSelect') end)
   vim.keymap.set({ 'n', 'v' }, '<leader>a', function() vscode.call('editor.action.quickFix') end)
   vim.keymap.set('n', '<leader>s', function() vscode.call('workbench.action.files.save') end)
-  vim.keymap.set('n', '<leader>b', function() vscode.call('workbench.action.files.saveWithoutFormatting') end)
+  vim.keymap.set('n', '<leader>t', function() vscode.call('workbench.action.files.saveWithoutFormatting') end)
   -- vim.keymap.set('n', '<leader>k', function()
   --     vscode.call("snipe-vscode.switchTab")
   -- end)
