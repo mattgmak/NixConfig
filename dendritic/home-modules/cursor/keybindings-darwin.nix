@@ -925,6 +925,21 @@
     "when" = "!editorTextFocus && !inputFocus";
   }
   {
+    "key" = "ctrl+h";
+    "command" = "-deleteLeft";
+    "when" = "textInputFocus";
+  }
+  {
+    "key" = "ctrl+h";
+    "command" = "-vscode-neovim.send";
+    "when" = "editorTextFocus && neovim.ctrlKeysInsert.h && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+  }
+  {
+    "key" = "ctrl+h";
+    "command" = "-vscode-neovim.send";
+    "when" = "editorTextFocus && neovim.ctrlKeysNormal.h && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+  }
+  {
     "key" = "ctrl+j";
     "command" = "-vscode-neovim.send";
     "when" =
@@ -1355,21 +1370,21 @@
       "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
-    "key" = "ctrl+;";
-    "command" = "workbench.action.focusRightGroup";
-  }
-  {
-    "key" = "ctrl+l";
+    "key" = "ctrl+h";
     "command" = "workbench.action.focusLeftGroup";
   }
   {
-    "key" = "ctrl+k";
+    "key" = "ctrl+j";
     "command" = "workbench.action.navigateDown";
     "when" = "!terminalFocus";
   }
   {
-    "key" = "ctrl+j";
+    "key" = "ctrl+k";
     "command" = "workbench.action.navigateUp";
+  }
+  {
+    "key" = "ctrl+l";
+    "command" = "workbench.action.focusRightGroup";
   }
   {
     "key" = "ctrl+l";
@@ -1624,20 +1639,20 @@
     "when" = "terminalFocus && terminalHasBeenCreated";
   }
   {
+    "key" = "ctrl+shift+h";
+    "command" = "workbench.action.moveEditorToLeftGroup";
+  }
+  {
     "key" = "ctrl+shift+j";
-    "command" = "workbench.action.moveEditorToAboveGroup";
-  }
-  {
-    "key" = "ctrl+shift+;";
-    "command" = "workbench.action.moveEditorToRightGroup";
-  }
-  {
-    "key" = "ctrl+shift+k";
     "command" = "workbench.action.moveEditorToBelowGroup";
   }
   {
+    "key" = "ctrl+shift+k";
+    "command" = "workbench.action.moveEditorToAboveGroup";
+  }
+  {
     "key" = "ctrl+shift+l";
-    "command" = "workbench.action.moveEditorToLeftGroup";
+    "command" = "workbench.action.moveEditorToRightGroup";
   }
   {
     "key" = "ctrl+m i";

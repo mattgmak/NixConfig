@@ -944,6 +944,16 @@
     "when" = "!editorTextFocus && !inputFocus";
   }
   {
+    "key" = "ctrl+h";
+    "command" = "-vscode-neovim.send";
+    "when" = "editorTextFocus && neovim.ctrlKeysInsert.h && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+  }
+  {
+    "key" = "ctrl+h";
+    "command" = "-vscode-neovim.send";
+    "when" = "editorTextFocus && neovim.ctrlKeysNormal.h && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";
+  }
+  {
     "key" = "ctrl+j";
     "command" = "-vscode-neovim.send";
     "when" = "editorTextFocus && neovim.ctrlKeysInsert.j && neovim.init && neovim.mode == 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'";

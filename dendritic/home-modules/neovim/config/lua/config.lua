@@ -118,11 +118,11 @@ if is_vscode then
 
   local cursors = require('vscode-multi-cursor')
 
-  vim.keymap.set({ 'n', 'x', 'i' }, '<c-h>', function() cursors.addSelectionToNextFindMatch() end, {
+  vim.keymap.set({ 'n', 'x', 'i' }, '<c-y>', function() cursors.addSelectionToNextFindMatch() end, {
     silent = true,
   })
 
-  vim.keymap.set({ 'n', 'x', 'i' }, '<cs-h>', function() cursors.addSelectionToPreviousFindMatch() end, {
+  vim.keymap.set({ 'n', 'x', 'i' }, '<cs-y>', function() cursors.addSelectionToPreviousFindMatch() end, {
     silent = true,
   })
 
@@ -133,7 +133,7 @@ if is_vscode then
   vim.keymap.set('n', 'mcm', cursors.cancel, {
     silent = true,
   })
-  vim.keymap.set('n', '<c-h>', 'mciw*:nohl<cr>', {
+  vim.keymap.set('n', '<c-y>', 'mciw*:nohl<cr>', {
     remap = true,
     silent = true,
   })
