@@ -59,7 +59,7 @@
         udiskie
         zellij
         tmux
-        self.homeModules."whisper-dictation"
+        whisper-dictation
         worktrunk
         gh-dash
       ];
