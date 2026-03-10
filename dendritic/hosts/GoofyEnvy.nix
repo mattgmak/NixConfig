@@ -59,6 +59,8 @@
         worktrunk
         whisper-dictation
         gh-dash
+        btop
+        bat
       ];
     };
 
@@ -95,7 +97,6 @@
           overskride
           wev
           evtest
-          btop
           chromium
           xorg.xeyes
           kdePackages.okular

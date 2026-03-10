@@ -37,6 +37,9 @@ in
       tmux
       worktrunk
       gh-dash
+      btop
+      # bat
+      # ghosttyBatSyntax
     ];
   };
 
@@ -122,15 +125,14 @@ in
           swiftlint
           xcbeautify
           sourcekit-lsp
-          btop
           dua
           nodejs_20
-          bat
           eza
           ollama
           stylua
           podman-tui
           go
+          bat
         ]
         ++ (with pkgs.darwin; [
           file_cmds

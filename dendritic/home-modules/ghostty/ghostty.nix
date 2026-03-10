@@ -22,7 +22,7 @@
           else
             pkgs.emptyDirectory;
         settings = {
-          font-size = 14;
+          font-size = if pkgs.stdenv.isLinux then 14 else 18;
           font-family = [
             "IosevkaTerm Nerd Font Propo"
             "Noto Color Emoji"
@@ -112,5 +112,25 @@
       };
 
       stylix.targets.ghostty.fonts.enable = false;
+    };
+  flake.homeModules.ghosttyBatSyntax =
+    {
+      lib,
+      pkgs,
+      config,
+      ...
+    }:
+    lib.mkIf pkgs.stdenv.isDarwin {
+      programs = {
+        ghostty.installBatSyntax = false;
+        bat = {
+          config.map-syntax = [ "${config.xdg.configHome}/ghostty/config:Ghostty Config" ];
+
+          syntaxes.ghostty = {
+            src = config.programs.ghostty.package;
+            file = "Applications/Ghostty.app/Contents/Resources/bat/syntaxes/ghostty.sublime-syntax";
+          };
+        };
+      };
     };
 }
