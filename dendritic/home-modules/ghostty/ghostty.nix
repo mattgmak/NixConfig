@@ -32,6 +32,7 @@
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
           cursor-color = "#B757CA";
+          window-decoration = "none";
           keybind = [
             "global:super+t=toggle_quick_terminal"
             # "super+alt+shift+j=write_screen_file:open"
@@ -106,7 +107,6 @@
             "shift+end=adjust_selection:end"
             "shift+page_up=adjust_selection:page_up"
             "shift+page_down=adjust_selection:page_down"
-
           ];
         };
       };

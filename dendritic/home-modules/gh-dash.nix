@@ -19,8 +19,17 @@
               filters = "is:open involves:@me -author:@me";
             }
           ];
-          preview = {
-            width = 0.5;
+          defaults = {
+            issuesLimit = 20;
+            notificationsLimit = 20;
+            prApproveComment = "Looks good";
+            preview = {
+              open = true;
+              width = 100;
+            };
+            prsLimit = 20;
+            refetchIntervalMinutes = 30;
+            confirmQuit = true;
           };
           pager.diff = "diffnav";
         };
