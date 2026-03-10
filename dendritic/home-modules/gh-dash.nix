@@ -29,8 +29,8 @@
             };
             prsLimit = 20;
             refetchIntervalMinutes = 30;
-            confirmQuit = true;
           };
+          confirmQuit = true;
           pager.diff = "diffnav";
         };
       };
