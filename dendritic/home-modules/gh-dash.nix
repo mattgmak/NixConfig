@@ -32,6 +32,15 @@
           };
           confirmQuit = true;
           pager.diff = "diffnav";
+          keybindings = {
+            prs = [
+              {
+                key = "C";
+                name = "Code Review";
+                command = "tmux new-window -n 'PR-{{.PrNumber}}' 'nu -e `wt switch pr:{{.PrNumber}} -x pwd`'";
+              }
+            ];
+          };
         };
       };
       home.packages = with pkgs; [
