@@ -1,6 +1,12 @@
 {
   flake.homeModules.tmux =
-    { pkgs, hostname, ... }:
+    {
+      pkgs,
+      hostname,
+      config,
+      lib,
+      ...
+    }:
     {
       programs.tmux = {
         enable = true;
@@ -115,15 +121,42 @@
               set -g @fuzzback-popup-size '90%'
             '';
           }
+          {
+            plugin = better-mouse-mode;
+            extraConfig = ''
+              set -g @scroll-speed-num-lines-per-scroll '1'
+              set -g @emulate-scroll-for-no-mouse-alternate-buffer 'on'
+            '';
+          }
+          {
+            plugin = jump;
+            extraConfig =
+              let
+                decRgbToEsc =
+                  baseName: prefix:
+                  let
+                    c = (config.lib.stylix or { }).colors or { };
+                    to255 = ch: builtins.floor ((builtins.fromJSON (c.${"${baseName}-dec-${ch}"} or "0")) * 255);
+                    r = to255 "r";
+                    g = to255 "g";
+                    b = to255 "b";
+                  in
+                  "${prefix}${toString r};${toString g};${toString b}m";
+                stylixColors = (config.lib.stylix or { }).colors or { };
+                jumpBgColor =
+                  if stylixColors != { } then "\\e[0m" + (decRgbToEsc "base02" "\\e[48;2;") else "\\e[0m\\e[90m";
+                jumpFgColor = if stylixColors != { } then (decRgbToEsc "base08" "\\e[38;2;") else "\\e[1m\\e[31m";
+              in
+              ''
+                set -g @jump-key 'Bspace'
+                # set -g @jump-bg-color '${jumpBgColor}'
+                set -g @jump-fg-color '${jumpFgColor}'
+              '';
+          }
         ];
       };
     }
-    // (
-      if hostname != "Droid" then
-        {
-          stylix.targets.tmux.enable = false;
-        }
-      else
-        { }
-    );
+    // lib.optionalAttrs (hostname != "Droid") {
+      stylix.targets.tmux.enable = false;
+    };
 }

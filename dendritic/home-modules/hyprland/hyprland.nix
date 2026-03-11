@@ -163,6 +163,8 @@
               "SUPER, G, exec, ~/.config/hypr/scripts/animation-toggle.nu"
               # Input toggle binds
               "SUPER, SPACE, exec, fcitx5-remote -t"
+              # Consume Super+Period so it doesn't reach apps; whisper-dictation gets it via evdev
+              "SUPER, period, exec, true"
               # Logout bind
               "$mod, Q, exec, wlogout"
               # Floating terminal bind

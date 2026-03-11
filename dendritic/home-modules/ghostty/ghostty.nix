@@ -28,7 +28,7 @@
             "Noto Color Emoji"
           ];
           quick-terminal-position = "center";
-          command = lib.getExe pkgs.nushell;
+          command = "${lib.getExe pkgs.nushell} -e 'tmux'";
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
           cursor-color = "#B757CA";

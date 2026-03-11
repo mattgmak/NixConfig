@@ -998,6 +998,6 @@ $env.config.hooks.pre_prompt = (
 # start_zellij
 
 # Auto-start tmux
-if "TMUX" not-in $env and (which tmux | is-not-empty) {
-    tmux
-}
+# if "TMUX" not-in $env and (which tmux | is-not-empty) {
+#     tmux
+# }
