@@ -78,7 +78,6 @@
             scrolling = {
               column_width = 0.7;
             };
-            "$mod" = "ALT";
             unbind = [ ];
             bindin = [
               # "Super, catchall, global, caelestia:launcherInterrupt"
@@ -93,43 +92,43 @@
             ];
             bindlpt = [
               # Focus binds
-              "$mod, R, focuswindow, initialtitle:(Zen Browser)"
-              "$mod, E, focuswindow, class:(.*[Cc]ursor.*)"
-              "$mod, W, focuswindow, class:(.*ghostty.*)"
-              "$mod, Z, focuswindow, class:(vesktop)"
-              "$mod, O, focuswindow, class:(OrcaSlicer)"
+              "ALT, R, focuswindow, initialtitle:(Zen Browser)"
+              "ALT, E, focuswindow, class:(.*[Cc]ursor.*)"
+              "ALT, W, focuswindow, class:(.*ghostty.*)"
+              "ALT, Z, focuswindow, class:(vesktop)"
+              "ALT, O, focuswindow, class:(OrcaSlicer)"
             ];
             bind = [
-              "$mod, m, global, caelestia:launcher"
-              "$mod SHIFT, m, exec, rofi -show drun"
-              "$mod, h, movefocus, l"
-              "$mod, j, movefocus, d"
-              "$mod, k, movefocus, u"
-              "$mod, l, movefocus, r"
-              "$mod, Up, movefocus, u"
-              "$mod, Down, movefocus, d"
-              "$mod SUPER, Up, layoutmsg, move -col"
-              "$mod SUPER, Down, layoutmsg, move +col"
-              "$mod, mouse_up, layoutmsg, move +col"
-              "$mod, mouse_down, layoutmsg, move -col"
-              "$mod, Left, movefocus, l"
-              "$mod, Right, movefocus, r"
-              "$mod SHIFT, h, movewindow, l"
-              "$mod SHIFT, j, movewindow, d"
-              "$mod SHIFT, k, movewindow, u"
-              "$mod SHIFT, l, movewindow, r"
-              "$mod SHIFT, Left, movewindow, l"
-              "$mod SHIFT, Down, movewindow, d"
-              "$mod SHIFT, Up, movewindow, u"
-              "$mod SHIFT, Right, movewindow, r"
-              "$mod, Tab, layoutmsg, cyclenext"
-              "$mod SHIFT, Tab, layoutmsg, cycleprev"
-              "$mod, t, togglefloating"
-              "$mod, f, fullscreen"
-              "$mod, d, killactive"
-              "$mod, c, centerwindow"
-              "$mod, G, workspace, name:Game"
-              "$mod SHIFT, G, movetoworkspacesilent, name:Game"
+              "ALT, m, global, caelestia:launcher"
+              "ALT SHIFT, m, exec, rofi -show drun"
+              "ALT, h, movefocus, l"
+              "ALT, j, movefocus, d"
+              "ALT, k, movefocus, u"
+              "ALT, l, movefocus, r"
+              "ALT, Up, movefocus, u"
+              "ALT, Down, movefocus, d"
+              "ALT SUPER, Up, layoutmsg, move -col"
+              "ALT SUPER, Down, layoutmsg, move +col"
+              "ALT, mouse_up, layoutmsg, move +col"
+              "ALT, mouse_down, layoutmsg, move -col"
+              "ALT, Left, movefocus, l"
+              "ALT, Right, movefocus, r"
+              "ALT SHIFT, h, movewindow, l"
+              "ALT SHIFT, j, movewindow, d"
+              "ALT SHIFT, k, movewindow, u"
+              "ALT SHIFT, l, movewindow, r"
+              "ALT SHIFT, Left, movewindow, l"
+              "ALT SHIFT, Down, movewindow, d"
+              "ALT SHIFT, Up, movewindow, u"
+              "ALT SHIFT, Right, movewindow, r"
+              "ALT, Tab, layoutmsg, cyclenext"
+              "ALT SHIFT, Tab, layoutmsg, cycleprev"
+              "ALT, t, togglefloating"
+              "ALT, f, fullscreen"
+              "ALT, d, killactive"
+              "ALT, c, centerwindow"
+              "ALT, G, workspace, name:Game"
+              "ALT SHIFT, G, movetoworkspacesilent, name:Game"
               ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
               ", XF86AudioMicMute, exec, ~/.config/hypr/scripts/mic-toggle.sh"
               # ", XF86AudioPlay, exec, playerctl play-pause"
@@ -137,9 +136,9 @@
               # ", XF86AudioNext, exec, playerctl next"
               # ", XF86AudioPrev, exec, playerctl previous"
               # Waybar binds
-              # "$mod SHIFT, M, exec, pkill waybar || waybar"
-              # "$mod, M, exec, pkill -SIGUSR1 waybar"
-              "$mod SHIFT, M, exec, caelestia shell --kill; caelestia shell -d"
+              # "ALT SHIFT, M, exec, pkill waybar || waybar"
+              # "ALT, M, exec, pkill -SIGUSR1 waybar"
+              "ALT SHIFT, M, exec, caelestia shell --kill; caelestia shell -d"
               # Utility binds
               "SUPER, V, exec, ghostty --title=clipse -e clipse"
               "SUPER, B, exec, ghostty --title=bluetui -e bluetui"
@@ -150,8 +149,8 @@
               "Super Shift, S, global, caelestia:screenshotFreeze"
               "SUPER SHIFT, C, exec, hyprpicker -a"
               # "SUPER, N, exec, makoctl dismiss -a"
-              "$mod, N, global, caelestia:clearNotifs"
-              "$mod, B, exec, caelestia shell drawers toggle sidebar"
+              "ALT, N, global, caelestia:clearNotifs"
+              "ALT, B, exec, caelestia shell drawers toggle sidebar"
               # App launch binds
               "SUPER, R, exec, zen-beta"
               "SUPER, E, exec, cursor"
@@ -166,11 +165,11 @@
               # Consume Super+Period so it doesn't reach apps; whisper-dictation gets it via evdev
               "SUPER, period, exec, true"
               # Logout bind
-              "$mod, Q, exec, wlogout"
+              "ALT, Q, exec, wlogout"
               # Floating terminal bind
               "SUPER, T, exec, ~/.config/hypr/scripts/floating-terminal.nu"
               # Window switcher bind
-              "$mod, Comma, exec, ~/.config/hypr/scripts/window-switcher.nu"
+              "ALT, Comma, exec, ~/.config/hypr/scripts/window-switcher.nu"
             ]
             ++ lib.concatMap (
               index:
@@ -178,31 +177,31 @@
                 key = if index == "10" then "0" else index;
               in
               [
-                "$mod, ${key}, workspace, ${index}"
-                "$mod SHIFT, ${key}, movetoworkspacesilent, ${index}"
+                "ALT, ${key}, workspace, ${index}"
+                "ALT SHIFT, ${key}, movetoworkspacesilent, ${index}"
               ]
             ) allWorkspacesIndex;
             bindm = [
-              "$mod SHIFT, mouse:272, movewindow"
-              "$mod, mouse:272, resizewindow"
+              "ALT SHIFT, mouse:272, movewindow"
+              "ALT, mouse:272, resizewindow"
             ];
             binde = [
-              "$mod, i, resizeactive, 0 -20"
-              "$mod, u, resizeactive, 0 20"
-              "$mod, y, resizeactive, -20 0"
-              "$mod, o, resizeactive, 20 0"
-              "$mod SHIFT, i, moveactive, 0 -20"
-              "$mod SHIFT, u, moveactive, 0 20"
-              "$mod SHIFT, y, moveactive, -20 0"
-              "$mod SHIFT, o, moveactive, 20 0"
-              "$mod, Prior, resizeactive, 0 -20"
-              "$mod, Next, resizeactive, 0 20"
-              "$mod, Home, resizeactive, -20 0"
-              "$mod, End, resizeactive, 20 0"
-              "$mod SHIFT, Prior, moveactive, 0 -20"
-              "$mod SHIFT, Next, moveactive, 0 20"
-              "$mod SHIFT, Home, moveactive, -20 0"
-              "$mod SHIFT, End, moveactive, 20 0"
+              "ALT, i, resizeactive, 0 -20"
+              "ALT, u, resizeactive, 0 20"
+              "ALT, y, resizeactive, -20 0"
+              "ALT, o, resizeactive, 20 0"
+              "ALT SHIFT, i, moveactive, 0 -20"
+              "ALT SHIFT, u, moveactive, 0 20"
+              "ALT SHIFT, y, moveactive, -20 0"
+              "ALT SHIFT, o, moveactive, 20 0"
+              "ALT, Prior, resizeactive, 0 -20"
+              "ALT, Next, resizeactive, 0 20"
+              "ALT, Home, resizeactive, -20 0"
+              "ALT, End, resizeactive, 20 0"
+              "ALT SHIFT, Prior, moveactive, 0 -20"
+              "ALT SHIFT, Next, moveactive, 0 20"
+              "ALT SHIFT, Home, moveactive, -20 0"
+              "ALT SHIFT, End, moveactive, 20 0"
               ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%+"
               ", XF86AudioLowerVolume, exec, wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%-"
               # ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
