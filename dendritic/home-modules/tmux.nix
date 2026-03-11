@@ -103,17 +103,18 @@
               set -g @sessionx-filter-current 'false'
             '';
           }
-          # {
-          #   plugin = tmux-floax;
-          #   extraConfig = ''
-          #     set -g @floax-width '80%'
-          #     set -g @floax-height '80%'
-          #     set -g @floax-border-color 'magenta'
-          #     set -g @floax-text-color 'blue'
-          #     set -g @floax-bind 'p'
-          #     set -g @floax-change-path 'true'
-          #   '';
-          # }
+          {
+            plugin = tmux-floax;
+            extraConfig = ''
+              set -g @floax-width '80%'
+              set -g @floax-height '80%'
+              set -g @floax-border-color 'magenta'
+              set -g @floax-text-color 'blue'
+              set -g @floax-bind 't'
+              set -g @floax-bind-menu 'T'
+              set -g @floax-change-path 'true'
+            '';
+          }
           tmux-fzf
           fzf-tmux-url
           {
