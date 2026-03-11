@@ -143,13 +143,14 @@
                   in
                   "${prefix}${toString r};${toString g};${toString b}m";
                 stylixColors = (config.lib.stylix or { }).colors or { };
-                jumpBgColor =
-                  if stylixColors != { } then "\\e[0m" + (decRgbToEsc "base02" "\\e[48;2;") else "\\e[0m\\e[90m";
+                # jumpBgColor =
+                #   if stylixColors != { } then "\\e[0m" + (decRgbToEsc "base02" "\\e[48;2;") else "\\e[0m\\e[90m";
+                jumpBgColor = "\\e[0m";
                 jumpFgColor = if stylixColors != { } then (decRgbToEsc "base08" "\\e[38;2;") else "\\e[1m\\e[31m";
               in
               ''
                 set -g @jump-key 'Bspace'
-                # set -g @jump-bg-color '${jumpBgColor}'
+                set -g @jump-bg-color '${jumpBgColor}'
                 set -g @jump-fg-color '${jumpFgColor}'
               '';
           }
