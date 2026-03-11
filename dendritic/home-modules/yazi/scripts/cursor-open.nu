@@ -1,5 +1,6 @@
 #!/usr/bin/env nu
 
+# TODO: refactor to use pkgs.writeScript
 def main [...paths: string] {
   let quoted_paths = $paths | each { |f| $"\"($f)\"" }
 
