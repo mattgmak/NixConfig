@@ -33,6 +33,10 @@
           cursor-style = "block";
           cursor-color = "#B757CA";
           window-decoration = "none";
+          window-padding-x = 4;
+          window-padding-y = 4;
+          window-padding-balance = true;
+          window-padding-color = "extend";
           keybind = [
             "global:super+t=toggle_quick_terminal"
             # "super+alt+shift+j=write_screen_file:open"

@@ -75,16 +75,16 @@
               set -g @catppuccin_window_current_text "#W#{?window_zoomed_flag,(),} "
               set -g @catppuccin_window_current_number "#I"
 
-              set -g @catppuccin_status_left_separator  " "
+              set -g @catppuccin_status_left_separator  ""
               # set -g @catppuccin_status_middle_separator "#[bg=#{@thm_surface_0}]"
               set -g @catppuccin_status_middle_separator ""
-              set -g @catppuccin_status_right_separator " "
+              set -g @catppuccin_status_right_separator ""
               set -g @catppuccin_status_fill "icon"
               set -g @catppuccin_status_connect_separator "no"
               set -g status-left-length 100
               set -g status-right-length 100
-              set -g status-left "#{E:@catppuccin_status_session}"
-              set -g status-right "#{E:@catppuccin_status_directory}#{E:@catppuccin_status_application}#{E:@catppuccin_status_date_time}"
+              set -g status-left "#{E:@catppuccin_status_session} "
+              set -g status-right "#{E:@catppuccin_status_directory} #{E:@catppuccin_status_application} #{E:@catppuccin_status_date_time}"
               set -g @catppuccin_directory_text " #{b:pane_current_path}"
               set -g @catppuccin_directory_icon "󰉋 "
               set -g @catppuccin_date_time_text " %H:%M"
