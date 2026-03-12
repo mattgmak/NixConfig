@@ -52,6 +52,7 @@
           lazygit
           carapace
           tmux
+          nix-index-database
         ];
         programs.ssh = {
           enable = true;

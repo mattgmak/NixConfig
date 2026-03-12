@@ -40,6 +40,7 @@ in
       btop
       # bat
       # ghosttyBatSyntax
+      nix-index-database
     ];
   };
 

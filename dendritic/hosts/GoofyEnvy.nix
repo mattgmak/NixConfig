@@ -61,6 +61,7 @@
         gh-dash
         btop
         bat
+        nix-index-database
       ];
     };
 
