@@ -24,12 +24,6 @@
           set -g status-position top
           set -g pane-active-border-style 'fg=magenta,bg=default'
           set -g pane-border-style 'fg=brightblack,bg=default'
-          # set -g @floax-width '80%'
-          # set -g @floax-height '80%'
-          # set -g @floax-border-color 'magenta'
-          # set -g @floax-text-color 'blue'
-          # set -g @floax-bind 'p'
-          # set -g @floax-change-path 'true'
           bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
           bind-key -T copy-mode-vi v send-keys -X begin-selection
           bind-key -T copy-mode-vi C-v send-keys -X rectangle-on \; send -X begin-selection
@@ -109,7 +103,7 @@
               set -g @floax-width '80%'
               set -g @floax-height '80%'
               set -g @floax-border-color 'magenta'
-              set -g @floax-text-color 'blue'
+              set -g @floax-text-color 'white'
               set -g @floax-bind 't'
               set -g @floax-bind-menu 'T'
               set -g @floax-change-path 'true'
