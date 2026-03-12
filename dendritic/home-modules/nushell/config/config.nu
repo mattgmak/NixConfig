@@ -926,8 +926,6 @@ $env.config = {
 
 
 source ~/.nushell-extra/.zoxide.nu
-source ~/.nushell-extra/atuin.nu
-use ~/.nushell-extra/conda.nu
 
 def --env y [...args] {
 	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
@@ -976,10 +974,6 @@ $env.EDITOR = "nvim"
 
 $env.CONDA_NO_PROMPT = true
 
-$env.config.hooks.pre_prompt = (
-    $env.config.hooks.pre_prompt | append (source ~/.nushell-extra/direnv.nu)
-)
-
 # zellij
 # def start_zellij [] {
 #   if 'ZELLIJ' not-in ($env | columns) {
@@ -996,8 +990,3 @@ $env.config.hooks.pre_prompt = (
 # }
 
 # start_zellij
-
-# Auto-start tmux
-# if "TMUX" not-in $env and (which tmux | is-not-empty) {
-#     tmux
-# }

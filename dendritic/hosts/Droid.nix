@@ -34,13 +34,13 @@
         unzip
         zoxide
         which
-        atuin
         openssh
         curlMinimal
       ];
 
       home-manager.config = {
         imports = with self.homeModules; [
+          atuin
           nushell
           neovim
           starship

@@ -106,7 +106,6 @@
         ripgrep
         zip
         unzip
-        atuin
         nh
         nvd
         nix-output-monitor
@@ -124,6 +123,7 @@
   flake.homeConfigurations.minimalIso = {
     imports = with self.homeModules; [
       nixos-home
+      atuin
       nushell
       neovim
       starship

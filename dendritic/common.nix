@@ -190,7 +190,6 @@
         zip
         unzip
         nixfmt
-        atuin
         nixd
         kitty
         nh

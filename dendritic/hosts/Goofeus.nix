@@ -31,6 +31,7 @@
     homeConfigurations.Goofeus = {
       imports = with self.homeModules; [
         nixos-home
+        atuin
         nushell
         neovim
         starship
@@ -107,7 +108,6 @@
           ripgrep
           zip
           unzip
-          atuin
           nh
           nvd
           nix-output-monitor

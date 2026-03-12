@@ -30,6 +30,7 @@
     homeConfigurations.GoofyDesky = {
       imports = with self.homeModules; [
         nixos-home
+        atuin
         zen-browser
         cs2
         nushell

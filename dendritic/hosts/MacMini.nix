@@ -19,6 +19,7 @@ in
   flake.homeConfigurations.MacMini = {
     imports = with self.homeModules; [
       darwin-home
+      atuin
       zen-browser
       nushell
       wezterm
@@ -104,7 +105,6 @@ in
           starship
           ripgrep
           nixfmt
-          atuin
           nixd
           nh
           nvd

@@ -28,6 +28,7 @@
     homeConfigurations.GoofyEnvy = {
       imports = with self.homeModules; [
         nixos-home
+        atuin
         zen-browser
         nushell
         wezterm
