@@ -31,6 +31,7 @@
       imports = with self.homeModules; [
         nixos-home
         atuin
+        zoxide
         zen-browser
         cs2
         nushell

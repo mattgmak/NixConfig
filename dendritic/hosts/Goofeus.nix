@@ -32,6 +32,7 @@
       imports = with self.homeModules; [
         nixos-home
         atuin
+        zoxide
         nushell
         neovim
         starship
@@ -103,7 +104,6 @@
           git
           nushell
           fzf
-          zoxide
           starship
           ripgrep
           zip

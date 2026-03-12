@@ -184,7 +184,6 @@
         appimage-run
         nushell
         fzf
-        zoxide
         starship
         ripgrep
         zip

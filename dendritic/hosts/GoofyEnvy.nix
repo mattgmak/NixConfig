@@ -29,6 +29,7 @@
       imports = with self.homeModules; [
         nixos-home
         atuin
+        zoxide
         zen-browser
         nushell
         wezterm

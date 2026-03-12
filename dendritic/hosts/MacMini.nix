@@ -20,6 +20,7 @@ in
     imports = with self.homeModules; [
       darwin-home
       atuin
+      zoxide
       zen-browser
       nushell
       wezterm
@@ -101,7 +102,6 @@ in
         [
           git
           fzf
-          zoxide
           starship
           ripgrep
           nixfmt
