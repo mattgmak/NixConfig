@@ -179,12 +179,9 @@
 
       environment.systemPackages = with pkgs; [
         wget
-        git
         chezmoi
         appimage-run
-        nushell
         fzf
-        starship
         ripgrep
         zip
         unzip
@@ -199,9 +196,7 @@
         nix-prefetch-github
         nvfetcher
         zenity
-        gh
         base16-shell-preview
-        lazygit
         nurl
         dua
         nautilus

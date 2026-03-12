@@ -100,9 +100,7 @@ in
       environment.systemPackages =
         with pkgs;
         [
-          git
           fzf
-          starship
           ripgrep
           nixfmt
           nixd
@@ -110,18 +108,13 @@ in
           nvd
           nix-output-monitor
           neofetch
-          gh
           base16-shell-preview
-          lazygit
-          wezterm
           jq
           mas
-          direnv
           git-credential-manager
           cocoapods
           ruby_3_4
           nix-search-cli
-          delta
           swift-format
           swiftlint
           xcbeautify
@@ -133,7 +126,6 @@ in
           stylua
           podman-tui
           go
-          bat
         ]
         ++ (with pkgs.darwin; [
           file_cmds

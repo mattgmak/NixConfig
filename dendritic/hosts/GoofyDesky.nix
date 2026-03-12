@@ -108,7 +108,6 @@
           chromium
           xorg.xeyes
           kdePackages.okular
-          mpv
           qbittorrent
           gparted
           tparted

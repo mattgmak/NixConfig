@@ -98,10 +98,7 @@
       };
 
       environment.systemPackages = with pkgs; [
-        git
-        nushell
         fzf
-        starship
         ripgrep
         zip
         unzip
@@ -112,7 +109,6 @@
         nitch
         zenity
         gh
-        lazygit
         dua
         parted
         tparted

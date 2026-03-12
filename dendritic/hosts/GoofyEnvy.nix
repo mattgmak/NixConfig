@@ -85,7 +85,6 @@
 
         environment.systemPackages = with pkgs; [
           bitwarden-desktop
-          wezterm
           libnotify
           obsidian
           pkgs-stable.vesktop
@@ -103,7 +102,6 @@
           chromium
           xorg.xeyes
           kdePackages.okular
-          mpv
           qbittorrent
           gparted
           appflowy

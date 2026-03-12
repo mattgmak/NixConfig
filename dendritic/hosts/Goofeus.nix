@@ -101,21 +101,15 @@
         security.sudo.enable = true;
 
         environment.systemPackages = with pkgs; [
-          git
-          nushell
           fzf
-          starship
           ripgrep
           zip
           unzip
           nh
           nvd
           nix-output-monitor
-          gh
-          lazygit
           dua
           lazyjournal
-          neovim
           btop
         ];
 
