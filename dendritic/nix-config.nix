@@ -1,6 +1,6 @@
 {
   flake.nixConfig =
-    { lib, pkgs, ... }:
+    { pkgs, ... }:
     {
       nix = {
         settings = {
@@ -23,13 +23,21 @@
           ];
         };
         gc = {
-          automatic = lib.mkIf pkgs.stdenv.isLinux true;
-          dates = lib.mkIf pkgs.stdenv.isLinux "daily";
-          interval = lib.mkIf pkgs.stdenv.isDarwin {
-            Hour = 8;
-          };
           options = "--delete-older-than 7d";
-        };
+        }
+        // (
+          if pkgs.stdenv.isDarwin then
+            {
+              interval = {
+                Hour = 8;
+              };
+            }
+          else
+            {
+              automatic = true;
+              dates = "daily";
+            }
+        );
       };
 
     };
