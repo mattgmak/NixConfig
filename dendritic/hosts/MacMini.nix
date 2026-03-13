@@ -13,6 +13,7 @@ in
     modules = [
       self.darwinModules.${hostname}
       self.nixpkgsConfig
+      self.nixConfig
     ];
   };
 
@@ -67,7 +68,6 @@ in
         inputs.stylix.darwinModules.stylix
         self.fonts
         self.stylixCommon
-        # self.darwinModules.stylixCursor
       ];
 
       users.users.${username} = {
