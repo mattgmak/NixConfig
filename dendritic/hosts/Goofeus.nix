@@ -85,9 +85,6 @@
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;
 
-        # Set your time zone.
-        # time.timeZone = "Europe/Amsterdam";
-
         environment.sessionVariables = {
           NH_OS_FLAKE = "/home/${username}/NixConfig";
         };
