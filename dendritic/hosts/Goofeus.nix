@@ -26,6 +26,7 @@
           self.nixConfig
           tailscale
           homepage-dashboard
+          immich
         ];
       }
     );
@@ -193,6 +194,7 @@
           options = [
             "defaults"
             "users"
+            "nofail"
           ];
         };
 
