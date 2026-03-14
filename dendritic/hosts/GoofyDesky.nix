@@ -23,6 +23,7 @@
           orca-slicer
           steam
           vr
+          tailscale
         ];
       }
     );
@@ -67,6 +68,7 @@
         btop
         bat
         nix-index-database
+        tailscale-systray
       ];
     };
 
@@ -227,6 +229,11 @@
           package = pkgs.ollama-cuda;
           loadModels = [ "deepseek-r1:8b" ];
         };
+
+        users.users.${username}.openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBhBPZ6RstKIkG1on6ny8fRJ3oOSvgqMPK+y8RNn8gX u3592095@connect.hku.hk"
+        ];
+        services.openssh.enable = true;
 
         system.stateVersion = "24.11";
 
