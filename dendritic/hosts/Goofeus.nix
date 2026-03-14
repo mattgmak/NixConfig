@@ -16,14 +16,15 @@
           inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
           hostname = self.constants.serverName;
         };
-        modules = [
-          self.nixosModules.Goofeus
-          self.nixosModules.GoofeusHardware
+        modules = with self.nixosModules; [
+          Goofeus
+          GoofeusHardware
           self.stylixCommon
           inputs.home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
           self.nixpkgsConfig
           self.nixConfig
+          tailscale
         ];
       }
     );
