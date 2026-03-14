@@ -1,6 +1,6 @@
 {
   flake.nixosModules.homepage-dashboard =
-    { config, lib, ... }:
+    { config, ... }:
     let
       port = config.services.homepage-dashboard.listenPort;
       immichPort = config.services.immich.port;
@@ -10,9 +10,14 @@
         enable = true;
         openFirewall = false;
         allowedHosts = "100.111.11.128:${toString port},goofeus:${toString port}";
-        # Add HOMEPAGE_VAR_IMMICH_KEY to environmentFiles for the widget to work.
-        # Create an API key in Immich: Account Settings > API Keys (with server.statistics permission)
-        widgets = lib.mkAfter [
+        widgets = [
+          {
+            resources = {
+              cpu = true;
+              disk = "/";
+              memory = true;
+            };
+          }
           {
             widget = {
               type = "immich";
