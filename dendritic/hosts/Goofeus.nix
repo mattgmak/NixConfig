@@ -43,7 +43,9 @@
         gh
         direnv
         lazygit
-        tmux
+        btop
+        bat
+        nix-index-database
       ];
     };
 
