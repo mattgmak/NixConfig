@@ -22,6 +22,7 @@
             };
           }
         ];
+        environmentFile = "/etc/homepage-dashboard/environment";
       };
       networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ port ];
     };
