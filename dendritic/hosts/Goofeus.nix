@@ -124,6 +124,7 @@
           extraGroups = [
             "wheel"
             "networkmanager"
+            "immich"
           ];
           shell = pkgs.nushell;
           openssh.authorizedKeys.keys = [

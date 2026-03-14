@@ -22,6 +22,7 @@
           if mountpoint -q /mnt/2TBSeagateHDD; then
             mkdir -p /mnt/2TBSeagateHDD/immich
             chown immich:immich /mnt/2TBSeagateHDD/immich
+            chmod 2770 /mnt/2TBSeagateHDD/immich
           fi
         '';
       };
