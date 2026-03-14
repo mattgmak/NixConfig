@@ -1,7 +1,8 @@
 {
   flake.nixosModules.homepage-dashboard =
+    { config, ... }:
     let
-      port = 8082;
+      port = config.services.homepage-dashboard.listenPort;
     in
     {
       services.homepage-dashboard = {
@@ -9,7 +10,6 @@
         openFirewall = false;
         allowedHosts = "100.111.11.128:${toString port},goofeus:${toString port}";
       };
-      # Allow Tailscale nodes to access homepage-dashboard (port 8082)
       networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ port ];
     };
 }
