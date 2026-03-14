@@ -7,6 +7,7 @@
     {
       services.immich = {
         enable = true;
+        host = "0.0.0.0";
         mediaLocation = "/mnt/2TBSeagateHDD/immich";
       };
 
