@@ -10,6 +10,9 @@
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
+    nixpkgs-for-homelab = {
+      url = "github:nixos/nixpkgs/nixos-unstable";
+    };
     nixpkgs-for-cursor = {
       url = "github:nixos/nixpkgs/master";
     };

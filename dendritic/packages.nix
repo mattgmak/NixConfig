@@ -17,9 +17,18 @@
             inherit system;
             config.allowUnfree = true;
           };
+          pkgs-for-homelab = import inputs.nixpkgs-for-homelab {
+            inherit system;
+            config.allowUnfree = true;
+          };
         in
         {
-          inherit pkgs-stable pkgs-for-cursor pkgs-unstable;
+          inherit
+            pkgs-stable
+            pkgs-for-cursor
+            pkgs-unstable
+            pkgs-for-homelab
+            ;
         };
     };
   flake.nixpkgsConfig =
