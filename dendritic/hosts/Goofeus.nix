@@ -25,6 +25,7 @@
           self.nixpkgsConfig
           self.nixConfig
           tailscale
+          homepage-dashboard
         ];
       }
     );
