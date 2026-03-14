@@ -24,6 +24,9 @@
           set -g status-position top
           set -g pane-active-border-style 'fg=magenta,bg=default'
           set -g pane-border-style 'fg=brightblack,bg=default'
+          set -g allow-passthrough on
+          set -ga update-environment TERM
+          set -ga update-environment TERM_PROGRAM
           bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
           bind-key -T copy-mode-vi v send-keys -X begin-selection
           bind-key -T copy-mode-vi C-v send-keys -X rectangle-on \; send -X begin-selection
