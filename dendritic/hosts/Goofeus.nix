@@ -152,6 +152,7 @@
         config,
         lib,
         modulesPath,
+        username,
         ...
       }:
       {
@@ -187,6 +188,11 @@
         fileSystems."/mnt/2TBSeagateHDD" = {
           device = "/dev/disk/by-label/2TBSeagateHDD";
           fsType = "ext4";
+          options = [
+            "uid=${toString config.users.users.${username}.uid}"
+            "gid=${toString config.users.groups.${config.users.users.${username}.group}.gid}"
+            "nofail"
+          ];
         };
 
         nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
