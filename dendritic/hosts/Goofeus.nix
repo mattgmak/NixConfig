@@ -115,6 +115,7 @@
           btop
           powertop
           lazydocker
+          systemctl-tui
         ];
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
