@@ -1,10 +1,10 @@
 {
   flake.homeModules.atuin =
-    { ... }:
+    { hostname, ... }:
     {
       programs.atuin = {
         enable = true;
-        daemon.enable = true;
+        daemon.enable = hostname != "Droid";
         settings = {
           exit_mode = "return-query";
           invert = true;
