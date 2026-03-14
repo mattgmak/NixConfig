@@ -116,6 +116,7 @@
           lazyjournal
           btop
           powertop
+          lazydocker
         ];
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -143,6 +144,8 @@
           }
         ];
         powerManagement.powertop.enable = true;
+
+        virtualisation.docker.enable = true;
 
         system.stateVersion = "26.05";
       };
