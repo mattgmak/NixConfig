@@ -3,6 +3,7 @@
     {
       config,
       lib,
+      pkgs,
       ...
     }:
     let
@@ -16,8 +17,7 @@
           default = "";
           example = "goofeus.tail-xxxxx.ts.net";
           description = ''
-            Base Tailscale magic DNS domain for subdomain routing.
-            Subdomains will be: immich.<domain>, glance.<domain>.
+            Base Tailscale magic DNS domain. Path routing: / → Glance, /immich → Immich.
             Set this to enable the reverse proxy (e.g. in your host config).
           '';
         };
@@ -26,21 +26,18 @@
       config = mkIf (cfg.domain != "") {
         services.caddy = {
           enable = true;
-          # Caddy 2.5+ automatically fetches TLS certs from Tailscale for *.ts.net - no config needed
-          virtualHosts = {
-            immich = {
-              hostName = "immich.${cfg.domain}";
-              extraConfig = ''
+          # TODO: routing to /immich does not work
+          configFile = pkgs.writeText "Caddyfile" ''
+            ${cfg.domain} {
+              handle_path /immich* {
                 reverse_proxy :${toString config.services.immich.port}
-              '';
-            };
-            glance = {
-              hostName = "glance.${cfg.domain}";
-              extraConfig = ''
+              }
+              handle {
                 reverse_proxy :${toString config.services.glance.settings.server.port}
-              '';
-            };
-          };
+              }
+            }
+          '';
+          # Caddy 2.5+ automatically fetches TLS certs from Tailscale for *.ts.net - no config needed
         };
 
         # Only Caddy needs ports on tailscale - services are reached via localhost
