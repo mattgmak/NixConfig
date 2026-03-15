@@ -218,6 +218,7 @@
         go
         podman-tui
         jq
+        cursor-cli
       ];
 
       services.gvfs.enable = true;
