@@ -219,6 +219,7 @@
         podman-tui
         jq
         dnsutils
+        cursor-cli
       ];
 
       services.gvfs.enable = true;
