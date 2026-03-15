@@ -58,7 +58,7 @@
               mkExtensionSettings = builtins.mapAttrs (
                 _: pluginId: {
                   install_url = "https://addons.mozilla.org/firefox/downloads/latest/${pluginId}/latest.xpi";
-                  installation_mode = "force_installed";
+                  installation_mode = "normal_installed";
                 }
               );
             in
@@ -107,6 +107,7 @@
                 # "uBlock0@raymondhill.net" = "ublock-origin";
                 "vimium-c@gdh1995.cn" = "vimium-c";
                 "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = "styl-us";
+                "@crw-extension-firefox" = "consumer-rights-wiki";
               };
             };
           profiles.default = rec {
