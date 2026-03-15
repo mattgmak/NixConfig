@@ -35,6 +35,7 @@
         which
         openssh
         curlMinimal
+	busybox
       ];
 
       home-manager.config = {
