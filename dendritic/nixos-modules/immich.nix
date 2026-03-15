@@ -1,14 +1,10 @@
 {
   flake.nixosModules.immich =
     {
-      config,
       pkgs,
       pkgs-for-homelab,
       ...
     }:
-    let
-      port = config.services.immich.port;
-    in
     {
       services.immich = {
         enable = true;
@@ -32,6 +28,5 @@
           fi
         '';
       };
-      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ port ];
     };
 }

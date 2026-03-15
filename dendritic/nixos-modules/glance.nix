@@ -1,3 +1,4 @@
+{ self, ... }:
 {
   flake.nixosModules.glance =
     {
@@ -6,7 +7,6 @@
       ...
     }:
     let
-      port = config.services.glance.settings.server.port;
       immichPort = config.services.immich.port;
     in
     {
@@ -32,7 +32,7 @@
                       servers = [
                         {
                           type = "local";
-                          name = "goofeus";
+                          name = self.constants.serverName;
                           mountpoints = {
                             "/" = {
                               name = "Root";
@@ -85,6 +85,5 @@
       # Allow Glance to access Docker socket for docker-containers widget
       systemd.services.glance.serviceConfig.SupplementaryGroups = [ "docker" ];
 
-      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ port ];
     };
 }

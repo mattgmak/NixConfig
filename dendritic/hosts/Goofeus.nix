@@ -27,6 +27,7 @@
           tailscale
           glance
           immich
+          caddy
         ];
       }
     );
@@ -82,6 +83,9 @@
 
         networking.hostName = hostname;
         networking.firewall.enable = true;
+
+        # Caddy reverse proxy - set your actual Tailscale magic DNS (from tailscale status)
+        caddyTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
 
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;
