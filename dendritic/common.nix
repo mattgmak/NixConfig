@@ -218,6 +218,7 @@
         go
         podman-tui
         jq
+        dnsutils
       ];
 
       services.gvfs.enable = true;
