@@ -58,6 +58,10 @@
               pkg = pkgs.callPackage self.yaziPluginFg { };
             }
             {
+              name = "fg-rga";
+              pkg = pkgs.callPackage self.yaziPluginFgRga { };
+            }
+            {
               name = "compress";
               pkg = pkgs.callPackage self.yaziPluginCompress { };
             }

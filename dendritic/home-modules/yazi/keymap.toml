@@ -85,6 +85,11 @@ run = "plugin fg -- rg"
 desc = "Find file by content (rg)"
 
 [[mgr.prepend_keymap]]
+on = ["f", "r"]
+run = "plugin fg-rga"
+desc = "Find by content (rga - PDFs, archives, etc.)"
+
+[[mgr.prepend_keymap]]
 on = ["f", "l"]
 run = "filter --smart"
 desc = "Filter files"
