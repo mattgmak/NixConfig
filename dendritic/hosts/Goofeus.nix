@@ -28,7 +28,7 @@
           glance
           immich
           caddy
-          coredns
+          # coredns
         ];
       }
     );
@@ -88,9 +88,10 @@
         # Caddy reverse proxy - set your actual Tailscale magic DNS (from tailscale status)
         caddyTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
 
+        # Does not through tailnet domains
         # CoreDNS split DNS - resolve *.goofeus.dab-octatonic.ts.net to this host
         # Add this host's Tailscale IP as restricted nameserver in Tailscale admin console
-        corednsTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
+        # corednsTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
 
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;

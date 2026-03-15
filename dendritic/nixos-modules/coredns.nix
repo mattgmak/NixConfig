@@ -1,4 +1,5 @@
 {
+  # Does not through tailnet domains
   flake.nixosModules.coredns =
     {
       config,
