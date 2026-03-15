@@ -4,10 +4,9 @@
     {
       programs.lazygit = {
         enable = true;
+        # Use my own
+        enableNushellIntegration = false;
         settings = {
-          # Use my own
-          enableNushellIntegration = lib.mkForce false;
-          shellWrapperName = "lgg";
           keybinding = {
             # universal = {
             # };
