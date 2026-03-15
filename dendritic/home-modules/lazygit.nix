@@ -1,6 +1,6 @@
 {
   flake.homeModules.lazygit =
-    { pkgs, lib, ... }:
+    { pkgs, ... }:
     {
       programs.lazygit = {
         enable = true;
