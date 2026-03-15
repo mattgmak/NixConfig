@@ -127,25 +127,28 @@
           # Map CapsLock to Escape
           yamlConfig = ''
             modmap:
-              - name: "CapsLock"
+              # - name: "CapsLock"
+              #   remap:
+              #     CapsLock: esc
+              - name: "CapsLock Special Layer"
                 remap:
-                  CapsLock: esc
-              - name: "RightAlt Nav Layer"
-                remap:
-                  RightAlt:
+                  CapsLock:
                     skip_key_event: true
-                    press: { set_mode: nav }
+                    press: { set_mode: caps_layer }
                     release: { set_mode: default }
             keymap:
-              - name: "Nav Layer Mappings"
-                mode: nav
+              - name: "Caps Lock Special Layer Mappings"
+                mode: caps_layer
                 remap:
-                  j: up
-                  k: down
-                  l: left
-                  semicolon: right
-                  m: pageup
-                  comma: pagedown
+                  h: left
+                  j: down
+                  k: up
+                  l: right
+                  n: home
+                  m: pagedown
+                  comma: pageup
+                  dot: end
+                  g: esc
               - name: "Super-u"
                 remap:
                   Super-u: NumLock
