@@ -36,6 +36,7 @@
         openssh
         curlMinimal
 	busybox
+	cursor-cli
       ];
 
       home-manager.config = {
