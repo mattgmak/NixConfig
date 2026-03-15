@@ -231,7 +231,7 @@
         };
 
         users.users.${username}.openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBhBPZ6RstKIkG1on6ny8fRJ3oOSvgqMPK+y8RNn8gX u3592095@connect.hku.hk"
+          self.sshKeys.Droid
         ];
         services.openssh.enable = true;
 

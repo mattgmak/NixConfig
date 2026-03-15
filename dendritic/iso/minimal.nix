@@ -82,7 +82,7 @@
         ];
         shell = pkgs.nushell;
         openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMq/zGCOmrHUwNRwjDsj8Sw0PDbnMd3Ck7H/ZKsHKPkM u3592095@connect.hku.hk"
+          self.sshKeys.GoofyDesky
         ];
       };
 

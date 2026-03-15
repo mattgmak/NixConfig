@@ -21,6 +21,7 @@
           GoofyEnvy
           GoofyEnvyHardware
           steam
+          tailscale
         ];
       }
     );
