@@ -10,7 +10,7 @@ end)
 
 local init_ui_data = ya.sync(function(self, file_url)
   self.opt = { 'jump', 'cursor', 'nvim' }
-  self.title = 'fg'
+  self.title = 'fg-rga'
   self.title_color = '#82ab3a'
   self.cursor = 0
   self.file_url = file_url and file_url or ''
@@ -30,8 +30,6 @@ local get_option = ya.sync(function(self) return self.active_opt end)
 local get_default_action = ya.sync(function(self) return self.default_action end)
 
 local update_cursor = ya.sync(function(self, cursor)
-  -- if add opt, need to add change 3th arg.
-  -- forexample, 2 mean 3 opt. circle 0 to 2.
   self.cursor = ya.clamp(0, self.cursor + cursor, 2)
   ui.render()
 end)
@@ -88,7 +86,7 @@ local function splitAndGetNth(inputstr, sep, index)
     start = sepEnd + 1
   end
   if index == 1 then return inputstr end
-  return nil -- 如果没有足够的分割部分，返回nil
+  return nil
 end
 
 local state = ya.sync(function() return tostring(cx.active.current.cwd) end)
@@ -96,71 +94,62 @@ local state = ya.sync(function() return tostring(cx.active.current.cwd) end)
 local function fail(s, ...) ya.notify({ title = 'Fzf', content = string.format(s, ...), timeout = 5, level = 'error' }) end
 
 function M:entry(job)
-  local args = job.args
   local _permit = ui.hide()
   local cwd = state()
   local shell_value = ya.target_family() == 'windows' and 'nu' or os.getenv('SHELL'):match('.*/(.*)')
-  local cmd_args = ''
 
   local preview_cmd = [[bat --style=numbers --color=always --highlight-line {2} {1}]]
   local preview_window = [[--preview-window 'top:60%:+{2}-6']]
   if ya.target_family() == 'windows' then preview_window = [[--preview-window "top:60%:+{2}-6"]] end
-  if ya.target_family() == 'windows' and args[1] == 'fzf' then
-    cmd_args = [[fzf --preview="bat --color=always {}"]]
-  elseif ya.target_family() == 'windows' and args[1] == 'rg' then
-    local rg_prefix = [[rg  --column --line-number --no-heading --color=always --smart-case ]]
+
+  -- rga (ripgrep-all) - searches PDFs, archives, etc. in addition to text files
+  local rga_prefix =
+    "rga --colors 'path:fg:blue' --colors 'line:fg:red' --colors 'column:fg:yellow' --column --line-number --no-heading --color=always --smart-case "
+  local cmd_args
+  if ya.target_family() == 'windows' then
     cmd_args = [[fzf --ansi --disabled --bind "start:reload:]]
-      .. rg_prefix
+      .. rga_prefix
       .. [[{q}" --bind "change:reload:]]
-      .. rg_prefix
+      .. rga_prefix
       .. [[{q}" --delimiter ":" --preview "]]
       .. preview_cmd
       .. [[" ]]
       .. preview_window
       .. [[ --nth "3.."]]
-  elseif ya.target_family() == 'windows' then
-    cmd_args = [[rg --color=always --line-number --no-heading --smart-case "" | fzf --ansi --preview="]]
-      .. preview_cmd
-      .. [[" --delimiter=":" ]]
-      .. preview_window
-      .. [[ --nth="3.."]]
-  elseif args[1] == 'fzf' then
-    cmd_args = [[fzf --preview="bat --color=always {}"]]
-  elseif args[1] == 'rg' and shell_value == 'fish' then
+  elseif shell_value == 'fish' then
     cmd_args = [[
-			RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case " \
+			RGA_PREFIX="rga --colors 'path:fg:blue' --colors 'line:fg:red' --colors 'column:fg:yellow' --column --line-number --no-heading --color=always --smart-case " \
 			fzf --ansi --disabled \
-				--bind "start:reload:$RG_PREFIX {q}" \
-				--bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
+				--bind "start:reload:$RGA_PREFIX {q}" \
+				--bind "change:reload:sleep 0.1; $RGA_PREFIX {q} || true" \
 				--delimiter : \
 				--preview ']] .. preview_cmd .. [[' \
 				]] .. preview_window .. [[ \
 				--nth '3..'
 		]]
-  elseif args[1] == 'rg' and (shell_value == 'bash' or shell_value == 'zsh') then
+  elseif shell_value == 'bash' or shell_value == 'zsh' then
     cmd_args = [[
-			RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+			RGA_PREFIX="rga --colors 'path:fg:blue' --colors 'line:fg:red' --colors 'column:fg:yellow' --column --line-number --no-heading --color=always --smart-case "
 			fzf --ansi --disabled \
-				--bind "start:reload:$RG_PREFIX {q}" \
-				--bind "change:reload:sleep 0.1; $RG_PREFIX {q} || true" \
+				--bind "start:reload:$RGA_PREFIX {q}" \
+				--bind "change:reload:sleep 0.1; $RGA_PREFIX {q} || true" \
 				--delimiter : \
 				--preview ']] .. preview_cmd .. [[' \
 				]] .. preview_window .. [[ \
 				--nth '3..'
 		]]
-  elseif args[1] == 'rg' and shell_value == 'nu' then
-    local rg_prefix = 'rg --column --line-number --no-heading --color=always --smart-case '
+  elseif shell_value == 'nu' then
     cmd_args = [[fzf --ansi --disabled --bind "start:reload:]]
-      .. rg_prefix
+      .. rga_prefix
       .. [[{q}" --bind "change:reload:sleep 100ms; try { ]]
-      .. rg_prefix
+      .. rga_prefix
       .. [[{q} }" --delimiter : --preview ']]
       .. preview_cmd
       .. [[' ]]
       .. preview_window
       .. [[ --nth '3..']]
   else
-    cmd_args = [[rg --color=always --line-number --no-heading --smart-case '' | fzf --ansi --preview=']]
+    cmd_args = [[rga --color=always --line-number --no-heading --smart-case '' | fzf --ansi --preview=']]
       .. preview_cmd
       .. [[' --delimiter=':' ]]
       .. preview_window
@@ -175,7 +164,7 @@ function M:entry(job)
     :stderr(Command.INHERIT)
     :spawn()
 
-  if not child then return fail('Spawn `rfzf` failed with error code %s. Do you have it installed?', err) end
+  if not child then return fail('Spawn `fzf` failed with error code %s. Do you have rga and fzf installed?', err) end
 
   local output, err = child:wait_with_output()
   if not output then
@@ -194,7 +183,7 @@ function M:entry(job)
   init_ui_data(cwd .. '/' .. file_url)
   local default_action = get_default_action()
 
-  if (default_action == 'menu' or default_action == nil) and args[1] ~= 'fzf' then
+  if default_action == 'menu' or default_action == nil then
     _permit:drop()
     toggle_ui()
     while true do
@@ -218,11 +207,11 @@ function M:entry(job)
     _permit = ui.hide()
   end
 
-  if (default_action == 'nvim' or get_option() == 'nvim') and args[1] ~= 'fzf' then
+  if default_action == 'nvim' or get_option() == 'nvim' then
     os.execute('nvim +' .. line_number .. ' -n ' .. file_url)
-  elseif (default_action == 'cursor' or get_option() == 'cursor') and args[1] ~= 'fzf' then
+  elseif default_action == 'cursor' or get_option() == 'cursor' then
     os.execute('cursor -g ' .. file_url .. ':' .. line_number)
-  elseif (default_action == 'jump' or get_option() == 'jump' or args[1] == 'fzf') and file_url ~= '' then
+  elseif (default_action == 'jump' or get_option() == 'jump') and file_url ~= '' then
     ya.mgr_emit(file_url:match('[/\\]$') and 'cd' or 'reveal', { file_url })
   else
     return
@@ -254,7 +243,7 @@ end
 
 function M.fail(s, ...)
   ya.mgr_emit('plugin', { 'mount', 'refresh' })
-  ya.notify({ title = 'fg', content = string.format(s, ...), timeout = 10, level = 'error' })
+  ya.notify({ title = 'fg-rga', content = string.format(s, ...), timeout = 10, level = 'error' })
 end
 
 function M:click() end

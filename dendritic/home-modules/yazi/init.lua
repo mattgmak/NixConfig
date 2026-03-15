@@ -25,6 +25,9 @@ require('relative-motions'):setup({
 require('fg'):setup({
   default_action = 'menu',
 })
+require('fg-rga'):setup({
+  default_action = 'menu',
+})
 
 th.git = th.git or {}
 th.git.modified = ui.Style():fg('yellow')
