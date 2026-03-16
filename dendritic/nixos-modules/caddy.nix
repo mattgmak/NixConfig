@@ -2,52 +2,66 @@
   flake.nixosModules.caddy =
     {
       config,
-      lib,
-      pkgs,
+      pkgs-for-homelab,
       ...
     }:
-    let
-      cfg = config.caddyTailscaleProxy;
-      inherit (lib) mkIf mkOption types;
-    in
     {
-      options.caddyTailscaleProxy = {
-        domain = mkOption {
-          type = types.str;
-          default = "";
-          example = "goofeus.tail-xxxxx.ts.net";
-          description = ''
-            Base Tailscale magic DNS domain. Path routing: / → Glance, /immich → Immich.
-            Set this to enable the reverse proxy (e.g. in your host config).
-          '';
+      services.caddy = {
+        enable = true;
+        package = pkgs-for-homelab.caddy.withPlugins {
+          plugins = [
+            "github.com/caddy-dns/cloudflare@v0.2.3"
+          ];
+          hash = "sha256-bL1cpMvDogD/pdVxGA8CAMEXazWpFDBiGBxG83SmXLA=";
         };
+        extraConfig = ''
+          (cloudflare) {
+            tls {
+              dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+              resolvers 1.1.1.1
+            }
+          }
+        '';
+        environmentFile = config.age.secrets.cloudflare-caddy.path;
+        virtualHosts =
+          let
+            baseDomain = "px.goofy.me.in";
+          in
+          {
+            glance = {
+              hostName = "glance.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy :${toString config.services.glance.settings.server.port}
+                import cloudflare
+              '';
+            };
+            immich = {
+              hostName = "immich.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy :${toString config.services.immich.port}
+                import cloudflare
+              '';
+            };
+          };
       };
 
-      config = mkIf (cfg.domain != "") {
-        services.caddy = {
-          enable = true;
-          # TODO: routing to /immich does not work
-          configFile = pkgs.writeText "Caddyfile" ''
-            ${cfg.domain} {
-              handle_path /immich* {
-                reverse_proxy :${toString config.services.immich.port}
-              }
-              handle {
-                reverse_proxy :${toString config.services.glance.settings.server.port}
-              }
-            }
-          '';
-          # Caddy 2.5+ automatically fetches TLS certs from Tailscale for *.ts.net - no config needed
-        };
+      # Only Caddy needs ports on tailscale - services are reached via localhost
+      networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
+        80
+        443
+      ];
 
-        # Only Caddy needs ports on tailscale - services are reached via localhost
-        networking.firewall.interfaces."tailscale0".allowedTCPPorts = [
-          80
-          443
-        ];
+      # Allow Caddy (runs as non-root) to fetch Tailscale certs for *.ts.net
+      services.tailscale.permitCertUid = "caddy";
 
-        # Allow Caddy (runs as non-root) to fetch Tailscale certs for *.ts.net
-        services.tailscale.permitCertUid = "caddy";
+      # Explicitly inject env file; nixpkgs module may not apply it with custom package
+      # systemd.services.caddy.serviceConfig.EnvironmentFile =
+      #   lib.mkForce config.age.secrets.cloudflare-caddy.path;
+
+      age.secrets.cloudflare-caddy = {
+        file = ../../secrets/cloudflare-caddy.age;
+        owner = "caddy";
+        group = "caddy";
       };
     };
 }
