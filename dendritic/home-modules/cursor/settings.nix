@@ -490,6 +490,6 @@
         "**/.env*" = true;
       };
       "editor.fontVariations" = true;
-      "editor.fontSize" = if pkgs.stdenv.isDarwin then 16 else 12;
+      "editor.fontSize" = 16;
     };
 }
