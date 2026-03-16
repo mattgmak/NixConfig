@@ -126,6 +126,7 @@ in
           stylua
           podman-tui
           go
+          cursor-cli
         ]
         ++ (with pkgs.darwin; [
           file_cmds
