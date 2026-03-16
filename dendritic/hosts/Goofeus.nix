@@ -22,6 +22,7 @@
           self.stylixCommon
           inputs.home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
+          inputs.agenix.nixosModules.default
           self.nixpkgsConfig
           self.nixConfig
           tailscale
@@ -84,14 +85,6 @@
 
         networking.hostName = hostname;
         networking.firewall.enable = true;
-
-        # Caddy reverse proxy - set your actual Tailscale magic DNS (from tailscale status)
-        caddyTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
-
-        # Does not through tailnet domains
-        # CoreDNS split DNS - resolve *.goofeus.dab-octatonic.ts.net to this host
-        # Add this host's Tailscale IP as restricted nameserver in Tailscale admin console
-        # corednsTailscaleProxy.domain = "goofeus.dab-octatonic.ts.net";
 
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;
