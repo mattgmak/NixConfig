@@ -175,6 +175,10 @@ if is_vscode then
     vscode.call('workbench.action.editor.previousChange')
     vscode.call('editor.action.dirtydiff.previous')
   end)
+  vim.keymap.set('n', '<leader>vy', function() vscode.call('editor.action.inlineDiffs.acceptPartialEdit') end)
+  vim.keymap.set('n', '<leader>vay', function() vscode.call('editor.action.inlineDiffs.acceptAll') end)
+  vim.keymap.set('n', '<leader>vn', function() vscode.call('editor.action.inlineDiffs.rejectPartialEdit') end)
+  vim.keymap.set('n', '<leader>van', function() vscode.call('editor.action.inlineDiffs.rejectAll') end)
   vim.keymap.set('n', 'gt', function() vscode.call('editor.action.goToTypeDefinition') end)
   vim.keymap.set('n', '<leader>gsy', function()
     vscode.action('git.sync', {
