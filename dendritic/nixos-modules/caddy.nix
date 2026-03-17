@@ -3,6 +3,7 @@
     {
       config,
       pkgs-for-homelab,
+      lib,
       ...
     }:
     {
@@ -63,5 +64,49 @@
         owner = "caddy";
         group = "caddy";
       };
+
+      # Tailscale serve: expose glance and immich directly (bypasses Caddy)
+      systemd.services.tailscale-serve =
+        lib.mkIf
+          (
+            config.services.tailscale.enable && (config.services.glance.enable || config.services.immich.enable)
+          )
+          (
+            let
+              tailscalePkg = config.services.tailscale.package;
+              mkServe =
+                service: port:
+                lib.optionalString config.services.${service}.enable
+                  "tailscale serve --yes --service=svc:${service} --https=443 127.0.0.1:${toString port}";
+              # Tailscale Serve forwards directly to apps (bypasses Caddy)
+              glanceServe = mkServe "glance" config.services.glance.settings.server.port;
+              immichServe = mkServe "immich" config.services.immich.port;
+            in
+            {
+              description = "Tailscale serve for Glance and Immich";
+              after = [ "tailscaled.service" ];
+              wants = [ "tailscaled.service" ];
+              wantedBy = [ "multi-user.target" ];
+              serviceConfig.Type = "oneshot";
+              serviceConfig.RemainAfterExit = true;
+              path = [ tailscalePkg ];
+              script = ''
+                # Wait for Tailscale to be up
+                for i in $(seq 1 30); do
+                  if tailscale status &>/dev/null; then
+                    break
+                  fi
+                  if [ $i -eq 30 ]; then
+                    echo "Tailscale did not become ready in time"
+                    exit 1
+                  fi
+                  sleep 2
+                done
+
+                ${glanceServe}
+                ${immichServe}
+              '';
+            }
+          );
     };
 }
