@@ -55,6 +55,7 @@
         fcitx5
         mpv
         kdeconnect
+        nextcloudClient
         filepicker
         wiremix
         caelestia
