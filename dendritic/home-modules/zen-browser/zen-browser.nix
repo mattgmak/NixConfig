@@ -351,15 +351,15 @@
             };
 
             pinsForce = false;
-            pins = {
-              "Whatsapp" = {
-                id = "8af62707-0722-4049-9801-bedced343333";
-                container = containers.Personal.id;
-                url = "https://web.whatsapp.com";
-                isEssential = true;
-                position = 101;
-              };
-            };
+            # pins = {
+            #   "Whatsapp" = {
+            #     id = "8af62707-0722-4049-9801-bedced343333";
+            #     container = containers.Personal.id;
+            #     url = "https://web.whatsapp.com";
+            #     isEssential = true;
+            #     position = 101;
+            #   };
+            # };
 
           };
         };
