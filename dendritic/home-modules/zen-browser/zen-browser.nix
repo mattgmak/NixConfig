@@ -108,6 +108,7 @@
                 "vimium-c@gdh1995.cn" = "vimium-c";
                 "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = "styl-us";
                 "@crw-extension-firefox" = "consumer-rights-wiki";
+                "a7812ae3-777d-43ee-922f-871e684fc6c5" = "youtube-recommended-videos";
               };
             };
           profiles.default = rec {
