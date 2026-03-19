@@ -28,6 +28,7 @@
           tailscale
           glance
           immich
+          nextcloud
           caddy
           # coredns
         ];

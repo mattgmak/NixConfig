@@ -12,4 +12,12 @@ in
       GoofyDesky
     ];
   };
+
+  "nextcloud-admin-pass.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }

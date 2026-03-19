@@ -43,7 +43,57 @@
                 import cloudflare
               '';
             };
-          };
+          }
+          // lib.optionalAttrs config.services.nextcloud.enable (
+            let
+              nextcloudPhpConfig = ''
+                root * ${config.services.nextcloud.finalPackage}
+                root /store-apps/* ${config.services.nextcloud.home}
+                root /nix-apps/* ${config.services.nextcloud.home}
+                encode zstd gzip
+
+                php_fastcgi unix//${config.services.phpfpm.pools.nextcloud.socket} {
+                  env front_controller_active true
+                }
+                file_server
+
+                header {
+                  Strict-Transport-Security max-age=31536000;
+                }
+
+                redir /.well-known/carddav /remote.php/dav 301
+                redir /.well-known/caldav /remote.php/dav 301
+                redir /.well-known/webfinger /index.php/.well-known/webfinger 301
+                redir /.well-known/nodeinfo /index.php/.well-known/nodeinfo 301
+
+                @sensitive {
+                  path /config/* /data/* /db_structure /.htaccess /.xml /README /3rdparty/* /lib/* /templates/* /occ /console.php /autotest* /issue* /indie* /db_* /build /build/* /tests /tests/*
+                }
+                respond @sensitive 404
+              '';
+              baseDomain = "px.goofy.me.in";
+              tailnetFqdn = "goofeus.dab-octatonic.ts.net";
+            in
+            {
+              # Caddy: public domain (Cloudflare TLS)
+              nextcloud = {
+                hostName = "nextcloud.${baseDomain}";
+                extraConfig = ''
+                  ${nextcloudPhpConfig}
+
+                  import cloudflare
+                '';
+              };
+              # Tailscale Serve: proxies to Caddy (tls internal for *.ts.net)
+              nextcloud-ts = {
+                hostName = tailnetFqdn;
+                extraConfig = ''
+                  tls internal
+                  ${nextcloudPhpConfig}
+                '';
+              };
+            }
+          );
       };
 
       # Only Caddy needs ports on tailscale - services are reached via localhost
@@ -65,25 +115,29 @@
         group = "caddy";
       };
 
-      # Tailscale serve: expose glance and immich directly (bypasses Caddy)
+      # Tailscale serve: glance/immich directly; nextcloud via Caddy
       systemd.services.tailscale-serve =
         lib.mkIf
           (
-            config.services.tailscale.enable && (config.services.glance.enable || config.services.immich.enable)
+            config.services.tailscale.enable
+            && (
+              config.services.glance.enable || config.services.immich.enable || config.services.nextcloud.enable
+            )
           )
           (
             let
               tailscalePkg = config.services.tailscale.package;
-              mkServe =
+              mkServeDirect =
                 service: port:
                 lib.optionalString config.services.${service}.enable
                   "tailscale serve --yes --service=svc:${service} --https=443 127.0.0.1:${toString port}";
-              # Tailscale Serve forwards directly to apps (bypasses Caddy)
-              glanceServe = mkServe "glance" config.services.glance.settings.server.port;
-              immichServe = mkServe "immich" config.services.immich.port;
+              # Nextcloud: TS Serve -> Caddy:443 -> PHP-FPM
+              nextcloudServe = lib.optionalString config.services.nextcloud.enable "tailscale serve --yes --service=svc:nextcloud --https=443 127.0.0.1:443";
+              glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
+              immichServe = mkServeDirect "immich" config.services.immich.port;
             in
             {
-              description = "Tailscale serve for Glance and Immich";
+              description = "Tailscale serve for Glance, Immich and Nextcloud";
               after = [ "tailscaled.service" ];
               wants = [ "tailscaled.service" ];
               wantedBy = [ "multi-user.target" ];
@@ -105,6 +159,7 @@
 
                 ${glanceServe}
                 ${immichServe}
+                ${nextcloudServe}
               '';
             }
           );
