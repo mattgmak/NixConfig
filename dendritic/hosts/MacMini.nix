@@ -44,6 +44,7 @@ in
       # bat
       # ghosttyBatSyntax
       nix-index-database
+      opencode
     ];
   };
 

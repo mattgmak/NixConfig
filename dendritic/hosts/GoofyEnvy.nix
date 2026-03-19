@@ -65,6 +65,7 @@
         btop
         bat
         nix-index-database
+        opencode
       ];
     };
 
