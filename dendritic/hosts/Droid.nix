@@ -35,8 +35,8 @@
         which
         openssh
         curlMinimal
-	busybox
-	cursor-cli
+        busybox
+        cursor-cli
       ];
 
       home-manager.config = {
@@ -55,6 +55,7 @@
           carapace
           tmux
           nix-index-database
+          opencode
         ];
         programs.ssh = {
           enable = true;
