@@ -25,6 +25,7 @@
     }
   );
 
+  # nix build .#nixosConfigurations.minimalIso.config.system.build.isoImage
   flake.nixosModules.minimalIso =
     {
       pkgs,
@@ -51,11 +52,8 @@
         backupFileExtension = "hm-backup-1";
       };
 
-      home-manager.users.nixos = self.homeConfigurations.minimalIso;
+      home-manager.users.${username} = self.homeConfigurations.minimalIso;
 
-      environment.sessionVariables = {
-        NH_OS_FLAKE = "/home/${username}/NixConfig";
-      };
       environment.shells = with pkgs; [
         nushell
         bash
@@ -68,21 +66,20 @@
       i18n.defaultLocale = "en_HK.UTF-8";
 
       # Define a user account. Don't forget to set a password with 'passwd'.
-      users.users.nixos = {
+      users.users.${username} = {
         isNormalUser = true;
         extraGroups = [
           "networkmanager"
           "wheel"
-          "adbusers"
           "input"
           "kvm"
           "dialout"
-          "docker"
-          "podman"
         ];
         shell = pkgs.nushell;
-        openssh.authorizedKeys.keys = [
-          self.sshKeys.GoofyDesky
+        openssh.authorizedKeys.keys = with self.sshKeys; [
+          GoofyDesky
+          GoofyEnvy
+          Droid
         ];
       };
 

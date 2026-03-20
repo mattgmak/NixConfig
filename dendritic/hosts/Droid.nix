@@ -9,12 +9,8 @@
         overlays.enable = false;
         # enable = true;
       };
-      # Simply install just the packages
+
       environment.packages = with pkgs; [
-        # User-facing stuff that you really really want to have
-        # neovim # or some other editor, e.g. nano or neovim
-        # git
-        # Some common stuff that people expect to have
         procps
         killall
         diffutils
