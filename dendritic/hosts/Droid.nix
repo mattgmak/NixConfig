@@ -37,6 +37,7 @@
         curlMinimal
         busybox
         cursor-cli
+        dnsutils
       ];
 
       home-manager.config = {
