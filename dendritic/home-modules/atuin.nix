@@ -9,6 +9,10 @@
           exit_mode = "return-query";
           invert = true;
           enter_accept = true;
+          keymap = {
+            emacs."ctrl-y" = "copy";
+            vim-normal."ctrl-y" = "copy";
+          };
           # keymap.prefix =
           #   let
           #     commandSlots = lib.map (index: toString index) (lib.range 1 9);
