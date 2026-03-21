@@ -115,7 +115,7 @@
   display: none !important;
 }
 
-.monaco-list-row {
+.monaco-list-rows > .monaco-list-row {
   border-radius: 6px !important;
   width: calc(100% - 8px) !important;
   margin: 0 4px !important;

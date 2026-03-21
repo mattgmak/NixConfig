@@ -1944,11 +1944,6 @@
   }
   {
     "key" = "ctrl+w";
-    "command" = "composer.closeComposerTab";
-    "when" = "composerFocused || focusedView =~ /^workbench.panel.aichat.view/";
-  }
-  {
-    "key" = "ctrl+w";
     "command" = "-composer.closeComposerTab";
     "when" = "composerFocused || focusedView =~ /^workbench.panel.aichat.view/";
   }
