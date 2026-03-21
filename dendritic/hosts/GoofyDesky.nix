@@ -18,6 +18,7 @@
         };
         modules = with self.nixosModules; [
           common
+          inputs.agenix.nixosModules.default
           GoofyDesky
           GoofyDeskyHardware
           orca-slicer
@@ -94,6 +95,7 @@
         };
 
         environment.systemPackages = with pkgs; [
+          inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           bitwarden-desktop
           libnotify
           obsidian

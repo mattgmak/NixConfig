@@ -12,7 +12,7 @@
         specialArgs = {
           inherit inputs inputs';
           inherit (config) packages;
-          inherit (self.constants) username;
+          username = "root";
           inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor pkgs-for-homelab;
           hostname = self.constants.serverName;
         };
@@ -28,7 +28,7 @@
           tailscale
           glance
           immich
-          nextcloud
+          # nextcloud
           caddy
           # coredns
         ];
@@ -90,9 +90,13 @@
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;
 
-        environment.sessionVariables = {
-          NH_OS_FLAKE = "/home/${username}/NixConfig";
-        };
+        environment.sessionVariables =
+          let
+            homeDir = if username == "root" then "/root" else "/home/${username}";
+          in
+          {
+            NH_OS_FLAKE = "${homeDir}/NixConfig";
+          };
         environment.shells = with pkgs; [
           nushell
           bash
@@ -104,7 +108,10 @@
         # Select internationalisation properties.
         i18n.defaultLocale = "en_HK.UTF-8";
 
-        security.sudo.enable = true;
+        security.sudo = {
+          enable = true;
+          wheelNeedsPassword = false;
+        };
 
         environment.systemPackages = with pkgs; [
           fzf
@@ -124,12 +131,6 @@
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.users.${username} = {
-          isNormalUser = true;
-          extraGroups = [
-            "wheel"
-            "networkmanager"
-            "immich"
-          ];
           shell = pkgs.nushell;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             GoofyDesky

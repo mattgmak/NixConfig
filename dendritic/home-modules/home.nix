@@ -7,13 +7,15 @@
       programs.home-manager.enable = true;
     };
 
+    # TODO: refactor this
     homeModules.nixos-home =
       { username, ... }:
       {
         imports = [ self.homeModules.main ];
         home = {
           inherit username;
-          homeDirectory = "/home/${username}";
+          # Must match NixOS/home-manager default for root (/root), not /home/root.
+          homeDirectory = if username == "root" then "/root" else "/home/${username}";
         };
       };
 
