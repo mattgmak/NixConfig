@@ -14,27 +14,32 @@
   margin: 2px auto !important;
 }
 
-.interactive-input-part>.interactive-input-and-side-toolbar>.interactive-input-and-execute-toolbar>.interactive-input-editor {
+.interactive-input-part
+  > .interactive-input-and-side-toolbar
+  > .interactive-input-and-execute-toolbar
+  > .interactive-input-editor {
   width: 500px !important;
 }
 
-.interactive-input-part>.interactive-input-and-side-toolbar>.interactive-input-and-execute-toolbar {
+.interactive-input-part
+  > .interactive-input-and-side-toolbar
+  > .interactive-input-and-execute-toolbar {
   width: 100% !important;
   border-radius: 6px !important;
   padding: 2px 10px !important;
 }
 
-.interactive-session>.interactive-input-part {
+.interactive-session > .interactive-input-part {
   padding: 10px 16px !important;
 }
 
-.monaco-inputbox>.ibwrapper>.input,
-.monaco-inputbox>.ibwrapper>.mirror {
-  padding: 4px 10px !important;
+.monaco-inputbox > .ibwrapper > .input,
+.monaco-inputbox > .ibwrapper > .mirror {
+  padding: 4px 0px !important;
 }
 
-.quick-input-list>.monaco-list>.monaco-scrollable-element {
-  padding: 8px 14px !important;
+.quick-input-list > .monaco-list > .monaco-scrollable-element {
+  padding: 0 !important;
 }
 
 .sidebar,
@@ -55,7 +60,7 @@
   transform: translateX(1px) !important;
 }
 
-.sidebar>.composite.title {
+.sidebar > .composite.title {
   display: none !important;
 }
 
@@ -102,16 +107,18 @@
   height: 39px !important;
 }
 
-.find-widget>.codicon-widget-close {
+.find-widget > .codicon-widget-close {
   top: 8px !important;
 }
 
-.find-widget>.monaco-sash.vertical {
+.find-widget > .monaco-sash.vertical {
   display: none !important;
 }
 
 .monaco-list-row {
   border-radius: 6px !important;
+  width: calc(100% - 8px) !important;
+  margin: 0 4px !important;
 }
 
 /* Toolbars when tabs are enabled. */
@@ -121,13 +128,13 @@
 
 /* File Explorer Selected Item */
 .monaco-list.list_id_1 .monaco-list-row.selected {
-  background-color: #C017C638 !important;
+  background-color: #c017c638 !important;
 }
 
 /* List item label name */
 .monaco-list.list_id_1 .monaco-list-row.selected .label-name {
   opacity: 1 !important;
-  color: #FFF !important;
+  color: #fff !important;
 }
 
 /* File Explorer Item Label */
@@ -164,19 +171,18 @@
 
 .monaco-editor-hover,
 .monaco-hover {
-  box-shadow: 0px 8px 32px rgba(0, 0, 0, .45) !important;
-  background-color: #17032D !important;
+  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+  background-color: #17032d !important;
   backdrop-filter: blur(3px) !important;
   border-radius: 6px !important;
   border: none !important;
 }
 
 .monaco-editor-hover,
-.monaco-hover>.monaco-scrollable-element,
-.monaco-hover-content>div {
+.monaco-hover > .monaco-scrollable-element,
+.monaco-hover-content > div {
   border-radius: 6px !important;
 }
-
 
 .overflowingContentWidgets .monaco-sash {
   background-color: transparent !important;
@@ -184,14 +190,14 @@
 
 /* Suggestion box style */
 .suggest-widget {
-  background-color: #17032D !important;
+  background-color: #17032d !important;
   border-radius: 6px !important;
   border: none !important;
   padding: 2px !important;
 }
 
 .suggest-details {
-  background-color: #1A1829 !important;
+  background-color: #1a1829 !important;
   border-radius: 6px !important;
   border: none !important;
   padding: 2px !important;
@@ -219,7 +225,7 @@
   display: none !important;
 }
 
-.titlebar-right>* {
+.titlebar-right > * {
   display: none !important;
 }
 
@@ -233,8 +239,10 @@
   margin-right: auto !important;
   border-radius: 6px;
   max-height: 60vh !important;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, .45) !important;
-  padding: 10px 10px 20px 10px !important;
+  width: 680px !important;
+  max-width: 90vw !important;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.45) !important;
+  padding: 10px 0 !important;
   backdrop-filter: blur(3px) !important;
   z-index: 100000 !important;
   overflow: hidden !important;
@@ -242,6 +250,7 @@
 
 .quick-input-titlebar {
   border-radius: 6px !important;
+  margin: 0 8px !important;
 }
 
 /* Remove background for lists */
@@ -271,7 +280,7 @@
 }
 
 #command-blur.active {
-  background: rgba(0, 0, 0, .15);
+  background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
   opacity: 1;
 }
@@ -282,11 +291,17 @@
   padding: 2px !important;
 }
 
-.split-view-container>.split-view-view:not(:first-child):before {
+.split-view-container > .split-view-view:not(:first-child):before {
   background-color: transparent !important;
 }
 
-.monaco-workbench .part.editor>.content .editor-group-container>.title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item:before {
+.monaco-workbench
+  .part.editor
+  > .content
+  .editor-group-container
+  > .title.breadcrumbs
+  .breadcrumbs-control
+  .monaco-breadcrumb-item:before {
   height: auto !important;
   padding: 0 4px !important;
 }

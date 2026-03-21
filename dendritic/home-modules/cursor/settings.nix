@@ -4,7 +4,6 @@
     {
       "editor.suggestSelection" = "first";
       "terminal.integrated.useWslProfiles" = true;
-      "eslint.workingDirectories" = [ { "mode" = "auto"; } ];
       "gitlens.currentLine.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "gitlens.blame.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "errorLens.fontFamily" = "IosevkaTerm Nerd Font Mono";
@@ -18,7 +17,6 @@
       "notebook.output.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "markdown.preview.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "window.titleBarStyle" = "native";
-      "window.customTitleBarVisibility" = "never";
       "workbench.colorCustomizations" = {
         "[Aura Soft Dark]" =
           let
@@ -110,13 +108,6 @@
       };
       "typescript.suggest.paths" = false;
       "javascript.suggest.paths" = false;
-      "eslint.validate" = [
-        "typescript"
-        "typescriptreact"
-        "javascript"
-        "javascriptreact"
-        "vue"
-      ];
       "path-intellisense.mappings" = {
         "@" = "\${workspaceRoot}/src";
       };
@@ -337,15 +328,12 @@
       "editor.overviewRulerBorder" = false;
       "editor.scrollbar.verticalScrollbarSize" = 20;
       "editor.cursorBlinking" = "solid";
-      "workbench.editor.showTabs" = "single";
+      "workbench.editor.showTabs" = "multiple";
       "breadcrumbs.enabled" = true;
       "workbench.tips.enabled" = false;
       "files.insertFinalNewline" = true;
       "files.trimFinalNewlines" = true;
       "extensions.ignoreRecommendations" = true;
-      "remote.SSH.remotePlatform" = {
-        "workbench2" = "linux";
-      };
       "javascript.inlayHints.functionLikeReturnTypes.enabled" = true;
       "javascript.inlayHints.parameterNames.enabled" = "all";
       "javascript.inlayHints.variableTypes.enabled" = true;
@@ -369,8 +357,6 @@
       "gitlens.outputLevel" = "error";
       "cursor.cpp.disabledLanguages" = [ "scminput" ];
       "git.autofetch" = true;
-      "sync.quietSync" = false;
-      "sync.gist" = "56caf7d547529cdff341d35e01b4ff18";
       "gitlens.views.commits.files.layout" = "list";
       "githubPullRequests.remotes" = [
         "origin"
@@ -393,8 +379,6 @@
       "githubPullRequests.fileListLayout" = "flat";
       "githubPullRequests.showPullRequestNumberInTree" = true;
       "githubPullRequests.defaultCommentType" = "review";
-      "sync.forceUpload" = false;
-      "sync.forceDownload" = false;
       "[firestorerules]" = {
         "editor.formatOnSave" = false;
       };
@@ -403,7 +387,6 @@
       "errorLens.enabled" = true;
       "cursor.cpp.enablePartialAccepts" = true;
       "githubPullRequests.pullBranch" = "never";
-      "symbols.hidesExplorerArrows" = true;
       "tailwindCSS.classAttributes" = [
         "className"
         ".*ClassName"
@@ -425,12 +408,10 @@
       "helium-icon-theme.hidesExplorerArrows" = true;
       "extensions.autoUpdate" = false;
       "cursor.composer.usageSummaryDisplay" = "always";
-      "customizeUI.titleBar" = "frameless";
       "[shellscript]" = {
         "editor.defaultFormatter" = "mads-hartmann.bash-ide-vscode";
       };
       # "editor.cursorStyle" = "block";
-      "editor.allowVariableFontsInAccessibilityMode" = true;
       "vscode-neovim.highlightGroups.highlights" = {
         "IncSearch" = {
           "backgroundColor" = "theme.editor.findMatchBackground";
