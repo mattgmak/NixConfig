@@ -16,6 +16,9 @@
     nixpkgs-for-cursor = {
       url = "github:nixos/nixpkgs/master";
     };
+    nixpkgs-for-vr = {
+      url = "github:nixos/nixpkgs/master";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       # url = "github:SoumyabrataBanik/flake-zen-browser";
@@ -76,7 +79,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
+    # nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
 
     # ghostty = { url = "github:ghostty-org/ghostty?ref=v1.1.3"; };
     ghostty = {

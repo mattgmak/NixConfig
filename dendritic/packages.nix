@@ -21,6 +21,10 @@
             inherit system;
             config.allowUnfree = true;
           };
+          pkgs-for-vr = import inputs.nixpkgs-for-vr {
+            inherit system;
+            config.allowUnfree = true;
+          };
         in
         {
           inherit
@@ -28,6 +32,7 @@
             pkgs-for-cursor
             pkgs-unstable
             pkgs-for-homelab
+            pkgs-for-vr
             ;
         };
     };

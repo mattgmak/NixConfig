@@ -65,8 +65,6 @@
         ...
       }:
       {
-        imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
-
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;

@@ -13,7 +13,7 @@
           inherit inputs inputs';
           inherit (config) packages;
           inherit (self.constants) username;
-          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
+          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor pkgs-for-vr;
           hostname = self.constants.desktopName;
         };
         modules = with self.nixosModules; [
@@ -84,11 +84,7 @@
         ...
       }:
       {
-        imports = [ inputs.nixpkgs-xr.nixosModules.nixpkgs-xr ];
-
         home-manager.users.${username} = self.homeConfigurations.GoofyDesky;
-        home-manager.extraSpecialArgs = { inherit inputs; };
-
         programs.appimage = {
           enable = true;
           binfmt = true;
@@ -155,16 +151,6 @@
             "nofail"
           ];
         };
-
-        # fileSystems."/mnt/windows/d" = {
-        #   # device = "/dev/sdb2";
-        #   device = "/dev/disk/by-uuid/F6025F5D025F21C3";
-        #   fsType = "ntfs";
-        #   options = [
-        #     "defaults"
-        #     "nofail"
-        #   ];
-        # };
 
         systemd.services.hyperhdr = {
           enable = true;
