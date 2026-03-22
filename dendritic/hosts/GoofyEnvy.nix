@@ -22,6 +22,7 @@
           GoofyEnvyHardware
           steam
           tailscale
+          inputs.agenix.nixosModules.default
         ];
       }
     );
@@ -87,6 +88,7 @@
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
 
         environment.systemPackages = with pkgs; [
+          inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           bitwarden-desktop
           libnotify
           obsidian

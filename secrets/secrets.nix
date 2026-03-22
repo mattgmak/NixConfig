@@ -20,4 +20,12 @@ in
       GoofyDesky
     ];
   };
+
+  "copyparty-goofy-pass.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }

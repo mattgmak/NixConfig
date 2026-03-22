@@ -16,6 +16,10 @@
         user = "copyparty";
         group = "copyparty";
 
+        accounts = {
+          goofy.passwordFile = config.age.secrets.copyparty-goofy-pass.path;
+        };
+
         # Maps to copyparty [global]; see `copyparty --help` / upstream module docs.
         # Binds loopback only; Caddy (px.goofy.me.in) and `tailscale serve` reach it on 127.0.0.1:3923.
         settings = {
@@ -29,11 +33,16 @@
 
         volumes."/" = {
           path = "/mnt/2TBSeagateHDD/copyparty";
-          access.r = "*";
+          access.A = [ "goofy" ];
         };
 
-        # accounts = { };
-        # groups = { };
+      };
+
+      age.secrets.copyparty-goofy-pass = {
+        file = ../../secrets/copyparty-goofy-pass.age;
+        owner = config.services.copyparty.user;
+        group = config.services.copyparty.group;
+        mode = "0400";
       };
     };
 }
