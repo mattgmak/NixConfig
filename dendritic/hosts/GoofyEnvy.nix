@@ -66,6 +66,7 @@
         bat
         nix-index-database
         opencode
+        tailscale-systray
       ];
     };
 
