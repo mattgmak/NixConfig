@@ -6,6 +6,13 @@
       lib,
       ...
     }:
+    let
+      copypartyPort =
+        let
+          p = config.services.copyparty.settings.p or 3923;
+        in
+        if lib.isList p then lib.elemAt p 0 else p;
+    in
     {
       services.caddy = {
         enable = true;
@@ -40,6 +47,15 @@
               hostName = "immich.${baseDomain}";
               extraConfig = ''
                 reverse_proxy :${toString config.services.immich.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.copyparty.enable {
+            copyparty = {
+              hostName = "copyparty.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString copypartyPort}
                 import cloudflare
               '';
             };
@@ -121,7 +137,10 @@
           (
             config.services.tailscale.enable
             && (
-              config.services.glance.enable || config.services.immich.enable || config.services.nextcloud.enable
+              config.services.glance.enable
+              || config.services.immich.enable
+              || config.services.nextcloud.enable
+              || config.services.copyparty.enable
             )
           )
           (
@@ -135,9 +154,11 @@
               nextcloudServe = lib.optionalString config.services.nextcloud.enable "tailscale serve --yes --service=svc:nextcloud --https=443 127.0.0.1:443";
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
               immichServe = mkServeDirect "immich" config.services.immich.port;
+              copypartyServe = lib.optionalString config.services.copyparty.enable
+                "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
             in
             {
-              description = "Tailscale serve for Glance, Immich and Nextcloud";
+              description = "Tailscale serve for Glance, Immich, Copyparty, and Nextcloud";
               after = [ "tailscaled.service" ];
               wants = [ "tailscaled.service" ];
               wantedBy = [ "multi-user.target" ];
@@ -159,6 +180,7 @@
 
                 ${glanceServe}
                 ${immichServe}
+                ${copypartyServe}
                 ${nextcloudServe}
               '';
             }
