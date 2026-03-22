@@ -19,6 +19,7 @@
         modules = with self.nixosModules; [
           common
           inputs.agenix.nixosModules.default
+          copyparty-client
           GoofyDesky
           GoofyDeskyHardware
           orca-slicer
@@ -76,6 +77,7 @@
 
     nixosModules.GoofyDesky =
       {
+        config,
         pkgs,
         pkgs-stable,
         inputs,
@@ -90,7 +92,25 @@
           binfmt = true;
         };
 
+        # copyparty on Goofeus: on-demand WebDAV via copyparty-mount (see programs.copyparty-client).
+        age.secrets.copyparty-goofy-pass = {
+          file = ../../secrets/copyparty-goofy-pass.age;
+          owner = username;
+          mode = "0400";
+        };
+
+        # TODO: fix this
+        programs.copyparty-client = {
+          enable = true;
+          url = "https://goofeus.dab-octatonic.ts.net/";
+          mountPoint = "/mnt/copyparty";
+          passwordFile = config.age.secrets.copyparty-goofy-pass.path;
+          webdavUser = username;
+          localUser = username;
+        };
+
         environment.systemPackages = with pkgs; [
+          immich-go
           inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           bitwarden-desktop
           libnotify
