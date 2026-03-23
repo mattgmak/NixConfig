@@ -18,9 +18,8 @@
         package = pkgs-for-cursor.code-cursor;
         electron = {
           frame = false;
-          titleBarStyle = "hidden";
-          # titleBarStyle =
-          #   if pkgs.stdenv.isDarwin then "customButtonsOnHover" else "hiddenInset";
+          # titleBarStyle = "hidden";
+          titleBarStyle = if pkgs.stdenv.isDarwin then "hiddenInset" else "hidden";
           trafficLightPosition = {
             x = 10000;
             y = 10000;

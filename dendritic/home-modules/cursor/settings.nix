@@ -328,7 +328,7 @@
       "editor.overviewRulerBorder" = false;
       "editor.scrollbar.verticalScrollbarSize" = 20;
       "editor.cursorBlinking" = "solid";
-      "workbench.editor.showTabs" = "multiple";
+      "workbench.editor.showTabs" = if pkgs.stdenv.isDarwin then "single" else "multiple";
       "breadcrumbs.enabled" = true;
       "workbench.tips.enabled" = false;
       "files.insertFinalNewline" = true;
