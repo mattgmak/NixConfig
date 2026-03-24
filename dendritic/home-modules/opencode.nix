@@ -15,6 +15,12 @@
               "cursor-acp/auto" = {
                 name = "Auto";
               };
+              "cursor-acp/composer-2-fast" = {
+                name = "Composer 2 Fast";
+              };
+              "cursor-acp/composer-2" = {
+                name = "Composer 2";
+              };
               "cursor-acp/composer-1.5" = {
                 name = "Composer 1.5";
               };
