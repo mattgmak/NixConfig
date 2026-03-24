@@ -147,9 +147,6 @@
           (
             let
               tailscalePkg = config.services.tailscale.package;
-              mkTailscaleCert = service: ''
-                tailscale cert ${service}.${tailnetBaseDomain}
-              '';
               mkServeDirect =
                 service: port:
                 lib.optionalString config.services.${service}.enable ''
@@ -157,17 +154,9 @@
                 '';
               # Nextcloud: TS Serve -> Caddy:443 -> PHP-FPM
               nextcloudServe = lib.optionalString config.services.nextcloud.enable "tailscale serve --yes --service=svc:nextcloud --https=443 127.0.0.1:443";
-              nextcloudTailscaleCert = lib.optionalString config.services.nextcloud.enable (
-                mkTailscaleCert "nextcloud"
-              );
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
-              glanceTailscaleCert = lib.optionalString config.services.glance.enable (mkTailscaleCert "glance");
               immichServe = mkServeDirect "immich" config.services.immich.port;
-              immichTailscaleCert = lib.optionalString config.services.immich.enable (mkTailscaleCert "immich");
               copypartyServe = lib.optionalString config.services.copyparty.enable "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
-              copypartyTailscaleCert = lib.optionalString config.services.copyparty.enable (
-                mkTailscaleCert "copyparty"
-              );
             in
             {
               description = "Tailscale serve for Glance, Immich, Copyparty, and Nextcloud";
@@ -195,11 +184,6 @@
                 ${immichServe}
                 ${copypartyServe}
                 ${nextcloudServe}
-
-                ${glanceTailscaleCert}
-                ${immichTailscaleCert}
-                ${copypartyTailscaleCert}
-                ${nextcloudTailscaleCert}
               '';
             }
           );
