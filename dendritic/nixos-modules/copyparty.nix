@@ -34,6 +34,8 @@
         volumes."/" = {
           path = "/mnt/2TBSeagateHDD/copyparty";
           access.A = [ "goofy" ];
+          # WebDAV (rclone, etc.) editing files expects delete-on-replace semantics; see copyparty README §webdav.
+          flags.daw = true;
         };
 
       };
@@ -46,7 +48,6 @@
       };
     };
 
-  # TODO: fix this
   # On-demand rclone WebDAV mount for copyparty (see copyparty/docs/rclone.md).
   flake.nixosModules.copyparty-client =
     {
@@ -80,7 +81,12 @@
 
         webdavUser = lib.mkOption {
           type = lib.types.str;
-          description = "copyparty WebDAV username (account name on the server).";
+          default = "";
+          description = ''
+            Account name for copyparty’s WebDAV cookie. Non-empty: cookie value is
+            `cppwd=<this>:<password>` (named accounts). Empty: `cppwd=<password>` only.
+            Matches copyparty docs/rclone.md (Cookie auth; avoids Basic auth issues behind redirects).
+          '';
         };
 
         remoteName = lib.mkOption {
@@ -109,59 +115,111 @@
                 passPath = lib.escapeShellArg cfg.passwordFile;
                 mp = lib.escapeShellArg cfg.mountPoint;
                 remote = lib.escapeShellArg "${cfg.remoteName}:/";
-                urlLit = lib.escapeShellArg cfg.url;
-                davUserLit = lib.escapeShellArg cfg.webdavUser;
+                urlNorm = if lib.hasSuffix "/" cfg.url then cfg.url else cfg.url + "/";
+                urlLit = lib.escapeShellArg urlNorm;
+                # copyparty expects Cookie cppwd=… (see docs/rclone.md); Basic auth can break
+                # behind redirects (e.g. Tailscale serve) when Authorization is dropped.
+                cookieUserPrefix = if cfg.webdavUser != "" then "${cfg.webdavUser}:" else "";
+                cookieUserPrefixLit = lib.escapeShellArg cookieUserPrefix;
                 remoteSection = lib.escapeShellArg "[${cfg.remoteName}]";
               in
               ''
+                # bash
                 set -euo pipefail
                 MP=${mp}
-                RUNDIR="''${XDG_RUNTIME_DIR:-/tmp}/rclone-copyparty-$USER"
+                # Use uid in the path so a stale dir from `sudo -E` (root-owned under your
+                # XDG_RUNTIME_DIR) does not block writes; $USER-named dirs are easy to poison.
+                RUNDIR="''${XDG_RUNTIME_DIR:-/tmp}/rclone-copyparty-$(id -u)"
+                if [[ -e "$RUNDIR" ]] && [[ ! -O "$RUNDIR" ]]; then
+                  echo "copyparty-mount: $RUNDIR not owned by $(id -un); remove with: sudo rm -rf -- \"$RUNDIR\"" >&2
+                  exit 1
+                fi
                 mkdir -p "$RUNDIR" "$MP"
+                if [[ ! -w "$RUNDIR" ]]; then
+                  echo "copyparty-mount: cannot write to $RUNDIR" >&2
+                  exit 1
+                fi
                 if mountpoint -q "$MP"; then
                   echo "already mounted: $MP" >&2
                   exit 0
                 fi
                 pass="$(tr -d '\n' < ${passPath})"
-                obf="$(printf '%s' "$pass" | rclone obscure -)"
-                umask 0177
+                qual=${cookieUserPrefixLit}
+                cookie_val="cppwd=''${qual}$pass"
+                hdr_val_esc=$(printf '%s' "$cookie_val" | sed 's/"/""/g')
                 conf="$RUNDIR/rclone.conf"
+                cache="$RUNDIR/cache"
+                # Root (e.g. sudo -E) can leave rclone.conf/cache here; you cannot overwrite or mkdir into them.
+                for p in "$conf" "$cache"; do
+                  if [[ -e "$p" ]] && [[ ! -O "$p" ]]; then
+                    echo "copyparty-mount: $p is not owned by $(id -un); run: sudo rm -rf -- \"$p\"" >&2
+                    exit 1
+                  fi
+                done
+                # Previous run used chmod 400; owner still cannot `>`-truncate without write bit.
+                rm -f "$conf"
+                umask 0177
                 {
                   printf '%s\n' ${remoteSection}
                   printf '%s\n' 'type = webdav'
                   printf '%s\n' 'vendor = owncloud'
                   printf 'url = %s\n' ${urlLit}
-                  printf 'user = %s\n' ${davUserLit}
-                  printf 'pass = %s\n' "$obf"
+                  printf 'headers = "Cookie","%s"\n' "$hdr_val_esc"
+                  printf '%s\n' 'auth_redirect = true'
                   printf '%s\n' 'pacer_min_sleep = 0.01ms'
                 } > "$conf"
                 chmod 400 "$conf"
-                mkdir -p "$RUNDIR/cache"
+                mkdir -p "$cache"
+                # copyparty’s rclone.md uses 5s caches for same-machine benches; over Tailscale that
+                # thrashes WebDAV and shows up as FUSE I/O errors. full + longer metadata cache is safer.
                 exec rclone mount ${remote} "$MP" \
                   --config="$conf" \
-                  --cache-dir="$RUNDIR/cache" \
-                  --vfs-cache-mode=writes \
-                  --vfs-cache-max-age=5s \
-                  --attr-timeout=5s \
-                  --dir-cache-time=5s \
+                  --cache-dir="$cache" \
+                  --disable-http2 \
+                  --retries=10 \
+                  --low-level-retries=20 \
+                  --buffer-size=32M \
+                  --vfs-cache-mode=full \
+                  --vfs-cache-max-age=1h \
+                  --vfs-read-ahead=128M \
+                  --attr-timeout=1m \
+                  --dir-cache-time=5m \
                   --daemon
               '';
           })
           (pkgs.writeShellApplication {
             name = "copyparty-unmount";
-            runtimeInputs = [ pkgs.rclone ];
+            runtimeInputs = [
+              pkgs.fuse3
+              pkgs.util-linux
+            ];
             text =
               let
                 mp = lib.escapeShellArg cfg.mountPoint;
               in
               ''
+                # bash
                 set -euo pipefail
                 MP=${mp}
                 if ! mountpoint -q "$MP"; then
                   echo "not mounted: $MP" >&2
                   exit 1
                 fi
-                exec rclone umount "$MP"
+                # rclone FUSE mounts: many rclone builds have no `rclone umount`. On NixOS the
+                # fusermount3 in PATH (nix store) is not setuid — use the system wrapper first.
+                if [[ -x /run/wrappers/bin/fusermount3 ]]; then
+                  exec /run/wrappers/bin/fusermount3 -u "$MP"
+                fi
+                if [[ -x /run/wrappers/bin/fusermount ]]; then
+                  exec /run/wrappers/bin/fusermount -u "$MP"
+                fi
+                if command -v fusermount3 >/dev/null 2>&1; then
+                  exec fusermount3 -u "$MP"
+                fi
+                if command -v fusermount >/dev/null 2>&1; then
+                  exec fusermount -u "$MP"
+                fi
+                exec umount "$MP"
               '';
           })
           pkgs.rclone

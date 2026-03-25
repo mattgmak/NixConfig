@@ -99,7 +99,6 @@
           mode = "0400";
         };
 
-        # TODO: fix this
         programs.copyparty-client = {
           enable = true;
           url = "https://goofeus.dab-octatonic.ts.net/";
