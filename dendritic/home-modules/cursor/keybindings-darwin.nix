@@ -1130,7 +1130,14 @@
   {
     "key" = "ctrl+e";
     "args" = "<c-e>";
-    "command" = "vscode-neovim.send";
+    "command" = "workbench.action.focusAuxiliaryBar";
+    "when" = "editorFocus";
+  }
+  {
+    "key" = "ctrl+e";
+    "args" = "<c-e>";
+    "command" = "workbench.action.focusActiveEditorGroup";
+    "when" = "!editorFocus";
   }
   {
     "key" = "space f f";
@@ -2186,5 +2193,10 @@
     "command" = "vscode-neovim.send";
     "when" =
       "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "ctrl+e";
+    "command" = "-cursorLineEnd";
+    "when" = "textInputFocus";
   }
 ]; }
