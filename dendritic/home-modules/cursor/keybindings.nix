@@ -1127,18 +1127,11 @@
     # "when" = "(!inputFocus) && neovim.init && neovim.mode == 'normal'";
   }
   # MARK = Passthrough hotkeys;
+  # Keep in sync with dendritic/home-modules/neovim/config/lua/config.lua (<leader> = space, vscode block).
   {
     "key" = "space l n";
     "args" = " ln";
     "command" = "vscode-neovim.send";
-    # toggle linenumber
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space ";
-    "args" = " ";
-    "command" = "vscode-neovim.send";
-    # code action
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
@@ -1154,53 +1147,17 @@
     "when" = "!editorFocus";
   }
   {
-    "key" = "space f f";
-    "args" = " ff";
+    "key" = "space c r";
+    "args" = " cr";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.files.action.focusFilesExplorer";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
-    "key" = "space f s";
-    "args" = " fs";
+    "key" = "space c f";
+    "args" = " cf";
     "command" = "vscode-neovim.send";
-    # "command" = "search.action.focusSearchFromResults";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space f t";
-    "args" = " ft";
-    "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.terminal.focus";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space f x";
-    "args" = " fx";
-    "command" = "vscode-neovim.send";
-    # "command" = "workbench.extensions.action.focusExtensionsView";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space f p";
-    "args" = " fp";
-    "command" = "vscode-neovim.send";
-    # "command" = "pr:github.focus";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space c";
-    "args" = " c";
-    "command" = "vscode-neovim.send";
-    # open nvim config
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space s";
-    "args" = " s";
-    "command" = "vscode-neovim.send";
-    # open nvim config
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && (neovim.mode == 'normal' || neovim.mode == 'visual')";
   }
   {
     "key" = "space d";
@@ -1209,37 +1166,56 @@
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
+    "key" = "space ,";
+    "args" = " ,";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f s";
+    "args" = " fs";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f f";
+    "args" = " ff";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f t";
+    "args" = " ft";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f x";
+    "args" = " fx";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f p";
+    "args" = " fp";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
     "key" = "space r o";
     "args" = " ro";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.reopenClosedEditor";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space space";
     "args" = "  ";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.quickOpen";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space f c";
-    "args" = " fc";
-    "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.quickOpen";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space f l";
-    "args" = " fl";
-    "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.quickOpen";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && (neovim.mode == 'normal' || neovim.mode == 'visual')";
   }
   {
     "key" = "space r r";
-    # "args" = " rr";
-    # "command" = "vscode-neovim.send";
     "command" = "vscode-neovim.restart";
     "when" = "editorFocus && neovim.init && !inputFocus && (neovim.mode == 'normal' || neovim.mode == 'visual') || neovim.init && !inputFocus && !searchInputBoxFocus && neovim.mode == 'normal'";
   }
@@ -1247,158 +1223,320 @@
     "key" = "space s r";
     "args" = " sr";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.quickOpen";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f c";
+    "args" = " fc";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space f l";
+    "args" = " fl";
+    "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space w c";
     "args" = " wc";
     "command" = "vscode-neovim.send";
-    # "command" = "editor.action.dirtydiff.next";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space f o";
-    "args" = " wc";
+    "args" = " fo";
     "command" = "vscode-neovim.send";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space o t";
-    "args" = " ot";
-    "command" = "vscode-neovim.send";
-    # "command" = "vscode-wezterm.openTerminal";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space c n";
     "args" = " cn";
     "command" = "vscode-neovim.send";
-    # "command" = "notifications.clearAll";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space n";
+    "args" = " n";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space b";
+    "args" = " b";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v y";
+    "args" = " vy";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v a y";
+    "args" = " vay";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v r";
+    "args" = " vr";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v a r";
+    "args" = " var";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v n";
+    "args" = " vn";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v b";
+    "args" = " vb";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v f";
+    "args" = " vf";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space v p";
+    "args" = " vp";
+    "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g s y";
     "args" = " gsy";
     "command" = "vscode-neovim.send";
-    # "command" = "git.sync";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g s a";
     "args" = " gsa";
     "command" = "vscode-neovim.send";
-    # "command" = "git.stageAll";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "space g s t";
-    "args" = " gst";
-    "command" = "vscode-neovim.send";
-    # "command" = "gitlens.gitCommands.status";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g b";
     "args" = " gb";
     "command" = "vscode-neovim.send";
-    # "command" = "git.branchFrom";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g c";
     "args" = " gc";
     "command" = "vscode-neovim.send";
-    # "command" = "git.commit";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g f";
     "args" = " gf";
     "command" = "vscode-neovim.send";
-    # "command" = "git.fetchPrune";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g g";
     "args" = " gg";
     "command" = "vscode-neovim.send";
-    # "command" = "git.checkout";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g m";
     "args" = " gm";
     "command" = "vscode-neovim.send";
-    # "command" = "git.merge";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space g d";
     "args" = " gd";
     "command" = "vscode-neovim.send";
-    # "command" = "gitlens.gitCommands.branch.delete";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space p r";
     "args" = " pr";
     "command" = "vscode-neovim.send";
-    # "command" = "gitlens.createPullRequestOnRemote";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space p v";
+    "args" = " pv";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space p n";
+    "args" = " pn";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space g s t";
+    "args" = " gst";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space g s f";
+    "args" = " gsf";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m c";
+    "args" = " mc";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m i";
+    "args" = " mi";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m b";
+    "args" = " mb";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m a c";
+    "args" = " mac";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m a i";
+    "args" = " mai";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m a b";
+    "args" = " mab";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m n";
+    "args" = " mn";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space m p";
+    "args" = " mp";
+    "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j s";
     "args" = " js";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.gotoSymbol";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j f";
     "args" = " jf";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.quickTextSearch";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && (neovim.mode == 'normal' || neovim.mode == 'visual')";
+  }
+  {
+    "key" = "space j g";
+    "args" = " jg";
+    "command" = "vscode-neovim.send";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && (neovim.mode == 'normal' || neovim.mode == 'visual')";
+  }
+  {
+    "key" = "space j v";
+    "args" = " jv";
+    "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j a";
     "args" = " ja";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.showAllSymbols";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space j c";
     "args" = " jc";
     "command" = "vscode-neovim.send";
-    # "command" = "breadcrumbs.focusAndSelect";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space a";
+    "args" = " a";
+    "command" = "vscode-neovim.send";
+    "when" =
+      "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && (neovim.mode == 'normal' || neovim.mode == 'visual')";
+  }
+  {
+    "key" = "space s";
+    "args" = " s";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space t";
+    "args" = " t";
+    "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space k";
     "args" = " k";
     "command" = "vscode-neovim.send";
-    # "command" = "snipe-vscode.switchTab";
-    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
-  }
-  {
-    "key" = "backspace";
-    "args" = "<BS>";
-    "command" = "vscode-neovim.send";
-    # "command" = "snipe-vscode.switchTab";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
     "key" = "space c a";
     "args" = " ca";
     "command" = "vscode-neovim.send";
-    # "command" = "workbench.action.closeAllEditors";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
   {
-    "key" = "space j g";
-    "args" = " jg";
+    "key" = "space w h";
+    "args" = " wh";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space w v";
+    "args" = " wv";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space w n";
+    "args" = " wn";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space w o";
+    "args" = " wo";
+    "command" = "vscode-neovim.send";
+    "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
+  }
+  {
+    "key" = "space o";
+    "args" = " o";
     "command" = "vscode-neovim.send";
     "when" = "(editorFocus || !searchInputBoxFocus) && !inputFocus && neovim.init && neovim.mode == 'normal'";
   }
