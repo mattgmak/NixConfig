@@ -3,6 +3,7 @@
   flake.nixosModules.glance =
     {
       config,
+      lib,
       pkgs-for-homelab,
       ...
     }:
@@ -14,7 +15,7 @@
         enable = true;
         package = pkgs-for-homelab.glance;
         openFirewall = false;
-        environmentFile = "/etc/glance/environment";
+        environmentFile = lib.mkIf config.services.glance.enable config.age.secrets.glance-env.path;
         settings = {
           server = {
             host = "0.0.0.0";
@@ -43,6 +44,14 @@
                           };
                         }
                       ];
+                    }
+                    {
+                      type = "dns-stats";
+                      service = "pihole-v6";
+                      url = "http://192.168.50.2";
+                      allow-insecure = true;
+                      username = "admin";
+                      password = "\${PIHOLE_PASSWORD}";
                     }
                     {
                       type = "docker-containers";
@@ -84,6 +93,12 @@
 
       # Allow Glance to access Docker socket for docker-containers widget
       systemd.services.glance.serviceConfig.SupplementaryGroups = [ "docker" ];
+
+      # systemd reads EnvironmentFile as root and passes vars into the service (DynamicUser-safe)
+      age.secrets.glance-env = lib.mkIf config.services.glance.enable {
+        file = ../../secrets/glance-env.age;
+        mode = "0400";
+      };
 
     };
 }
