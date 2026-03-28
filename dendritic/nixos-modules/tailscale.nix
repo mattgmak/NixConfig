@@ -1,10 +1,19 @@
 {
   flake.nixosModules.tailscale =
-    { config, ... }:
+    {
+      config,
+      hostname,
+      ...
+    }:
     {
       services.tailscale = {
         enable = true;
+        useRoutingFeatures = if hostname == "Goofeus" then "server" else "client";
+        extraSetFlags = [ "--accept-dns=true" ];
+        extraUpFlags =
+          if hostname == "Goofeus" then [ "--advertise-exit-node" ] else [ "--exit-node-allow-lan-access" ];
       };
+
       networking.nftables.enable = true;
       networking.firewall = {
         enable = true;
