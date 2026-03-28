@@ -30,4 +30,12 @@ in
       GoofyDeskyRoot
     ];
   };
+
+  "glance-env.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }
