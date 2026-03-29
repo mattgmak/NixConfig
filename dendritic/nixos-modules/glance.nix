@@ -48,7 +48,7 @@
                     {
                       type = "dns-stats";
                       service = "pihole-v6";
-                      url = "http://192.168.50.2";
+                      url = "http://finite.dab-octatonic.ts.net";
                       allow-insecure = true;
                       username = "admin";
                       password = "\${PIHOLE_PASSWORD}";
