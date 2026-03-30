@@ -9,3 +9,5 @@ def --env y [...args] {
 	}
 	rm -fp $tmp
 }
+
+alias s = sesh connect (sesh list --icons | fzf --ansi)

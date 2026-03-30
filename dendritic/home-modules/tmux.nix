@@ -8,6 +8,31 @@
       ...
     }:
     {
+      # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
+      programs.fzf = {
+        enable = true;
+        tmux.enableShellIntegration = true;
+      };
+
+      programs.sesh = {
+        enable = true;
+        tmuxKey = "g";
+        enableAlias = false; # Use my own
+        settings = {
+          cache = false;
+          blacklist = [
+            "scratch"
+          ];
+          dir_length = 2;
+          separator_aware = true;
+        };
+      };
+
+      # sesh tmux bind uses fd for ctrl-f find mode (not added by programs.sesh)
+      home.packages = [
+        pkgs.fd
+      ];
+
       programs.tmux = {
         enable = true;
         mouse = true;
@@ -33,6 +58,11 @@
           bind-key c new-window -c "#{pane_current_path}"
           bind-key % split-window -h -c "#{pane_current_path}"
           bind-key '"' split-window -v -c "#{pane_current_path}"
+
+          bind-key x kill-pane # skip "kill-pane 1? (y/n)" prompt
+          set -g detach-on-destroy off  # don't exit from tmux when closing a session
+
+          bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible
@@ -85,19 +115,6 @@
               set -g @catppuccin_directory_text " #{b:pane_current_path}"
               set -g @catppuccin_directory_icon "󰉋 "
               set -g @catppuccin_date_time_text " %H:%M"
-            '';
-          }
-          {
-            plugin = tmux-sessionx;
-            extraConfig = ''
-              set -g @sessionx-bind-zo-new-window 'ctrl-y'
-              set -g @sessionx-auto-accept 'off'
-              set -g @sessionx-bind 'o'
-              set -g @sessionx-window-height '85%'
-              set -g @sessionx-window-width '75%'
-              set -g @sessionx-zoxide-mode 'on'
-              set -g @sessionx-custom-paths-subdirectories 'false'
-              set -g @sessionx-filter-current 'false'
             '';
           }
           {
