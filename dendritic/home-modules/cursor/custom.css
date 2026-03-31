@@ -115,11 +115,11 @@
   display: none !important;
 }
 
-.monaco-list-rows > .monaco-list-row {
+/* .monaco-list-rows > .monaco-list-row {
   border-radius: 6px !important;
   width: calc(100% - 8px) !important;
   margin: 0 4px !important;
-}
+} */
 
 /* Toolbars when tabs are enabled. */
 /* .monaco-workbench .part.editor>.content .editor-group-container>.title .editor-actions {
@@ -239,8 +239,7 @@
   margin-right: auto !important;
   border-radius: 6px;
   max-height: 60vh !important;
-  width: 680px !important;
-  max-width: 90vw !important;
+  max-width: min(90vw, 620px) !important;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.45) !important;
   padding: 10px 0 !important;
   backdrop-filter: blur(3px) !important;
