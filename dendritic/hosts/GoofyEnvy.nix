@@ -68,6 +68,7 @@
         nix-index-database
         opencode
         tailscale-systray
+        bash
       ];
     };
 
