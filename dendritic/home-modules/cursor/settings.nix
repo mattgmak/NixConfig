@@ -1,6 +1,13 @@
 {
   flake.cursorSettings =
-    { pkgs, ... }:
+    {
+      pkgs,
+      colors,
+      ...
+    }:
+    let
+      c = colors.withHashtag;
+    in
     {
       "editor.suggestSelection" = "first";
       "terminal.integrated.useWslProfiles" = true;
@@ -17,32 +24,41 @@
       "notebook.output.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "markdown.preview.fontFamily" = "IosevkaTerm Nerd Font Mono";
       "window.titleBarStyle" = "native";
+      # Theming: Stylix `stylix.targets.vscode` (theme "Stylix" + fonts). Override in
+      # programs.vscode.profiles.default.userSettings under "[Stylix]" if needed.
+      # "workbench.colorCustomizations" = {
+      #   "[Aura Soft Dark]" =
+      #     let
+      #       generalBackground = "#21202e";
+      #     in
+      #     {
+      #       "editor.background" = generalBackground;
+      #       "terminal.background" = generalBackground;
+      #       "activityBar.background" = generalBackground;
+      #       "statusBar.background" = generalBackground;
+      #       "editorGroupHeader.tabsBackground" = generalBackground;
+      #       "tab.inactiveBackground" = generalBackground;
+      #       "editorSuggestWidget.background" = generalBackground;
+      #       "sideBar.background" = generalBackground;
+      #       "titleBar.activeBackground" = generalBackground;
+      #       "terminalCursor.foreground" = "#b757ca";
+      #       "editorInlayHint.foreground" = "#afafaf";
+      #       "editorCursor.background" = "#21202e";
+      #       "editorCursor.foreground" = "#b757ca";
+      #       "editor.selectionBackground" = "#C234FF19";
+      #       "editor.selectionHighlightBackground" = "#DAA8F019";
+      #       "editorLineNumber.foreground" = "#954fa3";
+      #       "editorLineNumber.activeForeground" = "#b757ca";
+      #       "editorBracketMatch.border" = "#23384300";
+      #       "editorBracketMatch.background" = "#57A7CA5F";
+      #     };
+      # };
       "workbench.colorCustomizations" = {
-        "[Aura Soft Dark]" =
-          let
-            generalBackground = "#21202e";
-          in
-          {
-            "editor.background" = generalBackground;
-            "terminal.background" = generalBackground;
-            "activityBar.background" = generalBackground;
-            "statusBar.background" = generalBackground;
-            "editorGroupHeader.tabsBackground" = generalBackground;
-            "tab.inactiveBackground" = generalBackground;
-            "editorSuggestWidget.background" = generalBackground;
-            "sideBar.background" = generalBackground;
-            "titleBar.activeBackground" = generalBackground;
-            "terminalCursor.foreground" = "#b757ca";
-            "editorInlayHint.foreground" = "#afafaf";
-            "editorCursor.background" = "#21202e";
-            "editorCursor.foreground" = "#b757ca";
-            "editor.selectionBackground" = "#C234FF19";
-            "editor.selectionHighlightBackground" = "#DAA8F019";
-            "editorLineNumber.foreground" = "#954fa3";
-            "editorLineNumber.activeForeground" = "#b757ca";
-            "editorBracketMatch.border" = "#23384300";
-            "editorBracketMatch.background" = "#57A7CA5F";
-          };
+        "[Stylix]" = {
+          "editorCursor.foreground" = c.base0E;
+          "editorCursor.background" = c.base00;
+          "terminalCursor.foreground" = c.base0E;
+        };
       };
       "explorer.confirmDelete" = false;
       "explorer.confirmDragAndDrop" = false;
@@ -312,7 +328,7 @@
       "notebook.lineNumbers" = "on";
       "remote.autoForwardPortsSource" = "hybrid";
       "workbench.iconTheme" = "helium-icon-theme";
-      "workbench.colorTheme" = "Aura Soft Dark";
+      # "workbench.colorTheme" = "Aura Soft Dark"; # Stylix sets "Stylix"
       "[kotlin]" = {
         "editor.defaultFormatter" = "cstef.kotlin-formatter";
       };

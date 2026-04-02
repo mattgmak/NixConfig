@@ -42,7 +42,6 @@ in
       gh-dash
       btop
       # bat
-      # ghosttyBatSyntax
       nix-index-database
       opencode
     ];
@@ -128,6 +127,7 @@ in
           podman-tui
           go
           cursor-cli
+          bat
         ]
         ++ (with pkgs.darwin; [
           file_cmds

@@ -2,6 +2,7 @@
 {
   flake.homeModules.cursor =
     {
+      config,
       hostname,
       pkgs,
       pkgs-for-cursor,
@@ -10,8 +11,8 @@
     {
       imports = [ self.homeModules.cursorInjection ];
       home.file = {
-        ".cursor/extensions/custom/custom.js".source = ./custom.js;
-        ".cursor/extensions/custom/custom.css".source = ./custom.css;
+        ".cursor/extensions/custom/custom.js".text = self.cursorCustomJs config.lib.stylix.colors;
+        ".cursor/extensions/custom/custom.css".text = self.cursorCustomCss config.lib.stylix.colors;
       };
       programs.cursor-injection = {
         enable = true;
@@ -35,7 +36,8 @@
           "test.js"
         ];
       };
-      stylix.targets.vscode.enable = false;
+      stylix.targets.vscode.enable = true;
+      stylix.targets.vscode.fonts.enable = false;
       programs.vscode = {
         enable = true;
         mutableExtensionsDir = true;
@@ -43,7 +45,10 @@
           default = {
             enableUpdateCheck = false;
             enableExtensionUpdateCheck = false;
-            userSettings = self.cursorSettings { inherit hostname pkgs; };
+            userSettings = self.cursorSettings {
+              inherit hostname pkgs;
+              colors = config.lib.stylix.colors;
+            };
             keybindings = if pkgs.stdenv.isDarwin then self.cursorKeybindingsDarwin else self.cursorKeybindings;
             userMcp = self.cursorMcp;
             extensions =

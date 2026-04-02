@@ -1,0 +1,298 @@
+# Workbench CSS tinted with Stylix base16. Exposed as flake.lib so import-tree
+# treats this file as a flake fragment (not a bare function).
+{ ... }:
+{
+  flake.cursorCustomCss =
+    colors:
+    let
+      c = colors.withHashtag;
+      rgb = clr: builtins.substring 1 6 clr;
+    in
+    ''
+      # css
+      * {
+        font-family: "IosevkaTerm Nerd Font Propo";
+      }
+
+      .quick-input-html-widget {
+        width: 100% !important;
+        max-height: 100% !important;
+        overflow: hidden !important;
+      }
+
+      .monaco-inputbox {
+        border-radius: 6px !important;
+        width: 97.5% !important;
+        margin: 2px auto !important;
+      }
+
+      .interactive-input-part
+        > .interactive-input-and-side-toolbar
+        > .interactive-input-and-execute-toolbar
+        > .interactive-input-editor {
+        width: 500px !important;
+      }
+
+      .interactive-input-part
+        > .interactive-input-and-side-toolbar
+        > .interactive-input-and-execute-toolbar {
+        width: 100% !important;
+        border-radius: 6px !important;
+        padding: 2px 10px !important;
+      }
+
+      .interactive-session > .interactive-input-part {
+        padding: 10px 16px !important;
+      }
+
+      .monaco-inputbox > .ibwrapper > .input,
+      .monaco-inputbox > .ibwrapper > .mirror {
+        padding: 4px 0px !important;
+      }
+
+      .quick-input-list > .monaco-list > .monaco-scrollable-element {
+        padding: 0 !important;
+      }
+
+      .sidebar,
+      .titlebar,
+      .activitybar {
+        border: none !important;
+        border-left-color: transparent !important;
+      }
+
+      .breadcrumbs-control {
+        margin-left: 10px !important;
+        height: 100% !important;
+        align-items: center !important;
+        display: flex !important;
+      }
+
+      .minimap {
+        transform: translateX(1px) !important;
+      }
+
+      .sidebar > .composite.title {
+        display: none !important;
+      }
+
+      .statusbar.status-border-top,
+      .composite.title.has-composite-bar {
+        border-top: none !important;
+        --status-border-top-color: transparent !important;
+      }
+
+      .tabs-container {
+        border-left-width: 0px !important;
+      }
+
+      .tab {
+        border-right-width: 0px !important;
+      }
+
+      .tabs-border-bottom {
+        --tabs-border-bottom-color: transparent !important;
+      }
+
+      .monaco-sash.vertical {
+        background-color: ${c.base01} !important;
+      }
+
+      .find-part,
+      .monaco-findInput {
+        align-items: center !important;
+      }
+
+      .controls {
+        display: flex !important;
+        margin-top: 3.5px !important;
+        margin-right: 7px !important;
+      }
+
+      .find-widget.replaceToggled {
+        height: 75px !important;
+      }
+
+      .find-widget {
+        border-radius: 6px !important;
+        box-shadow: none !important;
+        height: 39px !important;
+      }
+
+      .find-widget > .codicon-widget-close {
+        top: 8px !important;
+      }
+
+      .find-widget > .monaco-sash.vertical {
+        display: none !important;
+      }
+
+      .monaco-list.list_id_1 .monaco-list-row.selected {
+        background-color: #${rgb c.base0E}38 !important;
+      }
+
+      .monaco-list.list_id_1 .monaco-list-row.selected .label-name {
+        opacity: 1 !important;
+        color: ${c.base07} !important;
+      }
+
+      .monaco-tree .monaco-tree-row .label-name,
+      .monaco-list .monaco-list-row .monaco-icon-label .label-name {
+        font-size: 14px !important;
+        font-weight: 400 !important;
+      }
+
+      .monaco-workbench .part.sidebar .title-actions .actions-container {
+        display: none !important;
+      }
+
+      .slider {
+        position: absolute !important;
+        right: 2px !important;
+        width: 2px !important;
+        background: ${c.base0E} !important;
+        left: auto !important;
+      }
+
+      .codicon-toolbar-more,
+      .codicon-word-wrap {
+        display: block !important;
+      }
+
+      .monaco-resizable-hover {
+        border-radius: 6px !important;
+        border: none !important;
+      }
+
+      .monaco-editor-hover,
+      .monaco-hover {
+        box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.45) !important;
+        background-color: ${c.base02} !important;
+        backdrop-filter: blur(3px) !important;
+        border-radius: 6px !important;
+        border: none !important;
+      }
+
+      .monaco-editor-hover,
+      .monaco-hover > .monaco-scrollable-element,
+      .monaco-hover-content > div {
+        border-radius: 6px !important;
+      }
+
+      .overflowingContentWidgets .monaco-sash {
+        background-color: transparent !important;
+      }
+
+      .suggest-widget {
+        background-color: ${c.base02} !important;
+        border-radius: 6px !important;
+        border: none !important;
+        padding: 2px !important;
+      }
+
+      .suggest-details {
+        background-color: ${c.base01} !important;
+        border-radius: 6px !important;
+        border: none !important;
+        padding: 2px !important;
+        transform: translateX(4px) !important;
+      }
+
+      .search-label {
+        font-size: 14px;
+        color: ${c.base07};
+        display: block;
+      }
+
+      .search-icon {
+        display: none !important;
+      }
+
+      .codicon-search::before {
+        display: none !important;
+      }
+
+      .codicon-arrow-right,
+      .codicon-arrow-left {
+        display: none !important;
+      }
+
+      .titlebar-right > * {
+        display: none !important;
+      }
+
+      .quick-input-widget {
+        position: absolute !important;
+        top: 20vh !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        border-radius: 6px;
+        max-height: 60vh !important;
+        max-width: min(90vw, 620px) !important;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.45) !important;
+        padding: 10px 0 !important;
+        backdrop-filter: blur(3px) !important;
+        z-index: 100000 !important;
+        overflow: hidden !important;
+      }
+
+      .quick-input-titlebar {
+        border-radius: 6px !important;
+        margin: 0 8px !important;
+      }
+
+      .monaco-list-rows {
+        background: transparent !important;
+      }
+
+      .notifications-toasts .monaco-list-row:hover {
+        background: none !important;
+      }
+
+      .pane-header {
+        border-radius: 6px !important;
+      }
+
+      #command-blur {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0);
+        top: 0;
+        left: 0;
+        backdrop-filter: blur(0px);
+        z-index: 99999;
+        transition: all 0.2s ease-out;
+        opacity: 0;
+      }
+
+      #command-blur.active {
+        background: rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(8px);
+        opacity: 1;
+      }
+
+      .scm-editor,
+      .suggest-input-container {
+        border-radius: 6px !important;
+        padding: 2px !important;
+      }
+
+      .split-view-container > .split-view-view:not(:first-child):before {
+        background-color: transparent !important;
+      }
+
+      .monaco-workbench
+        .part.editor
+        > .content
+        .editor-group-container
+        > .title.breadcrumbs
+        .breadcrumbs-control
+        .monaco-breadcrumb-item:before {
+        height: auto !important;
+        padding: 0 4px !important;
+      }
+    '';
+}
