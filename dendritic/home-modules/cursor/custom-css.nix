@@ -1,6 +1,3 @@
-# Workbench CSS tinted with Stylix base16. Exposed as flake.lib so import-tree
-# treats this file as a flake fragment (not a bare function).
-{ ... }:
 {
   flake.cursorCustomCss =
     colors:
