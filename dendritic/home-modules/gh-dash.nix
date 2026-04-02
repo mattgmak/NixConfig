@@ -37,10 +37,9 @@
               {
                 key = "C";
                 name = "Code Review";
-                command = "tmux new-window -n 'PR-{{.PrNumber}}' 'nu -e `wt switch pr:{{.PrNumber}} -x \"${
-                  "pwd | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\\n' | "
-                  + (if pkgs.stdenv.isLinux then "wl-copy" else "pbcopy")
-                }\"`'";
+                command = "tmux new-window -n 'PR-{{.PrNumber}}' 'nu -e `wt switch pr:{{.PrNumber}}; ^pwd | str trim | ${
+                  if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy"
+                }`'";
               }
             ];
           };
