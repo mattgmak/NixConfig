@@ -9,7 +9,7 @@
       rgb = clr: builtins.substring 1 6 clr;
     in
     ''
-      # css
+      /* css */
       * {
         font-family: "IosevkaTerm Nerd Font Propo";
       }
