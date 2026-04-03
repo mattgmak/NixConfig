@@ -127,6 +127,11 @@
       url = "github:9001/copyparty";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # code-cursor-flake = {
+    #   url = "github:jacopone/code-cursor-nix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs =

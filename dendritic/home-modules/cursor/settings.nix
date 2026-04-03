@@ -59,6 +59,7 @@
           "editorCursor.foreground" = c.base0E;
           "editorCursor.background" = c.base00;
           "terminalCursor.foreground" = c.base0E;
+          "editorSuggestWidget.selectedBackground" = c.base0D;
         };
       };
       "explorer.confirmDelete" = false;
@@ -345,7 +346,8 @@
       "editor.overviewRulerBorder" = false;
       "editor.scrollbar.verticalScrollbarSize" = 20;
       "editor.cursorBlinking" = "solid";
-      "workbench.editor.showTabs" = if pkgs.stdenv.isDarwin then "single" else "multiple";
+      # "workbench.editor.showTabs" = if pkgs.stdenv.isDarwin then "single" else "multiple";
+      "workbench.editor.showTabs" = "single";
       "breadcrumbs.enabled" = true;
       "workbench.tips.enabled" = false;
       "files.insertFinalNewline" = true;
@@ -489,5 +491,7 @@
       };
       "editor.fontVariations" = true;
       "editor.fontSize" = 16;
+      "editor.occurrencesHighlight" = "off";
+      "editor.selectionHighlight" = false;
     };
 }

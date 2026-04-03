@@ -17,6 +17,7 @@
       programs.cursor-injection = {
         enable = true;
         package = pkgs-for-cursor.code-cursor;
+        # package = inputs.code-cursor-flake.packages.${pkgs.stdenv.hostPlatform.system}.cursor;
         electron = {
           frame = false;
           # titleBarStyle = "hidden";
