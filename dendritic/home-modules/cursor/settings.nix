@@ -53,6 +53,7 @@
       #       "editorBracketMatch.background" = "#57A7CA5F";
       #     };
       # };
+      "workbench.colorTheme" = "Stylix";
       "workbench.colorCustomizations" = {
         "[Stylix]" = {
           "editorCursor.foreground" = c.base0E;
