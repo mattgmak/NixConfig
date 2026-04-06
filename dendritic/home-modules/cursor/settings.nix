@@ -59,7 +59,7 @@
           "editorCursor.foreground" = c.base0E;
           "editorCursor.background" = c.base00;
           "terminalCursor.foreground" = c.base0E;
-          "editorSuggestWidget.selectedBackground" = c.base0E;
+          "editorSuggestWidget.selectedBackground" = c.base03;
           "list.highlightForeground" = c.base0C;
         };
       };
