@@ -9,7 +9,7 @@ local MOTIONS_AND_OP_KEYS = {
 	{ on = "t" }, { on = "L" }, { on = "H" }, { on = "w" },
 	{ on = "W" }, { on = "<" }, { on = ">" }, { on = "~" },
 	-- movement
-	{ on = "g" }, { on = "k" }, { on = "j" }, { on = "h" }, { on = "l" }, { on = "<Down>" }, { on = "<Up>" }, { on = "<Left>" }, { on = "<Right>" }
+	{ on = "g" }, { on = "k" }, { on = "j" }, { on = "h" }, { on = "l" }, { on = "<Up>" }, { on = "<Down>" }, { on = "<Left>" }, { on = "<Right>" }
 }
 
 -- stylua: ignore
@@ -17,12 +17,12 @@ local MOTION_KEYS = {
 	{ on = "0" }, { on = "1" }, { on = "2" }, { on = "3" }, { on = "4" },
 	{ on = "5" }, { on = "6" }, { on = "7" }, { on = "8" }, { on = "9" },
 	-- movement
-	{ on = "g" }, { on = "k" }, { on = "j" }, { on = "h" }, { on = "l" }, { on = "<Down>" }, { on = "<Up>" }, { on = "<Left>" }, { on = "<Right>" }
+	{ on = "g" }, { on = "k" }, { on = "j" }, { on = "h" }, { on = "l" }, { on = "<Up>" }, { on = "<Down>" }, { on = "<Left>" }, { on = "<Right>" }
 }
 
 -- stylua: ignore
 local DIRECTION_KEYS = {
-	{ on = "k" }, { on = "j" }, { on = "<Down>" }, { on = "<Up>" },
+	{ on = "k" }, { on = "j" }, { on = "<Up>" }, { on = "<Down>" },
 	-- tab movement
 	{ on = "t" }
 }
@@ -170,9 +170,9 @@ local get_keys = ya.sync(function(state) return state._only_motions and MOTION_K
 
 local function normal_direction(dir)
   if dir == '<Down>' then
-    return 'k'
-  elseif dir == '<Up>' then
     return 'j'
+  elseif dir == '<Up>' then
+    return 'k'
   elseif dir == '<Left>' then
     return 'h'
   elseif dir == '<Right>' then
@@ -292,9 +292,9 @@ return {
     end
 
     if cmd == 'k' then
-      ya.mgr_emit('arrow', { lines })
-    elseif cmd == 'j' then
       ya.mgr_emit('arrow', { -lines })
+    elseif cmd == 'j' then
+      ya.mgr_emit('arrow', { lines })
     elseif cmd == 'h' then
       for _ = 1, lines do
         ya.mgr_emit('leave', {})
