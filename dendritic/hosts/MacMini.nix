@@ -217,9 +217,19 @@ in
 
             # Workspace switching
             "alt-0" = "workspace 0";
+
+            # Workspace 1 for ghostty
             "alt-1" = "workspace 1";
+            "alt-w" = "workspace 1";
+
+            # Workspace 2 for cursor
             "alt-2" = "workspace 2";
+            "alt-e" = "workspace 2";
+
+            # Workspace 3 for zen
             "alt-3" = "workspace 3";
+            "alt-r" = "workspace 3";
+
             "alt-4" = "workspace 4";
             "alt-5" = "workspace 5";
             "alt-6" = "workspace 6";
@@ -250,9 +260,9 @@ in
             "alt-shift-p" = "resize width -50";
 
             # Focus key apps
-            "alt-w" = "exec-and-forget osascript -e 'tell application \"Ghostty\" to activate'";
-            "alt-e" = "exec-and-forget osascript -e 'tell application \"Cursor\" to activate'";
-            "alt-r" = "exec-and-forget osascript -e 'tell application \"Zen\" to activate'";
+            # "alt-w" = "exec-and-forget osascript -e 'tell application \"Ghostty\" to activate'";
+            # "alt-e" = "exec-and-forget osascript -e 'tell application \"Cursor\" to activate'";
+            # "alt-r" = "exec-and-forget osascript -e 'tell application \"Zen\" to activate'";
             "alt-x" = "exec-and-forget osascript -e 'tell application \"Xcode\" to activate'";
             "alt-a" = "exec-and-forget osascript -e 'tell application \"Android Studio\" to activate'";
             "alt-s" = "exec-and-forget osascript -e 'tell application \"Simulator\" to activate'";

@@ -32,8 +32,6 @@
         let
           pkgs = pkgsFor system nixpkgs;
           biome-pin-pkgs = pkgsFor system biome-pin;
-          # Platform-specific browser selection
-          browser = if pkgs.stdenv.isDarwin then pkgs.google-chrome else pkgs.chromium;
         in
         {
           default =
@@ -42,7 +40,6 @@
                 with pkgs;
                 [
                   nodejs_22
-                  browser
                   deno
                   pnpm
                   jdk17
@@ -54,15 +51,12 @@
                   mise
                   postgresql
                 ]
-                ++ (with pkgs.nodePackages; [
-                  eas-cli
-                  vercel
-                ])
                 ++ (
                   if pkgs.stdenv.isLinux then
                     [
                       android-studio
                       androidenv.androidPkgs.platform-tools
+                      chromium
                     ]
                   else
                     [ ]
