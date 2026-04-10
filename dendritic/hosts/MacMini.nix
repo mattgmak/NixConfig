@@ -45,6 +45,7 @@ in
       nix-index-database
       opencode
     ];
+    stylix.targets.bat.enable = false;
   };
 
   flake.darwinModules.${hostname} =
