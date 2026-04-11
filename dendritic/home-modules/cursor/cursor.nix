@@ -13,6 +13,10 @@
       home.file = {
         ".cursor/extensions/custom/custom.js".text = self.cursorCustomJs config.lib.stylix.colors;
         ".cursor/extensions/custom/custom.css".text = self.cursorCustomCss config.lib.stylix.colors;
+        ".cursor/skills" = {
+          source = ./skills;
+          recursive = true;
+        };
       };
       programs.cursor-injection = {
         enable = true;
