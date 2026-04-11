@@ -38,4 +38,12 @@ in
       GoofyDesky
     ];
   };
+
+  "donetick-jwt.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }

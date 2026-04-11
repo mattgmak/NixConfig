@@ -2,6 +2,7 @@
   flake.nixosModules.caddy =
     {
       config,
+      options,
       pkgs-for-homelab,
       lib,
       ...
@@ -49,6 +50,15 @@
               hostName = "immich.${baseDomain}";
               extraConfig = ''
                 reverse_proxy :${toString config.services.immich.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs (options.services ? donetick && config.services.donetick.enable) {
+            donetick = {
+              hostName = "donetick.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.donetick.port}
                 import cloudflare
               '';
             };
@@ -142,6 +152,7 @@
               || config.services.immich.enable
               || config.services.nextcloud.enable
               || config.services.copyparty.enable
+              || (options.services ? donetick && config.services.donetick.enable)
             )
           )
           (
@@ -157,9 +168,12 @@
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
               immichServe = mkServeDirect "immich" config.services.immich.port;
               copypartyServe = lib.optionalString config.services.copyparty.enable "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
+              donetickServe = lib.optionalString (options.services ? donetick && config.services.donetick.enable) ''
+                tailscale serve --yes --service=svc:donetick --https=443 127.0.0.1:${toString config.services.donetick.port}
+              '';
             in
             {
-              description = "Tailscale serve for Glance, Immich, Copyparty, and Nextcloud";
+              description = "Tailscale serve for Glance, Immich, Donetick, Copyparty, and Nextcloud";
               after = [ "tailscaled.service" ];
               wants = [ "tailscaled.service" ];
               wantedBy = [ "multi-user.target" ];
@@ -183,6 +197,7 @@
                 ${glanceServe}
                 ${immichServe}
                 ${copypartyServe}
+                ${donetickServe}
                 ${nextcloudServe}
               '';
             }

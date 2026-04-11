@@ -29,6 +29,7 @@
           glance
           immich
           copyparty
+          donetick
           # nextcloud
           caddy
           # coredns
