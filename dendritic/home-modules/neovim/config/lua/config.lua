@@ -53,6 +53,10 @@ vim.opt.shellpipe =
 
 vim.o.relativenumber = true
 
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.softtabstop = -1
+
 -- save
 vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
   silent = true,
