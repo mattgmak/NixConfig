@@ -31,7 +31,6 @@
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
-              flyctl
               uv
               python314
             ];
