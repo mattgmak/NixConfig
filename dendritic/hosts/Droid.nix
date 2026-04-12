@@ -1,13 +1,26 @@
 { self, inputs, ... }:
 {
   flake.nixOnDroidConfiguration =
-    { config, pkgs, ... }:
+    { config, pkgs, lib, ... }:
+    let
+      # Stylix's home-manager integration reads osConfig (see stylix/home-manager-integration.nix).
+      # Nix-on-droid does not pass it like NixOS does; without this, HM infers osConfig lazily and hits infinite recursion.
+      hmSpecialArgs = {
+        inherit (self.constants) username;
+        hostname = "Droid";
+        osConfig = config;
+      };
+    in
     {
-      imports = [ inputs.stylix.nixOnDroidModules.stylix ];
+      imports = [
+        inputs.stylix.nixOnDroidModules.stylix
+        # Same palette/fonts as other hosts; stylix requires image or base16Scheme on both droid and HM.
+        self.stylixCommon
+      ];
 
       stylix = {
-        overlays.enable = false;
-        # enable = true;
+        overlays.enable = lib.mkForce false;
+        enable = lib.mkForce true;
       };
 
       environment.packages = with pkgs; [
@@ -54,6 +67,12 @@
           nix-index-database
           opencode
         ];
+        # Stylix enables gnome/gtk/kde on Linux by default; those use dconf and fail HM activation on Termux (no session dbus).
+        stylix.targets.gnome.enable = lib.mkForce false;
+        stylix.targets.gtk.enable = lib.mkForce false;
+        stylix.targets.kde.enable = lib.mkForce false;
+        # HM defaults dconf on for Linux; dbus is not available in this environment.
+        dconf.enable = false;
         programs.ssh = {
           enable = true;
         };
@@ -65,10 +84,7 @@
       home-manager = {
         useGlobalPkgs = true;
         useUserPackages = true;
-        extraSpecialArgs = {
-          inherit (self.constants) username;
-          hostname = "Droid";
-        };
+        extraSpecialArgs = hmSpecialArgs;
         backupFileExtension = "hm-backup-1";
       };
 
@@ -94,7 +110,7 @@
         ];
       };
 
-      terminal.font = "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/NerdFonts/IosevkaTerm/IosevkaTermNerdFontMono-Regular.ttf";
+      # terminal.font is set by stylix/droid/fonts.nix from stylix.fonts.monospace (see stylixCommon).
       # Set your time zone
       time.timeZone = "Asia/Hong_Kong";
     };
