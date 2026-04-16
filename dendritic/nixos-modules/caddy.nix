@@ -72,6 +72,60 @@
               '';
             };
           }
+          // lib.optionalAttrs config.services.jellyfin.enable {
+            jellyfin = {
+              hostName = "jellyfin.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:8096
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.sonarr.enable {
+            sonarr = {
+              hostName = "sonarr.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.sonarr.settings.server.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.radarr.enable {
+            radarr = {
+              hostName = "radarr.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.radarr.settings.server.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.prowlarr.enable {
+            prowlarr = {
+              hostName = "prowlarr.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.prowlarr.settings.server.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.bazarr.enable {
+            bazarr = {
+              hostName = "bazarr.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.bazarr.listenPort}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs config.services.transmission.enable {
+            transmission = {
+              hostName = "transmission.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.transmission.settings.rpc-port}
+                import cloudflare
+              '';
+            };
+          }
           // lib.optionalAttrs config.services.nextcloud.enable (
             let
               nextcloudPhpConfig = ''
@@ -153,6 +207,12 @@
               || config.services.nextcloud.enable
               || config.services.copyparty.enable
               || (options.services ? donetick && config.services.donetick.enable)
+              || config.services.jellyfin.enable
+              || config.services.sonarr.enable
+              || config.services.radarr.enable
+              || config.services.prowlarr.enable
+              || config.services.bazarr.enable
+              || config.services.transmission.enable
             )
           )
           (
@@ -171,9 +231,27 @@
               donetickServe = lib.optionalString (options.services ? donetick && config.services.donetick.enable) ''
                 tailscale serve --yes --service=svc:donetick --https=443 127.0.0.1:${toString config.services.donetick.port}
               '';
+              jellyfinServe = lib.optionalString config.services.jellyfin.enable ''
+                tailscale serve --yes --service=svc:jellyfin --https=443 127.0.0.1:8096
+              '';
+              sonarrServe = lib.optionalString config.services.sonarr.enable ''
+                tailscale serve --yes --service=svc:sonarr --https=443 127.0.0.1:${toString config.services.sonarr.settings.server.port}
+              '';
+              radarrServe = lib.optionalString config.services.radarr.enable ''
+                tailscale serve --yes --service=svc:radarr --https=443 127.0.0.1:${toString config.services.radarr.settings.server.port}
+              '';
+              prowlarrServe = lib.optionalString config.services.prowlarr.enable ''
+                tailscale serve --yes --service=svc:prowlarr --https=443 127.0.0.1:${toString config.services.prowlarr.settings.server.port}
+              '';
+              bazarrServe = lib.optionalString config.services.bazarr.enable ''
+                tailscale serve --yes --service=svc:bazarr --https=443 127.0.0.1:${toString config.services.bazarr.listenPort}
+              '';
+              transmissionServe = lib.optionalString config.services.transmission.enable ''
+                tailscale serve --yes --service=svc:transmission --https=443 127.0.0.1:${toString config.services.transmission.settings.rpc-port}
+              '';
             in
             {
-              description = "Tailscale serve for Glance, Immich, Donetick, Copyparty, and Nextcloud";
+              description = "Tailscale serve for homelab HTTP services (incl. Jellyfin and *Arr)";
               after = [ "tailscaled.service" ];
               wants = [ "tailscaled.service" ];
               wantedBy = [ "multi-user.target" ];
@@ -198,6 +276,12 @@
                 ${immichServe}
                 ${copypartyServe}
                 ${donetickServe}
+                ${jellyfinServe}
+                ${sonarrServe}
+                ${radarrServe}
+                ${prowlarrServe}
+                ${bazarrServe}
+                ${transmissionServe}
                 ${nextcloudServe}
               '';
             }

@@ -27,6 +27,7 @@
           self.nixConfig
           tailscale
           glance
+          arr
           immich
           copyparty
           donetick
