@@ -2,7 +2,8 @@
 # Layout on the disk (under /mnt/2TBSeagateHDD/servarr): sonarr/{anime,tv}, radarr/movies,
 # transmission/{daemon home + downloads}. Jellyfin libraries should use those same paths.
 # Post-switch: set Sonarr/Radarr root folders to match, Prowlarr → apps, Transmission client,
-# Bazarr → Sonarr/Radarr URLs + providers.
+# Bazarr → Sonarr/Radarr URLs + providers. FlareSolverr listens on loopback only; in Prowlarr →
+# Settings → General set FlareSolverr URL to http://127.0.0.1:8191.
 { ... }:
 {
   flake.nixosModules.arr =
@@ -97,6 +98,14 @@
         enable = true;
         openFirewall = false;
       };
+
+      services.flaresolverr = {
+        enable = true;
+        openFirewall = false;
+      };
+
+      # Loopback only (no Caddy / tailscale serve); Prowlarr uses http://127.0.0.1:8191.
+      systemd.services.flaresolverr.environment.HOST = "127.0.0.1";
 
       services.bazarr = {
         enable = true;
