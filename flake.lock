@@ -1714,11 +1714,11 @@
         "systems": "systems_5"
       },
       "locked": {
-        "lastModified": 1771728519,
-        "narHash": "sha256-ZbhCQctRj9kUw2yq9iVhpT5rxBirdBwkAk6CQjJuWhM=",
+        "lastModified": 1776307357,
+        "narHash": "sha256-OJvl12ocBhrJldbx1PMSbhKR5ynwoBhJlxGRB3popTY=",
         "owner": "nix-community",
         "repo": "nix4vscode",
-        "rev": "283d1ad7b496cef68013be6252efc84fce3f16dd",
+        "rev": "8f428788bc5930a15340105b5fadea5d66d54f51",
         "type": "github"
       },
       "original": {
