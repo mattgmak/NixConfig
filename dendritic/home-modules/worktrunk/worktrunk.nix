@@ -11,7 +11,7 @@
       home.file.".config/worktrunk/config.toml".text = ''
         # toml
         [post-start]
-        copy = "wt step copy-ignored"
+        copy = "{% if base %}wt step copy-ignored --from {{ base }}{% else %}wt step copy-ignored{% endif %}"
 
         [post-switch]
         copy-pwd = "printf %s {{ worktree_path }} | ${
