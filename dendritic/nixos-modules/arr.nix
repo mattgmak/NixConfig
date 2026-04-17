@@ -1,6 +1,7 @@
 # Jellyfin + *Arr stack (TV, anime, movies) with Transmission on the HDD.
-# Layout on the disk (under /mnt/2TBSeagateHDD/servarr): sonarr/{anime,tv}, radarr/movies,
-# transmission/{daemon home + downloads}. Jellyfin libraries should use those same paths.
+# Layout: servarr/sonarr, servarr/radarr, servarr/transmission (daemon home + downloads/).
+# Point Sonarr/Radarr root folders at sonarr/ and radarr/; Jellyfin libraries same. Use a flat
+# download dir in Transmission (no per-app subfolders) or match paths in *Arr download client settings.
 # Post-switch: set Sonarr/Radarr root folders to match, Prowlarr → apps, Transmission client,
 # Bazarr → Sonarr/Radarr URLs + providers. FlareSolverr listens on loopback only; in Prowlarr →
 # Settings → General set FlareSolverr URL to http://127.0.0.1:8191.
@@ -40,26 +41,37 @@
         script = ''
           if mountpoint -q ${mediaMount}; then
             mkdir -p \
-              ${sonarrRoot}/anime \
-              ${sonarrRoot}/tv \
-              ${radarrRoot}/movies \
+              ${servarrRoot} \
+              ${sonarrRoot} \
+              ${radarrRoot} \
               ${transmissionRoot}/downloads/.incomplete
+
+            # Whole servarr tree: group "transmission" so Sonarr/Radarr/Bazarr/Jellyfin can traverse.
+            chown root:transmission ${servarrRoot}
+            chmod 2775 ${servarrRoot}
 
             chown sonarr:transmission ${sonarrRoot}
             chmod 2775 ${sonarrRoot}
-            chown sonarr:transmission ${sonarrRoot}/anime ${sonarrRoot}/tv
-            chmod 2775 ${sonarrRoot}/anime ${sonarrRoot}/tv
 
             chown radarr:transmission ${radarrRoot}
             chmod 2775 ${radarrRoot}
-            chown radarr:transmission ${radarrRoot}/movies
-            chmod 2775 ${radarrRoot}/movies
 
+            # Home 0750; downloads/ is 2775 so Sonarr/Radarr (group "transmission") can read imports.
             chown transmission:transmission ${transmissionRoot}
             chmod 0750 ${transmissionRoot}
-            chown transmission:transmission ${transmissionRoot}/downloads ${transmissionRoot}/downloads/.incomplete
+            chown -R transmission:transmission ${transmissionRoot}/downloads
             chmod 2775 ${transmissionRoot}/downloads
             chmod 2770 ${transmissionRoot}/downloads/.incomplete
+            # Repair perms on existing torrent data (skip .incomplete: stricter mode).
+            (
+              cd ${transmissionRoot}/downloads || exit 0
+              find . \( -name .incomplete -prune \) -o -type d -exec chmod 2775 {} +
+              find . \( -name .incomplete -prune \) -o -type f -exec chmod 664 {} +
+            )
+            if [ -d ${transmissionRoot}/downloads/.incomplete ]; then
+              find ${transmissionRoot}/downloads/.incomplete -mindepth 1 -type d -exec chmod 2770 {} + 2>/dev/null || true
+              find ${transmissionRoot}/downloads/.incomplete -mindepth 1 -type f -exec chmod 660 {} + 2>/dev/null || true
+            fi
           fi
         '';
       };
