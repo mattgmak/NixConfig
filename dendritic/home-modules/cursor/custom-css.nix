@@ -8,7 +8,7 @@
     ''
       /* css */
       * {
-        font-family: "IosevkaTerm Nerd Font Propo";
+        font-family: "IosevkaTerm Nerd Font Propo" !important;
       }
 
       .quick-input-html-widget {
