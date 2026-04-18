@@ -8,7 +8,12 @@
 { ... }:
 {
   flake.nixosModules.arr =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       mediaMount = "/mnt/2TBSeagateHDD";
       servarrRoot = "${mediaMount}/servarr";
@@ -91,10 +96,24 @@
         hardwareAcceleration = {
           enable = true;
           type = "qsv";
+          # First render node on typical single-iGPU box (i3-8100 UHD 630). Confirm: ls /dev/dri
           device = "/dev/dri/renderD128";
         };
         transcoding.enableHardwareEncoding = true;
       };
+
+      # nixpkgs jellyfin only DeviceAllow's hardwareAcceleration.device; Intel VAAPI+QSV often
+      # also needs the DRM primary node or init_hw_device fails ("unknown libva error"). Enumeration
+      # varies (card0 vs card1 only); allow both so one-iGPU boxes match either layout.
+      systemd.services.jellyfin.serviceConfig.DeviceAllow =
+        lib.mkIf (config.services.jellyfin.enable && config.services.jellyfin.hardwareAcceleration.enable)
+          (
+            lib.mkForce [
+              "${config.services.jellyfin.hardwareAcceleration.device} rw"
+              "/dev/dri/card0 rw"
+              "/dev/dri/card1 rw"
+            ]
+          );
 
       services.sonarr = {
         enable = true;
