@@ -8,7 +8,8 @@
     ''
       /* css */
       * {
-        font-family: "IosevkaTerm Nerd Font Propo" !important;
+        font-family: "IosevkaTerm Nerd Font Propo";
+        --vscode-font-family: "IosevkaTerm Nerd Font Propo" !important;
       }
 
       .quick-input-html-widget {
