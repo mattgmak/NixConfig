@@ -20,6 +20,7 @@
           pkgs-for-homelab = import inputs.nixpkgs-for-homelab {
             inherit system;
             config.allowUnfree = true;
+            overlays = [ inputs.copyparty.overlays.default ];
           };
           pkgs-for-vr = import inputs.nixpkgs-for-vr {
             inherit system;

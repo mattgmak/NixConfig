@@ -3,7 +3,7 @@
 { inputs, ... }:
 {
   flake.nixosModules.copyparty =
-    { config, ... }:
+    { config, pkgs-for-homelab, ... }:
     {
       imports = [ inputs.copyparty.nixosModules.default ];
 
@@ -11,6 +11,7 @@
 
       services.copyparty = {
         enable = true;
+        package = pkgs-for-homelab.copyparty;
 
         # Dedicated user is typical; adjust if you need group access to /mnt/2TBSeagateHDD.
         user = "copyparty";

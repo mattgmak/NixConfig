@@ -12,6 +12,7 @@
       config,
       lib,
       pkgs,
+      pkgs-for-homelab,
       ...
     }:
     let
@@ -92,6 +93,7 @@
 
       services.jellyfin = {
         enable = true;
+        package = pkgs-for-homelab.jellyfin;
         openFirewall = false;
         hardwareAcceleration = {
           enable = true;
@@ -117,21 +119,25 @@
 
       services.sonarr = {
         enable = true;
+        package = pkgs-for-homelab.sonarr;
         openFirewall = false;
       };
 
       services.radarr = {
         enable = true;
+        package = pkgs-for-homelab.radarr;
         openFirewall = false;
       };
 
       services.prowlarr = {
         enable = true;
+        package = pkgs-for-homelab.prowlarr;
         openFirewall = false;
       };
 
       services.flaresolverr = {
         enable = true;
+        package = pkgs-for-homelab.flaresolverr;
         openFirewall = false;
       };
 
@@ -140,11 +146,13 @@
 
       services.bazarr = {
         enable = true;
+        package = pkgs-for-homelab.bazarr;
         openFirewall = false;
       };
 
       services.transmission = {
         enable = true;
+        package = pkgs-for-homelab.transmission_4;
         home = transmissionHome;
         downloadDirPermissions = "2775";
         openPeerPorts = true;

@@ -4,11 +4,13 @@
       config,
       lib,
       pkgs,
+      pkgs-for-homelab,
       ...
     }:
     {
       services.nextcloud = {
         enable = true;
+        package = pkgs-for-homelab.nextcloud32;
         hostName = "localhost";
 
         https = true;
@@ -43,7 +45,7 @@
         # App store: must be true to provide writable store-apps dir (needed for upgrade)
         # extraApps from Nix still take precedence; store used only if you install from web UI
         appstoreEnable = true;
-        extraApps = { inherit (pkgs.nextcloud32Packages.apps) calendar; };
+        extraApps = { inherit (pkgs-for-homelab.nextcloud32Packages.apps) calendar; };
       };
 
       # Disable nginx – Caddy will serve Nextcloud via PHP-FPM
