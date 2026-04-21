@@ -160,6 +160,7 @@ in
           "xcode-build-server"
           "podman"
           "podman-compose"
+          "fastlane"
         ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };
