@@ -1137,7 +1137,7 @@
   {
     "key" = "ctrl+e";
     "args" = "<c-e>";
-    "command" = "workbench.action.focusAuxiliaryBar";
+    "command" = "aichat.newfollowupaction";
     "when" = "editorFocus";
   }
   {
