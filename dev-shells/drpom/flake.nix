@@ -32,25 +32,28 @@
         let
           pkgs = pkgsFor system nixpkgs;
           biome-pin-pkgs = pkgsFor system biome-pin;
-          # androidComp = pkgs.androidenv.composeAndroidPackages {
-          #   platformVersions = [
-          #     "36"
-          #     "latest"
-          #   ];
-          #   systemImageTypes = [ "google_apis_playstore" ];
-          #   abiVersions = [
-          #     "armeabi-v7a"
-          #     "arm64-v8a"
-          #   ];
-          #   includeNDK = true;
-          #   ndkVersions = [ "27.1.12297006" ];
-          #   includeEmulator = true;
-          #   includeSystemImages = true;
-          #   includeExtras = [ "extras;google;auto" ];
-          # };
-          # androidStudio = pkgs.android-studio.withSdk androidComp.androidsdk;
-          # ANDROID_HOME = "${androidComp.androidsdk}/libexec/android-sdk";
-          # ANDROID_NDK_ROOT = "${ANDROID_HOME}/ndk-bundle";
+          androidComp = pkgs.androidenv.composeAndroidPackages {
+            platformVersions = [
+              "36"
+              "latest"
+            ];
+            systemImageTypes = [ "google_apis_playstore" ];
+            abiVersions = [
+              "armeabi-v7a"
+              "arm64-v8a"
+            ];
+            includeNDK = true;
+            ndkVersions = [
+              "27.0.12077973"
+              "27.1.12297006"
+            ];
+            includeEmulator = true;
+            includeSystemImages = true;
+            includeExtras = [ "extras;google;auto" ];
+          };
+          androidStudio = pkgs.android-studio.withSdk androidComp.androidsdk;
+          ANDROID_HOME = "${androidComp.androidsdk}/libexec/android-sdk";
+          ANDROID_NDK_ROOT = "${ANDROID_HOME}/ndk-bundle";
 
           # Use the same buildToolsVersion here
           # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
@@ -79,8 +82,8 @@
                     [
                       android-studio
                       androidenv.androidPkgs.platform-tools
-                      # androidStudio
-                      # androidComp.androidsdk
+                      androidStudio
+                      androidComp.androidsdk
                       chromium
                     ]
                   else
@@ -98,8 +101,12 @@
                       export PATH="$BUN_INSTALL/bin:$PATH"
                     ''
                   else
+                    # ''
+                    #   export ANDROID_HOME=~/Android
+                    # ''
                     ''
-                      export ANDROID_HOME=~/Android
+                      export ANDROID_HOME=${ANDROID_HOME}
+                      export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
                     ''
                 }
               '';
