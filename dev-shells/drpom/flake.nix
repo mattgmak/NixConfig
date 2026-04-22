@@ -99,7 +99,7 @@
                     ''
                   else
                     ''
-                      export ANDROID_HOME=~/Android/Sdk
+                      export ANDROID_HOME=~/Android
                     ''
                 }
               '';
