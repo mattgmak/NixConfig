@@ -1,0 +1,1 @@
+use flake . -v --log-format internal-json 2> >(nom --json)
