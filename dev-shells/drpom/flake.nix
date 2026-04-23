@@ -73,7 +73,6 @@
                   biome-pin-pkgs.biome
                   jq
                   rclone
-                  mise
                   postgresql
                   eas-cli
                 ]
