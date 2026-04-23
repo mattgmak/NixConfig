@@ -98,6 +98,8 @@
                       export ANDROID_HOME=~/Library/Android/sdk
                       export BUN_INSTALL="$HOME/.bun"
                       export PATH="$BUN_INSTALL/bin:$PATH"
+                      unset CC CXX
+                      export PATH="/usr/bin:/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH"
                     ''
                   else
                     # ''
