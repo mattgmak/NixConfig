@@ -47,6 +47,7 @@
         gh
         direnv
         lazygit
+        mangohud
         ghostty
         cursor
         carapace
