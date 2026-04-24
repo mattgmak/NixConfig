@@ -333,7 +333,9 @@
               in
               [
                 "${primaryWorkspacesMatcher}, match:title (clipse|bluetui|nmtui|wiremix|window-switcher), float on, size 1200 800, center on, stay_focused on, pin on"
+                "match:workspace name:Game, match:title (clipse|bluetui|nmtui|wiremix|window-switcher), float on, size 1200 800, center on, stay_focused on, pin on"
                 "${primaryWorkspacesMatcher}, match:title (btop), float on, size 1600 900, center on, stay_focused on, pin on"
+                "match:workspace name:Game, match:title (btop), float on, size 1600 900, center on, stay_focused on, pin on"
                 "${matchPip}, pin on, float on"
                 "${matchFloatingTerminal}, float on, pin on, center on, stay_focused on, size 1200 800"
                 "match:class ([Cc]ursor|zen.*), focus_on_activate on"
