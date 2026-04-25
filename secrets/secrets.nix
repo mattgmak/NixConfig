@@ -46,4 +46,20 @@ in
       GoofyDesky
     ];
   };
+
+  "restic-password.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
+
+  "restic-b2-env.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }

@@ -33,7 +33,7 @@
           donetick
           # nextcloud
           caddy
-          # coredns
+          resticGoofeus
         ];
       }
     );
