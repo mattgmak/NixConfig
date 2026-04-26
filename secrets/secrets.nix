@@ -47,6 +47,15 @@ in
     ];
   };
 
+  "radicale-htpasswd.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+      GoofyEnvy
+    ];
+  };
+
   "restic-password.age" = {
     armor = true;
     publicKeys = [

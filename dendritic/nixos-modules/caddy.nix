@@ -126,6 +126,17 @@
               '';
             };
           }
+          // lib.optionalAttrs config.services.radicale.enable {
+            radicale = {
+              hostName = "radicale.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:5232 {
+                  flush_interval -1
+                }
+                import cloudflare
+              '';
+            };
+          }
           // lib.optionalAttrs config.services.nextcloud.enable (
             let
               nextcloudPhpConfig = ''
@@ -213,6 +224,7 @@
               || config.services.prowlarr.enable
               || config.services.bazarr.enable
               || config.services.transmission.enable
+              || config.services.radicale.enable
             )
           )
           (
@@ -249,6 +261,9 @@
               transmissionServe = lib.optionalString config.services.transmission.enable ''
                 tailscale serve --yes --service=svc:transmission --https=443 127.0.0.1:${toString config.services.transmission.settings.rpc-port}
               '';
+              radicaleServe = lib.optionalString config.services.radicale.enable ''
+                tailscale serve --yes --service=svc:radicale --https=443 127.0.0.1:5232
+              '';
             in
             {
               description = "Tailscale serve for homelab HTTP services (incl. Jellyfin and *Arr)";
@@ -282,6 +297,7 @@
                 ${prowlarrServe}
                 ${bazarrServe}
                 ${transmissionServe}
+                ${radicaleServe}
                 ${nextcloudServe}
               '';
             }

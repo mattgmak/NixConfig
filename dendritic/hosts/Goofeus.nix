@@ -31,6 +31,7 @@
           immich
           copyparty
           donetick
+          radicale
           # nextcloud
           caddy
           resticGoofeus

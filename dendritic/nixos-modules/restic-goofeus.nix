@@ -39,6 +39,7 @@
           "/var/lib/glance"
           "/var/lib/copyparty"
           "/var/lib/immich"
+          "/mnt/2TBSeagateHDD/radicale"
         ];
         exclude = [
           "/var/lib/docker"
