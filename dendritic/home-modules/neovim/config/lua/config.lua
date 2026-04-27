@@ -266,6 +266,7 @@ if is_vscode then
     vscode.call('workbench.action.closeOtherEditors')
   end)
   vim.keymap.set('n', '<leader>o', function() vscode.call('workbench.action.files.openFile') end)
+  vim.keymap.set('n', '<leader>ws', function() vscode.call('workbench.action.openWorkspaceSettingsFile') end)
 
   -- use undotree to replace vanilla undo/redo
   -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
