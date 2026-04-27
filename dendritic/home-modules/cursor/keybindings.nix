@@ -2245,6 +2245,10 @@
     "command" = "hideCodeActionWidget";
     "when" = "codeActionMenuVisible";
   }
+  {
+    "key" = "ctrl+shift+w";
+    "command" = "workbench.action.openWorkspaceSettingsFile";
+  }
   # {
   #   "key" = "alt+r";
   #   "command" = "-toggleFindRegex";

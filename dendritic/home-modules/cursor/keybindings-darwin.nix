@@ -2405,4 +2405,8 @@
     "command" = "-cursorLineEnd";
     "when" = "textInputFocus";
   }
+  {
+    "key" = "ctrl+shift+w";
+    "command" = "workbench.action.openWorkspaceSettingsFile";
+  }
 ]; }
