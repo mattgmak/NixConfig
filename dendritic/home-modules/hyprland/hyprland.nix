@@ -219,6 +219,8 @@
             monitor =
               if hostname == "GoofyDesky" then
                 [
+                  # "${deskyMonitors.primary}, 2560x1440@240.00Hz, 0x0, 1, transform, 6"
+                  # "${deskyMonitors.secondary}, 1920x1080@144.00Hz, -1080x-650, 1, transform, 7"
                   "${deskyMonitors.primary}, 2560x1440@240.00Hz, 0x0, 1"
                   "${deskyMonitors.secondary}, 1920x1080@144.00Hz, -1080x-650, 1, transform, 3"
                 ]

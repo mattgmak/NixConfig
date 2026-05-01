@@ -19,6 +19,9 @@
     nixpkgs-for-vr = {
       url = "github:nixos/nixpkgs/master";
     };
+    nixpkgs-for-kernel = {
+      url = "github:nixos/nixpkgs/master";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       # url = "github:SoumyabrataBanik/flake-zen-browser";

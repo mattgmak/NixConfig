@@ -5,7 +5,6 @@
       services.wivrn = {
         enable = true;
         openFirewall = true;
-        defaultRuntime = true;
         autoStart = true;
         package = pkgs-for-vr.wivrn;
       };

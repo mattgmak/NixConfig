@@ -13,7 +13,12 @@
           inherit inputs inputs';
           inherit (config) packages;
           username = "root";
-          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor pkgs-for-homelab;
+          inherit (config.legacyPackages)
+            pkgs-stable
+            pkgs-for-cursor
+            pkgs-for-homelab
+            pkgs-for-kernel
+            ;
           hostname = self.constants.serverName;
         };
         modules = with self.nixosModules; [

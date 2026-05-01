@@ -1,7 +1,10 @@
-{ inputs, ... }: {
+{ inputs, ... }:
+{
   flake.homeModules.neovim =
     { pkgs, ... }:
-    let treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default; in
+    let
+      treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    in
     {
       # home.file = {
       #   ".config/nvim" = {
@@ -13,7 +16,7 @@
         enable = true;
         withPython3 = true;
         withNodeJs = true;
-        extraLuaConfig = ''
+        initLua = ''
           ${builtins.readFile ./config/lua/plugins.lua}
           ${builtins.readFile ./config/lua/config.lua}
         '';

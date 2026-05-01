@@ -191,7 +191,7 @@
         nh
         nvd
         nix-output-monitor
-        neofetch
+        fastfetch
         nitch
         nix-prefetch-github
         nvfetcher

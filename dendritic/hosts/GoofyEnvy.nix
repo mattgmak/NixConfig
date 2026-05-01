@@ -12,7 +12,12 @@
         specialArgs = {
           inherit inputs inputs';
           inherit (self.constants) username;
-          inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
+          inherit (config.legacyPackages)
+            pkgs-stable
+            pkgs-for-cursor
+            pkgs-for-homelab
+            pkgs-for-kernel
+            ;
           inherit (config) packages;
           hostname = self.constants.laptopName;
         };

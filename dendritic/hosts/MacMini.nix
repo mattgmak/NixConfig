@@ -108,7 +108,7 @@ in
           nh
           nvd
           nix-output-monitor
-          neofetch
+          fastfetch
           base16-shell-preview
           jq
           mas

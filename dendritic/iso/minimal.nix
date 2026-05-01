@@ -102,7 +102,7 @@
         nh
         nvd
         nix-output-monitor
-        neofetch
+        fastfetch
         nitch
         zenity
         gh
