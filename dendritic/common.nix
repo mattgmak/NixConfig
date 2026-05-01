@@ -220,6 +220,7 @@
         jq
         dnsutils
         cursor-cli
+        systemctl-tui
       ];
 
       services.gvfs.enable = true;
