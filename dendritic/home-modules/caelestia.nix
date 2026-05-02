@@ -1,9 +1,10 @@
 { inputs, ... }:
 {
   flake.homeModules.caelestia =
-    { pkgs, ... }:
+    { pkgs, config, ... }:
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
+      gtk.gtk4.theme = config.gtk.theme;
       gtk = {
         enable = true;
         iconTheme = {

@@ -16,6 +16,7 @@
         enable = true;
         withPython3 = true;
         withNodeJs = true;
+        withRuby = true;
         initLua = ''
           ${builtins.readFile ./config/lua/plugins.lua}
           ${builtins.readFile ./config/lua/config.lua}
@@ -25,7 +26,7 @@
           treesitterPkg
         ];
       };
-      home.packages = with pkgs; [
+      home.packages = [
         treesitterPkg
       ];
     };

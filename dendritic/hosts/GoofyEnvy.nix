@@ -99,7 +99,6 @@
           libnotify
           obsidian
           pkgs-stable.vesktop
-          protonvpn-gui
           wl-clipboard
           clipse
           pulseaudio-ctl
@@ -111,7 +110,7 @@
           wev
           evtest
           chromium
-          xorg.xeyes
+          xeyes
           kdePackages.okular
           qbittorrent
           gparted

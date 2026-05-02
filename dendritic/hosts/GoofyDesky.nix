@@ -122,7 +122,6 @@
           bitwarden-desktop
           libnotify
           obsidian
-          protonvpn-gui
           wl-clipboard
           clipse
           pulseaudio-ctl
@@ -134,7 +133,7 @@
           wev
           evtest
           chromium
-          xorg.xeyes
+          xeyes
           kdePackages.okular
           qbittorrent
           gparted

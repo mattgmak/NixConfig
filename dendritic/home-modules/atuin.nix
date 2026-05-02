@@ -5,6 +5,7 @@
       programs.atuin = {
         enable = true;
         daemon.enable = hostname != "Droid" && username != "root";
+        enableBashIntegration = false;
         settings = {
           exit_mode = "return-query";
           invert = true;

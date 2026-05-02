@@ -493,5 +493,8 @@
       "editor.fontSize" = 16;
       "editor.occurrencesHighlight" = "off";
       "editor.selectionHighlight" = false;
+      "workbench.view.showQuietly" = {
+        "workbench.panel.output" = true;
+      };
     };
 }

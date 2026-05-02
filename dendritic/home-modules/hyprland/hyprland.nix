@@ -42,15 +42,18 @@
         package = null;
         portalPackage = null;
         enable = true;
-        systemd.enable = false;
+        systemd.enable = true;
+        # systemd.variables = [
+        #   "DISPLAY"
+        #   "HYPRLAND_INSTANCE_SIGNATURE"
+        #   "WAYLAND_DISPLAY"
+        #   "XDG_CURRENT_DESKTOP"
+        #   "XDG_SESSION_DESKTOP"
+        #   "XDG_SESSION_TYPE"
+        #   "DESKTOP_SESSION"
+        # ];
         systemd.variables = [
-          "DISPLAY"
-          "HYPRLAND_INSTANCE_SIGNATURE"
-          "WAYLAND_DISPLAY"
-          "XDG_CURRENT_DESKTOP"
-          "XDG_SESSION_DESKTOP"
-          "XDG_SESSION_TYPE"
-          "DESKTOP_SESSION"
+          "--all"
         ];
 
         plugins = [

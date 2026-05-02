@@ -8,7 +8,8 @@
         package = inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
           _7zz = pkgs._7zz-rar; # Support for RAR extraction
         };
-        enableNushellIntegration = true;
+        enableNushellIntegration = false;
+        shellWrapperName = "y";
         initLua = ./init.lua;
         plugins = with pkgs.yaziPlugins; {
           inherit git;
