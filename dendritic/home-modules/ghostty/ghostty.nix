@@ -29,10 +29,11 @@
           ];
           quick-terminal-position = "center";
           # Bare `tmux` is new-session; attach to MRU (no -t) or start if no server. Stay in nu after tmux exits.
-          command =
-            "${lib.getExe pkgs.nushell} -e ${
-              lib.escapeShellArg ''^tmux attach-session; if ($env.LAST_EXIT_CODE != 0) { ^tmux new-session }''
-            }";
+          command = "nu";
+          # command =
+          #   "${lib.getExe pkgs.nushell} -e ${
+          #     lib.escapeShellArg ''^tmux attach-session; if ($env.LAST_EXIT_CODE != 0) { ^tmux new-session }''
+          #   }";
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
           cursor-color = "#B757CA";
