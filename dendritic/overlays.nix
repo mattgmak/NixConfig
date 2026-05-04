@@ -7,6 +7,11 @@
         inherit system;
         overlays = [
           (_: _: { ghostty = inputs.ghostty.packages.${system}.default; })
+          (_final: super: {
+            direnv = super.direnv.overrideAttrs (_: {
+              doCheck = false;
+            });
+          })
           inputs.nix4vscode.overlays.default
         ];
         config = {
