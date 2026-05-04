@@ -1793,11 +1793,11 @@
     },
     "nixpkgs-for-cursor": {
       "locked": {
-        "lastModified": 1776621630,
-        "narHash": "sha256-wsApTvPsoytcvgs8IXdT+4Asf7yDYO0Q9TzXG0enHoI=",
+        "lastModified": 1777511819,
+        "narHash": "sha256-Mxa4FZ2DSDZXfGTyOncvVM1lbreHVou+jr9/XvpIH7g=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "01509903e323daaab761021c796f082bab2db67a",
+        "rev": "5495b6eeb5c22aab1a8585f0a3c6875826d6ae90",
         "type": "github"
       },
       "original": {
