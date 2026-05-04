@@ -55,6 +55,47 @@
           ANDROID_HOME = "${androidComp.androidsdk}/libexec/android-sdk";
           ANDROID_NDK_ROOT = "${ANDROID_HOME}/ndk-bundle";
 
+          # Argent: upstream git omits Simulator binaries (npm-only); the workspace lockfile is
+          # missing resolved URLs (~npm/cli#6301), so fetchNpmDeps cannot satisfy npm ci reliably.
+          # Package the registry release (matches https://github.com/software-mansion/argent releases).
+          argentVersion = "0.6.0";
+          argentNpmRelease = pkgs.fetchurl {
+            url = "https://registry.npmjs.org/@swmansion/argent/-/argent-${argentVersion}.tgz";
+            hash = "sha256-2bUPzWbTJyxZrf91WV1f8bAVzt/IfGherSOHRv3ySWA=";
+          };
+          argent = pkgs.stdenvNoCC.mkDerivation {
+            pname = "argent";
+            version = argentVersion;
+            src = argentNpmRelease;
+            nativeBuildInputs = [
+              pkgs.nodejs_22
+              pkgs.makeWrapper
+            ];
+            unpackPhase = ''
+              tar -xzf "$src"
+            '';
+            sourceRoot = "package";
+            installPhase = ''
+              mkdir -p "$out/libexec/argent"
+              cp -r . "$out/libexec/argent/"
+              chmod +x "$out/libexec/argent/bin"/* 2>/dev/null || true
+
+              mkdir -p "$out/bin"
+              makeWrapper "${pkgs.nodejs_22}/bin/node" "$out/bin/argent" \
+                --add-flags "$out/libexec/argent/dist/cli.js"
+
+              ln -sf "$out/libexec/argent/bin/simulator-server" "$out/bin/argent-simulator-server"
+              ln -sf "$out/libexec/argent/bin/ax-service" "$out/bin/ax-service"
+            '';
+            meta = {
+              description = "Agentic toolkit for iOS Simulator (MCP)";
+              homepage = "https://github.com/software-mansion/argent";
+              license = pkgs.lib.licenses.asl20;
+              mainProgram = "argent";
+              platforms = pkgs.lib.platforms.darwin;
+            };
+          };
+
           # Use the same buildToolsVersion here
           # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
         in
@@ -76,6 +117,9 @@
                   postgresql
                   eas-cli
                 ]
+                ++ (
+                  if pkgs.stdenv.isDarwin then [ argent ] else [ ]
+                )
                 ++ (
                   if pkgs.stdenv.isLinux then
                     [
