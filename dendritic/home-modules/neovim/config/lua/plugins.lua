@@ -1,6 +1,6 @@
 local is_vscode = vim.g.vscode ~= nil
 
-require('vim._core.ui2').enable({})
+if not is_vscode then require('vim._core.ui2').enable({}) end
 
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
