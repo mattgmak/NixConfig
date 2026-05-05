@@ -73,8 +73,13 @@ in
 
       users.users.${username} = {
         home = "/Users/${username}";
-        shell = pkgs.nushell;
+        shell = pkgs.zsh;
       };
+
+      environment.shells = with pkgs; [
+        bashInteractive
+        zsh
+      ];
 
       home-manager = {
         useGlobalPkgs = true;
