@@ -75,12 +75,12 @@
                 tamasfe.even-better-toml
                 davidanson.vscode-markdownlint
                 mkhl.direnv
-                usernamehw.errorlens
                 aaron-bond.better-comments
                 jnoortheen.nix-ide
               ]
               ++ pkgs.nix4vscode.forVscodeVersion vscodeVersion [
                 "ms-vsliveshare.vsliveshare.1.0.5905"
+                "usernamehw.errorlens"
                 "github.vscode-pull-request-github"
                 "bbenoist.QML"
                 "delgan.qml-format"
