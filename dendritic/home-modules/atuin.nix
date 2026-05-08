@@ -4,13 +4,15 @@
     {
       programs.atuin = {
         enable = true;
-        daemon.enable = hostname != "Droid" && username != "root";
+        daemon.enable = hostname != "Droid" && username != "root" && hostname != "MacMini";
         enableBashIntegration = false;
         settings = {
           exit_mode = "return-query";
           invert = true;
           enter_accept = true;
           keymap = {
+            emacs."ctrl-d" = "delete";
+            vim-normal."ctrl-d" = "delete";
             emacs."ctrl-y" = "copy";
             vim-normal."ctrl-y" = "copy";
           };
