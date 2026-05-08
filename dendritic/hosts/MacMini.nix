@@ -134,6 +134,7 @@ in
           go
           cursor-cli
           bat
+          llama-cpp
         ]
         ++ (with pkgs.darwin; [
           file_cmds

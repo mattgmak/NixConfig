@@ -19,7 +19,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- TODO: move off lazy
 -- Setup lazy.nvim
 require('lazy').setup({
   {
@@ -181,6 +180,20 @@ require('lazy').setup({
       require('grug-far').setup({
         -- options, see Configuration section below
         -- there are no required options atm
+      })
+    end,
+  },
+  {
+    'BlinkResearchLabs/blink-edit.nvim',
+    enabled = not is_vscode,
+    config = function()
+      require('blink-edit').setup({
+        llm = {
+          provider = 'sweep',
+          backend = 'openai',
+          url = 'http://localhost:8000',
+          model = 'sweep',
+        },
       })
     end,
   },
