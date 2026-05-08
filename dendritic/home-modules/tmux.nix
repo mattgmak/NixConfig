@@ -63,6 +63,10 @@
           set -g detach-on-destroy off  # don't exit from tmux when closing a session
 
           bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
+
+          # Enable support for advanced keyboard shortcuts (like Ctrl+.)
+          set -g extended-keys on
+          set -as terminal-features 'xterm*:extkeys'
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible

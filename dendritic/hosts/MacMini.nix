@@ -54,6 +54,7 @@ in
       hostname,
       username,
       pkgs-for-cursor,
+      pkgs-stable,
       ...
     }:
     {
@@ -90,6 +91,7 @@ in
             hostname
             username
             pkgs-for-cursor
+            pkgs-stable
             ;
         };
         backupFileExtension = "hm-backup";

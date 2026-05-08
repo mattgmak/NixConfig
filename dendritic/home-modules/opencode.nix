@@ -3,7 +3,10 @@
     programs.opencode = {
       enable = true;
       settings = {
-        plugin = [ "@rama_nigg/open-cursor@latest" ];
+        plugin = [
+          "@rama_nigg/open-cursor@latest"
+          "opencode-gemini-auth@latest"
+        ];
         provider = {
           "cursor-acp" = {
             name = "Cursor ACP";
@@ -153,6 +156,11 @@
               "cursor-acp/kimi-k2.5" = {
                 name = "Kimi K2.5";
               };
+            };
+          };
+          google = {
+            options = {
+              projectId = "firm-circlet-495702-t8";
             };
           };
         };
