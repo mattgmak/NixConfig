@@ -6,12 +6,12 @@
       treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in
     {
-      # home.file = {
-      #   ".config/nvim" = {
-      #     source = ./config;
-      #     recursive = true;
-      #   };
-      # };
+      home.file = {
+        ".config/nvim/after" = {
+          source = ./config/lua/after;
+          recursive = true;
+        };
+      };
       programs.neovim = {
         enable = true;
         withPython3 = true;
@@ -22,6 +22,7 @@
           ${builtins.readFile ./config/lua/config.lua}
         '';
         extraPackages = with pkgs; [
+          lua-language-server
           gcc
           treesitterPkg
         ];

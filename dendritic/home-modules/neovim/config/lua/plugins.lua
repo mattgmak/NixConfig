@@ -134,7 +134,7 @@ require('lazy').setup({
     branch = 'main',
   },
   {
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.nvim',
     version = '*',
     event = 'VeryLazy',
     config = function()
@@ -166,6 +166,7 @@ require('lazy').setup({
         },
       })
       require('mini.surround').setup()
+      require('mini.statusline').setup()
     end,
   },
   { 'actionshrimp/direnv.nvim', opts = {} },
@@ -194,6 +195,32 @@ require('lazy').setup({
           url = 'http://localhost:8000',
           model = 'sweep',
         },
+      })
+    end,
+  },
+  {
+    'neovim/nvim-lspconfig',
+    config = function() vim.lsp.enable('lua_ls') end,
+  },
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua', -- only load on lua files
+    opts = {
+      library = {
+        -- See the configuration section for more details
+        -- Load luvit types when the `vim.uv` word is found
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
+  -- TODO: move to blink cmp
+  { -- optional cmp completion source for require statements and module annotations
+    'hrsh7th/nvim-cmp',
+    opts = function(_, opts)
+      opts.sources = opts.sources or {}
+      table.insert(opts.sources, {
+        name = 'lazydev',
+        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
       })
     end,
   },

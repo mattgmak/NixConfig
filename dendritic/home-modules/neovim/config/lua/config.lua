@@ -145,8 +145,7 @@ if is_vscode then
 
   local vscode = require('vscode')
 
-  vim.keymap.set('n', '<leader>cr', function() vscode.call('editor.action.rename') end)
-  vim.keymap.set({ 'n', 'v' }, '<leader>cf', function() vscode.call('editor.action.refactor') end)
+  vim.keymap.set({ 'n', 'v' }, 'grf', function() vscode.call('editor.action.refactor') end)
   vim.keymap.set('n', '<leader>d', function() vscode.call('workbench.action.closeActiveEditor') end)
   vim.keymap.set('n', '<leader>,', function() vscode.call('workbench.action.showAllEditors') end)
   vim.keymap.set('n', '<leader>fs', function() vscode.call('workbench.action.findInFiles') end)
@@ -161,7 +160,6 @@ if is_vscode then
     vscode.call('extension.updateCustomCSS')
     vscode.call('workbench.action.reloadWindow')
   end)
-  vim.keymap.set('n', 'gr', function() vscode.call('editor.action.goToReferences') end)
   vim.keymap.set('n', '<leader>fc', function() vscode.call('workbench.scm.focus') end)
   vim.keymap.set('n', '<leader>fl', function() vscode.call('gitlens.views.scm.grouped.focus') end)
   vim.keymap.set('n', '<leader>wc', function() vscode.call('editor.action.dirtydiff.next') end)
@@ -283,6 +281,7 @@ if is_vscode then
 else
   -- exit
   vim.keymap.set('n', '<leader>d', '<cmd>q<cr>')
+  vim.keymap.set('n', '<leader>D', '<cmd>q!<cr>')
   -- window operations
   vim.keymap.set('n', '<leader>wh', ':split<cr>')
   vim.keymap.set('n', '<leader>wv', ':vsplit<cr>')
@@ -305,3 +304,8 @@ vim.api.nvim_set_hl(0, 'FlashCurrent', {
   bg = '#7c634c',
   fg = 'white',
 })
+
+vim.opt.complete:append('o')
+vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert' }
+vim.opt.pumheight = 8
+vim.opt.pumborder = 'rounded'
