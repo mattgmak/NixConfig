@@ -68,8 +68,10 @@ require('lazy').setup({
     url = 'https://codeberg.org/andyg/leap.nvim',
     enabled = true,
     config = function(_, opts)
-      vim.keymap.set({ 'n', 'x', 'o' }, '<BS>', '<Plug>(leap)')
-      vim.keymap.set({ 'n', 'x', 'o' }, 'gh', '<Plug>(leap)')
+      -- vim.keymap.set({ 'n', 'x', 'o' }, '<BS>', '<Plug>(leap)')
+      -- vim.keymap.set({ 'n', 'x', 'o' }, 'gh', '<Plug>(leap)')
+      vim.keymap.set({ 'n', 'x', 'o' }, '<BS>', '<Plug>(leap-anywhere)')
+      vim.keymap.set({ 'n', 'x', 'o' }, 'gh', '<Plug>(leap-anywhere)')
       vim.keymap.set({ 'n' }, '<leader><BS>', '<Plug>(leap-from-window)')
       vim.keymap.set({ 'n', 'o' }, 'gs', function()
         require('leap.remote').action({
@@ -155,9 +157,9 @@ require('lazy').setup({
             -- 'a' includes trailing space(s), 'i' is just the word
             {
               '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
-              '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
-              '()%s+()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
-              '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
+              '[\'"`]()()[^%s\'"`]+()%s+()',    -- First of multiple classnames
+              '()%s+()[^%s\'"`]+()()[\'"`]',    -- Last of multiple classnames
+              '%s+()()[^%s\'"`]+()%s+()',       -- Middle of multiple classnames
             },
           },
           -- Tag attribute textobject (for HTML/XML tags)
@@ -200,7 +202,10 @@ require('lazy').setup({
   },
   {
     'neovim/nvim-lspconfig',
-    config = function() vim.lsp.enable('lua_ls') end,
+    config = function()
+      vim.lsp.enable('lua_ls')
+      vim.lsp.enable('nixd')
+    end,
   },
   {
     'folke/lazydev.nvim',
@@ -213,15 +218,43 @@ require('lazy').setup({
       },
     },
   },
-  -- TODO: move to blink cmp
-  { -- optional cmp completion source for require statements and module annotations
-    'hrsh7th/nvim-cmp',
-    opts = function(_, opts)
-      opts.sources = opts.sources or {}
-      table.insert(opts.sources, {
-        name = 'lazydev',
-        group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-      })
-    end,
-  },
+  {
+    'saghen/blink.cmp',
+    -- dependencies = { 'rafamadriz/friendly-snippets' },
+
+    version = '1.*',
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+      -- 'super-tab' for mappings similar to vscode (tab to accept)
+      -- 'enter' for enter to accept
+      -- 'none' for no mappings
+      --
+      -- All presets have the following mappings:
+      -- C-space: Open menu or open docs if already open
+      -- C-n/C-p or Up/Down: Select next/previous item
+      -- C-e: Hide menu
+      -- C-k: Toggle signature help (if signature.enabled = true)
+      --
+      -- See :h blink-cmp-config-keymap for defining your own keymap
+      keymap = { preset = 'default' },
+
+      appearance = {
+        nerd_font_variant = 'mono'
+      },
+
+      -- (Default) Only show the documentation popup when manually triggered
+      completion = { documentation = { auto_show = false } },
+
+      -- Default list of enabled providers defined so that you can extend it
+      -- elsewhere in your config, without redefining it, due to `opts_extend`
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
+
+      fuzzy = { implementation = "prefer_rust_with_warning" }
+    },
+    opts_extend = { "sources.default" }
+  }
 })
