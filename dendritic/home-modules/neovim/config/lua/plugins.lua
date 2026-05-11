@@ -66,7 +66,6 @@ require('lazy').setup({
   --   },
   {
     url = 'https://codeberg.org/andyg/leap.nvim',
-    enabled = true,
     config = function(_, opts)
       -- vim.keymap.set({ 'n', 'x', 'o' }, '<BS>', '<Plug>(leap)')
       -- vim.keymap.set({ 'n', 'x', 'o' }, 'gh', '<Plug>(leap)')
@@ -157,9 +156,9 @@ require('lazy').setup({
             -- 'a' includes trailing space(s), 'i' is just the word
             {
               '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
-              '[\'"`]()()[^%s\'"`]+()%s+()',    -- First of multiple classnames
-              '()%s+()[^%s\'"`]+()()[\'"`]',    -- Last of multiple classnames
-              '%s+()()[^%s\'"`]+()%s+()',       -- Middle of multiple classnames
+              '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
+              '()%s+()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
+              '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
             },
           },
           -- Tag attribute textobject (for HTML/XML tags)
@@ -168,13 +167,13 @@ require('lazy').setup({
         },
       })
       require('mini.surround').setup()
-      require('mini.statusline').setup()
+      if not is_vscode then require('mini.statusline').setup() end
     end,
   },
   { 'actionshrimp/direnv.nvim', opts = {} },
   {
     'MagicDuck/grug-far.nvim',
-    enabled = not is_vscode,
+    cond = not is_vscode,
     -- Note (lazy loading): grug-far.lua defers all it's requires so it's lazy by default
     -- additional lazy config to defer loading is not really needed...
     config = function()
@@ -221,7 +220,7 @@ require('lazy').setup({
   {
     'saghen/blink.cmp',
     -- dependencies = { 'rafamadriz/friendly-snippets' },
-
+    cond = not is_vscode,
     version = '1.*',
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -241,7 +240,7 @@ require('lazy').setup({
       keymap = { preset = 'default' },
 
       appearance = {
-        nerd_font_variant = 'mono'
+        nerd_font_variant = 'mono',
       },
 
       -- (Default) Only show the documentation popup when manually triggered
@@ -253,8 +252,8 @@ require('lazy').setup({
         default = { 'lsp', 'path', 'snippets', 'buffer' },
       },
 
-      fuzzy = { implementation = "prefer_rust_with_warning" }
+      fuzzy = { implementation = 'prefer_rust_with_warning' },
     },
-    opts_extend = { "sources.default" }
-  }
+    opts_extend = { 'sources.default' },
+  },
 })
