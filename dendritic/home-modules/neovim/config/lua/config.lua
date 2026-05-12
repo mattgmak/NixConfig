@@ -265,6 +265,8 @@ if is_vscode then
     vscode.call('workbench.action.closeOtherEditors')
   end)
   vim.keymap.set('n', '<leader>o', function() vscode.call('workbench.action.files.openFile') end)
+  vim.keymap.set('v', 'gf', function() vscode.call('editor.action.formatSelection') end)
+  vim.keymap.set('n', 'gf', function() vscode.call('editor.action.formatDocument') end)
 
   -- use undotree to replace vanilla undo/redo
   -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
@@ -287,6 +289,19 @@ else
   vim.keymap.set('n', '<leader>wv', ':vsplit<cr>')
   vim.keymap.set('n', '<leader>wn', ':enew<cr>')
   vim.keymap.set('n', '<leader>wo', ':only<cr>')
+  vim.keymap.set('v', 'gf', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
+  vim.keymap.set(
+    'n',
+    'gf',
+    function()
+      vim.lsp.buf.format({
+        range = {
+          ['start'] = vim.api.nvim_win_get_cursor(0),
+          ['end'] = vim.api.nvim_win_get_cursor(0),
+        },
+      })
+    end
+  )
 end
 
 -- flash
