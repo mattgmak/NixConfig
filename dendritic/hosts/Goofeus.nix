@@ -40,6 +40,7 @@
           # nextcloud
           caddy
           resticGoofeus
+          syncthing
         ];
       }
     );
