@@ -59,9 +59,12 @@ vim.o.softtabstop = -1
 vim.o.expandtab = true
 
 -- save
-vim.keymap.set('n', '<leader>s', '<cmd>w<cr>', {
-  silent = true,
-})
+vim.keymap.set('n', '<leader>s', function()
+  if not is_vscode and #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/formatting' }) > 0 then
+    vim.lsp.buf.format({ async = false })
+  end
+  vim.cmd('write')
+end, { silent = true, desc = 'Save and Format' })
 
 -- motion keys
 -- vim.keymap.set({ 'n', 'v' }, 'j', 'k')
@@ -302,6 +305,7 @@ else
       })
     end
   )
+  vim.keymap.set('n', '<leader>t', '<cmd>w<cr>')
 end
 
 -- flash
