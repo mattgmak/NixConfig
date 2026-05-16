@@ -40,6 +40,7 @@
           "/var/lib/copyparty"
           "/var/lib/immich"
           "/mnt/2TBSeagateHDD/radicale"
+          "/mnt/2TBSeagateHDD/syncthing"
         ];
         exclude = [
           "/var/lib/docker"
