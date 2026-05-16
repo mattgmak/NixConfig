@@ -1,7 +1,11 @@
 { inputs, ... }:
 {
   flake.homeModules.caelestia =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      ...
+    }:
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
       gtk.gtk4.theme = config.gtk.theme;
@@ -40,6 +44,26 @@
             };
           };
           general = {
+            apps = {
+              terminal = [ "ghostty" ];
+              audio = [
+                "${
+                  (pkgs.writeShellApplication {
+                    name = "wiremix-term-audio";
+                    text = "ghostty -e wiremix";
+                  })
+                }/bin/wiremix-term-audio"
+              ];
+              playback = [ "mpv" ];
+              explorer = [
+                "${
+                  (pkgs.writeShellApplication {
+                    name = "yazi-term-explorer";
+                    text = ''ghostty -e yazi "$@"'';
+                  })
+                }/bin/yazi-term-explorer"
+              ];
+            };
             idle = {
               lockBeforeSleep = true;
               inhibitWhenAudio = true;

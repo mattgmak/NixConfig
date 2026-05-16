@@ -145,7 +145,6 @@
           via
           vial
           kbd
-          pkgs-stable.vesktop
           prismlauncher
           hyperhdr
           google-chrome

@@ -98,7 +98,6 @@
           bitwarden-desktop
           libnotify
           obsidian
-          pkgs-stable.vesktop
           wl-clipboard
           clipse
           pulseaudio-ctl

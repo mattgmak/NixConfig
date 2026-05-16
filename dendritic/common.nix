@@ -221,7 +221,10 @@
         dnsutils
         cursor-cli
         systemctl-tui
+        vesktop
       ];
+
+      programs.gpu-screen-recorder.enable = true;
 
       services.gvfs.enable = true;
       services.udisks2.enable = true;
