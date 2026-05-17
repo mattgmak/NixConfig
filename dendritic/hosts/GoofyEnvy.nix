@@ -50,6 +50,7 @@
         lazygit
         ghostty
         cursor
+        pi-coding-agent
         carapace
         bluetui
         hyprland

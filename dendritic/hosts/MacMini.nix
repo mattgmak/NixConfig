@@ -35,6 +35,7 @@ in
       lazygit
       ghostty
       cursor
+      pi-coding-agent
       carapace
       zellij
       tmux

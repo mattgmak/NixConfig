@@ -13,6 +13,7 @@
             });
           })
           inputs.nix4vscode.overlays.default
+          inputs.coding-agents.overlays.default
         ];
         config = {
           allowUnfree = true;
