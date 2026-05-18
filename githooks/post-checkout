@@ -1,0 +1,3 @@
+#!/bin/sh
+ROOT="$(git rev-parse --show-toplevel)"
+exec "$ROOT/githooks/submodule-sync.sh"
