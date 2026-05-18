@@ -17,5 +17,8 @@
           promptsDir = lib.mkDefault "${piAgentRoot}/prompts";
         };
       };
+
+      home.file.".pi/agent/themes".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
     };
 }

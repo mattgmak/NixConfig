@@ -1,3 +1,9 @@
 [submodule "zen-wireframe-2"]
 	path = dendritic/home-modules/zen-browser/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0
+[submodule "dendritic/home-modules/pi-coding-agent/themes"]
+	path = dendritic/home-modules/pi-coding-agent/themes
+	url = https://github.com/dracula/pi-coding-agent.git
+[submodule "pi-cursor-provider"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/cursor-provider
+	url = https://github.com/offbynan/pi-cursor-provider.git
