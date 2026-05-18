@@ -67,6 +67,7 @@
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
           set -g extended-keys on
           set -as terminal-features 'xterm*:extkeys'
+          set -g extended-keys-format csi-u
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible

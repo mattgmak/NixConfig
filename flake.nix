@@ -128,6 +128,7 @@
 
     coding-agents = {
       url = "github:kissgyorgy/coding-agents";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     copyparty = {
