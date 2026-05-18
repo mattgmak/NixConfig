@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   flake.homeModules.nushell =
     {
@@ -10,8 +11,24 @@
     }:
     let
       linuxHome = if username == "root" then "/root" else "/home/${username}";
+      opencodeApiKeySecret = ../../../secrets/opencode-api-key.age;
+      hasOpencodeApiKeySecret = builtins.pathExists opencodeApiKeySecret;
+      readOpencodeApiKeyScript =
+        if hasOpencodeApiKeySecret then
+          pkgs.writeShellScript "read-opencode-api-key" ''
+            set -euo pipefail
+            cat "${config.age.secrets.opencode-api-key.path}"
+          ''
+        else
+          null;
     in
     {
+      imports = [ inputs.agenix.homeManagerModules.default ];
+
+      age.secrets = lib.mkIf hasOpencodeApiKeySecret {
+        "opencode-api-key".file = opencodeApiKeySecret;
+      };
+
       programs.nushell = {
         enable = true;
         configFile.source = ./config/config.nu;
@@ -43,6 +60,18 @@
               $ssh_agent_env | save --force $ssh_agent_file
             }
           '')
+          + lib.optionalString hasOpencodeApiKeySecret ''
+
+            # opencode-api-key.age: one line, raw API key (no OPENCODE_API_KEY= prefix)
+            # Bash expands agenix paths (e.g. $(getconf DARWIN_USER_TEMP_DIR)/agenix/… and ''${XDG_RUNTIME_DIR}/agenix/…) like HM activation.
+            $env.OPENCODE_API_KEY = (
+              try {
+                (^${readOpencodeApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
         );
         environmentVariables = {
           NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";

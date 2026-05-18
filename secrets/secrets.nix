@@ -4,6 +4,7 @@ let
   GoofyDeskyRoot = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEYYvebtw5TAg8ZbaL0CTRmq2buYXyUDAYFbAaGAYKJO root@GoofyDesky";
   GoofyEnvy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcf8d+U2aI4zO/axcvK97qP1FG9cfwp5CCUuKZEYRu5 goofy@GoofyEnvy";
   Droid = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBhBPZ6RstKIkG1on6ny8fRJ3oOSvgqMPK+y8RNn8gX";
+  MacMini = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILvHr70WhwFy98okSEV2hpsiUMZwqVuME+T97Gd6SGvP mattgmak@Matthews-Mac-mini.local";
 in
 {
   "cloudflare-caddy.age" = {
@@ -69,6 +70,17 @@ in
     publicKeys = [
       Goofeus
       GoofyDesky
+    ];
+  };
+
+  "opencode-api-key.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
     ];
   };
 }

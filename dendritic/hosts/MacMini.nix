@@ -14,6 +14,7 @@ in
       self.darwinModules.${hostname}
       self.nixpkgsConfig
       self.nixConfig
+      inputs.agenix.darwinModules.default
     ];
   };
 
@@ -138,6 +139,7 @@ in
           cursor-cli
           bat
           llama-cpp
+          inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
         ]
         ++ (with pkgs.darwin; [
           file_cmds
