@@ -157,9 +157,9 @@ require('lazy').setup({
             -- 'a' includes trailing space(s), 'i' is just the word
             {
               '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
-              '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
-              '()%s+()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
-              '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
+              '[\'"`]()()[^%s\'"`]+()%s+()',    -- First of multiple classnames
+              '()%s+()[^%s\'"`]+()()[\'"`]',    -- Last of multiple classnames
+              '%s+()()[^%s\'"`]+()%s+()',       -- Middle of multiple classnames
             },
           },
           -- Tag attribute textobject (for HTML/XML tags)
@@ -172,6 +172,77 @@ require('lazy').setup({
     end,
   },
   { 'actionshrimp/direnv.nvim', opts = {} },
+  {
+    'stevearc/oil.nvim',
+    cond = not is_vscode,
+    event = 'VeryLazy',
+    config = function()
+      require('oil').setup({})
+      vim.keymap.set('n', '<leader>ff', '<cmd>Oil<cr>', { desc = 'Oil file browser' })
+    end,
+  },
+  {
+    'nvim-telescope/telescope.nvim',
+    version = '*',
+    cond = not is_vscode,
+    event = 'VeryLazy',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+    },
+    config = function()
+      require('telescope').setup({})
+      pcall(require('telescope').load_extension, 'fzf')
+
+      local builtin = require('telescope.builtin')
+      -- vim.keymap.set('n', '<leader>fs', function() builtin.live_grep() end, { desc = 'Find in files (Telescope)' })
+      vim.keymap.set({ 'n', 'v' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
+      -- vim.keymap.set('n', '<leader>o', function() builtin.find_files() end, { desc = 'Open file' })
+      vim.keymap.set('n', '<leader>js', function() builtin.lsp_document_symbols() end, { desc = 'Goto symbol in file' })
+      vim.keymap.set(
+        'n',
+        '<leader>jc',
+        function()
+          builtin.lsp_document_symbols({
+            symbols = { 'method', 'function', 'constructor', 'field', 'class', 'struct', 'interface' },
+          })
+        end,
+        { desc = 'Symbol outline (breadcrumb-ish)' }
+      )
+      vim.keymap.set({ 'n' }, '<leader>jf', function() builtin.current_buffer_fuzzy_find() end, {
+        desc = 'Find in active file',
+      })
+      vim.keymap.set({ 'v' }, '<leader>jf', function()
+        vim.cmd('noau normal! "vy"')
+        local selection = vim.fn.getreg('v')
+        local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
+        builtin.current_buffer_fuzzy_find({
+          default_text = query
+        })
+      end, {
+        desc = 'Find in active file',
+      })
+      vim.keymap.set({ 'n' }, '<leader>jg', function()
+        builtin.live_grep()
+      end, { desc = 'Find within files' })
+      vim.keymap.set({ 'v' }, '<leader>jg', function()
+        vim.cmd('noau normal! "vy"')
+        local selection = vim.fn.getreg('v')
+        local flat = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
+        local query = vim.fn.escape(flat, [[\/.*$^~[()]])
+        builtin.live_grep({
+          default_text = query,
+        })
+      end, { desc = 'Find within files' })
+      -- Visual mode keymap to prefill Telescope live_grep with selection
+      vim.keymap.set("v", "<leader>fw", function()
+      end, { desc = "Telescope live grep visual selection" })
+      vim.keymap.set('n', '<leader>jv', function() builtin.resume() end, { desc = 'Resume last Telescope' })
+      vim.keymap.set('n', '<leader>ja', function() builtin.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
+      vim.keymap.set('n', '<leader>k', function() builtin.buffers({ sort_mru = true }) end, { desc = 'Buffers MRU' })
+      vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
+    end,
+  },
   {
     'MagicDuck/grug-far.nvim',
     cond = not is_vscode,

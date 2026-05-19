@@ -23,7 +23,11 @@
         '';
         extraPackages = with pkgs; [
           lua-language-server
+          nixd
           gcc
+          gnumake
+          ripgrep
+          fd
           treesitterPkg
         ];
       };
