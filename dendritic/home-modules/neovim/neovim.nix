@@ -9,12 +9,8 @@
     in
     {
       home.file = {
-        ".config/nvim/lua/plugins.lua".source =
-          config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua/plugins.lua";
-        ".config/nvim/lua/config.lua".source =
-          config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua/config.lua";
-        ".config/nvim/after".source =
-          config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua/after";
+        ".config/nvim/after".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/after";
+        ".config/nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua";
       };
       programs.neovim = {
         enable = true;

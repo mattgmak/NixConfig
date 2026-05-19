@@ -205,6 +205,7 @@ require('lazy').setup({
         },
       })
       require('mini.surround').setup()
+      require('mini.splitjoin').setup()
       if not is_vscode then require('mini.statusline').setup() end
     end,
   },
@@ -225,14 +226,27 @@ require('lazy').setup({
     event = 'VeryLazy',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons',
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     },
     config = function()
-      require('telescope').setup({})
+      local actions_layout = require("telescope.actions.layout")
+      require('telescope').setup {
+        defaults = {
+          mappings = {
+            i = {
+              ["<C-h>"] = actions_layout.toggle_preview,
+            },
+            n = {
+              ["<C-h>"] = actions_layout.toggle_preview,
+            },
+          }
+        }
+      }
       pcall(require('telescope').load_extension, 'fzf')
 
       local builtin = require('telescope.builtin')
-      function get_selection()
+      local function get_selection()
         vim.cmd('noau normal! "vy"')
         local selection = vim.fn.getreg('v')
         local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
@@ -266,19 +280,28 @@ require('lazy').setup({
       end, {
         desc = 'Find in active file',
       })
-      vim.keymap.set({ 'n' }, '<leader>jg', function()
-        builtin.live_grep()
-      end, { desc = 'Find within files' })
-      vim.keymap.set({ 'v' }, '<leader>jg', function()
-        local query = vim.fn.escape(get_selection(), [[\/.*$^~[()]])
-        builtin.live_grep({
-          default_text = query,
-        })
-      end, { desc = 'Find within files' })
+
+      require "plugins.telescope.multigrep".setup()
+      -- vim.keymap.set({ 'n' }, '<leader>jg', function()
+      --   builtin.live_grep()
+      -- end, { desc = 'Find within files' })
+      -- vim.keymap.set({ 'v' }, '<leader>jg', function()
+      --   local query = vim.fn.escape(get_selection(), [[\/.*$^~[()]])
+      --   builtin.live_grep({
+      --     default_text = query,
+      --   })
+      -- end, { desc = 'Find within files' })
+
       vim.keymap.set('n', '<leader>jv', function() builtin.resume() end, { desc = 'Resume last Telescope' })
       vim.keymap.set('n', '<leader>ja', function() builtin.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
-      vim.keymap.set('n', '<leader>k', function() builtin.buffers({ sort_mru = true }) end, { desc = 'Buffers MRU' })
-      vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
+      vim.keymap.set('n', '<leader>k', function()
+          builtin.buffers {
+            sort_mru = true,
+            ignore_current_buffer = true
+          }
+        end,
+        { desc = 'Buffers MRU' })
+      -- vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
       vim.keymap.set('n', '<leader>jh', function() builtin.help_tags() end, { desc = 'Help tags' })
     end,
   },
