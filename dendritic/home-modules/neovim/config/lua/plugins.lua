@@ -195,9 +195,19 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'fzf')
 
       local builtin = require('telescope.builtin')
-      -- vim.keymap.set('n', '<leader>fs', function() builtin.live_grep() end, { desc = 'Find in files (Telescope)' })
-      vim.keymap.set({ 'n', 'v' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
-      -- vim.keymap.set('n', '<leader>o', function() builtin.find_files() end, { desc = 'Open file' })
+      function get_selection()
+        vim.cmd('noau normal! "vy"')
+        local selection = vim.fn.getreg('v')
+        local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
+        return query
+      end
+
+      vim.keymap.set({ 'n' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
+      vim.keymap.set({ 'v' }, '<leader><leader>', function()
+        builtin.find_files({
+          default_text = get_selection()
+        })
+      end, { desc = 'Find files' })
       vim.keymap.set('n', '<leader>js', function() builtin.lsp_document_symbols() end, { desc = 'Goto symbol in file' })
       vim.keymap.set(
         'n',
@@ -213,11 +223,8 @@ require('lazy').setup({
         desc = 'Find in active file',
       })
       vim.keymap.set({ 'v' }, '<leader>jf', function()
-        vim.cmd('noau normal! "vy"')
-        local selection = vim.fn.getreg('v')
-        local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
         builtin.current_buffer_fuzzy_find({
-          default_text = query
+          default_text = get_selection()
         })
       end, {
         desc = 'Find in active file',
@@ -226,21 +233,16 @@ require('lazy').setup({
         builtin.live_grep()
       end, { desc = 'Find within files' })
       vim.keymap.set({ 'v' }, '<leader>jg', function()
-        vim.cmd('noau normal! "vy"')
-        local selection = vim.fn.getreg('v')
-        local flat = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
-        local query = vim.fn.escape(flat, [[\/.*$^~[()]])
+        local query = vim.fn.escape(get_selection(), [[\/.*$^~[()]])
         builtin.live_grep({
           default_text = query,
         })
       end, { desc = 'Find within files' })
-      -- Visual mode keymap to prefill Telescope live_grep with selection
-      vim.keymap.set("v", "<leader>fw", function()
-      end, { desc = "Telescope live grep visual selection" })
       vim.keymap.set('n', '<leader>jv', function() builtin.resume() end, { desc = 'Resume last Telescope' })
       vim.keymap.set('n', '<leader>ja', function() builtin.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
       vim.keymap.set('n', '<leader>k', function() builtin.buffers({ sort_mru = true }) end, { desc = 'Buffers MRU' })
       vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
+      vim.keymap.set('n', '<leader>jh', function() builtin.help_tags() end, { desc = 'Help tags' })
     end,
   },
   {
