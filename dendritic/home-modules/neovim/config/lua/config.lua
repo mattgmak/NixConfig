@@ -49,7 +49,7 @@ vim.opt.shellquote = ''
 -- 2. show the stdout, stderr and the return_code on the screen
 -- NOTE: `ansi strip` removes all ansi coloring from nushell errors
 vim.opt.shellpipe =
-  '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
+'| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
 
 vim.o.relativenumber = true
 
@@ -306,6 +306,7 @@ else
     end
   )
   vim.keymap.set('n', '<leader>t', '<cmd>w<cr>')
+  vim.keymap.set('n', '<leader>rr', '<cmd>restart<cr>')
 end
 
 -- flash
