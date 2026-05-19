@@ -48,7 +48,7 @@ require('lazy').setup({
           gs.setqflist('attached', { open = true })
         end, 'Gitsigns: QF attached hunks (GitLens-ish)')
         map('n', '<leader>wc', function()
-          gs.nav_hunk('next')
+          gs.preview_hunk_inline()
         end, 'Gitsigns: next hunk (dirty diff)')
         map('n', '<leader>n', function()
           gs.nav_hunk('next')
