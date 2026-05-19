@@ -7,3 +7,6 @@
 [submodule "pi-cursor-provider"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/cursor-provider
 	url = https://github.com/offbynan/pi-cursor-provider.git
+[submodule "dendritic/home-modules/pi-coding-agent/extensions/pi-nvim"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/pi-nvim
+	url = https://github.com/carderne/pi-nvim.git
