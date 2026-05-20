@@ -50,6 +50,8 @@
           set -g pane-active-border-style 'fg=magenta,bg=default'
           set -g pane-border-style 'fg=brightblack,bg=default'
           set -g allow-passthrough on
+          set -g visual-activity off
+          set -g focus-events on
           set -ga update-environment TERM
           set -ga update-environment TERM_PROGRAM
           bind r source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."

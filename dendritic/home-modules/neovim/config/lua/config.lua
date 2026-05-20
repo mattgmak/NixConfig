@@ -284,6 +284,11 @@ if is_vscode then
   --   })
   -- end
 else
+  vim.keymap.set('t', '<C-Esc>', '<C-\\><C-N>', {
+    noremap = true,
+    desc = 'Exit terminal mode',
+  })
+
   -- exit
   vim.keymap.set('n', '<leader>d', '<cmd>q<cr>')
   vim.keymap.set('n', '<leader>D', '<cmd>q!<cr>')

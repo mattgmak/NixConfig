@@ -21,6 +21,7 @@
           require('plugins')
           require('config')
         '';
+        extraLuaPackages = ps: [ ps.magick ];
         extraPackages = with pkgs; [
           lua-language-server
           nixd
@@ -29,6 +30,8 @@
           ripgrep
           fd
           treesitterPkg
+          imagemagick
+          ueberzugpp
         ];
       };
       home.packages = [

@@ -346,6 +346,7 @@
                 "match:class ([Cc]ursor|zen.*), focus_on_activate on"
                 "match:class ([Cc]ursor), match:float true, center on"
                 "match:title (window-switcher|clipse), no_anim on"
+                "match:class ^ueberzug.*, no_anim on, border_size 0, float on, no_focus on, no_shadow on, rounding 0"
               ]
               ++ (
                 if hostname == "GoofyDesky" then

@@ -387,6 +387,22 @@ require('lazy').setup({
     opts = { finder = 'fff' },
   },
   {
+    '3rd/image.nvim',
+    cond = not is_vscode,
+    build = false,
+    opts = {
+      processor = 'magick_rock',
+      backend = 'kitty',
+      integrations = {
+        markdown = {
+          enabled = true,
+          download_remote_images = true,
+          only_render_image_at_cursor = false,
+        },
+      },
+    },
+  },
+  {
     'saghen/blink.cmp',
     -- dependencies = { 'rafamadriz/friendly-snippets' },
     cond = not is_vscode,
