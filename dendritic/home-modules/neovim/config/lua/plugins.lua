@@ -371,6 +371,20 @@ require('lazy').setup({
     end,
   },
   {
+    'not-manu/filemention.nvim',
+    cond = not is_vscode,
+    event = 'InsertEnter',
+    dependencies = {
+      {
+        'dmtrKovalenko/fff.nvim',
+        build = function()
+          require('fff.download').download_or_build_binary()
+        end,
+      },
+    },
+    opts = { finder = 'fff' },
+  },
+  {
     'saghen/blink.cmp',
     -- dependencies = { 'rafamadriz/friendly-snippets' },
     cond = not is_vscode,
@@ -402,7 +416,13 @@ require('lazy').setup({
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
+        default = { 'filemention', 'lsp', 'path', 'snippets', 'buffer' },
+        providers = {
+          filemention = {
+            name = 'filemention',
+            module = 'filemention.sources.blink',
+          },
+        },
       },
 
       fuzzy = { implementation = 'prefer_rust_with_warning' },
