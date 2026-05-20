@@ -11,7 +11,7 @@
       inputs.nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs inputs';
-          inherit (config) packages;
+          inherit (config) packages common-overlays common-nixpkgs-config;
           username = "root";
           inherit (config.legacyPackages)
             pkgs-stable
@@ -28,7 +28,6 @@
           inputs.home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
           inputs.agenix.nixosModules.default
-          self.nixpkgsConfig
           self.nixConfig
           tailscale
           glance
@@ -72,9 +71,14 @@
         username,
         hostname,
         pkgs-for-cursor,
+        common-overlays,
+        common-nixpkgs-config,
         ...
       }:
       {
+        nixpkgs.overlays = common-overlays;
+        nixpkgs.config = common-nixpkgs-config;
+
         home-manager = {
           useGlobalPkgs = true;
           useUserPackages = true;

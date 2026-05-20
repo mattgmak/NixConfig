@@ -7,18 +7,19 @@
 {
   flake.nixosConfigurations.minimalIso = withSystem "x86_64-linux" (
     {
+      config,
       inputs',
       ...
     }:
     inputs.nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit inputs inputs';
+        inherit (config) common-overlays common-nixpkgs-config;
         username = "nixos";
         hostname = self.constants.serverName;
       };
       modules = [
         inputs.home-manager.nixosModules.home-manager
-        self.nixpkgsConfig
         self.nixConfig
         self.nixosModules.minimalIso
       ];
@@ -32,6 +33,8 @@
       modulesPath,
       hostname,
       username,
+      common-overlays,
+      common-nixpkgs-config,
       ...
     }:
     {
@@ -39,6 +42,8 @@
         "${modulesPath}/installer/cd-dvd/installation-cd-minimal.nix"
       ];
       nixpkgs.hostPlatform = "x86_64-linux";
+      nixpkgs.overlays = common-overlays;
+      nixpkgs.config = common-nixpkgs-config;
 
       home-manager = {
         useGlobalPkgs = true;

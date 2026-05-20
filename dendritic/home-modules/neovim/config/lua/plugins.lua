@@ -30,35 +30,28 @@ require('lazy').setup({
   {
     'lewis6991/gitsigns.nvim',
     event = { 'BufReadPost', 'BufNewFile' },
-    cond = function()
-      return not vim.g.vscode
-    end,
+    cond = function() return not vim.g.vscode end,
     opts = {
       on_attach = function(bufnr)
         local gs = require('gitsigns')
 
-        local function map(mode, lhs, rhs, desc)
-          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-        end
+        local function map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc }) end
 
-        map('n', '<leader>fc', function()
-          gs.setqflist('all', { open = true })
-        end, 'Gitsigns: QF all hunks (SCM)')
-        map('n', '<leader>fl', function()
-          gs.setqflist('attached', { open = true })
-        end, 'Gitsigns: QF attached hunks (GitLens-ish)')
-        map('n', '<leader>wc', function()
-          gs.preview_hunk_inline()
-        end, 'Gitsigns: next hunk (dirty diff)')
-        map('n', '<leader>n', function()
-          gs.nav_hunk('next')
-        end, 'Gitsigns: next hunk')
-        map('n', '<leader>b', function()
-          gs.nav_hunk('prev')
-        end, 'Gitsigns: prev hunk')
+        map('n', '<leader>fc', function() gs.setqflist('all', { open = true }) end, 'Gitsigns: QF all hunks (SCM)')
+        map(
+          'n',
+          '<leader>fl',
+          function() gs.setqflist('attached', { open = true }) end,
+          'Gitsigns: QF attached hunks (GitLens-ish)'
+        )
+        map('n', '<leader>wc', function() gs.preview_hunk_inline() end, 'Gitsigns: next hunk (dirty diff)')
+        map('n', '<leader>n', function() gs.nav_hunk('next') end, 'Gitsigns: next hunk')
+        map('n', '<leader>b', function() gs.nav_hunk('prev') end, 'Gitsigns: prev hunk')
         map('v', 'R', function()
           local s, e = vim.fn.line('v'), vim.fn.line('.')
-          if s > e then s, e = e, s end
+          if s > e then
+            s, e = e, s
+          end
           gs.reset_hunk({ s, e })
         end, 'Gitsigns: reset hunk (visual range)')
       end,
@@ -230,19 +223,19 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     },
     config = function()
-      local actions_layout = require("telescope.actions.layout")
-      require('telescope').setup {
+      local actions_layout = require('telescope.actions.layout')
+      require('telescope').setup({
         defaults = {
           mappings = {
             i = {
-              ["<C-h>"] = actions_layout.toggle_preview,
+              ['<C-h>'] = actions_layout.toggle_preview,
             },
             n = {
-              ["<C-h>"] = actions_layout.toggle_preview,
+              ['<C-h>'] = actions_layout.toggle_preview,
             },
-          }
-        }
-      }
+          },
+        },
+      })
       pcall(require('telescope').load_extension, 'fzf')
 
       local builtin = require('telescope.builtin')
@@ -254,11 +247,16 @@ require('lazy').setup({
       end
 
       vim.keymap.set({ 'n' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
-      vim.keymap.set({ 'v' }, '<leader><leader>', function()
-        builtin.find_files({
-          default_text = get_selection()
-        })
-      end, { desc = 'Find files' })
+      vim.keymap.set(
+        { 'v' },
+        '<leader><leader>',
+        function()
+          builtin.find_files({
+            default_text = get_selection(),
+          })
+        end,
+        { desc = 'Find files' }
+      )
       vim.keymap.set('n', '<leader>js', function() builtin.lsp_document_symbols() end, { desc = 'Goto symbol in file' })
       vim.keymap.set(
         'n',
@@ -273,15 +271,20 @@ require('lazy').setup({
       vim.keymap.set({ 'n' }, '<leader>jf', function() builtin.current_buffer_fuzzy_find() end, {
         desc = 'Find in active file',
       })
-      vim.keymap.set({ 'v' }, '<leader>jf', function()
-        builtin.current_buffer_fuzzy_find({
-          default_text = get_selection()
-        })
-      end, {
-        desc = 'Find in active file',
-      })
+      vim.keymap.set(
+        { 'v' },
+        '<leader>jf',
+        function()
+          builtin.current_buffer_fuzzy_find({
+            default_text = get_selection(),
+          })
+        end,
+        {
+          desc = 'Find in active file',
+        }
+      )
 
-      require "plugins.telescope.multigrep".setup()
+      require('plugins.telescope.multigrep').setup()
       -- vim.keymap.set({ 'n' }, '<leader>jg', function()
       --   builtin.live_grep()
       -- end, { desc = 'Find within files' })
@@ -294,13 +297,17 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>jv', function() builtin.resume() end, { desc = 'Resume last Telescope' })
       vim.keymap.set('n', '<leader>ja', function() builtin.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
-      vim.keymap.set('n', '<leader>k', function()
-          builtin.buffers {
+      vim.keymap.set(
+        'n',
+        '<leader>k',
+        function()
+          builtin.buffers({
             sort_mru = true,
-            ignore_current_buffer = true
-          }
+            ignore_current_buffer = true,
+          })
         end,
-        { desc = 'Buffers MRU' })
+        { desc = 'Buffers MRU' }
+      )
       -- vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
       vim.keymap.set('n', '<leader>jh', function() builtin.help_tags() end, { desc = 'Help tags' })
     end,
@@ -327,8 +334,8 @@ require('lazy').setup({
         llm = {
           provider = 'sweep',
           backend = 'openai',
-          url = 'http://localhost:8000',
-          model = 'sweep',
+          url = 'http://127.0.0.1:9292',
+          model = 'sweep-next-edit:1.5b-q8',
         },
       })
     end,

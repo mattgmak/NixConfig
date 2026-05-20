@@ -1,22 +1,31 @@
-{ inputs, self, ... }:
+{
+  inputs,
+  self,
+  withSystem,
+  ...
+}:
 let
   hostname = self.constants.macMiniName;
+  system = "aarch64-darwin";
 in
 {
-  flake.darwinConfigurations.${hostname} = inputs.nix-darwin.lib.darwinSystem {
-    specialArgs = rec {
-      system = "aarch64-darwin";
-      inherit inputs hostname;
-      inherit (self.legacyPackages.${system}) pkgs-stable pkgs-for-cursor;
-      username = "mattgmak";
-    };
-    modules = [
-      self.darwinModules.${hostname}
-      self.nixpkgsConfig
-      self.nixConfig
-      inputs.agenix.darwinModules.default
-    ];
-  };
+  flake.darwinConfigurations.${hostname} = withSystem system (
+    { config, ... }:
+    inputs.nix-darwin.lib.darwinSystem {
+      specialArgs = rec {
+        inherit system;
+        inherit inputs hostname;
+        inherit (config) common-overlays common-nixpkgs-config;
+        inherit (config.legacyPackages) pkgs-stable pkgs-for-cursor;
+        username = "mattgmak";
+      };
+      modules = [
+        self.darwinModules.${hostname}
+        self.nixConfig
+        inputs.agenix.darwinModules.default
+      ];
+    }
+  );
 
   flake.homeConfigurations.MacMini = {
     imports = with self.homeModules; [
@@ -57,9 +66,13 @@ in
       username,
       pkgs-for-cursor,
       pkgs-stable,
+      common-overlays,
+      common-nixpkgs-config,
       ...
     }:
     {
+      nixpkgs.overlays = common-overlays;
+      nixpkgs.config = common-nixpkgs-config;
       nixpkgs.hostPlatform = "aarch64-darwin";
       system.stateVersion = 6;
       nix = {

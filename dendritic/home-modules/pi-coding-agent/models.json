@@ -1,0 +1,14 @@
+{
+  "providers": {
+    "llama-swap": {
+      "baseUrl": "http://127.0.0.1:9292/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": false
+      },
+      "models": [{ "id": "gemma-4:26b-a4b-q4" }, { "id": "qwen3.6:27b-q4" }]
+    }
+  }
+}

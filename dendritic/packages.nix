@@ -1,4 +1,4 @@
-{ inputs, withSystem, ... }:
+{ inputs, ... }:
 {
   perSystem =
     { system, ... }:
@@ -36,10 +36,5 @@
             pkgs-for-vr
             ;
         };
-    };
-  flake.nixpkgsConfig =
-    { config, ... }:
-    {
-      nixpkgs.pkgs = withSystem config.nixpkgs.hostPlatform.system ({ pkgs, ... }: pkgs);
     };
 }

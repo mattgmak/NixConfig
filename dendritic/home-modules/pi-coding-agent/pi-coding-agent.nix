@@ -23,5 +23,7 @@
       ];
 
       home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
+      home.file.".pi/agent/models.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
     };
 }

@@ -16,7 +16,6 @@
         self.stylixCursor
         inputs.home-manager.nixosModules.home-manager
         inputs.stylix.nixosModules.stylix
-        self.nixpkgsConfig
         self.nixConfig
         self.nixosModules.syncthing
       ];
