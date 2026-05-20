@@ -246,6 +246,7 @@ require('lazy').setup({
         return query
       end
 
+      vim.keymap.set({ 'n' }, '<leader>jj', function() builtin.builtin() end, { desc = 'Telescope builtins' })
       vim.keymap.set({ 'n' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
       vim.keymap.set(
         { 'v' },
