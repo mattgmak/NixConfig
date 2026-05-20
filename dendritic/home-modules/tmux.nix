@@ -61,6 +61,11 @@
           bind-key % split-window -h -c "#{pane_current_path}"
           bind-key '"' split-window -v -c "#{pane_current_path}"
 
+          bind-key C-h select-pane -L
+          bind-key C-j select-pane -D
+          bind-key C-k select-pane -U
+          bind-key C-l select-pane -R
+
           bind-key x kill-pane # skip "kill-pane 1? (y/n)" prompt
           set -g detach-on-destroy off  # don't exit from tmux when closing a session
 
