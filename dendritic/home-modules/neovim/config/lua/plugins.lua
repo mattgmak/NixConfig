@@ -34,6 +34,7 @@ require('lazy').setup({
     opts = {
       on_attach = function(bufnr)
         local gs = require('gitsigns')
+        gs.setup {}
 
         local function map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc }) end
 
@@ -199,10 +200,62 @@ require('lazy').setup({
       })
       require('mini.surround').setup()
       require('mini.splitjoin').setup()
-      if not is_vscode then require('mini.statusline').setup() end
+      if not is_vscode then
+        require('mini.pairs').setup {
+          modes = { command = true },
+        }
+        require('mini.statusline').setup(
+          {
+            content = {
+              active = function()
+                -- Get default active statusline sections
+                local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+                local git           = MiniStatusline.section_git({ trunc_width = 40 })
+                local diff          = MiniStatusline.section_diff({ trunc_width = 75 })
+                local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+                local lsp           = MiniStatusline.section_lsp({ trunc_width = 75 })
+                local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
+                local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+                local location      = MiniStatusline.section_location({ trunc_width = 75 })
+                local search        = MiniStatusline.section_searchcount({ trunc_width = 75 })
+
+
+                -- --- Limit Git branch name length ---
+                local max_length = 15 -- Set your max branch length here
+
+                -- Extract just the branch name from the git string (e.g., "  branch-name")
+                local branch_name = git:match("%s*(.*)")
+                if branch_name and #branch_name > max_length then
+                  -- Truncate and add ellipsis
+                  git = string.format("  %s…", string.sub(branch_name, 1, max_length))
+                end
+                -- ------------------------------------
+
+                -- Return the composed statusline
+                return MiniStatusline.combine_groups({
+                  { hl = mode_hl,                 strings = { mode } },
+                  { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
+                  '%<', -- Mark general truncate point
+                  { hl = 'MiniStatuslineFilename', strings = { filename } },
+                  '%=', -- End left alignment
+                  { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+                  { hl = mode_hl,                  strings = { search, location } },
+                })
+              end
+            }
+          })
+      end
     end,
   },
-  { 'actionshrimp/direnv.nvim', opts = {} },
+  {
+    'actionshrimp/direnv.nvim',
+    opts = {
+      -- async = true,
+      -- on_direnv_finished = function()
+      --   vim.cmd("LspStart")
+      -- end
+    }
+  },
   {
     'stevearc/oil.nvim',
     cond = not is_vscode,
@@ -238,6 +291,11 @@ require('lazy').setup({
               ['<C-s>'] = actions.select_horizontal,
               ['<C-x>'] = false,
             },
+          },
+          cache_picker = {
+            num_pickers = 30,
+            limit_entries = 1000,
+            ignore_empty_prompt = true,
           },
         },
         pickers = {
@@ -301,6 +359,9 @@ require('lazy').setup({
           desc = 'Find in active file',
         }
       )
+      vim.keymap.set({ 'n' }, '<leader>jp', function() builtin.pickers() end, {
+        desc = 'Find cached pickers',
+      })
 
       require('plugins.telescope.multigrep').setup()
       -- vim.keymap.set({ 'n' }, '<leader>jg', function()
@@ -355,6 +416,18 @@ require('lazy').setup({
           url = 'http://127.0.0.1:9292',
           model = 'sweep-next-edit:1.5b-q8',
         },
+        ui = {
+          progress = false,
+          context = {
+            history = {
+              enabled = false,  -- Include recent edit history
+              max_items = 5,    -- Number of history entries
+              max_tokens = 512, -- Token budget for history
+              max_files = 2,    -- Max files in history
+              global = true,    -- Share history across buffers
+            },
+          },
+        },
       })
     end,
   },
@@ -364,6 +437,7 @@ require('lazy').setup({
       vim.lsp.enable('lua_ls')
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
+      vim.lsp.enable('tailwindcss', { autostart = false })
     end,
   },
   {

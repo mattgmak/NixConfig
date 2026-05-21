@@ -116,10 +116,9 @@
                   rclone
                   postgresql
                   eas-cli
+                  tailwindcss-language-server
                 ]
-                ++ (
-                  if pkgs.stdenv.isDarwin then [ argent ] else [ ]
-                )
+                ++ (if pkgs.stdenv.isDarwin then [ argent ] else [ ])
                 ++ (
                   if pkgs.stdenv.isLinux then
                     [

@@ -63,6 +63,13 @@ vim.keymap.set('n', '<leader>s', function()
   if not is_vscode and #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/formatting' }) > 0 then
     vim.lsp.buf.format({ async = false })
   end
+  local clients = vim.lsp.get_clients({ name = "biome" })
+  if #clients > 0 then
+    vim.lsp.buf.code_action({
+      context = { only = { "source.fixAll.biome" } },
+      apply = true,
+    })
+  end
   vim.cmd('write')
 end, { silent = true, desc = 'Save and Format' })
 
@@ -312,6 +319,9 @@ else
   )
   vim.keymap.set('n', '<leader>t', '<cmd>w<cr>')
   vim.keymap.set('n', '<leader>rr', '<cmd>restart<cr>')
+  vim.keymap.set('n', '<leader>lj', '<cmd>cnext<cr>')
+  vim.keymap.set('n', '<leader>lk', '<cmd>cprev<cr>')
+  vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = "Show line diagnostics" })
 end
 
 -- flash
@@ -334,3 +344,4 @@ vim.opt.complete:append('o')
 vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert' }
 vim.opt.pumheight = 8
 vim.opt.pumborder = 'rounded'
+vim.opt.scrolloff = 6
