@@ -200,6 +200,7 @@ require('lazy').setup({
       })
       require('mini.surround').setup()
       require('mini.splitjoin').setup()
+      require('mini.comment').setup()
       if not is_vscode then
         require('mini.pairs').setup {
           modes = { command = true },

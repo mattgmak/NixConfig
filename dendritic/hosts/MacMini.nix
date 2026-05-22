@@ -152,6 +152,7 @@ in
           bat
           llama-cpp
           inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
+          nightlight
         ]
         ++ (with pkgs.darwin; [
           file_cmds
