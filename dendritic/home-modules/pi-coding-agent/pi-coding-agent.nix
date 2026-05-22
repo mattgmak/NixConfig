@@ -5,6 +5,29 @@
     let
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
+      extensionsDir = "${piAgentRoot}/extensions";
+
+      piNpmI = pkgs.writeShellApplication {
+        name = "pi-npm-i";
+        runtimeInputs = with pkgs; [ nodejs_22 ];
+        text = ''
+          set -euo pipefail
+          EXTENSIONS=${lib.escapeShellArg extensionsDir}
+          for ext in "$EXTENSIONS"/*; do
+            [ -d "$ext" ] || continue
+            pkg="$ext/package.json"
+            [ -f "$pkg" ] || continue
+            if node -e "
+              const fs = require('node:fs');
+              const p = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+              process.exit(Object.keys(p.dependencies || {}).length > 0 ? 0 : 1);
+            " "$pkg"; then
+              echo "pi-npm-i: $(basename "$ext")"
+              (cd "$ext" && npm i --prod "$@")
+            fi
+          done
+        '';
+      };
     in
     {
       imports = [ inputs.coding-agents.homeManagerModules.default ];
@@ -23,6 +46,7 @@
         ffmpeg
         uv
         bun
+        piNpmI
       ];
 
       home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
