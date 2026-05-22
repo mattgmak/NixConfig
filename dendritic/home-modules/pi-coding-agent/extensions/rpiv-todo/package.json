@@ -1,0 +1,10 @@
+{
+  "name": "rpiv-todo",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for @juicesharp/rpiv-todo (vendored rpiv-mono submodule)",
+  "pi": {
+    "extensions": ["../rpiv-mono/packages/rpiv-todo/index.ts"]
+  }
+}

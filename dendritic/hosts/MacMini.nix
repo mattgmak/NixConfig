@@ -143,7 +143,6 @@ in
           xcbeautify
           sourcekit-lsp
           dua
-          nodejs_20
           eza
           ollama
           stylua

@@ -19,3 +19,9 @@
 [submodule "utensils/mcp-nixos"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/mcp-nixos
 	url = https://github.com/utensils/mcp-nixos.git
+[submodule "mksglu/context-mode"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/context-mode
+	url = https://github.com/mksglu/context-mode.git
+[submodule "juicesharp/rpiv-mono"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/rpiv-mono
+	url = https://github.com/juicesharp/rpiv-mono.git

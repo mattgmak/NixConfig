@@ -22,6 +22,7 @@
         nodejs_22
         ffmpeg
         uv
+        bun
       ];
 
       home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
