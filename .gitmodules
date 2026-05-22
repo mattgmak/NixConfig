@@ -1,12 +1,21 @@
-[submodule "zen-wireframe-2"]
+[submodule "mattgmak/zen-wireframe-2.0"]
 	path = dendritic/home-modules/zen-browser/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0
-[submodule "pi-coding-agent/dracula"]
+[submodule "dracula/pi-coding-agent"]
 	path = dendritic/home-modules/pi-coding-agent/themes
 	url = https://github.com/dracula/pi-coding-agent.git
-[submodule "pi-cursor-provider"]
+[submodule "mattgmak/pi-cursor-provider"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/cursor-provider
 	url = https://github.com/mattgmak/pi-cursor-provider.git
-[submodule "pi-nvim"]
+[submodule "carderne/pi-nvim"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/pi-nvim
 	url = https://github.com/carderne/pi-nvim.git
+[submodule "nicobailon/pi-web-access"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/pi-web-access
+	url = https://github.com/nicobailon/pi-web-access.git
+[submodule "nicobailon/pi-mcp-adapter"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/pi-mcp-adapter
+	url = https://github.com/nicobailon/pi-mcp-adapter.git
+[submodule "utensils/mcp-nixos"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/mcp-nixos
+	url = https://github.com/utensils/mcp-nixos.git

@@ -150,7 +150,10 @@
       ...
     }@inputs:
     let
-      flake = flake-parts.lib.mkFlake { inherit inputs; } (import-tree ./dendritic);
+      lib = inputs.nixpkgs.lib;
+      flake = flake-parts.lib.mkFlake { inherit inputs; } (
+        (import-tree.filterNot (lib.hasInfix "/pi-coding-agent/extensions/")) ./dendritic
+      );
     in
     flake
     // {
