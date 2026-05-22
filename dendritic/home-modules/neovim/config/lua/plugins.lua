@@ -277,50 +277,10 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
     },
     config = function()
-      local actions = require('telescope.actions')
-      local actions_layout = require('telescope.actions.layout')
-      require('telescope').setup({
-        defaults = {
-          mappings = {
-            i = {
-              ['<C-h>'] = actions_layout.toggle_preview,
-              ['<C-s>'] = actions.select_horizontal,
-              ['<C-x>'] = false,
-            },
-            n = {
-              ['<C-h>'] = actions_layout.toggle_preview,
-              ['<C-s>'] = actions.select_horizontal,
-              ['<C-x>'] = false,
-            },
-          },
-          cache_picker = {
-            num_pickers = 30,
-            limit_entries = 1000,
-            ignore_empty_prompt = true,
-          },
-        },
-        pickers = {
-          buffers = {
-            mappings = {
-              i = {
-                ['<C-x>'] = actions.delete_buffer,
-              },
-              n = {
-                ['<C-x>'] = actions.delete_buffer,
-              },
-            },
-          },
-        },
-      })
-      pcall(require('telescope').load_extension, 'fzf')
+      local setup = require('plugins.telescope.setup')
+      setup.setup()
 
       local builtin = require('telescope.builtin')
-      local function get_selection()
-        vim.cmd('noau normal! "vy"')
-        local selection = vim.fn.getreg('v')
-        local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
-        return query
-      end
 
       vim.keymap.set({ 'n' }, '<leader>jj', function() builtin.builtin() end, { desc = 'Telescope builtins' })
       vim.keymap.set({ 'n' }, '<leader><leader>', function() builtin.find_files() end, { desc = 'Find files' })
@@ -329,7 +289,7 @@ require('lazy').setup({
         '<leader><leader>',
         function()
           builtin.find_files({
-            default_text = get_selection(),
+            default_text = setup.get_selection(),
           })
         end,
         { desc = 'Find files' }
@@ -353,7 +313,7 @@ require('lazy').setup({
         '<leader>jf',
         function()
           builtin.current_buffer_fuzzy_find({
-            default_text = get_selection(),
+            default_text = setup.get_selection(),
           })
         end,
         {

@@ -5,7 +5,9 @@ local conf = require "telescope.config".values
 
 local M = {}
 
-local live_multigrep = function(opts)
+local M = {}
+
+M.live_multigrep = function(opts)
   opts = opts or {}
   opts.cwd = opts.cwd or vim.uv.cwd()
 
@@ -50,18 +52,13 @@ local live_multigrep = function(opts)
 end
 
 M.setup = function()
-  local function get_selection()
-    vim.cmd('noau normal! "vy"')
-    local selection = vim.fn.getreg('v')
-    local query = vim.trim((selection:gsub('\r\n', '\n'):gsub('\r', '\n'):gsub('\n+', ' '):gsub('%s+', ' ')))
-    return query
-  end
+  local setup = require('plugins.telescope.setup')
   vim.keymap.set({ 'n' }, '<leader>jg', function()
-    live_multigrep()
+    M.live_multigrep()
   end, { desc = 'Find within files' })
   vim.keymap.set({ 'v' }, '<leader>jg', function()
-    local query = vim.fn.escape(get_selection(), [[\/.*$^~[()]])
-    live_multigrep({
+    local query = vim.fn.escape(setup.get_selection() or '', [[\/.*$^~[()]])
+    M.live_multigrep({
       default_text = query,
     })
   end, { desc = 'Find within files' })

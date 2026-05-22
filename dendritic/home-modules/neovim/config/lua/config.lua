@@ -117,6 +117,9 @@ vim.keymap.set('n', 'x', '"_x', {
 })
 
 if is_vscode then
+  vim.g.vscode_telescope_debug = true
+  vim.g.vscode_telescope_debug_strict = false
+
   -- vim.notify = vscode.notify
   -- vscode-multi-cursor
   vim.api.nvim_set_hl(0, 'VSCodeCursor', {
@@ -164,7 +167,7 @@ if is_vscode then
   vim.keymap.set('n', '<leader>fx', function() vscode.call('workbench.view.extensions') end)
   vim.keymap.set('n', '<leader>fp', function() vscode.call('pr:github.focus') end)
   vim.keymap.set('n', '<leader>ro', function() vscode.call('workbench.action.reopenClosedEditor') end)
-  vim.keymap.set({ 'n', 'v' }, '<leader><leader>', function() vscode.call('find-it-faster.findFiles') end)
+  require('plugins.vscode-telescope').setup()
   vim.keymap.set('n', '<leader>rr', function() vscode.call('vscode-neovim.restart') end)
   vim.keymap.set('n', '<leader>sr', function()
     vscode.call('extension.updateCustomCSS')
@@ -251,9 +254,6 @@ if is_vscode then
   vim.keymap.set('n', '<leader>mn', function() vscode.action('merge-conflict.next') end)
   vim.keymap.set('n', '<leader>mp', function() vscode.action('merge-conflict.previous') end)
   vim.keymap.set('n', '<leader>js', function() vscode.call('workbench.action.gotoSymbol') end)
-  vim.keymap.set({ 'n', 'v' }, '<leader>jf', function() vscode.call('find-it-faster.findInActiveFile') end)
-  vim.keymap.set({ 'n', 'v' }, '<leader>jg', function() vscode.call('find-it-faster.findWithinFiles') end)
-  vim.keymap.set('n', '<leader>jv', function() vscode.call('find-it-faster.resumeSearch') end)
   vim.keymap.set('n', '<leader>ja', function() vscode.call('workbench.action.showAllSymbols') end)
   vim.keymap.set('n', '<leader>jc', function() vscode.call('breadcrumbs.focusAndSelect') end)
   vim.keymap.set({ 'n', 'v' }, '<leader>a', function() vscode.call('editor.action.quickFix') end)
