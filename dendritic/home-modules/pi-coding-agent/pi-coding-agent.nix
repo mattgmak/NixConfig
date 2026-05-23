@@ -17,13 +17,22 @@
             [ -d "$ext" ] || continue
             pkg="$ext/package.json"
             [ -f "$pkg" ] || continue
-            if node -e "
+            kind=$(node -e "
               const fs = require('node:fs');
               const p = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
-              process.exit(Object.keys(p.dependencies || {}).length > 0 ? 0 : 1);
-            " "$pkg"; then
-              echo "pi-npm-i: $(basename "$ext")"
-              (cd "$ext" && npm i --prod "$@")
+              if (p.workspaces != null) {
+                console.log('monorepo');
+              } else if (Object.keys(p.dependencies || {}).length > 0) {
+                console.log('package');
+              } else {
+                process.exit(1);
+              }
+            " "$pkg") || continue
+            echo "pi-npm-i: $(basename "$ext")"
+            if [ "$kind" = "monorepo" ]; then
+              (cd "$ext" && npm i --omit=dev --ignore-scripts "$@")
+            else
+              (cd "$ext" && npm i --omit=dev "$@")
             fi
           done
         '';
