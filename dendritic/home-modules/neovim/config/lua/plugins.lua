@@ -518,6 +518,7 @@ require('lazy').setup({
 
       appearance = {
         nerd_font_variant = 'mono',
+        use_nvim_cmp_as_default = true,
       },
 
 
@@ -535,6 +536,21 @@ require('lazy').setup({
           filemention = {
             name = 'filemention',
             module = 'filemention.sources.blink',
+            override = {
+              -- upstream execute tracks frecency but skips default accept impl
+              execute = function(_source, _ctx, item, callback, default_implementation)
+                local data = item.data
+                if data and data.path then
+                  require('filemention.files').track_access(
+                    require('filemention.config').options,
+                    data.path,
+                    data.is_dir
+                  )
+                end
+                default_implementation()
+                callback()
+              end,
+            },
           },
         },
       },
