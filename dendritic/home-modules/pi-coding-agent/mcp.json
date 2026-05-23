@@ -1,9 +1,10 @@
 {
   "mcpServers": {
     "context-mode": {
-      "command": "node",
+      "command": "bash",
       "args": [
-        "${HOME}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/context-mode/cli.bundle.mjs"
+        "-c",
+        "exec node \"$HOME/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/context-mode/cli.bundle.mjs\""
       ]
     },
     "context7": {
