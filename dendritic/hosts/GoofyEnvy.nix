@@ -54,6 +54,7 @@
         carapace
         bluetui
         hyprland
+        hyprgrass
         # waybar
         wlogout
         fcitx5
