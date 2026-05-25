@@ -1,0 +1,7 @@
+{
+  "lastChangelogVersion": "0.75.3",
+  "defaultProvider": "cursor",
+  "defaultModel": "composer-2.5-fast",
+  "defaultThinkingLevel": "medium",
+  "theme": "dracula"
+}

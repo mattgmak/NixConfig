@@ -63,5 +63,7 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
       home.file.".pi/agent/mcp.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
+      home.file.".pi/agent/settings.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
     };
 }
