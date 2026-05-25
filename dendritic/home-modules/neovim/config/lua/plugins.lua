@@ -406,30 +406,48 @@ require('lazy').setup({
       })
     end,
   },
+  -- {
+  --   'BlinkResearchLabs/blink-edit.nvim',
+  --   enabled = not is_vscode,
+  --   config = function()
+  --     require('blink-edit').setup({
+  --       llm = {
+  --         provider = 'sweep',
+  --         backend = 'openai',
+  --         url = 'http://127.0.0.1:9292',
+  --         model = 'sweep-next-edit:1.5b-q8',
+  --       },
+  --       ui = {
+  --         progress = false,
+  --         context = {
+  --           history = {
+  --             enabled = false,  -- Include recent edit history
+  --             max_items = 5,    -- Number of history entries
+  --             max_tokens = 512, -- Token budget for history
+  --             max_files = 2,    -- Max files in history
+  --             global = true,    -- Share history across buffers
+  --           },
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
   {
-    'BlinkResearchLabs/blink-edit.nvim',
+    'cursortab/cursortab.nvim',
     enabled = not is_vscode,
+    lazy = false,
+    build = 'go build -C server',
     config = function()
-      require('blink-edit').setup({
-        llm = {
-          provider = 'sweep',
-          backend = 'openai',
+      require('cursortab').setup {
+        provider = {
+          type = 'sweep',
           url = 'http://127.0.0.1:9292',
           model = 'sweep-next-edit:1.5b-q8',
         },
-        ui = {
-          progress = false,
-          context = {
-            history = {
-              enabled = false,  -- Include recent edit history
-              max_items = 5,    -- Number of history entries
-              max_tokens = 512, -- Token budget for history
-              max_files = 2,    -- Max files in history
-              global = true,    -- Share history across buffers
-            },
-          },
+        blink = {
+          enabled = true,
         },
-      })
+      }
     end,
   },
   {

@@ -27,6 +27,7 @@
           nixd
           gcc
           gnumake
+          go
           ripgrep
           fd
           treesitterPkg
