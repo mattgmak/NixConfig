@@ -79,14 +79,17 @@ end, { silent = true, desc = 'Save and Format' })
 -- vim.keymap.set({ 'n', 'v' }, 'l', 'h')
 -- vim.keymap.set({ 'n', 'v' }, ';', 'l')
 
--- repeat previous f, t, F, T movement
-vim.keymap.set('n', "'", ';')
-
 -- paste without overwriting
 vim.keymap.set('v', 'p', 'P')
 
 -- redo
 vim.keymap.set('n', 'U', '<C-r>')
+
+-- pane navigation (ctrl+hjkl)
+vim.keymap.set('n', '<C-h>', '<C-w>h', { silent = true, desc = 'Focus left window' })
+vim.keymap.set('n', '<C-j>', '<C-w>j', { silent = true, desc = 'Focus below window' })
+vim.keymap.set('n', '<C-k>', '<C-w>k', { silent = true, desc = 'Focus above window' })
+vim.keymap.set('n', '<C-l>', '<C-w>l', { silent = true, desc = 'Focus right window' })
 
 -- clear search highlight
 vim.keymap.set('n', '<Esc>', '<CMD>nohlsearch<cr>', {
