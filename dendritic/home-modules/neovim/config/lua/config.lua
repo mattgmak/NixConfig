@@ -52,6 +52,7 @@ vim.opt.shellpipe =
 '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
 
 vim.o.relativenumber = true
+vim.o.number = true
 
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
@@ -104,7 +105,10 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- toggle relative line numbering
-vim.keymap.set('n', '<leader>ln', ':set relativenumber!<cr>', {
+vim.keymap.set('n', '<leader>ln', function()
+  vim.o.relativenumber = not vim.o.relativenumber
+  vim.o.number = not vim.o.number
+end, {
   silent = true,
 })
 
