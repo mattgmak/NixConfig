@@ -205,6 +205,7 @@ require('lazy').setup({
         require('mini.pairs').setup {
           modes = { command = true },
         }
+        require('mini.notify').setup {}
         require('mini.statusline').setup(
           {
             content = {
@@ -405,6 +406,38 @@ require('lazy').setup({
       )
       -- vim.keymap.set('n', '<leader>,', function() builtin.buffers() end, { desc = 'All editors / buffers' })
       vim.keymap.set('n', '<leader>jh', function() builtin.help_tags() end, { desc = 'Help tags' })
+      vim.keymap.set(
+        { 'v' },
+        '<leader>jh',
+        function()
+          builtin.help_tags({
+            default_text = get_selection(),
+          })
+        end,
+        { desc = 'Help tags' }
+      )
+      vim.keymap.set('n', '<leader>jd', function() builtin.lsp_definitions() end, { desc = 'LSP definitions' })
+      vim.keymap.set(
+        { 'v' },
+        '<leader>jd',
+        function()
+          builtin.lsp_definitions({
+            default_text = get_selection(),
+          })
+        end,
+        { desc = 'LSP definitions' }
+      )
+      vim.keymap.set('n', '<leader>jr', function() builtin.lsp_references() end, { desc = 'LSP references' })
+      vim.keymap.set(
+        { 'v' },
+        '<leader>jr',
+        function()
+          builtin.lsp_references()({
+            default_text = get_selection(),
+          })
+        end,
+        { desc = 'LSP references' }
+      )
     end,
   },
   {
@@ -468,10 +501,16 @@ require('lazy').setup({
   {
     'neovim/nvim-lspconfig',
     config = function()
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf, remap = false })
+        end
+      })
       vim.lsp.enable('lua_ls')
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
       vim.lsp.enable('tailwindcss', { autostart = false })
+      vim.lsp.enable('tsgo')
     end,
   },
   {

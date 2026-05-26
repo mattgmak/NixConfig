@@ -33,7 +33,7 @@
           treesitterPkg
           imagemagick
           ueberzugpp
-          yazi
+          config.programs.yazi.package
         ];
       };
       home.packages = [

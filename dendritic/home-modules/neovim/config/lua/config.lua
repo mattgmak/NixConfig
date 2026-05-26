@@ -324,7 +324,15 @@ else
   vim.keymap.set('n', '<leader>rr', '<cmd>restart<cr>')
   vim.keymap.set('n', '<leader>lj', '<cmd>cnext<cr>')
   vim.keymap.set('n', '<leader>lk', '<cmd>cprev<cr>')
-  vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = "Show line diagnostics" })
+  vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = 'Show line diagnostics' })
+
+  vim.api.nvim_create_user_command('CheckTypes', function(opts)
+    require('plugins.check-types').run({ filter = opts.fargs[1] })
+  end, { nargs = '?', desc = 'Run pnpm check-types and fill quickfix' })
+
+  vim.keymap.set('n', '<leader>ct', function()
+    require('plugins.check-types').run()
+  end, { desc = 'check-types → quickfix' })
 end
 
 -- flash
