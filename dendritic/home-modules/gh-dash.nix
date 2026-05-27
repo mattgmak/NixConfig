@@ -39,7 +39,7 @@
                 name = "Code Review";
                 command = "tmux new-window -n 'PR-{{.PrNumber}}' 'nu -e `wt switch pr:{{.PrNumber}}; ^pwd | str trim | ${
                   if pkgs.stdenv.isDarwin then "pbcopy" else "wl-copy"
-                }`'";
+                }; nvim -c \":silent Octo pr edit {{.PrNumber}}\"`'";
               }
             ];
           };

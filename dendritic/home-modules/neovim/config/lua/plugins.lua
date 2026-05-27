@@ -166,6 +166,7 @@ require('lazy').setup({
         'markdown_inline',
         'zig',
         'nix',
+        'gitcommit',
       }):wait(300000)
       if not is_vscode then
         vim.api.nvim_create_autocmd('FileType', {
@@ -491,6 +492,40 @@ require('lazy').setup({
         end,
         { desc = 'LSP references' }
       )
+    end,
+  },
+  {
+    'barrettruth/diffs.nvim',
+    cond = not is_vscode,
+    -- diffs.nvim lazy-loads itself; do not add event/ft/config/keys here
+    init = function()
+      vim.g.diffs = {
+        integrations = {
+          gitsigns = true,
+        },
+      }
+    end,
+  },
+  {
+    'pwntester/octo.nvim',
+    cmd = 'Octo',
+    cond = not is_vscode,
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim',
+      'nvim-tree/nvim-web-devicons',
+    },
+    opts = {
+      picker = 'telescope',
+    },
+    config = function()
+      require('octo').setup({
+        picker = 'telescope',
+        enable_builtin = true,
+        use_local_fs = true,
+      })
+      pcall(require('telescope').load_extension, 'octo')
+      vim.keymap.set('n', '<leader>o', '<cmd>Octo<cr>', { desc = 'Octo picker' })
     end,
   },
   {

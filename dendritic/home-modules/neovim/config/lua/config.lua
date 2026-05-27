@@ -2,6 +2,7 @@ local is_vscode = vim.g.vscode ~= nil
 
 -- <leader> key
 vim.g.mapleader = ' '
+vim.g.maplocalleader = ','
 
 -- lua binds
 vim.keymap.set('n', '<leader>ls', ':so %<cr>')
@@ -49,7 +50,7 @@ vim.opt.shellquote = ''
 -- 2. show the stdout, stderr and the return_code on the screen
 -- NOTE: `ansi strip` removes all ansi coloring from nushell errors
 vim.opt.shellpipe =
-'| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
+  '| complete | update stderr { ansi strip } | tee { get stderr | save --force --raw %s } | into record'
 
 vim.o.relativenumber = true
 vim.o.number = true
@@ -64,10 +65,10 @@ vim.keymap.set('n', '<leader>s', function()
   if not is_vscode and #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/formatting' }) > 0 then
     vim.lsp.buf.format({ async = false })
   end
-  local clients = vim.lsp.get_clients({ name = "biome" })
+  local clients = vim.lsp.get_clients({ name = 'biome' })
   if #clients > 0 then
     vim.lsp.buf.code_action({
-      context = { only = { "source.fixAll.biome" } },
+      context = { only = { 'source.fixAll.biome' } },
       apply = true,
     })
   end
@@ -285,18 +286,18 @@ if is_vscode then
   vim.keymap.set('v', 'gf', function() vscode.call('editor.action.formatSelection') end)
   vim.keymap.set('n', 'gf', function() vscode.call('editor.action.formatDocument') end)
 
-  -- use undotree to replace vanilla undo/redo
-  -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
-  -- if undotree then
-  --   vscode.notify('Using undotree')
-  --   vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
-  --   vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
+-- use undotree to replace vanilla undo/redo
+-- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
+-- if undotree then
+--   vscode.notify('Using undotree')
+--   vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
+--   vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
 
-  --   vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
-  --   vim.api.nvim_create_autocmd('TextChanged', {
-  --     callback = function() vscode.call('undotree.saveAndAdvance') end,
-  --   })
-  -- end
+--   vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
+--   vim.api.nvim_create_autocmd('TextChanged', {
+--     callback = function() vscode.call('undotree.saveAndAdvance') end,
+--   })
+-- end
 else
   vim.keymap.set('t', '<C-Esc>', '<C-\\><C-N>', {
     noremap = true,
@@ -330,13 +331,20 @@ else
   vim.keymap.set('n', '<leader>lk', '<cmd>cprev<cr>')
   vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = 'Show line diagnostics' })
 
-  vim.api.nvim_create_user_command('CheckTypes', function(opts)
-    require('plugins.check-types').run({ filter = opts.fargs[1] })
-  end, { nargs = '?', desc = 'Run pnpm check-types and fill quickfix' })
+  vim.api.nvim_create_user_command(
+    'CheckTypes',
+    function(opts) require('plugins.check-types').run({ filter = opts.fargs[1] }) end,
+    { nargs = '?', desc = 'Run pnpm check-types and fill quickfix' }
+  )
 
-  vim.keymap.set('n', '<leader>ct', function()
-    require('plugins.check-types').run()
-  end, { desc = 'check-types → quickfix' })
+  vim.keymap.set(
+    'n',
+    '<leader>ct',
+    function() require('plugins.check-types').run() end,
+    { desc = 'check-types → quickfix' }
+  )
+
+  vim.keymap.set('n', '<leader>o', '<cmd>Octo<cr>', { desc = 'Octo picker' })
 end
 
 -- flash
@@ -360,3 +368,83 @@ vim.opt.completeopt = { 'menuone', 'noselect', 'noinsert' }
 vim.opt.pumheight = 8
 vim.opt.pumborder = 'rounded'
 vim.opt.scrolloff = 6
+
+-- Diff buffers: soft red/green bg, no fg (syntax shows through).
+-- https://github.com/pwntester/octo.nvim/issues/442
+-- In vimdiff, lines only in the LEFT buffer use DiffAdd (not DiffDelete) — map per window.
+local diff_bg = {
+  add = '#1e3a2e',
+  delete = '#3a252a',
+  text_add = '#3a7558',
+  text_delete = '#5c3f4a',
+}
+
+local ns_diff_old = vim.api.nvim_create_namespace('config_diff_old')
+local ns_diff_new = vim.api.nvim_create_namespace('config_diff_new')
+
+local function hex_bg(hex) return tonumber(hex:gsub('#', ''), 16) end
+
+local function setup_diff_base_highlights()
+  vim.api.nvim_set_hl(0, 'DiffBgAdd', { bg = hex_bg(diff_bg.add) })
+  vim.api.nvim_set_hl(0, 'DiffBgDelete', { bg = hex_bg(diff_bg.delete) })
+  vim.api.nvim_set_hl(0, 'DiffBgAddText', { bg = hex_bg(diff_bg.text_add) })
+  vim.api.nvim_set_hl(0, 'DiffBgDeleteText', { bg = hex_bg(diff_bg.text_delete) })
+  vim.api.nvim_set_hl(0, 'OctoReviewDiffAddText', { link = 'DiffBgAddText' })
+  vim.api.nvim_set_hl(0, 'OctoReviewDiffDeleteText', { link = 'DiffBgDeleteText' })
+end
+
+local function setup_diff_window_namespaces()
+  local del = { link = 'DiffBgDelete' }
+  local add = { link = 'DiffBgAdd' }
+  local del_text = { link = 'DiffBgDeleteText' }
+  local add_text = { link = 'DiffBgAddText' }
+  -- Left/old: deletions are DiffAdd; filler for new lines on the right is DiffDelete
+  vim.api.nvim_set_hl(ns_diff_old, 'DiffAdd', del)
+  vim.api.nvim_set_hl(ns_diff_old, 'DiffChange', del)
+  vim.api.nvim_set_hl(ns_diff_old, 'DiffText', del_text)
+  vim.api.nvim_set_hl(ns_diff_old, 'DiffTextAdd', del_text)
+  vim.api.nvim_set_hl(ns_diff_old, 'DiffDelete', add)
+  -- Right/new: additions are DiffAdd; filler for removed lines is DiffDelete
+  vim.api.nvim_set_hl(ns_diff_new, 'DiffAdd', add)
+  vim.api.nvim_set_hl(ns_diff_new, 'DiffChange', add)
+  vim.api.nvim_set_hl(ns_diff_new, 'DiffText', add_text)
+  vim.api.nvim_set_hl(ns_diff_new, 'DiffTextAdd', add_text)
+  vim.api.nvim_set_hl(ns_diff_new, 'DiffDelete', del)
+end
+
+local function apply_diff_window_highlights()
+  setup_diff_base_highlights()
+  local diff_wins = {}
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.api.nvim_win_is_valid(win) and vim.wo[win].diff then
+      local col = vim.api.nvim_win_get_position(win)[2]
+      diff_wins[#diff_wins + 1] = { win = win, col = col }
+    end
+  end
+  table.sort(diff_wins, function(a, b) return a.col < b.col end)
+  for i, entry in ipairs(diff_wins) do
+    local ns = i == 1 and ns_diff_old or ns_diff_new
+    vim.api.nvim_win_set_hl_ns(entry.win, ns)
+  end
+end
+
+setup_diff_window_namespaces()
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  desc = 'Soft diff backgrounds; per-window old=left/new=right',
+  callback = function()
+    setup_diff_window_namespaces()
+    apply_diff_window_highlights()
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'OptionSet', 'WinEnter' }, {
+  desc = 'Re-apply per-window diff hl (octo review, vimdiff)',
+  callback = function(ev)
+    if ev.event == 'OptionSet' and ev.match ~= 'diff' then return end
+    if ev.event == 'OptionSet' and not vim.wo.diff then return end
+    vim.schedule(apply_diff_window_highlights)
+  end,
+})
+
+vim.schedule(function() setup_diff_base_highlights() end)

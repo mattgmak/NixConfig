@@ -9,6 +9,7 @@
           stdenv,
           fetchurl,
           autoPatchelfHook,
+          makeWrapper,
           openssl,
         }:
 
@@ -44,7 +45,10 @@
             hash = attrs.hash;
           };
 
-          nativeBuildInputs = lib.optionals stdenv.isLinux [ autoPatchelfHook ];
+          nativeBuildInputs = lib.optionals stdenv.isLinux [
+            autoPatchelfHook
+            makeWrapper
+          ];
           buildInputs = lib.optionals stdenv.isLinux [
             openssl
             stdenv.cc.cc.lib
@@ -52,7 +56,18 @@
 
           installPhase = ''
             runHook preInstall
-            install -Dm755 colgrep $out/bin/colgrep
+            install -Dm755 colgrep $out/bin/colgrep-unwrapped
+            if [ "$(uname -s)" = Linux ]; then
+              makeWrapper $out/bin/colgrep-unwrapped $out/bin/colgrep \
+                --prefix LD_LIBRARY_PATH : "${
+                  lib.makeLibraryPath [
+                    stdenv.cc.cc.lib
+                    openssl
+                  ]
+                }"
+            else
+              mv $out/bin/colgrep-unwrapped $out/bin/colgrep
+            fi
             runHook postInstall
           '';
 
