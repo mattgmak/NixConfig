@@ -25,12 +25,15 @@
 [submodule "juicesharp/rpiv-mono"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/rpiv-mono
 	url = https://github.com/juicesharp/rpiv-mono.git
-[submodule "nicobailon/pi-subagents"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-subagents
-	url = https://github.com/nicobailon/pi-subagents.git
 [submodule "MattDevy/pi-extensions"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-extensions
 	url = https://github.com/MattDevy/pi-extensions.git
 [submodule "apmantza/pi-lens"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-lens
 	url = https://github.com/apmantza/pi-lens.git
+[submodule "gotgenes/pi-packages"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-packages
+	url = https://github.com/gotgenes/pi-packages.git
+[submodule "fgladisch/pi-extensions"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/fgladisch-pi-extensions
+	url = https://github.com/fgladisch/pi-extensions.git

@@ -9,7 +9,10 @@
 
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
-        runtimeInputs = with pkgs; [ nodejs_22 ];
+        runtimeInputs = with pkgs; [
+          nodejs_22
+          pnpm
+        ];
         text = ''
           set -euo pipefail
           EXTENSIONS=${lib.escapeShellArg extensionsDir}
@@ -30,17 +33,35 @@
               }
             " "$pkg") || continue
             echo "pi-npm-i: $(basename "$ext")"
-            if [ "$kind" = "monorepo" ]; then
-              (cd "$ext" && npm i --omit=dev --ignore-scripts "$@")
+            if [ -f "$ext/package-lock.json" ]; then
+              if [ "$kind" = "monorepo" ]; then
+                (cd "$ext" && npm ci --omit=dev --ignore-scripts "$@")
+              else
+                (cd "$ext" && npm ci --omit=dev "$@")
+              fi
+            elif [ "$kind" = "monorepo" ]; then
+              (cd "$ext" && npm install --omit=dev --ignore-scripts --no-package-lock "$@")
             else
-              (cd "$ext" && npm i --omit=dev "$@")
+              (cd "$ext" && npm install --omit=dev --no-package-lock "$@")
             fi
           done
 
+          PI_PACKAGES="$EXTENSIONS/vendor/pi-packages"
+          if [ -f "$PI_PACKAGES/pnpm-lock.yaml" ]; then
+            echo "pi-npm-i: vendor/pi-packages (pnpm install --frozen-lockfile)"
+            (cd "$PI_PACKAGES" && pnpm install --frozen-lockfile)
+          fi
+
+          FGLADISCH_PI="$EXTENSIONS/vendor/fgladisch-pi-extensions"
+          if [ -f "$FGLADISCH_PI/package.json" ]; then
+            echo "pi-npm-i: vendor/fgladisch-pi-extensions (npm ci)"
+            (cd "$FGLADISCH_PI" && npm ci --omit=dev --ignore-scripts)
+          fi
+
           CONTEXT_MODE="$EXTENSIONS/vendor/context-mode"
           if [ -f "$CONTEXT_MODE/package.json" ]; then
-            echo "pi-npm-i: vendor/context-mode (install + build)"
-            (cd "$CONTEXT_MODE" && npm install && npm run build)
+            echo "pi-npm-i: vendor/context-mode (npm ci + build)"
+            (cd "$CONTEXT_MODE" && npm ci && npm run build)
           fi
         '';
       };

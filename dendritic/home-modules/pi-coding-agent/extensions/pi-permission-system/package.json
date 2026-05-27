@@ -1,0 +1,10 @@
+{
+  "name": "pi-permission-system",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for @gotgenes/pi-permission-system (vendored gotgenes/pi-packages submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "pi-session-tools",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for @gotgenes/pi-session-tools (vendored gotgenes/pi-packages submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

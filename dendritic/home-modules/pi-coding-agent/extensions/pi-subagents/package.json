@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for pi-subagents (vendored nicobailon/pi-subagents submodule)",
+  "description": "Pi loader for @gotgenes/pi-subagents (vendored gotgenes/pi-packages submodule)",
   "pi": {
     "extensions": ["./index.ts"]
   }

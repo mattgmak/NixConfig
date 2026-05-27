@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-subagents/src/extension/index.ts";
+export { default } from "../vendor/pi-packages/packages/pi-subagents/src/index.ts";
