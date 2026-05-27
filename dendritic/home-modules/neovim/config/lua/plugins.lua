@@ -181,6 +181,37 @@ require('lazy').setup({
     branch = 'main',
   },
   {
+    'andymass/vim-matchup',
+    -- cond = not is_vscode,
+    -- matchup loads minimal startup code; avoid deferring with CursorMoved/VimEnter
+    config = function()
+      require('match-up').setup({
+        text_obj = {
+          enabled = 1,
+          linewise_operators = {},
+        },
+        -- Use Neovim's built-in treesitter for %, highlighting, and textobjects
+        treesitter = {
+          enabled = true,
+          disabled = {},
+          disable_virtual_text = false,
+          enable_quotes = true,
+          stopline = 500,
+          include_match_words = true,
+        },
+        matchparen = {
+          deferred = 1,
+          enabled = 1,
+          hi_surround_always = 1,
+          offscreen = { method = 'popup' },
+          stopline = 400,
+        },
+        -- mini.surround handles ds%/cs%-style operations
+        surround = { enabled = 0 },
+      })
+    end,
+  },
+  {
     'nvim-mini/mini.nvim',
     version = '*',
     event = 'VeryLazy',
