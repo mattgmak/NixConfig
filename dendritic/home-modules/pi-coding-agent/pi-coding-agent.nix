@@ -44,7 +44,6 @@
           fi
         '';
       };
-      pilensDataDir = "${config.home.homeDirectory}/.pi-lens/projects";
     in
     {
       imports = [ inputs.coding-agents.homeManagerModules.default ];
@@ -57,8 +56,6 @@
           promptsDir = lib.mkDefault "${piAgentRoot}/prompts";
         };
       };
-
-      home.sessionVariables.PILENS_DATA_DIR = pilensDataDir;
 
       home.packages = with pkgs; [
         nodejs_22

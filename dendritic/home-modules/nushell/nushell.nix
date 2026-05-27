@@ -72,6 +72,9 @@
               }
             )
           ''
+          + ''
+            $env.PILENS_DATA_DIR = "${config.home.homeDirectory}/.pi-lens/projects";
+          ''
         );
         environmentVariables = {
           NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";
