@@ -5,32 +5,32 @@
 	path = dendritic/home-modules/pi-coding-agent/themes
 	url = https://github.com/dracula/pi-coding-agent.git
 [submodule "mattgmak/pi-cursor-provider"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/cursor-provider
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/cursor-provider
 	url = https://github.com/mattgmak/pi-cursor-provider.git
 [submodule "carderne/pi-nvim"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-nvim
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-nvim
 	url = https://github.com/carderne/pi-nvim.git
 [submodule "nicobailon/pi-web-access"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-web-access
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-web-access
 	url = https://github.com/nicobailon/pi-web-access.git
 [submodule "nicobailon/pi-mcp-adapter"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-mcp-adapter
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-mcp-adapter
 	url = https://github.com/nicobailon/pi-mcp-adapter.git
 [submodule "utensils/mcp-nixos"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/mcp-nixos
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/mcp-nixos
 	url = https://github.com/utensils/mcp-nixos.git
 [submodule "mksglu/context-mode"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/context-mode
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/context-mode
 	url = https://github.com/mksglu/context-mode.git
 [submodule "juicesharp/rpiv-mono"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/rpiv-mono
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/rpiv-mono
 	url = https://github.com/juicesharp/rpiv-mono.git
 [submodule "nicobailon/pi-subagents"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-subagents
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-subagents
 	url = https://github.com/nicobailon/pi-subagents.git
 [submodule "MattDevy/pi-extensions"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-extensions
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-extensions
 	url = https://github.com/MattDevy/pi-extensions.git
 [submodule "apmantza/pi-lens"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/pi-lens
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-lens
 	url = https://github.com/apmantza/pi-lens.git

@@ -15,6 +15,7 @@
           EXTENSIONS=${lib.escapeShellArg extensionsDir}
           for ext in "$EXTENSIONS"/*; do
             [ -d "$ext" ] || continue
+            [ "$(basename "$ext")" = "vendor" ] && continue
             pkg="$ext/package.json"
             [ -f "$pkg" ] || continue
             kind=$(node -e "
@@ -35,8 +36,15 @@
               (cd "$ext" && npm i --omit=dev "$@")
             fi
           done
+
+          CONTEXT_MODE="$EXTENSIONS/vendor/context-mode"
+          if [ -f "$CONTEXT_MODE/package.json" ]; then
+            echo "pi-npm-i: vendor/context-mode (install + build)"
+            (cd "$CONTEXT_MODE" && npm install && npm run build)
+          fi
         '';
       };
+      pilensDataDir = "${config.home.homeDirectory}/.pi-lens/projects";
     in
     {
       imports = [ inputs.coding-agents.homeManagerModules.default ];
@@ -49,6 +57,8 @@
           promptsDir = lib.mkDefault "${piAgentRoot}/prompts";
         };
       };
+
+      home.sessionVariables.PILENS_DATA_DIR = pilensDataDir;
 
       home.packages = with pkgs; [
         nodejs_22

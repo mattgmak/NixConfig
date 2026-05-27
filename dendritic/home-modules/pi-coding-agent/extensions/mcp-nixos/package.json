@@ -1,10 +1,10 @@
 {
-  "name": "mcp-nixos-pi",
+  "name": "mcp-nixos",
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
   "description": "Pi loader for mcp-nixos native tools (vendored submodule)",
   "pi": {
-    "extensions": ["../mcp-nixos/.pi/extensions/mcp-nixos.ts"]
+    "extensions": ["./index.ts"]
   }
 }

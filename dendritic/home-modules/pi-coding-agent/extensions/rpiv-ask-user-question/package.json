@@ -5,6 +5,6 @@
   "keywords": ["pi-package"],
   "description": "Pi loader for @juicesharp/rpiv-ask-user-question (vendored rpiv-mono submodule)",
   "pi": {
-    "extensions": ["../rpiv-mono/packages/rpiv-ask-user-question/index.ts"]
+    "extensions": ["./index.ts"]
   }
 }

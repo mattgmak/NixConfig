@@ -1,9 +1,9 @@
 {
-  "name": "rpiv-todo",
+  "name": "pi-nvim",
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for @juicesharp/rpiv-todo (vendored rpiv-mono submodule)",
+  "description": "Pi loader for pi-nvim (vendored carderne/pi-nvim submodule)",
   "pi": {
     "extensions": ["./index.ts"]
   }
