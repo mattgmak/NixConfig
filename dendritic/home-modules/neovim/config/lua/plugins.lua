@@ -34,7 +34,7 @@ require('lazy').setup({
     opts = {
       on_attach = function(bufnr)
         local gs = require('gitsigns')
-        gs.setup {}
+        gs.setup({})
 
         local function map(mode, lhs, rhs, desc) vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc }) end
 
@@ -131,13 +131,16 @@ require('lazy').setup({
   {
     'nvim-treesitter/nvim-treesitter-context',
     config = function()
-      require("treesitter-context").setup {
-        max_lines = 10
-      }
-      vim.keymap.set({ "n", "v" }, "[c", function()
-        require("treesitter-context").go_to_context(vim.v.count1)
-      end, { silent = true })
-    end
+      require('treesitter-context').setup({
+        max_lines = 10,
+      })
+      vim.keymap.set(
+        { 'n', 'v' },
+        '[c',
+        function() require('treesitter-context').go_to_context(vim.v.count1) end,
+        { silent = true }
+      )
+    end,
   },
   {
     'nvim-treesitter/nvim-treesitter',
@@ -199,9 +202,9 @@ require('lazy').setup({
             -- 'a' includes trailing space(s), 'i' is just the word
             {
               '[\'"`]()()[^%s\'"`]+()()[\'"`]', -- Single classname
-              '[\'"`]()()[^%s\'"`]+()%s+()',    -- First of multiple classnames
-              '()%s+()[^%s\'"`]+()()[\'"`]',    -- Last of multiple classnames
-              '%s+()()[^%s\'"`]+()%s+()',       -- Middle of multiple classnames
+              '[\'"`]()()[^%s\'"`]+()%s+()', -- First of multiple classnames
+              '()%s+()[^%s\'"`]+()()[\'"`]', -- Last of multiple classnames
+              '%s+()()[^%s\'"`]+()%s+()', -- Middle of multiple classnames
             },
           },
           -- Tag attribute textobject (for HTML/XML tags)
@@ -213,50 +216,58 @@ require('lazy').setup({
       require('mini.splitjoin').setup()
       require('mini.comment').setup()
       if not is_vscode then
-        require('mini.pairs').setup {
+        local hipatterns = require('mini.hipatterns')
+        hipatterns.setup({
+          highlighters = {
+            fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+            hack = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
+            todo = { pattern = '%f[%w]()TODO()%f[%W]', group = 'MiniHipatternsTodo' },
+            note = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
+            hex_color = hipatterns.gen_highlighter.hex_color(),
+          },
+        })
+        require('mini.pairs').setup({
           modes = { command = true },
-        }
-        require('mini.notify').setup {}
-        require('mini.statusline').setup(
-          {
-            content = {
-              active = function()
-                -- Get default active statusline sections
-                local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
-                local git           = MiniStatusline.section_git({ trunc_width = 40 })
-                local diff          = MiniStatusline.section_diff({ trunc_width = 75 })
-                local diagnostics   = MiniStatusline.section_diagnostics({ trunc_width = 75 })
-                local lsp           = MiniStatusline.section_lsp({ trunc_width = 75 })
-                local filename      = MiniStatusline.section_filename({ trunc_width = 140 })
-                local fileinfo      = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-                local location      = MiniStatusline.section_location({ trunc_width = 75 })
-                local search        = MiniStatusline.section_searchcount({ trunc_width = 75 })
+        })
+        require('mini.notify').setup({})
+        require('mini.statusline').setup({
+          content = {
+            active = function()
+              -- Get default active statusline sections
+              local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+              local git = MiniStatusline.section_git({ trunc_width = 40 })
+              local diff = MiniStatusline.section_diff({ trunc_width = 75 })
+              local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+              local lsp = MiniStatusline.section_lsp({ trunc_width = 75 })
+              local filename = MiniStatusline.section_filename({ trunc_width = 140 })
+              local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
+              local location = MiniStatusline.section_location({ trunc_width = 75 })
+              local search = MiniStatusline.section_searchcount({ trunc_width = 75 })
 
+              -- --- Limit Git branch name length ---
+              local max_length = 15 -- Set your max branch length here
 
-                -- --- Limit Git branch name length ---
-                local max_length = 15 -- Set your max branch length here
-
-                -- Extract just the branch name from the git string (e.g., "  branch-name")
-                local branch_name = git:match("%s*(.*)")
-                if branch_name and #branch_name > max_length then
-                  -- Truncate and add ellipsis
-                  git = string.format("  %s…", string.sub(branch_name, 1, max_length))
-                end
-                -- ------------------------------------
-
-                -- Return the composed statusline
-                return MiniStatusline.combine_groups({
-                  { hl = mode_hl,                 strings = { mode } },
-                  { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
-                  '%<', -- Mark general truncate point
-                  { hl = 'MiniStatuslineFilename', strings = { filename } },
-                  '%=', -- End left alignment
-                  { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-                  { hl = mode_hl,                  strings = { search, location } },
-                })
+              -- Extract just the branch name from the git string (e.g., "  branch-name")
+              local branch_name = git:match('%s*(.*)')
+              if branch_name and #branch_name > max_length then
+                -- Truncate and add ellipsis
+                git = string.format('  %s…', string.sub(branch_name, 1, max_length))
               end
-            }
-          })
+              -- ------------------------------------
+
+              -- Return the composed statusline
+              return MiniStatusline.combine_groups({
+                { hl = mode_hl, strings = { mode } },
+                { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics, lsp } },
+                '%<', -- Mark general truncate point
+                { hl = 'MiniStatuslineFilename', strings = { filename } },
+                '%=', -- End left alignment
+                { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+                { hl = mode_hl, strings = { search, location } },
+              })
+            end,
+          },
+        })
       end
     end,
   },
@@ -267,7 +278,7 @@ require('lazy').setup({
       -- on_direnv_finished = function()
       --   vim.cmd("LspStart")
       -- end
-    }
+    },
   },
   {
     'stevearc/oil.nvim',
@@ -497,7 +508,7 @@ require('lazy').setup({
     lazy = false,
     build = 'go build -C server',
     config = function()
-      require('cursortab').setup {
+      require('cursortab').setup({
         provider = {
           type = 'sweep',
           url = 'http://127.0.0.1:9292',
@@ -506,7 +517,7 @@ require('lazy').setup({
         blink = {
           enabled = true,
         },
-      }
+      })
     end,
   },
   {
@@ -515,13 +526,15 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
           vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { buffer = args.buf, remap = false })
-        end
+        end,
       })
+      vim.lsp.enable('stylua')
       vim.lsp.enable('lua_ls')
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
       vim.lsp.enable('tailwindcss', { autostart = false })
       vim.lsp.enable('tsgo')
+      vim.lsp.enable('zls')
     end,
   },
   {
@@ -554,9 +567,7 @@ require('lazy').setup({
     dependencies = {
       {
         'dmtrKovalenko/fff.nvim',
-        build = function()
-          require('fff.download').download_or_build_binary()
-        end,
+        build = function() require('fff.download').download_or_build_binary() end,
       },
     },
     opts = { finder = 'fff' },
@@ -603,7 +614,6 @@ require('lazy').setup({
         nerd_font_variant = 'mono',
         use_nvim_cmp_as_default = true,
       },
-
 
       completion = {
         documentation = { auto_show = true, auto_show_delay_ms = 500 },
