@@ -1,0 +1,10 @@
+{
+  "name": "pi-simplify",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-simplify (vendored MattDevy/pi-extensions submodule)",
+  "pi": {
+    "extensions": ["../pi-extensions/packages/pi-simplify/src/index.ts"]
+  }
+}

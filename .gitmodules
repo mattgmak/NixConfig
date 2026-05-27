@@ -28,3 +28,9 @@
 [submodule "nicobailon/pi-subagents"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/pi-subagents
 	url = https://github.com/nicobailon/pi-subagents.git
+[submodule "MattDevy/pi-extensions"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/pi-extensions
+	url = https://github.com/MattDevy/pi-extensions.git
+[submodule "apmantza/pi-lens"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/pi-lens
+	url = https://github.com/apmantza/pi-lens.git
