@@ -1,8 +1,14 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  self,
+  lib,
+  ...
+}:
 {
   flake.homeModules.pi-coding-agent =
     { config, pkgs, ... }:
     let
+      system = pkgs.stdenv.hostPlatform.system;
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
       extensionsDir = "${piAgentRoot}/extensions";
@@ -84,6 +90,7 @@
         uv
         bun
         piNpmI
+        self.packages.${system}.colgrep
       ];
 
       home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
