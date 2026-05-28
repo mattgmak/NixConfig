@@ -322,6 +322,33 @@ require('lazy').setup({
     end,
   },
   {
+    'stevearc/quicker.nvim',
+    cond = not is_vscode,
+    event = 'VeryLazy',
+    config = function()
+      vim.keymap.set('n', '<leader>lq', function() require('quicker').toggle() end, {
+        desc = 'Toggle quickfix',
+      })
+      vim.keymap.set('n', '<leader>ll', function() require('quicker').toggle({ loclist = true }) end, {
+        desc = 'Toggle loclist',
+      })
+      require('quicker').setup({
+        keys = {
+          {
+            '>',
+            function() require('quicker').expand({ before = 2, after = 2, add_to_existing = true }) end,
+            desc = 'Expand quickfix context',
+          },
+          {
+            '<',
+            function() require('quicker').collapse() end,
+            desc = 'Collapse quickfix context',
+          },
+        },
+      })
+    end,
+  },
+  {
     'mikavilpas/yazi.nvim',
     version = '*',
     cond = not is_vscode,
@@ -599,7 +626,8 @@ require('lazy').setup({
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
       vim.lsp.enable('tailwindcss', { autostart = false })
-      vim.lsp.enable('tsgo')
+      -- vim.lsp.enable('tsgo')
+      vim.lsp.enable('ts_ls')
       vim.lsp.enable('zls')
     end,
   },
