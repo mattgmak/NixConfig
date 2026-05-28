@@ -62,16 +62,7 @@ vim.o.expandtab = true
 
 -- save
 vim.keymap.set('n', '<leader>s', function()
-  if not is_vscode and #vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/formatting' }) > 0 then
-    vim.lsp.buf.format({ async = false })
-  end
-  local clients = vim.lsp.get_clients({ name = 'biome' })
-  if #clients > 0 then
-    vim.lsp.buf.code_action({
-      context = { only = { 'source.fixAll.biome' } },
-      apply = true,
-    })
-  end
+  if not is_vscode then require('plugins.lsp-format').format({ async = false }) end
   vim.cmd('write')
 end, { silent = true, desc = 'Save and Format' })
 
@@ -286,18 +277,18 @@ if is_vscode then
   vim.keymap.set('v', 'gf', function() vscode.call('editor.action.formatSelection') end)
   vim.keymap.set('n', 'gf', function() vscode.call('editor.action.formatDocument') end)
 
--- use undotree to replace vanilla undo/redo
--- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
--- if undotree then
---   vscode.notify('Using undotree')
---   vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
---   vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
+  -- use undotree to replace vanilla undo/redo
+  -- local undotree = vscode.eval('return vscode.extensions.getExtension("undotree.undo-tree")')
+  -- if undotree then
+  --   vscode.notify('Using undotree')
+  --   vim.keymap.set('n', '<leader>fu', function() vscode.call('workbench.view.extension.undoTreeContainer') end)
+  --   vim.keymap.set('n', 'u', function() vscode.call('undotree.undo') end)
 
---   vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
---   vim.api.nvim_create_autocmd('TextChanged', {
---     callback = function() vscode.call('undotree.saveAndAdvance') end,
---   })
--- end
+  --   vim.keymap.set('n', 'U', function() vscode.call('undotree.redo') end)
+  --   vim.api.nvim_create_autocmd('TextChanged', {
+  --     callback = function() vscode.call('undotree.saveAndAdvance') end,
+  --   })
+  -- end
 else
   vim.keymap.set('t', '<C-Esc>', '<C-\\><C-N>', {
     noremap = true,
@@ -312,18 +303,22 @@ else
   vim.keymap.set('n', '<leader>wv', ':vsplit<cr>')
   vim.keymap.set('n', '<leader>wn', ':enew<cr>')
   vim.keymap.set('n', '<leader>wo', ':only<cr>')
-  vim.keymap.set('v', 'gf', '<cmd>lua vim.lsp.buf.format()<cr><esc>')
+  vim.keymap.set('v', 'gf', function()
+    require('plugins.lsp-format').format({ fix_all = false })
+    vim.cmd('normal! <Esc>')
+  end, { desc = 'Format selection' })
   vim.keymap.set(
     'n',
     'gf',
     function()
-      vim.lsp.buf.format({
+      require('plugins.lsp-format').format({
         range = {
           ['start'] = vim.api.nvim_win_get_cursor(0),
           ['end'] = vim.api.nvim_win_get_cursor(0),
         },
       })
-    end
+    end,
+    { desc = 'Format at cursor' }
   )
   vim.keymap.set('n', '<leader>t', '<cmd>w<cr>')
   vim.keymap.set('n', '<leader>rr', '<cmd>restart<cr>')
