@@ -96,6 +96,47 @@
             };
           };
 
+          # Registry release from https://www.npmjs.com/package/eas-cli (npm tarball has no lockfile).
+          easCliVersion = "19.1.0";
+          easCli = pkgs.buildNpmPackage {
+            pname = "eas-cli";
+            version = easCliVersion;
+            src = pkgs.fetchurl {
+              url = "https://registry.npmjs.org/eas-cli/-/eas-cli-${easCliVersion}.tgz";
+              hash = "sha256-Wh2gE/Ey0uJkHS4iug6rK0HhVSwuFyTO9jwOJYWAZnc=";
+            };
+            sourceRoot = "package";
+
+            postPatch = ''
+              cp ${./eas-cli-package-lock.json} package-lock.json
+            '';
+
+            npmDepsHash = "sha256-sbgt2quVZrYOrpHmZheJZYmp3iwQw+iSUgWo3NQb4/Q=";
+
+            nodejs = pkgs.nodejs_22;
+
+            npmFlags = [
+              "--legacy-peer-deps"
+              "--omit=dev"
+              "--ignore-scripts"
+            ];
+            npmInstallFlags = [
+              "--legacy-peer-deps"
+              "--omit=dev"
+              "--ignore-scripts"
+            ];
+            npmPackFlags = [ "--ignore-scripts" ];
+
+            dontNpmBuild = true;
+
+            meta = {
+              description = "EAS command line tool";
+              homepage = "https://github.com/expo/eas-cli";
+              license = pkgs.lib.licenses.mit;
+              mainProgram = "eas";
+            };
+          };
+
           # Use the same buildToolsVersion here
           # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
         in
@@ -115,8 +156,8 @@
                   jq
                   rclone
                   postgresql
-                  eas-cli
                   tailwindcss-language-server
+                  easCli
                 ]
                 ++ (if pkgs.stdenv.isDarwin then [ argent ] else [ ])
                 ++ (
@@ -142,6 +183,10 @@
                       export BUN_INSTALL="$HOME/.bun"
                       export PATH="$BUN_INSTALL/bin:$PATH"
                       unset CC CXX
+                      # stdenv-darwin overrides DEVELOPER_DIR/SDKROOT with the Nix apple-sdk;
+                      # EAS local iOS builds need the real Xcode.app toolchain (xcodebuild).
+                      export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+                      unset SDKROOT
                       export PATH="/usr/bin:/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH"
                     ''
                   else

@@ -67,7 +67,7 @@
           CONTEXT_MODE="$EXTENSIONS/vendor/context-mode"
           if [ -f "$CONTEXT_MODE/package.json" ]; then
             echo "pi-npm-i: vendor/context-mode (npm ci + build)"
-            (cd "$CONTEXT_MODE" && npm ci && npm run build)
+            (cd "$CONTEXT_MODE" && npm i --omit=dev && npm ci && npm run build)
           fi
         '';
       };
