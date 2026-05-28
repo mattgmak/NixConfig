@@ -28,9 +28,9 @@
 [submodule "MattDevy/pi-extensions"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-extensions
 	url = https://github.com/MattDevy/pi-extensions.git
-[submodule "apmantza/pi-lens"]
+[submodule "mattgmak/pi-lens"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-lens
-	url = https://github.com/apmantza/pi-lens.git
+	url = https://github.com/mattgmak/pi-lens.git
 [submodule "gotgenes/pi-packages"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-packages
 	url = https://github.com/gotgenes/pi-packages.git
