@@ -179,7 +179,7 @@
                 ${
                   if pkgs.stdenv.isDarwin then
                     ''
-                      export ANDROID_HOME=~/Library/Android/sdk
+                      export ANDROID_HOME=/Volumes/Kingston480GB/Android/sdk
                       export BUN_INSTALL="$HOME/.bun"
                       export PATH="$BUN_INSTALL/bin:$PATH"
                       unset CC CXX
