@@ -1,11 +1,16 @@
 {
   "mcpServers": {
     "context7": {
-      "url": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.context7.com/mcp",
+      "directTools": true
     },
     "Linear": {
       "url": "https://mcp.linear.app/mcp",
-      "headers": {}
+      "headers": {},
+      "directTools": [
+        "get_issue",
+        "list_issues"
+      ]
     }
   }
 }

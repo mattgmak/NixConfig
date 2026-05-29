@@ -69,8 +69,27 @@
             echo "pi-npm-i: vendor/context-mode (npm ci + build)"
             (cd "$CONTEXT_MODE" && npm i --omit=dev && npm ci && npm run build)
           fi
+
+          MARKDOWN_PREVIEW="$EXTENSIONS/vendor/pi-markdown-preview"
+          if [ -f "$MARKDOWN_PREVIEW/package.json" ]; then
+            echo "pi-npm-i: vendor/pi-markdown-preview"
+            if [ -f "$MARKDOWN_PREVIEW/package-lock.json" ]; then
+              (cd "$MARKDOWN_PREVIEW" && npm ci --omit=dev)
+            else
+              (cd "$MARKDOWN_PREVIEW" && npm install --omit=dev --no-package-lock)
+            fi
+          fi
         '';
       };
+
+      markdownPreviewDeps =
+        with pkgs;
+        [
+          pandoc
+          texliveSmall
+          mermaid-cli
+        ]
+        ++ lib.optionals (!pkgs.stdenv.isDarwin) [ chromium ];
     in
     {
       imports = [ inputs.coding-agents.homeManagerModules.default ];
@@ -84,14 +103,17 @@
         };
       };
 
-      home.packages = with pkgs; [
-        nodejs_22
-        ffmpeg
-        uv
-        bun
-        piNpmI
-        self.packages.${system}.colgrep
-      ];
+      home.packages =
+        with pkgs;
+        [
+          nodejs_22
+          ffmpeg
+          uv
+          bun
+          piNpmI
+          self.packages.${system}.colgrep
+        ]
+        ++ markdownPreviewDeps;
 
       home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
       home.file.".pi/agent/models.json".source =

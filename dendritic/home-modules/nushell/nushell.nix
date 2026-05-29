@@ -72,15 +72,35 @@
               }
             )
           ''
-          + ''
-            $env.PILENS_DATA_DIR = "${config.home.homeDirectory}/.pi-lens/projects";
-          ''
         );
-        environmentVariables = {
-          NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";
-          NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${username}/NixConfig#darwinConfigurations.MacMini";
-          DEVELOPER_DIR = lib.mkIf pkgs.stdenv.isDarwin "/Applications/Xcode.app/Contents/Developer";
-        };
+        environmentVariables = lib.mkMerge [
+          {
+            NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";
+            NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${username}/NixConfig#darwinConfigurations.MacMini";
+            DEVELOPER_DIR = lib.mkIf pkgs.stdenv.isDarwin "/Applications/Xcode.app/Contents/Developer";
+          }
+          # pi-lens (packages from pi-coding-agent home module)
+          {
+            PILENS_DATA_DIR = "${config.home.homeDirectory}/.pi-lens/projects";
+          }
+          # pi-markdown-preview (packages from pi-coding-agent home module)
+          {
+            PANDOC_PATH = lib.getExe pkgs.pandoc;
+            MERMAID_CLI_PATH = lib.getExe pkgs.mermaid-cli;
+            PANDOC_PDF_ENGINE = "xelatex";
+          }
+          (lib.mkIf pkgs.stdenv.isDarwin {
+            # nixpkgs chromium is unsupported on darwin — Homebrew casks on MacMini
+            PUPPETEER_EXECUTABLE_PATH =
+              if builtins.pathExists "/Applications/Chromium.app" then
+                "/Applications/Chromium.app/Contents/MacOS/Chromium"
+              else
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+          })
+          (lib.mkIf (!pkgs.stdenv.isDarwin) {
+            PUPPETEER_EXECUTABLE_PATH = lib.getExe pkgs.chromium;
+          })
+        ];
       };
     };
 }

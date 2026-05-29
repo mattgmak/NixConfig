@@ -40,3 +40,6 @@
 [submodule "mattpocock/skills"]
 	path = dendritic/skills/vendor/mattpocock-skills
 	url = https://github.com/mattpocock/skills.git
+[submodule "omaclaren/pi-markdown-preview"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-markdown-preview
+	url = https://github.com/omaclaren/pi-markdown-preview.git
