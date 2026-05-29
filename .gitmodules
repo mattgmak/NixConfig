@@ -37,3 +37,6 @@
 [submodule "fgladisch/pi-extensions"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/fgladisch-pi-extensions
 	url = https://github.com/fgladisch/pi-extensions.git
+[submodule "mattpocock/skills"]
+	path = dendritic/skills/vendor/mattpocock-skills
+	url = https://github.com/mattpocock/skills.git

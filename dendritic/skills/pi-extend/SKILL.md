@@ -17,7 +17,10 @@ This repo manages pi via Home Manager + `coding-agents` flake module. Extensions
 ```
 dendritic/
 ├── skills/                          # global pi skills (SKILL.md dirs)
-│   └── <skill-name>/                # e.g. pi-extend/
+│   ├── vendor/                      # git submodules (upstream skill repos)
+│   │   └── mattpocock-skills/       # mattpocock/skills checkout
+│   ├── <skill-name>/                # local skill or symlink → vendor/.../skills/...
+│   └── pi-extend/                   # repo-owned skill
 └── home-modules/pi-coding-agent/
     ├── pi-coding-agent.nix          # wiring module
     ├── models.json                  # custom providers/models
@@ -82,11 +85,21 @@ Use `./index.ts` in `pi.extensions` so pi shows `<name>/index.ts`, not nested ve
 themes/                       # e.g. dracula/pi-coding-agent theme JSON files
 ```
 
-**Skill** — markdown instructions under `dendritic/skills/<name>/SKILL.md`:
+**Skill (local)** — markdown under `dendritic/skills/<name>/SKILL.md`:
 
 ```
-skills/caveman/SKILL.md       # e.g. response-style instructions for the model
+skills/caveman/SKILL.md       # repo-owned (not from mattpocock)
 ```
+
+**Skill (vendored)** — submodule + top-level symlink:
+
+```
+skills/vendor/mattpocock-skills/          # git submodule (mattpocock/skills)
+skills/tdd -> vendor/mattpocock-skills/skills/engineering/tdd
+skills/grill-me -> vendor/mattpocock-skills/skills/productivity/grill-me
+```
+
+`skills/.gitignore` lists `vendor/` so pi does not treat the submodule root as a skill.
 
 Vendored extensions are usually pi packages (`keywords: ["pi-package"]`). Pi discovers subdirs via `package.json` → `pi.extensions` array, or `index.ts`/`index.js`. Skills = `SKILL.md` in a directory; pi auto-discovers from the global skills dir.
 
@@ -233,6 +246,35 @@ git submodule add https://github.com/dracula/pi-coding-agent.git \
 
 Symlinked to `~/.pi/agent/themes` via `mkOutOfStoreSymlink`. Select theme name in `~/.pi/agent/settings.json`.
 
+## Vendored skills (`mattpocock/skills`)
+
+Submodule at `dendritic/skills/vendor/mattpocock-skills` (`.gitmodules`: `mattpocock/skills`). Expose skills via symlinks at `dendritic/skills/<name>` → `vendor/mattpocock-skills/skills/{engineering,productivity}/<name>`.
+
+**Installed from upstream** (engineering + productivity; `caveman` excluded — use local `skills/caveman/`):
+
+`diagnose`, `grill-with-docs`, `triage`, `improve-codebase-architecture`, `setup-matt-pocock-skills`, `tdd`, `to-issues`, `to-prd`, `zoom-out`, `prototype`, `grill-me`, `handoff`, `write-a-skill`
+
+Run **`/setup-matt-pocock-skills` once per target repo** before engineering skills that need issue tracker / triage labels / `docs/agents/` layout.
+
+### Add or bump vendored skills repo
+
+```bash
+# From NixConfig root — first time
+ git submodule add https://github.com/mattpocock/skills.git \
+   dendritic/skills/vendor/mattpocock-skills
+# .gitmodules: [submodule "mattpocock/skills"]
+
+# Expose a skill
+cd dendritic/skills
+ln -sfn vendor/mattpocock-skills/skills/engineering/<name> <name>
+
+# Bump
+cd dendritic/skills/vendor/mattpocock-skills && git fetch && git checkout <ref>
+cd ~/NixConfig && git add dendritic/skills/vendor/mattpocock-skills
+```
+
+No `npm install`. `/reload` in pi after symlink or submodule changes.
+
 ## Add a new skill (no submodule)
 
 ```bash
@@ -301,6 +343,8 @@ home-manager switch --flake .#<host>
 - Edit files under `~/.pi/agent/extensions` or `skills` directly — they symlink to repo; edit repo paths instead
 - Forget `npm install --omit=dev` after submodule add/update when extension has runtime deps
 - Remove `extensions/.gitignore` `vendor/` entry — pi would double-discover vendor checkouts
+- Remove `skills/.gitignore` `vendor/` entry — pi would treat the submodule root as a skill
+- Symlink mattpocock `caveman` over local `skills/caveman/` — keep the local copy
 
 ## Debugging
 
