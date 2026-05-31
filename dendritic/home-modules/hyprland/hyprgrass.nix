@@ -17,7 +17,7 @@
 
         settings = {
           gestures = {
-            workspace_swipe = true;
+            workspace_swipe_touch = true;
             workspace_swipe_cancel_ratio = 0.15;
           };
 
@@ -31,8 +31,8 @@
               edge_margin = 10;
               hyprgrass-bind = [
                 # Workspace
-                ", edge:r:l, workspace, +1"
-                ", edge:l:r, workspace, -1"
+                # ", edge:r:l, workspace, +1"
+                # ", edge:l:r, workspace, -1"
 
                 # Window management
                 ", swipe:3:u, fullscreen"

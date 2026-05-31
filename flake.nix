@@ -37,7 +37,7 @@
       inputs.hyprland.follows = "hyprland";
     };
     hyprgrass = {
-      url = "github:horriblename/hyprgrass";
+      url = "github:horriblename/hyprgrass?ref=hl-0.54.0";
       inputs.hyprland.follows = "hyprland";
     };
 
