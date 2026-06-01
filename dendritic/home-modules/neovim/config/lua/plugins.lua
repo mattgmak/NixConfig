@@ -210,6 +210,7 @@ require('lazy').setup({
         -- mini.surround handles ds%/cs%-style operations
         surround = { enabled = 0 },
       })
+      vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#917296', bold = true })
     end,
   },
   {
@@ -246,7 +247,13 @@ require('lazy').setup({
       })
       require('mini.surround').setup()
       require('mini.splitjoin').setup()
-      require('mini.comment').setup()
+      require('mini.comment').setup({
+        options = {
+          custom_commentstring = function()
+            return require('ts_context_commentstring.internal').calculate_commentstring() or vim.bo.commentstring
+          end,
+        },
+      })
       if not is_vscode then
         local hipatterns = require('mini.hipatterns')
         hipatterns.setup({
@@ -597,7 +604,8 @@ require('lazy').setup({
   -- },
   {
     'cursortab/cursortab.nvim',
-    enabled = not is_vscode,
+    -- cond = not is_vscode,
+    cond = false,
     lazy = false,
     build = 'go build -C server',
     config = function()
@@ -770,5 +778,11 @@ require('lazy').setup({
         },
       })
     end,
+  },
+  {
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    opts = {
+      enable_autocmd = false,
+    },
   },
 })
