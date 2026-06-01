@@ -604,16 +604,20 @@ require('lazy').setup({
   -- },
   {
     'cursortab/cursortab.nvim',
-    -- cond = not is_vscode,
-    cond = false,
+    cond = not is_vscode,
+    -- cond = false,
     lazy = false,
     build = 'go build -C server',
     config = function()
       require('cursortab').setup({
+        -- provider = {
+        --   type = 'sweep',
+        --   url = 'http://127.0.0.1:9292',
+        --   model = 'sweep-next-edit:1.5b-q8',
+        -- },
         provider = {
-          type = 'sweep',
-          url = 'http://127.0.0.1:9292',
-          model = 'sweep-next-edit:1.5b-q8',
+          type = 'mercuryapi',
+          api_key_env = 'MERCURY_AI_TOKEN',
         },
         blink = {
           enabled = true,

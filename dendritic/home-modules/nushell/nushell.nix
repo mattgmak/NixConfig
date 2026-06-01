@@ -21,12 +21,23 @@
           ''
         else
           null;
+      mercuryAiToken = ../../../secrets/mercury-ai-token.age;
+      hasMercuryAiTokenSecret = builtins.pathExists mercuryAiToken;
+      readMercuryAiTokenScript =
+        if hasMercuryAiTokenSecret then
+          pkgs.writeShellScript "read-mercury-ai-token" ''
+            set -euo pipefail
+            cat "${config.age.secrets.mercury-ai-token.path}"
+          ''
+        else
+          null;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
 
-      age.secrets = lib.mkIf hasOpencodeApiKeySecret {
-        "opencode-api-key".file = opencodeApiKeySecret;
+      age.secrets = {
+        opencode-api-key.file = lib.mkIf hasOpencodeApiKeySecret opencodeApiKeySecret;
+        mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
       };
 
       programs.nushell = {
@@ -67,6 +78,13 @@
             $env.OPENCODE_API_KEY = (
               try {
                 (^${readOpencodeApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+            $env.MERCURY_AI_TOKEN = (
+              try {
+                (^${readMercuryAiTokenScript} | str trim)
               } catch {
                 ""
               }

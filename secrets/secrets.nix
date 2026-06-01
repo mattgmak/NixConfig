@@ -83,4 +83,15 @@ in
       MacMini
     ];
   };
+
+  "mercury-ai-token.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
+    ];
+  };
 }
