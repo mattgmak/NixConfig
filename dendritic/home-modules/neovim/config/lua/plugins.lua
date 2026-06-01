@@ -789,4 +789,5 @@ require('lazy').setup({
       enable_autocmd = false,
     },
   },
+  { 'akinsho/git-conflict.nvim', version = '*', config = true },
 })
