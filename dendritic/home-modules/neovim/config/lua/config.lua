@@ -1,5 +1,8 @@
 local is_vscode = vim.g.vscode ~= nil
 
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.stdpath('data') .. '/undo'
+
 -- <leader> key
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
@@ -340,6 +343,11 @@ else
   )
 
   vim.keymap.set('n', '<leader>o', '<cmd>Octo<cr>', { desc = 'Octo picker' })
+
+  vim.keymap.set('n', '<leader>u', function()
+    vim.cmd('packadd nvim.undotree')
+    vim.cmd('Undotree')
+  end, { desc = 'Toggle Native Undotree' })
 end
 
 -- flash
