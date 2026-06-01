@@ -16,17 +16,13 @@ local function notify_update(id, msg, level, hl_group)
     MiniNotify.update(id, { msg = msg, level = level, hl_group = hl_group })
     return
   end
-  if msg then
-    vim.notify(msg, vim.log.levels[level])
-  end
+  if msg then vim.notify(msg, vim.log.levels[level]) end
 end
 
 local function notify_finish(id, msg, level, hl_group)
   notify_update(id, msg, level, hl_group)
   if id and type(MiniNotify) == 'table' and MiniNotify.remove then
-    vim.defer_fn(function()
-      MiniNotify.remove(id)
-    end, NOTIFY_DURATION[level] or NOTIFY_DURATION.INFO)
+    vim.defer_fn(function() MiniNotify.remove(id) end, NOTIFY_DURATION[level] or NOTIFY_DURATION.INFO)
   end
 end
 
@@ -41,17 +37,13 @@ local function pkg_roots(root)
     local lines = vim.fn.readfile(manifest)
     if #lines > 0 then
       local ok, data = pcall(vim.json.decode, table.concat(lines, '\n'))
-      if ok and data.name then
-        roots[data.name] = vim.fn.fnamemodify(manifest, ':h')
-      end
+      if ok and data.name then roots[data.name] = vim.fn.fnamemodify(manifest, ':h') end
     end
   end
   return roots
 end
 
-local function strip_ansi(line)
-  return line:gsub('\27%[[0-9;]*[A-Za-z]', '')
-end
+local function strip_ansi(line) return line:gsub('\27%[[0-9;]*[A-Za-z]', '') end
 
 function M.parse(lines, roots)
   local items = {}
@@ -72,9 +64,7 @@ function M.parse(lines, roots)
       last = #items
     elseif last then
       local cont = line:match(':check%-types:%s+(.*)$')
-      if cont and cont:match('^%s') then
-        items[last].text = items[last].text .. ' ' .. cont:gsub('^%s+', '')
-      end
+      if cont and cont:match('^%s') then items[last].text = items[last].text .. ' ' .. cont:gsub('^%s+', '') end
     end
   end
 
@@ -86,16 +76,12 @@ local running = false
 function M.run(opts)
   opts = opts or {}
 
-  if running then
-    return notify_add('check-types: already running', 'WARN', 'DiagnosticWarn')
-  end
+  if running then return notify_add('check-types: already running', 'WARN', 'DiagnosticWarn') end
 
   local root = mono_root()
-  if not root then
-    return notify_add('check-types: no pnpm-workspace.yaml found', 'ERROR', 'DiagnosticError')
-  end
+  if not root then return notify_add('check-types: no pnpm-workspace.yaml found', 'ERROR', 'DiagnosticError') end
 
-  local cmd = { 'pnpm', 'exec', 'turbo', 'run', 'check-types', '--ui=stream' }
+  local cmd = { 'pnpm', 'check-types', '--ui=stream' }
   local scope = 'monorepo'
   if opts.filter and opts.filter ~= '' then
     vim.list_extend(cmd, { '--filter', opts.filter })
@@ -107,38 +93,40 @@ function M.run(opts)
   local roots = pkg_roots(root)
   local notify_id = notify_add('check-types: running (' .. scope .. ')...', 'INFO', 'DiagnosticInfo')
 
-  vim.system(cmd, { cwd = root, text = true }, vim.schedule_wrap(function(obj)
-    running = false
-    local elapsed = (vim.loop.hrtime() - started_at) / 1e9
-    local elapsed_msg = string.format(' (%.1fs)', elapsed)
+  vim.system(
+    cmd,
+    { cwd = root, text = true },
+    vim.schedule_wrap(function(obj)
+      running = false
+      local elapsed = (vim.loop.hrtime() - started_at) / 1e9
+      local elapsed_msg = string.format(' (%.1fs)', elapsed)
 
-    if obj.code == nil then
-      return notify_finish(notify_id, 'check-types: cancelled' .. elapsed_msg, 'WARN', 'DiagnosticWarn')
-    end
-
-    local output = (obj.stdout or '') .. (obj.stderr or '')
-    local lines = vim.split(output, '\n', { plain = true })
-    local items = M.parse(lines, roots)
-
-    vim.fn.setqflist({}, ' ', { title = 'check-types', items = items })
-
-    if #items == 0 then
-      vim.cmd('cclose')
-      local msg = 'check-types: clean' .. elapsed_msg
-      if obj.code ~= 0 then
-        msg = msg .. ' (turbo exit ' .. obj.code .. ')'
+      if obj.code == nil then
+        return notify_finish(notify_id, 'check-types: cancelled' .. elapsed_msg, 'WARN', 'DiagnosticWarn')
       end
-      return notify_finish(notify_id, msg, 'INFO', 'DiagnosticInfo')
-    end
 
-    vim.cmd('copen')
-    notify_finish(
-      notify_id,
-      string.format('check-types: %d error%s%s', #items, #items == 1 and '' or 's', elapsed_msg),
-      'ERROR',
-      'DiagnosticError'
-    )
-  end))
+      local output = (obj.stdout or '') .. (obj.stderr or '')
+      local lines = vim.split(output, '\n', { plain = true })
+      local items = M.parse(lines, roots)
+
+      vim.fn.setqflist({}, ' ', { title = 'check-types', items = items })
+
+      if #items == 0 then
+        vim.cmd('cclose')
+        local msg = 'check-types: clean' .. elapsed_msg
+        if obj.code ~= 0 then msg = msg .. ' (turbo exit ' .. obj.code .. ')' end
+        return notify_finish(notify_id, msg, 'INFO', 'DiagnosticInfo')
+      end
+
+      vim.cmd('copen')
+      notify_finish(
+        notify_id,
+        string.format('check-types: %d error%s%s', #items, #items == 1 and '' or 's', elapsed_msg),
+        'ERROR',
+        'DiagnosticError'
+      )
+    end)
+  )
 end
 
 return M
