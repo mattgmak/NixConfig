@@ -210,7 +210,6 @@ require('lazy').setup({
         -- mini.surround handles ds%/cs%-style operations
         surround = { enabled = 0 },
       })
-      vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#917296', bold = true })
     end,
   },
   {

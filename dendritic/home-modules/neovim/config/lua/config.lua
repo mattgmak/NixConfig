@@ -433,11 +433,22 @@ end
 
 setup_diff_window_namespaces()
 
+local function setup_matchup_highlights()
+  -- vim-matchup uses MatchParenCur for the delimiter under the cursor and
+  -- MatchWord/MatchWordCur when treesitter include_match_words is enabled.
+  local matchup_hl = { bg = '#194224', bold = true }
+  vim.api.nvim_set_hl(0, 'MatchParen', matchup_hl)
+  vim.api.nvim_set_hl(0, 'MatchParenCur', matchup_hl)
+  vim.api.nvim_set_hl(0, 'MatchWord', matchup_hl)
+  vim.api.nvim_set_hl(0, 'MatchWordCur', matchup_hl)
+end
+
 vim.api.nvim_create_autocmd('ColorScheme', {
   desc = 'Soft diff backgrounds; per-window old=left/new=right',
   callback = function()
     setup_diff_window_namespaces()
     apply_diff_window_highlights()
+    setup_matchup_highlights()
   end,
 })
 
@@ -450,4 +461,7 @@ vim.api.nvim_create_autocmd({ 'OptionSet', 'WinEnter' }, {
   end,
 })
 
-vim.schedule(function() setup_diff_base_highlights() end)
+vim.schedule(function()
+  setup_diff_base_highlights()
+  setup_matchup_highlights()
+end)
