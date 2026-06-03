@@ -645,6 +645,7 @@ require('lazy').setup({
       -- vim.lsp.enable('tsgo')
       vim.lsp.enable('ts_ls')
       vim.lsp.enable('zls')
+      vim.lsp.enable('yamlls')
     end,
   },
   {
@@ -789,4 +790,16 @@ require('lazy').setup({
     },
   },
   { 'akinsho/git-conflict.nvim', version = '*', config = true },
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      require('bufferline').setup({
+        options = {
+          mode = 'tabs',
+        },
+      })
+    end,
+  },
 })

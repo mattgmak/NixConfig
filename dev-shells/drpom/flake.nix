@@ -158,6 +158,7 @@
                   postgresql
                   tailwindcss-language-server
                   easCli
+                  yaml-language-server
                 ]
                 ++ (if pkgs.stdenv.isDarwin then [ argent ] else [ ])
                 ++ (
