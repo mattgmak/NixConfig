@@ -1,9 +1,6 @@
 [submodule "mattgmak/zen-wireframe-2.0"]
 	path = dendritic/home-modules/zen-browser/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0
-[submodule "dracula/pi-coding-agent"]
-	path = dendritic/home-modules/pi-coding-agent/themes
-	url = https://github.com/dracula/pi-coding-agent.git
 [submodule "mattgmak/pi-cursor-provider"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/cursor-provider
 	url = https://github.com/mattgmak/pi-cursor-provider.git
@@ -43,3 +40,12 @@
 [submodule "omaclaren/pi-markdown-preview"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-markdown-preview
 	url = https://github.com/omaclaren/pi-markdown-preview.git
+[submodule "dracula/pi-coding-agent"]
+	path = dendritic/home-modules/pi-coding-agent/themes/vendor/dracula
+	url = https://github.com/dracula/pi-coding-agent.git
+[submodule "leblancfg/pi-ansi-themes"]
+	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-ansi-themes
+	url = https://github.com/leblancfg/pi-ansi-themes.git
+[submodule "dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin"]
+	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin
+	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git

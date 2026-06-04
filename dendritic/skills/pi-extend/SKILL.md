@@ -79,11 +79,21 @@ extensions/rpiv-todo/index.ts       → ../vendor/rpiv-mono/...
 
 Use `./index.ts` in `pi.extensions` so pi shows `<name>/index.ts`, not nested vendor paths.
 
-**Theme submodule** — vendored under `themes/` (not `extensions/`):
+**Theme submodules** — vendored under `themes/vendor/`, exposed via symlinks at `themes/*.json` (not `extensions/`):
 
 ```
-themes/                       # e.g. dracula/pi-coding-agent theme JSON files
+themes/vendor/dracula/dracula.json
+themes/vendor/pi-ansi-themes/themes/ansi-dark.json
+themes/dracula.json     -> vendor/dracula/dracula.json
+themes/ansi-dark.json   -> vendor/pi-ansi-themes/themes/ansi-dark.json
+themes/ansi-light.json  -> vendor/pi-ansi-themes/themes/ansi-light.json
+themes/catppuccin-latte.json     -> vendor/pi-coding-agent-catppuccin/catppuccin-latte.json
+themes/catppuccin-frappe.json    -> vendor/pi-coding-agent-catppuccin/catppuccin-frappe.json
+themes/catppuccin-macchiato.json -> vendor/pi-coding-agent-catppuccin/catppuccin-macchiato.json
+themes/catppuccin-mocha.json     -> vendor/pi-coding-agent-catppuccin/catppuccin-mocha.json
 ```
+
+`themes/.gitignore` lists `vendor/` (same pattern as `extensions/`).
 
 **Skill (local)** — markdown under `dendritic/skills/<name>/SKILL.md`:
 
@@ -236,15 +246,19 @@ Example: `offbynan/pi-cursor-provider` → fork `you/pi-cursor-provider` → sub
 
 ### Theme submodule
 
-Themes vendored same way but land in `themes/` not `extensions/`:
+Themes vendored under `themes/vendor/<name>/` (not `extensions/`). Pi discovers `*.json` at the top level of `themes/`, so symlink each theme file up from the submodule checkout.
 
 ```bash
-git submodule add https://github.com/dracula/pi-coding-agent.git \
-  dendritic/home-modules/pi-coding-agent/themes
-# .gitmodules entry: [submodule "dracula/pi-coding-agent"]  (owner/repo, not path)
+git submodule add https://github.com/leblancfg/pi-ansi-themes.git \
+  dendritic/home-modules/pi-coding-agent/themes/vendor/pi-ansi-themes
+# .gitmodules entry: [submodule "leblancfg/pi-ansi-themes"]  (owner/repo, not path)
+
+cd dendritic/home-modules/pi-coding-agent/themes
+ln -sfn vendor/pi-ansi-themes/themes/ansi-dark.json ansi-dark.json
+ln -sfn vendor/pi-ansi-themes/themes/ansi-light.json ansi-light.json
 ```
 
-Symlinked to `~/.pi/agent/themes` via `mkOutOfStoreSymlink`. Select theme name in `~/.pi/agent/settings.json`.
+Symlinked to `~/.pi/agent/themes` via `mkOutOfStoreSymlink`. Select theme name in `~/.pi/agent/settings.json` (e.g. `ansi-dark`, `ansi-light`, `dracula`).
 
 ## Vendored skills (`mattpocock/skills`)
 
