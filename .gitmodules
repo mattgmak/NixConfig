@@ -46,6 +46,6 @@
 [submodule "leblancfg/pi-ansi-themes"]
 	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-ansi-themes
 	url = https://github.com/leblancfg/pi-ansi-themes.git
-[submodule "dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin"]
+[submodule "otahontas/pi-coding-agent-catppuccin"]
 	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin
 	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git
