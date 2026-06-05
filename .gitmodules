@@ -49,3 +49,6 @@
 [submodule "otahontas/pi-coding-agent-catppuccin"]
 	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin
 	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git
+[submodule "elpapi42/pi-observational-memory"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-observational-memory
+	url = https://github.com/elpapi42/pi-observational-memory.git
