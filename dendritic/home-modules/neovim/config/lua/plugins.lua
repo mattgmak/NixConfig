@@ -214,7 +214,7 @@ require('lazy').setup({
   },
   {
     'nvim-mini/mini.nvim',
-    version = '*',
+    version = false,
     event = 'VeryLazy',
     config = function()
       local gen_ai_spec = require('mini.extra').gen_ai_spec
@@ -268,6 +268,7 @@ require('lazy').setup({
           modes = { command = true },
         })
         require('mini.notify').setup({})
+        require('mini.input').setup({})
         require('mini.statusline').setup({
           content = {
             active = function()
@@ -642,8 +643,8 @@ require('lazy').setup({
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
       vim.lsp.enable('tailwindcss', { autostart = false })
-      -- vim.lsp.enable('tsgo')
-      vim.lsp.enable('ts_ls')
+      vim.lsp.enable('tsgo')
+      -- vim.lsp.enable('ts_ls')
       vim.lsp.enable('zls')
       vim.lsp.enable('yamlls')
     end,
