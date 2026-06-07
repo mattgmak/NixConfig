@@ -9,5 +9,13 @@
       "id": "deepseek-v4-flash-free"
     }
   },
-  "theme": "catppuccin-mocha"
+  "theme": "catppuccin-mocha",
+  "enabledModels": [
+    "opencode/big-pickle",
+    "cursor/composer-2.5",
+    "cursor/composer-2.5-fast",
+    "opencode/deepseek-v4-flash-free",
+    "opencode/minimax-m2.5-free",
+    "opencode/nemotron-3-super-free"
+  ]
 }
