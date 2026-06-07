@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.75.3",
+  "lastChangelogVersion": "0.78.1",
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5-fast",
   "defaultThinkingLevel": "medium",
