@@ -2,6 +2,7 @@
 {
   flake.nixosModules.common =
     {
+      lib,
       pkgs,
       hostname,
       username,
@@ -237,6 +238,13 @@
         portalPackage =
           inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
       };
+
+      # termfilepickers portal is installed via home-manager, but NIX_XDG_DESKTOP_PORTAL_DIR
+      # restricts backend discovery to the system closure. Add it here so its .portal file
+      # lands in the system portal dir, allowing xdg-desktop-portal to route FileChooser to it.
+      xdg.portal.extraPortals = lib.mkAfter [
+        inputs.xdg-termfilepickers.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ];
 
       programs.nix-ld = {
         enable = true;
