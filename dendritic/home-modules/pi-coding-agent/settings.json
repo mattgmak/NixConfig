@@ -3,5 +3,11 @@
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5-fast",
   "defaultThinkingLevel": "medium",
+  "observational-memory": {
+    "model": {
+      "provider": "opencode",
+      "id": "deepseek-v4-flash-free"
+    }
+  },
   "theme": "catppuccin-mocha"
 }
