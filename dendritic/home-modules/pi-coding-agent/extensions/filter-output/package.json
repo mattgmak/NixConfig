@@ -1,0 +1,10 @@
+{
+  "name": "filter-output",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for filter-output (vendored michalvavra/agents submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

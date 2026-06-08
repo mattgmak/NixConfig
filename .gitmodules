@@ -55,3 +55,6 @@
 [submodule "mattgmak/lean-ctx"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/lean-ctx
 	url = https://github.com/mattgmak/lean-ctx.git
+[submodule "michalvavra/agents"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/michalvavra-agents
+	url = https://github.com/michalvavra/agents.git
