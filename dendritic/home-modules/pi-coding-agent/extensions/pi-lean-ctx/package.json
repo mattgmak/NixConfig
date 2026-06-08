@@ -1,0 +1,10 @@
+{
+  "name": "pi-lean-ctx",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-lean-ctx (vendored yvgude/lean-ctx submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

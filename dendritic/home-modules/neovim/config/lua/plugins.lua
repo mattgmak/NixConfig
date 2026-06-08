@@ -265,7 +265,7 @@ require('lazy').setup({
           },
         })
         require('mini.pairs').setup({
-          modes = { command = true },
+          -- modes = { command = true },
         })
         require('mini.notify').setup({})
         require('mini.input').setup({})

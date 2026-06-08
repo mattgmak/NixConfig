@@ -52,3 +52,6 @@
 [submodule "elpapi42/pi-observational-memory"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-observational-memory
 	url = https://github.com/elpapi42/pi-observational-memory.git
+[submodule "yvgude/lean-ctx"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/lean-ctx
+	url = https://github.com/yvgude/lean-ctx.git
