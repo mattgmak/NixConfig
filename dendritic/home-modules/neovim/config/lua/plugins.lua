@@ -602,6 +602,7 @@ require('lazy').setup({
   --     })
   --   end,
   -- },
+  -- TODO: https://github.com/safzanpirani/cursor.nvim
   {
     'cursortab/cursortab.nvim',
     cond = not is_vscode,

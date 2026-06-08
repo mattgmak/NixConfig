@@ -1,0 +1,10 @@
+{
+  "name": "gentle-engram",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for gentle-engram (vendored Gentleman-Programming/engram submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

@@ -79,6 +79,12 @@
               (cd "$MARKDOWN_PREVIEW" && npm install --omit=dev --no-package-lock)
             fi
           fi
+
+          ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"
+          if [ -f "$ENGRAM_PI/package.json" ]; then
+            echo "pi-npm-i: vendor/engram/plugin/pi"
+            (cd "$ENGRAM_PI" && npm install --omit=dev --no-package-lock)
+          fi
         '';
       };
 
@@ -113,6 +119,7 @@
           piNpmI
           self.packages.${system}.colgrep
           self.packages.${system}.lean-ctx
+          self.packages.${system}.engram
         ]
         ++ markdownPreviewDeps;
 

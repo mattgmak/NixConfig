@@ -58,3 +58,6 @@
 [submodule "michalvavra/agents"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/michalvavra-agents
 	url = https://github.com/michalvavra/agents.git
+[submodule "Gentleman-Programming/engram"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/engram
+	url = https://github.com/Gentleman-Programming/engram.git
