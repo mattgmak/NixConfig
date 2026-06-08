@@ -643,8 +643,8 @@ require('lazy').setup({
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
       vim.lsp.enable('tailwindcss', { autostart = false })
-      vim.lsp.enable('tsgo')
-      -- vim.lsp.enable('ts_ls')
+      -- vim.lsp.enable('tsgo')
+      vim.lsp.enable('ts_ls')
       vim.lsp.enable('zls')
       vim.lsp.enable('yamlls')
     end,

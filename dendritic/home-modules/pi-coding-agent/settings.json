@@ -1,8 +1,8 @@
 {
   "lastChangelogVersion": "0.78.1",
-  "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5-fast",
-  "defaultThinkingLevel": "medium",
+  "defaultProvider": "opencode",
+  "defaultModel": "deepseek-v4-flash-free",
+  "defaultThinkingLevel": "high",
   "observational-memory": {
     "model": {
       "provider": "opencode",

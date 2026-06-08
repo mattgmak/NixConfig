@@ -112,6 +112,7 @@
           bun
           piNpmI
           self.packages.${system}.colgrep
+          self.packages.${system}.lean-ctx
         ]
         ++ markdownPreviewDeps;
 
