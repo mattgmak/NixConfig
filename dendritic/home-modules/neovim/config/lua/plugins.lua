@@ -182,6 +182,11 @@ require('lazy').setup({
     branch = 'main',
   },
   {
+    'windwp/nvim-ts-autotag',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function() require('nvim-ts-autotag').setup() end,
+  },
+  {
     'andymass/vim-matchup',
     -- cond = not is_vscode,
     -- matchup loads minimal startup code; avoid deferring with CursorMoved/VimEnter
