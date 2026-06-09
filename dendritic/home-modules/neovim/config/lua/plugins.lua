@@ -602,30 +602,36 @@ require('lazy').setup({
   --     })
   --   end,
   -- },
-  -- TODO: https://github.com/safzanpirani/cursor.nvim
-  {
-    'cursortab/cursortab.nvim',
-    cond = not is_vscode,
-    -- cond = false,
-    lazy = false,
-    build = 'go build -C server',
-    config = function()
-      require('cursortab').setup({
-        -- provider = {
-        --   type = 'sweep',
-        --   url = 'http://127.0.0.1:9292',
-        --   model = 'sweep-next-edit:1.5b-q8',
-        -- },
-        provider = {
-          type = 'mercuryapi',
-          api_key_env = 'MERCURY_AI_TOKEN',
-        },
-        blink = {
-          enabled = true,
-        },
-      })
-    end,
-  },
+  -- {
+  --   'cursortab/cursortab.nvim',
+  --   cond = not is_vscode,
+  --   -- cond = false,
+  --   lazy = false,
+  --   build = 'go build -C server',
+  --   config = function()
+  --     require('cursortab').setup({
+  --       -- provider = {
+  --       --   type = 'sweep',
+  --       --   url = 'http://127.0.0.1:9292',
+  --       --   model = 'sweep-next-edit:1.5b-q8',
+  --       -- },
+  --       provider = {
+  --         type = 'mercuryapi',
+  --         api_key_env = 'MERCURY_AI_TOKEN',
+  --       },
+  --       blink = {
+  --         enabled = true,
+  --       },
+  --     })
+  --   end,
+  -- },
+  -- {
+  --   'safzanpirani/cursor.nvim',
+  --   cond = not is_vscode,
+  --   lazy = false,
+  --   build = 'cd server; npm install',
+  --   config = function() require('cursor').setup({}) end,
+  -- },
   {
     'neovim/nvim-lspconfig',
     config = function()
