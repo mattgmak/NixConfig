@@ -16,12 +16,37 @@
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
         runtimeInputs = with pkgs; [
+          git
           nodejs_22
           pnpm
         ];
         text = ''
           set -euo pipefail
           EXTENSIONS=${lib.escapeShellArg extensionsDir}
+
+          discard_vendor_changes() {
+            for vendor in "$EXTENSIONS/vendor"/*; do
+              [ -d "$vendor" ] || continue
+              toplevel=$(git -C "$vendor" rev-parse --show-toplevel 2>/dev/null || true)
+              [ -n "$toplevel" ] || continue
+              vendor_real=$(cd "$vendor" && pwd -P)
+              [ "$toplevel" = "$vendor_real" ] || continue
+              status=$(git -C "$vendor" status --porcelain 2>/dev/null || true)
+              [ -n "$status" ] || continue
+              name=$(basename "$vendor")
+              if echo "$status" | grep -Ev '^(\?\?|!!)' >/dev/null; then
+                echo "pi-npm-i: discard tracked changes in vendor/$name"
+                git -C "$vendor" restore .
+              fi
+              if echo "$status" | grep -E '^(\?\?|!!)' >/dev/null; then
+                echo "pi-npm-i: remove untracked files in vendor/$name"
+                git -C "$vendor" clean -fd
+              fi
+            done
+          }
+
+          discard_vendor_changes
+
           for ext in "$EXTENSIONS"/*; do
             [ -d "$ext" ] || continue
             [ "$(basename "$ext")" = "vendor" ] && continue
@@ -81,10 +106,26 @@
           fi
 
           ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"
+          ENGRAM_DEPS_DIR="$EXTENSIONS/vendor/.engram-deps"
           if [ -f "$ENGRAM_PI/package.json" ]; then
-            echo "pi-npm-i: vendor/engram/plugin/pi"
-            (cd "$ENGRAM_PI" && npm install --omit=dev --no-package-lock)
+            echo "pi-npm-i: gentle-engram deps (vendor/.engram-deps)"
+            rm -f "$EXTENSIONS/node_modules"
+            rm -rf "$EXTENSIONS/.engram-deps"
+            mkdir -p "$ENGRAM_DEPS_DIR"
+            node -e "
+              const fs = require('node:fs');
+              const src = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
+              fs.writeFileSync(process.argv[2], JSON.stringify({
+                name: 'engram-pi-deps',
+                private: true,
+                dependencies: src.dependencies || {},
+              }, null, 2));
+            " "$ENGRAM_PI/package.json" "$ENGRAM_DEPS_DIR/package.json"
+            (cd "$ENGRAM_DEPS_DIR" && npm install --omit=dev --no-package-lock)
+            ln -sfn ".engram-deps/node_modules" "$EXTENSIONS/vendor/node_modules"
           fi
+
+          discard_vendor_changes
         '';
       };
 
