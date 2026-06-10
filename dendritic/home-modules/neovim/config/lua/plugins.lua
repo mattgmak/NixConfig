@@ -654,9 +654,20 @@ require('lazy').setup({
       vim.lsp.enable('lua_ls')
       vim.lsp.enable('nixd')
       vim.lsp.enable('biome')
-      vim.lsp.enable('tailwindcss', { autostart = false })
-      -- vim.lsp.enable('tsgo')
-      vim.lsp.enable('ts_ls')
+      vim.lsp.config('tailwindcss', {
+        settings = {
+          tailwindCSS = {
+            experimental = {
+              classRegex = {
+                "[a-zA-Z]*ClassName='([^']+)'",
+                '[a-zA-Z]*ClassName="([^"]+)"',
+                '[a-zA-Z]*ClassName={`([^`]+)`}',
+              },
+            },
+          },
+        },
+      })
+      vim.lsp.enable('tailwindcss')
       vim.lsp.enable('zls')
       vim.lsp.enable('yamlls')
     end,

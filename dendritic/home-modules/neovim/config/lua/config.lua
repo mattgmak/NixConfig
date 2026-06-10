@@ -293,6 +293,7 @@ if is_vscode then
   --   })
   -- end
 else
+  vim.o.winborder = 'rounded'
   vim.keymap.set('t', '<C-Esc>', '<C-\\><C-N>', {
     noremap = true,
     desc = 'Exit terminal mode',
