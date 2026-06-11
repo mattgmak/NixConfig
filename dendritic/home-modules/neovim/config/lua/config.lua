@@ -349,6 +349,8 @@ else
     vim.cmd('packadd nvim.undotree')
     vim.cmd('Undotree')
   end, { desc = 'Toggle Native Undotree' })
+
+  vim.opt.fillchars:append({ diff = '·', eob = '○' })
 end
 
 -- flash
