@@ -48,6 +48,14 @@ in
     ];
   };
 
+  "trek-env.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
+
   "radicale-htpasswd.age" = {
     armor = true;
     publicKeys = [

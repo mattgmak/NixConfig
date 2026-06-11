@@ -28,6 +28,7 @@
           "/mnt/2TBSeagateHDD/immich"
           "/mnt/2TBSeagateHDD/copyparty"
           "/mnt/2TBSeagateHDD/donetick"
+          "/mnt/2TBSeagateHDD/trek"
           "/var/lib/jellyfin"
           "/var/lib/sonarr"
           "/var/lib/radarr"

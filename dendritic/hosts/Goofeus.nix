@@ -35,6 +35,7 @@
           immich
           copyparty
           donetick
+          trek
           radicale
           # nextcloud
           caddy

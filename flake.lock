@@ -2508,6 +2508,7 @@
         "sherlock": "sherlock",
         "stylix": "stylix",
         "tree-sitter": "tree-sitter",
+        "trek-src": "trek-src",
         "whisper-dictation": "whisper-dictation",
         "wiremix": "wiremix",
         "worktrunk": "worktrunk",
@@ -2938,6 +2939,23 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "trek-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781177503,
+        "narHash": "sha256-7VpCFID3wbjyJBZYFnY1ot4X3KvIT72ZH4/rSB5Q6tU=",
+        "owner": "mauriceboe",
+        "repo": "TREK",
+        "rev": "e65acb3de765f3c958dd4e139064b11fbbde79d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mauriceboe",
+        "repo": "TREK",
+        "rev": "e65acb3de765f3c958dd4e139064b11fbbde79d1",
         "type": "github"
       }
     },

@@ -218,6 +218,7 @@
               || config.services.nextcloud.enable
               || config.services.copyparty.enable
               || (options.services ? donetick && config.services.donetick.enable)
+              || (options.services ? trek && config.services.trek.enable)
               || config.services.jellyfin.enable
               || config.services.sonarr.enable
               || config.services.radarr.enable
@@ -240,8 +241,16 @@
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
               immichServe = mkServeDirect "immich" config.services.immich.port;
               copypartyServe = lib.optionalString config.services.copyparty.enable "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
-              donetickServe = lib.optionalString (options.services ? donetick && config.services.donetick.enable) ''
-                tailscale serve --yes --service=svc:donetick --https=443 127.0.0.1:${toString config.services.donetick.port}
+              donetickServe =
+                lib.optionalString (options.services ? donetick && config.services.donetick.enable)
+                  ''
+                    tailscale serve --yes --service=svc:donetick --https=443 127.0.0.1:${toString config.services.donetick.port}
+                  '';
+              trekServe = lib.optionalString (options.services ? trek && config.services.trek.enable) ''
+                tailscale serve --yes --service=svc:trek --https=443 127.0.0.1:${toString config.services.trek.port}
+              '';
+              trekFunnel = lib.optionalString (options.services ? trek && config.services.trek.enable) ''
+                tailscale funnel --yes --service=svc:trek --https=443 127.0.0.1:${toString config.services.trek.port}
               '';
               jellyfinServe = lib.optionalString config.services.jellyfin.enable ''
                 tailscale serve --yes --service=svc:jellyfin --https=443 127.0.0.1:8096
@@ -291,6 +300,8 @@
                 ${immichServe}
                 ${copypartyServe}
                 ${donetickServe}
+                ${trekServe}
+                ${trekFunnel}
                 ${jellyfinServe}
                 ${sonarrServe}
                 ${radarrServe}

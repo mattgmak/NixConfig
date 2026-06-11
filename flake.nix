@@ -140,6 +140,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    trek-src = {
+      url = "github:mauriceboe/TREK/e65acb3de765f3c958dd4e139064b11fbbde79d1";
+      flake = false;
+    };
+
     # code-cursor-flake = {
     #   url = "github:jacopone/code-cursor-nix";
     #   inputs.nixpkgs.follows = "nixpkgs";
