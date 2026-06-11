@@ -1,0 +1,10 @@
+{
+  "name": "cursor-provider",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for cursor-provider (vendored offbynan/pi-cursor-provider submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

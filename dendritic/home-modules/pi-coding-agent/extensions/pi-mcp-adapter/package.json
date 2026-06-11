@@ -1,0 +1,10 @@
+{
+  "name": "pi-mcp-adapter",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-mcp-adapter (vendored nicobailon/pi-mcp-adapter submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

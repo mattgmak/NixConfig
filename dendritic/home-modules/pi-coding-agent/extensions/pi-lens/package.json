@@ -1,0 +1,11 @@
+{
+  "name": "pi-lens",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-lens (vendored apmantza/pi-lens submodule)",
+  "pi": {
+    "extensions": ["./index.ts"],
+    "skills": ["../vendor/pi-lens/skills"]
+  }
+}

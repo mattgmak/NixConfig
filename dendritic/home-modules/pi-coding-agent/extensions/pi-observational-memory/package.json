@@ -1,0 +1,10 @@
+{
+  "name": "pi-observational-memory",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-observational-memory (vendored elpapi42/pi-observational-memory submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

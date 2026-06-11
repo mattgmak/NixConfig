@@ -28,8 +28,7 @@ dendritic/
     ├── extensions/                  # pi TypeScript extensions
     │   ├── vendor/                  # git submodules (upstream sources)
     │   │   └── <name>/              # e.g. vendor/cursor-provider/
-    │   ├── <name>/                  # symlink → vendor/<name> (direct exts)
-    │   └── <loader>/                # thin loader package.json (monorepo exts)
+    │   └── <loader>/                # thin loader dir (package.json + index.ts → vendor/)
     ├── prompts/                     # prompt templates (.md)
     └── themes/                      # e.g. git submodule of theme repo
 ```
@@ -60,15 +59,15 @@ User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix (provider
 
 ### Examples (not exhaustive)
 
-**Extension submodule** — vendored under `extensions/vendor/<name>/`, exposed via symlink `extensions/<name>`:
+**Extension submodule** — vendored under `extensions/vendor/<name>/`, exposed via loader dir `extensions/<name>/`:
 
 ```
-extensions/vendor/cursor-provider/   # git submodule checkout
-extensions/cursor-provider -> vendor/cursor-provider
-extensions/pi-nvim/index.ts     → ../vendor/pi-nvim/extension.ts
+extensions/vendor/cursor-provider/        # git submodule checkout
+extensions/cursor-provider/index.ts  → ../vendor/cursor-provider/index.ts
+extensions/pi-nvim/index.ts          → ../vendor/pi-nvim/extension.ts
 ```
 
-**Loader package** — thin dir with `./index.ts` re-export (good pi config names):
+**Loader package** — thin dir with `package.json` + `./index.ts` re-export:
 
 ```
 extensions/mcp-nixos/index.ts       → ../vendor/mcp-nixos/...
@@ -113,7 +112,7 @@ skills/grill-me -> vendor/mattpocock-skills/skills/productivity/grill-me
 
 Vendored extensions are usually pi packages (`keywords: ["pi-package"]`). Pi discovers subdirs via `package.json` → `pi.extensions` array, or `index.ts`/`index.js`. Skills = `SKILL.md` in a directory; pi auto-discovers from the global skills dir.
 
-`extensions/.gitignore` lists `vendor/` so pi auto-discovery skips duplicate scans of submodule checkouts. Top-level symlinks + loader dirs are what pi loads.
+`extensions/.gitignore` lists `vendor/` so pi auto-discovery skips duplicate scans of submodule checkouts. Top-level loader dirs are what pi loads.
 
 ## Extensions vs skills
 
@@ -198,8 +197,9 @@ git submodule add <upstream-url> dendritic/home-modules/pi-coding-agent/extensio
 
 # 2. Expose to pi discovery
 cd dendritic/home-modules/pi-coding-agent/extensions
-ln -s "vendor/<name>" "<name>"    # direct package
-# OR add a loader dir with package.json → ../vendor/<mono>/...
+mkdir <name>
+# package.json: { "pi": { "extensions": ["./index.ts"] } }
+# index.ts: export { default } from "../vendor/<name>/index.ts";
 
 # 3. Install runtime deps inside submodule (required before pi loads it)
 cd vendor/<name>
@@ -208,7 +208,7 @@ npm install --omit=dev
 # 4. Verify package.json has pi manifest
 #    "pi": { "extensions": ["./index.ts"] }
 
-# 5. Commit .gitmodules + submodule pointer + symlink/loader
+# 5. Commit .gitmodules + submodule pointer + loader dir
 git add .gitmodules dendritic/home-modules/pi-coding-agent/extensions/
 git commit -m "vendor pi extension <name>"
 ```
@@ -317,7 +317,7 @@ Commit directly in NixConfig (not submodule).
 
 ## Install extension deps (`pi-npm-i`)
 
-Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders/symlinks and runs `npm i --omit=dev` where `package.json` has deps.
+Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `extensions/vendor/*` submodules, running `npm i --omit=dev` where `package.json` has deps.
 
 Also builds vendored **context-mode** (needs devDependencies):
 
@@ -391,6 +391,6 @@ Common failures:
 | Custom models/providers | `dendritic/home-modules/pi-coding-agent/models.json` |
 | MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json` |
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
-| Add/update extension | `dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>/` + symlink/loader |
+| Add/update extension | `dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>/` + loader dir |
 | Register submodule | `.gitmodules` + `git submodule add` under `extensions/vendor/` |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent build tweaks) |

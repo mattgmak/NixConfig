@@ -45,13 +45,11 @@
             done
           }
 
-          discard_vendor_changes
-
-          for ext in "$EXTENSIONS"/*; do
-            [ -d "$ext" ] || continue
-            [ "$(basename "$ext")" = "vendor" ] && continue
-            pkg="$ext/package.json"
-            [ -f "$pkg" ] || continue
+          install_npm_deps() {
+            local dir="$1"
+            local label="$2"
+            local pkg="$dir/package.json"
+            [ -f "$pkg" ] || return 0
             kind=$(node -e "
               const fs = require('node:fs');
               const p = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
@@ -62,19 +60,35 @@
               } else {
                 process.exit(1);
               }
-            " "$pkg") || continue
-            echo "pi-npm-i: $(basename "$ext")"
-            if [ -f "$ext/package-lock.json" ]; then
+            " "$pkg") || return 0
+            echo "pi-npm-i: $label"
+            if [ -f "$dir/package-lock.json" ]; then
               if [ "$kind" = "monorepo" ]; then
-                (cd "$ext" && npm ci --omit=dev --ignore-scripts "$@")
+                (cd "$dir" && npm ci --omit=dev --ignore-scripts)
               else
-                (cd "$ext" && npm ci --omit=dev "$@")
+                (cd "$dir" && npm ci --omit=dev)
               fi
             elif [ "$kind" = "monorepo" ]; then
-              (cd "$ext" && npm install --omit=dev --ignore-scripts --no-package-lock "$@")
+              (cd "$dir" && npm install --omit=dev --ignore-scripts --no-package-lock)
             else
-              (cd "$ext" && npm install --omit=dev --no-package-lock "$@")
+              (cd "$dir" && npm install --omit=dev --no-package-lock)
             fi
+          }
+
+          discard_vendor_changes
+
+          for ext in "$EXTENSIONS"/*; do
+            [ -d "$ext" ] || continue
+            [ "$(basename "$ext")" = "vendor" ] && continue
+            install_npm_deps "$ext" "$(basename "$ext")"
+          done
+
+          for vendor in "$EXTENSIONS/vendor"/*; do
+            [ -d "$vendor" ] || continue
+            case "$(basename "$vendor")" in
+              pi-packages|fgladisch-pi-extensions|context-mode|engram) continue ;;
+            esac
+            install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
           done
 
           PI_PACKAGES="$EXTENSIONS/vendor/pi-packages"
@@ -93,16 +107,6 @@
           if [ -f "$CONTEXT_MODE/package.json" ]; then
             echo "pi-npm-i: vendor/context-mode (npm ci + build)"
             (cd "$CONTEXT_MODE" && npm i --omit=dev && npm ci && npm run build)
-          fi
-
-          MARKDOWN_PREVIEW="$EXTENSIONS/vendor/pi-markdown-preview"
-          if [ -f "$MARKDOWN_PREVIEW/package.json" ]; then
-            echo "pi-npm-i: vendor/pi-markdown-preview"
-            if [ -f "$MARKDOWN_PREVIEW/package-lock.json" ]; then
-              (cd "$MARKDOWN_PREVIEW" && npm ci --omit=dev)
-            else
-              (cd "$MARKDOWN_PREVIEW" && npm install --omit=dev --no-package-lock)
-            fi
           fi
 
           ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"

@@ -1,0 +1,10 @@
+{
+  "name": "pi-markdown-preview",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-markdown-preview (vendored omaclaren/pi-markdown-preview submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

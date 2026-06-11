@@ -1,0 +1,11 @@
+{
+  "name": "pi-web-access",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-web-access (vendored nicobailon/pi-web-access submodule)",
+  "pi": {
+    "extensions": ["./index.ts"],
+    "skills": ["../vendor/pi-web-access/skills"]
+  }
+}
