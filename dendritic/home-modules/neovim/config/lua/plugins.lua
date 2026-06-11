@@ -667,6 +667,7 @@ require('lazy').setup({
           },
         },
       })
+      vim.lsp.enable('ts_ls')
       vim.lsp.enable('tailwindcss')
       vim.lsp.enable('zls')
       vim.lsp.enable('yamlls')
