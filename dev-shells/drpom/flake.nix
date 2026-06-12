@@ -183,7 +183,7 @@
                       export ANDROID_HOME=/Volumes/Kingston480GB/Android/sdk
                       export BUN_INSTALL="$HOME/.bun"
                       export PATH="$BUN_INSTALL/bin:$PATH"
-                      unset CC CXX
+                      unset CC CXX LD
                       # stdenv-darwin overrides DEVELOPER_DIR/SDKROOT with the Nix apple-sdk;
                       # EAS local iOS builds need the real Xcode.app toolchain (xcodebuild).
                       export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
