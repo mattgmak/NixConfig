@@ -72,7 +72,6 @@ extensions/pi-nvim/index.ts          → ../vendor/pi-nvim/extension.ts
 ```
 extensions/mcp-nixos/index.ts       → ../vendor/mcp-nixos/...
 extensions/pi-simplify/index.ts     → ../vendor/pi-extensions/...
-extensions/context-mode/index.ts    → ../vendor/context-mode/build/adapters/pi/extension.js
 extensions/rpiv-todo/index.ts       → ../vendor/rpiv-mono/...
 ```
 
@@ -319,13 +318,7 @@ Commit directly in NixConfig (not submodule).
 
 Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `extensions/vendor/*` submodules, running `npm i --omit=dev` where `package.json` has deps.
 
-Also builds vendored **context-mode** (needs devDependencies):
-
-```bash
-pi-npm-i   # vendor/context-mode: npm install && npm run build
-```
-
-Run after submodule add/update or when `vendor/context-mode/build/` is missing.
+Run after submodule add/update when an extension has runtime deps.
 
 ## Apply config changes
 

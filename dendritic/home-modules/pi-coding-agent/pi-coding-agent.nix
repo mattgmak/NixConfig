@@ -86,7 +86,7 @@
           for vendor in "$EXTENSIONS/vendor"/*; do
             [ -d "$vendor" ] || continue
             case "$(basename "$vendor")" in
-              pi-packages|fgladisch-pi-extensions|context-mode|engram) continue ;;
+              pi-packages|fgladisch-pi-extensions|engram) continue ;;
             esac
             install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
           done
@@ -101,12 +101,6 @@
           if [ -f "$FGLADISCH_PI/package.json" ]; then
             echo "pi-npm-i: vendor/fgladisch-pi-extensions (npm ci)"
             (cd "$FGLADISCH_PI" && npm ci --omit=dev --ignore-scripts)
-          fi
-
-          CONTEXT_MODE="$EXTENSIONS/vendor/context-mode"
-          if [ -f "$CONTEXT_MODE/package.json" ]; then
-            echo "pi-npm-i: vendor/context-mode (npm ci + build)"
-            (cd "$CONTEXT_MODE" && npm i --omit=dev && npm ci && npm run build)
           fi
 
           ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"
