@@ -1,0 +1,10 @@
+{
+  "name": "pi-powerline-footer",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-powerline-footer (vendored nicobailon/pi-powerline-footer submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

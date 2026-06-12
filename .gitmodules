@@ -58,3 +58,6 @@
 [submodule "Gentleman-Programming/engram"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/engram
 	url = https://github.com/Gentleman-Programming/engram.git
+[submodule "nicobailon/pi-powerline-footer"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-powerline-footer
+	url = https://github.com/nicobailon/pi-powerline-footer.git

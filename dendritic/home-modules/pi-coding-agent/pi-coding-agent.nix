@@ -45,6 +45,14 @@
             done
           }
 
+          link_powerline_theme() {
+            local theme="$EXTENSIONS/pi-powerline-footer/theme.json"
+            local vendor="$EXTENSIONS/vendor/pi-powerline-footer"
+            if [ -f "$theme" ] && [ -d "$vendor" ]; then
+              ln -sfn ../../pi-powerline-footer/theme.json "$vendor/theme.json"
+            fi
+          }
+
           install_npm_deps() {
             local dir="$1"
             local label="$2"
@@ -76,6 +84,7 @@
           }
 
           discard_vendor_changes
+          link_powerline_theme
 
           for ext in "$EXTENSIONS"/*; do
             [ -d "$ext" ] || continue

@@ -10,6 +10,9 @@
     }
   },
   "theme": "catppuccin-mocha",
+  "powerline": {
+    "preset": "full"
+  },
   "enabledModels": [
     "opencode/big-pickle",
     "cursor/composer-2.5",
