@@ -1,5 +1,6 @@
 # TREK: https://github.com/mauriceboe/TREK — OCI container from Nix-built image.
-# Public: Tailscale Funnel (svc:trek). Tailnet: Tailscale Serve. See TREK.md at repo root.
+# Tailscale sidecar (trek-ts) joins the tailnet as hostname `trek` and exposes Serve + Funnel
+# via TS_SERVE_CONFIG. TREK shares the sidecar network namespace. See TREK.md at repo root.
 {
   flake.nixosModules.trek =
     {
@@ -12,7 +13,30 @@
     let
       cfg = config.services.trek;
       trekImage = packages.trek-image;
-      tailnetFunnelHost = "trek-goofeus.dab-octatonic.ts.net";
+      tailnetBaseDomain = "dab-octatonic.ts.net";
+      tailnetHost = "${cfg.tailscaleHostname}.${tailnetBaseDomain}";
+
+      tailscaleServeConfig = pkgs.writeTextDir "serve.json" ''
+        {
+          "TCP": {
+            "443": {
+              "HTTPS": true
+            }
+          },
+          "Web": {
+            "''${TS_CERT_DOMAIN}:443": {
+              "Handlers": {
+                "/": {
+                  "Proxy": "http://127.0.0.1:${toString cfg.port}"
+                }
+              }
+            }
+          },
+          "AllowFunnel": {
+            "''${TS_CERT_DOMAIN}:443": ${lib.boolToString cfg.funnelEnable}
+          }
+        }
+      '';
     in
     {
       options.services.trek = {
@@ -20,12 +44,12 @@
         port = lib.mkOption {
           type = lib.types.port;
           default = 3000;
-          description = "Host port (loopback only; Tailscale Serve/Funnel reach it externally).";
+          description = "TREK listen port inside the shared sidecar network namespace.";
         };
         stateDirectory = lib.mkOption {
           type = lib.types.str;
           default = "/mnt/2TBSeagateHDD/trek";
-          description = "Host path for SQLite data and uploads.";
+          description = "Host path for SQLite data, uploads, and Tailscale sidecar state.";
         };
         timezone = lib.mkOption {
           type = lib.types.str;
@@ -37,20 +61,63 @@
           default = "172981@gmail.com";
           description = "Initial admin email (first boot only, when no users exist).";
         };
+        tailscaleHostname = lib.mkOption {
+          type = lib.types.str;
+          default = "trek";
+          description = ''
+            MagicDNS hostname for the Tailscale sidecar node
+            (<hostname>.dab-octatonic.ts.net). Remove svc:trek from the admin console if
+            migrating from Tailscale Services.
+          '';
+        };
+        tailscaleTag = lib.mkOption {
+          type = lib.types.str;
+          default = "tag:trek";
+          description = "Tailscale tag advertised by the sidecar (must exist in ACL tagOwners).";
+        };
+        funnelEnable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Expose TREK on the public internet via Tailscale Funnel.";
+        };
+        tailscaleImage = lib.mkOption {
+          type = lib.types.str;
+          default = "docker.io/tailscale/tailscale:latest";
+          description = "OCI image for the Tailscale sidecar container.";
+        };
+        tailscaleAcceptDns = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+          description = ''
+            Whether the sidecar accepts MagicDNS from the tailnet. Leave false so
+            tailscaled can resolve ACME (Let's Encrypt) via the host resolvers.
+          '';
+        };
+        tailscaleDnsServers = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [
+            "1.1.1.1"
+            "8.8.8.8"
+          ];
+          description = ''
+            DNS servers for the sidecar (podman --dns). Public resolvers so
+            tailscaled can resolve ACME (Let's Encrypt) without MagicDNS.
+          '';
+        };
         publicUrl = lib.mkOption {
           type = lib.types.str;
-          default = "https://${tailnetFunnelHost}";
-          description = "APP_URL — Tailscale Funnel/Serve URL for links and cookies.";
+          default = "https://${tailnetHost}";
+          description = "APP_URL — Tailscale Serve/Funnel URL for links and cookies.";
         };
         allowedOrigins = lib.mkOption {
           type = lib.types.str;
-          default = "https://${tailnetFunnelHost}";
+          default = "https://${tailnetHost}";
           description = "ALLOWED_ORIGINS (comma-separated).";
         };
         package = lib.mkOption {
           type = lib.types.package;
           default = trekImage;
-          description = "Nix-built OCI image tarball (dendritic/packages/trek-image.nix).";
+          description = "TREK image package (dendritic/packages/trek-image.nix); built on host via trek-image-build.service.";
         };
       };
 
@@ -61,29 +128,96 @@
             description = "Ensure TREK state directory on 2TB HDD";
             serviceConfig.Type = "oneshot";
             path = [ pkgs.util-linux ];
-            wantedBy = [ "podman-trek.service" ];
-            before = [ "podman-trek.service" ];
+            wantedBy = [
+              "podman-trek-ts.service"
+              "podman-trek.service"
+            ];
+            before = [
+              "podman-trek-ts.service"
+              "podman-trek.service"
+            ];
             after = [ "mnt-2TBSeagateHDD.mount" ];
             script = ''
               if mountpoint -q /mnt/2TBSeagateHDD; then
-                mkdir -p "${cfg.stateDirectory}/data" "${cfg.stateDirectory}/uploads"
-                chmod 0755 "${cfg.stateDirectory}" "${cfg.stateDirectory}/data" "${cfg.stateDirectory}/uploads"
+                mkdir -p \
+                  "${cfg.stateDirectory}/data" \
+                  "${cfg.stateDirectory}/uploads" \
+                  "${cfg.stateDirectory}/tailscale-state"
+                chmod 0755 \
+                  "${cfg.stateDirectory}" \
+                  "${cfg.stateDirectory}/data" \
+                  "${cfg.stateDirectory}/uploads" \
+                  "${cfg.stateDirectory}/tailscale-state"
               fi
             '';
           };
 
+          systemd.services.trek-image-build = {
+            description = "Build TREK OCI image (${cfg.package.passthru.fullName})";
+            serviceConfig = {
+              Type = "oneshot";
+              RemainAfterExit = true;
+              StateDirectory = "trek-image-build";
+            };
+            wantedBy = [ "podman-trek.service" ];
+            before = [ "podman-trek.service" ];
+            after = [ "network-online.target" ];
+            wants = [ "network-online.target" ];
+            path = [ pkgs.podman ];
+            script = ''
+              ${cfg.package}/bin/trek-image-build
+            '';
+          };
+
+          virtualisation.oci-containers.containers.trek-ts = {
+            image = cfg.tailscaleImage;
+            autoStart = true;
+            hostname = cfg.tailscaleHostname;
+            environment = {
+              TS_HOSTNAME = cfg.tailscaleHostname;
+              TS_STATE_DIR = "/var/lib/tailscale";
+              TS_SERVE_CONFIG = "/config/serve.json";
+              TS_AUTH_ONCE = "true";
+              TS_USERSPACE = "false";
+              TS_ENABLE_HEALTH_CHECK = "true";
+              TS_LOCAL_ADDR_PORT = "127.0.0.1:41234";
+              TS_ACCEPT_DNS = lib.boolToString cfg.tailscaleAcceptDns;
+              TS_EXTRA_ARGS = lib.concatStringsSep " " [
+                "--advertise-tags=${cfg.tailscaleTag}"
+                (lib.optionalString (!cfg.tailscaleAcceptDns) "--accept-dns=false")
+              ];
+            };
+            environmentFiles = [ config.age.secrets.trek-tailscale-auth.path ];
+            volumes = [
+              "${cfg.stateDirectory}/tailscale-state:/var/lib/tailscale:rw"
+              "${tailscaleServeConfig}:/config:ro"
+            ];
+            devices = [
+              "/dev/net/tun:/dev/net/tun"
+            ];
+            extraOptions = [
+              "--cap-add=NET_ADMIN"
+              "--cap-add=NET_RAW"
+              "--cap-add=SYS_MODULE"
+            ]
+            ++ map (dns: "--dns=${dns}") cfg.tailscaleDnsServers;
+            podman = {
+              sdnotify = "conmon";
+            };
+          };
+
           virtualisation.oci-containers.containers.trek = {
             image = cfg.package.passthru.fullName;
-            imageFile = "${cfg.package}/image.tar";
             autoStart = true;
-            ports = [ "127.0.0.1:${toString cfg.port}:3000/tcp" ];
+            dependsOn = [ "trek-ts" ];
+            networks = [ "container:trek-ts" ];
             volumes = [
               "${cfg.stateDirectory}/data:/app/data:rw"
               "${cfg.stateDirectory}/uploads:/app/uploads:rw"
             ];
             environment = {
               NODE_ENV = "production";
-              PORT = "3000";
+              PORT = toString cfg.port;
               TZ = cfg.timezone;
               FORCE_HTTPS = "true";
               TRUST_PROXY = "1";
@@ -102,7 +236,7 @@
               "--cap-add=SETUID"
               "--cap-add=SETGID"
               "--tmpfs=/tmp:noexec,nosuid,size=64m"
-              "--health-cmd=wget -qO- http://localhost:3000/api/health || exit 1"
+              "--health-cmd=wget -qO- http://127.0.0.1:${toString cfg.port}/api/health || exit 1"
               "--health-interval=30s"
               "--health-timeout=10s"
               "--health-retries=3"
@@ -115,6 +249,11 @@
 
           age.secrets.trek-env = {
             file = ../../secrets/trek-env.age;
+            mode = "0400";
+          };
+
+          age.secrets.trek-tailscale-auth = {
+            file = ../../secrets/trek-tailscale-auth.age;
             mode = "0400";
           };
         })
