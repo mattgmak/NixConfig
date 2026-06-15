@@ -11,7 +11,8 @@
   },
   "theme": "catppuccin-mocha",
   "powerline": {
-    "preset": "full"
+    "preset": "full",
+    "fixedEditor": false
   },
   "enabledModels": [
     "opencode/big-pickle",
