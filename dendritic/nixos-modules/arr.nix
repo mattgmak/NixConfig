@@ -5,6 +5,13 @@
 # Post-switch: set Sonarr/Radarr root folders to match, Prowlarr → apps, Transmission client,
 # Bazarr → Sonarr/Radarr URLs + providers. FlareSolverr listens on loopback only; in Prowlarr →
 # Settings → General set FlareSolverr URL to http://127.0.0.1:8191.
+#
+# Abyss Jellyfin theme (https://github.com/AumGupta/abyss-jellyfin) is patched into
+# jellyfin-web via flake.abyssJellyfinOverlay (dendritic/overlays/abyss-jellyfin-overlay.nix).
+# - CSS @import URL is injected into index.html (CDN-loaded, no manual step)
+# - Spotlight feature files (spotlight.html, spotlight.css, home-html chunk) are deployed
+# - Home sections should be arranged manually: Settings > Home > Continue Watching,
+#   Next Up, My Media, Recently Added (recommended by the theme)
 { ... }:
 {
   flake.nixosModules.arr =
@@ -91,6 +98,8 @@
         "render"
       ];
 
+      # Jellyfin with Abyss theme (spotlight + CSS injected via jellyfin-web overlay).
+      # Post-rebuild: hard-refresh browser (Ctrl+F5) to clear cached web UI.
       services.jellyfin = {
         enable = true;
         package = pkgs-for-homelab.jellyfin;

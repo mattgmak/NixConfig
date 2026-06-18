@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
   perSystem =
     { system, ... }:
@@ -20,7 +20,10 @@
           pkgs-for-homelab = import inputs.nixpkgs-for-homelab {
             inherit system;
             config.allowUnfree = true;
-            overlays = [ inputs.copyparty.overlays.default ];
+            overlays = [
+              inputs.copyparty.overlays.default
+              self.abyssJellyfinOverlay
+            ];
           };
           pkgs-for-vr = import inputs.nixpkgs-for-vr {
             inherit system;
