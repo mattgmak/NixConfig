@@ -36,10 +36,10 @@
                 patchFlags = old.patchFlags or [ ];
                 name = "${old.pname}-${old.version}-npm-deps";
                 fetcherVersion = 2;
-                hash = "sha256-7zLvhuhyOD/p5xCZ4hsCdFH9E9AQFu8HCOsjSxMB74o=";
+                hash = "sha256-hyr417eI7qtHcLhDweQKhl0KG4ukeWypgUEzqESTuaI=";
                 postPatch = modelsPatch;
               };
-              npmDepsHash = "sha256-vQdV59PAzY1DzGoaNYBXS+3fhqM6yCJ6YzTmr7nuQmk=";
+              npmDepsHash = "sha256-hyr417eI7qtHcLhDweQKhl0KG4ukeWypgUEzqESTuaI=";
             }
           );
         })

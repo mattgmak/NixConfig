@@ -53,6 +53,15 @@
             fi
           }
 
+          link_extension_node_modules() {
+            local ext="$1"
+            local rel_vendor_nm="$2"
+            local abs_vendor_nm="$ext/$rel_vendor_nm"
+            if [ -d "$abs_vendor_nm" ]; then
+              ln -sfn "$rel_vendor_nm" "$ext/node_modules"
+            fi
+          }
+
           install_npm_deps() {
             local dir="$1"
             local label="$2"
@@ -131,6 +140,13 @@
             (cd "$ENGRAM_DEPS_DIR" && npm install --omit=dev --no-package-lock)
             ln -sfn ".engram-deps/node_modules" "$EXTENSIONS/vendor/node_modules"
           fi
+
+          link_extension_node_modules \
+            "$EXTENSIONS/pi-lens" \
+            "../vendor/pi-lens/node_modules"
+          link_extension_node_modules \
+            "$EXTENSIONS/pi-permission-system" \
+            "../vendor/pi-packages/packages/pi-permission-system/node_modules"
 
           discard_vendor_changes
         '';
