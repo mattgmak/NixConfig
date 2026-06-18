@@ -5,13 +5,13 @@
     let
       lean-ctx = pkgs.rustPlatform.buildRustPackage rec {
         pname = "lean-ctx";
-        version = "3.7.5";
+        version = "3.8.8";
 
         src = pkgs.fetchFromGitHub {
           owner = "yvgude";
           repo = "lean-ctx";
           rev = "v${version}";
-          hash = "sha256-V/jjrVh0b/poIkDCDPvHREOAwEKOfEqJD8zfdCW42dQ=";
+          hash = "sha256-4ZaHThboLzgFwKy2jgGww0XOzU1InaACINH0Ow30nPc=";
         };
 
         buildAndTestSubdir = "rust";
