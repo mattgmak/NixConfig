@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   perSystem =
     { pkgs, ... }:
@@ -8,10 +7,10 @@
         version = "3.8.8";
 
         src = pkgs.fetchFromGitHub {
-          owner = "yvgude";
+          owner = "mattgmak";
           repo = "lean-ctx";
-          rev = "v${version}";
-          hash = "sha256-4ZaHThboLzgFwKy2jgGww0XOzU1InaACINH0Ow30nPc=";
+          rev = "ca9397ddc1ff6b15e1dbc0a31287b73579cf8102";
+          hash = "sha256-aiErff8RhLE/3SVPYFhZIIioMmwpl6vdDQdu+tzIg1Y=";
         };
 
         buildAndTestSubdir = "rust";
