@@ -156,6 +156,36 @@
         alsa.support32Bit = true;
         pulse.enable = true;
         jack.enable = true;
+        extraConfig.pipewire."50-combine-stream" = {
+          "context.modules" = [
+            {
+              name = "libpipewire-module-combine-stream";
+              args = {
+                "combine.mode" = "sink";
+                "node.name" = "combined_sink";
+                "node.description" = "All Connected Outputs";
+                "combine.props" = {
+                  "audio.position" = [
+                    "FL"
+                    "FR"
+                  ];
+                };
+                "stream.rules" = [
+                  {
+                    matches = [
+                      {
+                        "media.class" = "Audio/Sink";
+                      }
+                    ];
+                    actions = {
+                      "create-stream" = { };
+                    };
+                  }
+                ];
+              };
+            }
+          ];
+        };
       };
 
       # Define a user account. Don't forget to set a password with 'passwd'.
