@@ -185,6 +185,7 @@ in
           "podman"
           "podman-compose"
           "fastlane"
+          "blueutil"
         ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };
