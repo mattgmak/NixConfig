@@ -166,6 +166,7 @@
 
       coding-agents = {
         skillsDir = lib.mkDefault "${repoRoot}/skills";
+        agentsMdPath = lib.mkDefault "${piAgentRoot}/AGENTS.md";
         pi-coding-agent = {
           enable = lib.mkDefault true;
           extensionsDir = lib.mkDefault "${piAgentRoot}/extensions";
@@ -194,8 +195,6 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
       home.file.".pi/agent/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
-      home.file.".pi/agent/APPEND_SYSTEM.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/APPEND_SYSTEM.md";
       home.file.".pi/web-search.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
     };
