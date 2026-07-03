@@ -52,6 +52,7 @@ Deployed at runtime:
 | `home-modules/pi-coding-agent/themes/` | `themes/` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/models.json` | `models.json` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/mcp.json` | `mcp.json` | `home.file` → `mkOutOfStoreSymlink` |
+| `home-modules/pi-coding-agent/APPEND_SYSTEM.md` | `APPEND_SYSTEM.md` | `home.file` → `mkOutOfStoreSymlink` |
 
 `pi-coding-agent.nix` also imports `inputs.coding-agents.homeManagerModules.default`, enables `pi-coding-agent`, and adds `nodejs_22`.
 
