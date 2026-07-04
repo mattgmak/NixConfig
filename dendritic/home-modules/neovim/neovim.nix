@@ -18,7 +18,7 @@
         withNodeJs = true;
         withRuby = true;
         initLua = ''
-          require('plugins')
+          require('lazy_setup')
           require('config')
         '';
         extraLuaPackages = ps: [ ps.magick ];

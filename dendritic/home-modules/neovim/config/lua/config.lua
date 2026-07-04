@@ -3,10 +3,6 @@ local is_vscode = vim.g.vscode ~= nil
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.stdpath('data') .. '/undo'
 
--- <leader> key
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ','
-
 -- lua binds
 vim.keymap.set('n', '<leader>ls', ':so %<cr>')
 vim.keymap.set('n', '<leader>lx', ':.lua<cr>')
@@ -65,7 +61,7 @@ vim.o.expandtab = true
 
 -- save
 vim.keymap.set('n', '<leader>s', function()
-  if not is_vscode then require('plugins.lsp-format').format({ async = false }) end
+  if not is_vscode then require('lib.lsp-format').format({ async = false }) end
   vim.cmd('write')
 end, { silent = true, desc = 'Save and Format' })
 
@@ -308,14 +304,14 @@ else
   vim.keymap.set('n', '<leader>wn', ':enew<cr>')
   vim.keymap.set('n', '<leader>wo', ':only<cr>')
   vim.keymap.set('v', 'gf', function()
-    require('plugins.lsp-format').format({ fix_all = false })
+    require('lib.lsp-format').format({ fix_all = false })
     vim.cmd('normal! <Esc>')
   end, { desc = 'Format selection' })
   vim.keymap.set(
     'n',
     'gf',
     function()
-      require('plugins.lsp-format').format({
+      require('lib.lsp-format').format({
         range = {
           ['start'] = vim.api.nvim_win_get_cursor(0),
           ['end'] = vim.api.nvim_win_get_cursor(0),
@@ -332,14 +328,14 @@ else
 
   vim.api.nvim_create_user_command(
     'CheckTypes',
-    function(opts) require('plugins.check-types').run({ filter = opts.fargs[1] }) end,
+    function(opts) require('lib.check-types').run({ filter = opts.fargs[1] }) end,
     { nargs = '?', desc = 'Run pnpm check-types and fill quickfix' }
   )
 
   vim.keymap.set(
     'n',
     '<leader>ct',
-    function() require('plugins.check-types').run() end,
+    function() require('lib.check-types').run() end,
     { desc = 'check-types → quickfix' }
   )
 
