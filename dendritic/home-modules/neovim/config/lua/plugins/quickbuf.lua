@@ -6,7 +6,7 @@ return {
   event = 'VeryLazy',
   priority = 1000,
   keys = {
-    { '<leader>m', '<cmd>QuickBuf<CR>', desc = 'QuickBuf' },
+    { '<leader>k', '<cmd>QuickBuf<CR>', desc = 'QuickBuf' },
     { '<leader>p', '<cmd>QuickBufPinToggle<CR>', desc = 'Pin toggle' },
     { '<S-h>', '<cmd>QuickBufPrevPinned<CR>', desc = 'Prev pinned buffer' },
     { '<S-l>', '<cmd>QuickBufNextPinned<CR>', desc = 'Next pinned buffer' },
@@ -19,8 +19,10 @@ return {
       fuzzy_key = '/',
       fuzzy_backend = 'telescope',
       fuzzy_open = nil,
-      alternate_key = '<Tab>',
-      alternate_key_display = '',
+      -- alternate_key = '<Tab>',
+      -- alternate_key_display = '',
+      alternate_key = ' ',
+      alternate_key_display = '󱁐',
       alternate_without_label = true,
       picker = {
         move_up_key = 'k',

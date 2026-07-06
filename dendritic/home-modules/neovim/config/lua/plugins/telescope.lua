@@ -100,17 +100,17 @@ return {
 
     vim.keymap.set('n', '<leader>jv', function() builtin.resume() end, { desc = 'Resume last Telescope' })
     vim.keymap.set('n', '<leader>ja', function() builtin.lsp_workspace_symbols() end, { desc = 'Workspace symbols' })
-    vim.keymap.set(
-      'n',
-      '<leader>k',
-      function()
-        builtin.buffers({
-          sort_mru = true,
-          ignore_current_buffer = true,
-        })
-      end,
-      { desc = 'Buffers MRU' }
-    )
+    -- vim.keymap.set(
+    --   'n',
+    --   '<leader>k',
+    --   function()
+    --     builtin.buffers({
+    --       sort_mru = true,
+    --       ignore_current_buffer = true,
+    --     })
+    --   end,
+    --   { desc = 'Buffers MRU' }
+    -- )
     vim.keymap.set('n', '<leader>jh', function() builtin.help_tags() end, { desc = 'Help tags' })
     vim.keymap.set(
       { 'v' },
