@@ -1,7 +1,7 @@
 { inputs, ... }:
 {
   flake.homeModules.neovim =
-    { config, pkgs, ... }:
+    { config, pkgs, hostname, ... }:
     let
       treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default;
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
@@ -18,6 +18,7 @@
         withNodeJs = true;
         withRuby = true;
         initLua = ''
+          ${pkgs.lib.optionalString (hostname == "Goofeus") "vim.g.disable_ui2 = true"}
           require('lazy_setup')
           require('config')
         '';

@@ -3,6 +3,7 @@ local is_vscode = vim.g.vscode ~= nil
 return {
   'saghen/blink.cmp',
   cond = not is_vscode,
+  branch = 'v1',
   version = '1.*',
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config

@@ -15,6 +15,14 @@
         if lib.isList p then lib.elemAt p 0 else p;
       tailnetBaseDomain = "dab-octatonic.ts.net";
       tailnetFqdn = "goofeus.${tailnetBaseDomain}";
+      transmissionRpcEnabled =
+        config.services.transmission.enable
+        || (lib.isOption options.services.transmissionGluetun && config.services.transmissionGluetun.enable);
+      transmissionRpcPort =
+        if config.services.transmission.enable then
+          config.services.transmission.settings.rpc-port
+        else
+          config.services.transmissionGluetun.rpcPort;
     in
     {
       services.caddy = {
@@ -117,11 +125,11 @@
               '';
             };
           }
-          // lib.optionalAttrs config.services.transmission.enable {
+          // lib.optionalAttrs transmissionRpcEnabled {
             transmission = {
               hostName = "transmission.${baseDomain}";
               extraConfig = ''
-                reverse_proxy 127.0.0.1:${toString config.services.transmission.settings.rpc-port}
+                reverse_proxy 127.0.0.1:${toString transmissionRpcPort}
                 import cloudflare
               '';
             };
@@ -223,7 +231,7 @@
               || config.services.radarr.enable
               || config.services.prowlarr.enable
               || config.services.bazarr.enable
-              || config.services.transmission.enable
+              || transmissionRpcEnabled
               || config.services.radicale.enable
             )
           )
@@ -260,8 +268,8 @@
               bazarrServe = lib.optionalString config.services.bazarr.enable ''
                 tailscale serve --yes --service=svc:bazarr --https=443 127.0.0.1:${toString config.services.bazarr.listenPort}
               '';
-              transmissionServe = lib.optionalString config.services.transmission.enable ''
-                tailscale serve --yes --service=svc:transmission --https=443 127.0.0.1:${toString config.services.transmission.settings.rpc-port}
+              transmissionServe = lib.optionalString transmissionRpcEnabled ''
+                tailscale serve --yes --service=svc:transmission --https=443 127.0.0.1:${toString transmissionRpcPort}
               '';
               radicaleServe = lib.optionalString config.services.radicale.enable ''
                 tailscale serve --yes --service=svc:radicale --https=443 127.0.0.1:5232

@@ -17,6 +17,7 @@
   flake.nixosModules.arr =
     {
       config,
+      options,
       lib,
       pkgs,
       pkgs-for-homelab,
@@ -42,14 +43,16 @@
         wantedBy = [ "multi-user.target" ];
         before = [
           "transmission.service"
+          "podman-transmission-gluetun.service"
+          "podman-transmission.service"
           "sonarr.service"
           "radarr.service"
           "bazarr.service"
           "jellyfin.service"
         ];
+        unitConfig.RequiresMountsFor = [ mediaMount ];
         serviceConfig = {
           Type = "oneshot";
-          RequiresMountsFor = [ mediaMount ];
         };
         script = ''
           if mountpoint -q ${mediaMount}; then
@@ -57,7 +60,11 @@
               ${servarrRoot} \
               ${sonarrRoot} \
               ${radarrRoot} \
-              ${transmissionRoot}/downloads/.incomplete
+              ${transmissionRoot}/downloads/.incomplete \
+              ${transmissionRoot}/downloads/complete
+
+            # LinuxServer transmission init expects /downloads/complete and /downloads/incomplete.
+            ln -sfn .incomplete ${transmissionRoot}/downloads/incomplete
 
             # Whole servarr tree: group "transmission" so Sonarr/Radarr/Bazarr/Jellyfin can traverse.
             chown root:transmission ${servarrRoot}
@@ -159,24 +166,27 @@
         openFirewall = false;
       };
 
-      services.transmission = {
-        enable = true;
-        package = pkgs-for-homelab.transmission_4;
-        home = transmissionHome;
-        downloadDirPermissions = "2775";
-        openPeerPorts = true;
-        openRPCPort = false;
-        settings = {
-          umask = "002";
-          download-dir = "${transmissionRoot}/downloads";
-          incomplete-dir = "${transmissionRoot}/downloads/.incomplete";
-          incomplete-dir-enabled = true;
-          rpc-bind-address = "127.0.0.1";
-          # Reverse proxy (Caddy / tailscale serve) sends a public Host header; without
-          # this, the web UI shows "could not connect to the server" (RPC host check).
-          # RPC stays on loopback only, so disabling host whitelist is low risk.
-          rpc-host-whitelist-enabled = false;
-        };
-      };
+      services.transmission =
+        lib.mkIf
+          (!(lib.isOption options.services.transmissionGluetun && config.services.transmissionGluetun.enable))
+          {
+            enable = true;
+            package = pkgs-for-homelab.transmission_4;
+            home = transmissionHome;
+            downloadDirPermissions = "2775";
+            openPeerPorts = true;
+            openRPCPort = false;
+            settings = {
+              umask = "002";
+              download-dir = "${transmissionRoot}/downloads";
+              incomplete-dir = "${transmissionRoot}/downloads/.incomplete";
+              incomplete-dir-enabled = true;
+              rpc-bind-address = "127.0.0.1";
+              # Reverse proxy (Caddy / tailscale serve) sends a public Host header; without
+              # this, the web UI shows "could not connect to the server" (RPC host check).
+              # RPC stays on loopback only, so disabling host whitelist is low risk.
+              rpc-host-whitelist-enabled = false;
+            };
+          };
     };
 }

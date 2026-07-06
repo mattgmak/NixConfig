@@ -4,7 +4,7 @@ vim.g.maplocalleader = ','
 
 local is_vscode = vim.g.vscode ~= nil
 
-if not is_vscode then require('vim._core.ui2').enable({}) end
+if not is_vscode and not vim.g.disable_ui2 then require('vim._core.ui2').enable({}) end
 
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then

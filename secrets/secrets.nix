@@ -64,6 +64,14 @@ in
     ];
   };
 
+  "transmission-pia-vpn.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
+
   "radicale-htpasswd.age" = {
     armor = true;
     publicKeys = [

@@ -32,6 +32,7 @@
           tailscale
           glance
           arr
+          transmissionGluetun
           immich
           copyparty
           donetick
@@ -140,6 +141,7 @@
           powertop
           lazydocker
           systemctl-tui
+          jq
         ];
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
@@ -166,6 +168,12 @@
         powerManagement.powertop.enable = true;
 
         virtualisation.docker.enable = true;
+        virtualisation.podman.enable = true;
+
+        services.transmissionGluetun = {
+          enable = true;
+          serverRegions = "Netherlands";
+        };
 
         system.stateVersion = "26.05";
       };
