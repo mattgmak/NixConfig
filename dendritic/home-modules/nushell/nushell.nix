@@ -92,6 +92,7 @@
           ''
         );
         environmentVariables = lib.mkMerge [
+          config.home.sessionVariables
           {
             NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";
             NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${username}/NixConfig#darwinConfigurations.MacMini";
