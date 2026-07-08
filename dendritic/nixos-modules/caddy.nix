@@ -107,6 +107,15 @@
               '';
             };
           }
+          // lib.optionalAttrs config.services.lidarr.enable {
+            lidarr = {
+              hostName = "lidarr.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString config.services.lidarr.settings.server.port}
+                import cloudflare
+              '';
+            };
+          }
           // lib.optionalAttrs config.services.prowlarr.enable {
             prowlarr = {
               hostName = "prowlarr.${baseDomain}";
@@ -229,6 +238,7 @@
               || config.services.jellyfin.enable
               || config.services.sonarr.enable
               || config.services.radarr.enable
+              || config.services.lidarr.enable
               || config.services.prowlarr.enable
               || config.services.bazarr.enable
               || transmissionRpcEnabled
@@ -261,6 +271,9 @@
               '';
               radarrServe = lib.optionalString config.services.radarr.enable ''
                 tailscale serve --yes --service=svc:radarr --https=443 127.0.0.1:${toString config.services.radarr.settings.server.port}
+              '';
+              lidarrServe = lib.optionalString config.services.lidarr.enable ''
+                tailscale serve --yes --service=svc:lidarr --https=443 127.0.0.1:${toString config.services.lidarr.settings.server.port}
               '';
               prowlarrServe = lib.optionalString config.services.prowlarr.enable ''
                 tailscale serve --yes --service=svc:prowlarr --https=443 127.0.0.1:${toString config.services.prowlarr.settings.server.port}
@@ -304,6 +317,7 @@
                 ${jellyfinServe}
                 ${sonarrServe}
                 ${radarrServe}
+                ${lidarrServe}
                 ${prowlarrServe}
                 ${bazarrServe}
                 ${transmissionServe}

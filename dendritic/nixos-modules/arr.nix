@@ -1,8 +1,9 @@
-# Jellyfin + *Arr stack (TV, anime, movies) with Transmission on the HDD.
-# Layout: servarr/sonarr, servarr/radarr, servarr/transmission (daemon home + downloads/).
-# Point Sonarr/Radarr root folders at sonarr/ and radarr/; Jellyfin libraries same. Use a flat
+# Jellyfin + *Arr stack (TV, anime, movies, music) with Transmission on the HDD.
+# Layout: servarr/sonarr, servarr/radarr, syncthing/Music (Lidarr), servarr/transmission (daemon home + downloads/).
+# Point Sonarr/Radarr root folders at sonarr/ and radarr/; Lidarr root folder at syncthing/Music
+# (Syncthing shares that path to other devices). Jellyfin libraries same. Use a flat
 # download dir in Transmission (no per-app subfolders) or match paths in *Arr download client settings.
-# Post-switch: set Sonarr/Radarr root folders to match, Prowlarr → apps, Transmission client,
+# Post-switch: set Sonarr/Radarr/Lidarr root folders to match, Prowlarr → apps, Transmission client,
 # Bazarr → Sonarr/Radarr URLs + providers. FlareSolverr listens on loopback only; in Prowlarr →
 # Settings → General set FlareSolverr URL to http://127.0.0.1:8191.
 #
@@ -28,6 +29,8 @@
       servarrRoot = "${mediaMount}/servarr";
       sonarrRoot = "${servarrRoot}/sonarr";
       radarrRoot = "${servarrRoot}/radarr";
+      syncthingRoot = "${mediaMount}/syncthing";
+      musicRoot = "${syncthingRoot}/Music";
       transmissionRoot = "${servarrRoot}/transmission";
       transmissionHome = transmissionRoot;
     in
@@ -47,6 +50,7 @@
           "podman-transmission.service"
           "sonarr.service"
           "radarr.service"
+          "lidarr.service"
           "bazarr.service"
           "jellyfin.service"
         ];
@@ -60,6 +64,7 @@
               ${servarrRoot} \
               ${sonarrRoot} \
               ${radarrRoot} \
+              ${musicRoot} \
               ${transmissionRoot}/downloads/.incomplete \
               ${transmissionRoot}/downloads/complete
 
@@ -76,7 +81,11 @@
             chown radarr:transmission ${radarrRoot}
             chmod 2775 ${radarrRoot}
 
-            # Home 0750; downloads/ is 2775 so Sonarr/Radarr (group "transmission") can read imports.
+            # Lidarr library; Syncthing (root on Goofeus) shares ${musicRoot} to other devices.
+            chown lidarr:transmission ${musicRoot}
+            chmod 2775 ${musicRoot}
+
+            # Home 0750; downloads/ is 2775 so Sonarr/Radarr/Lidarr (group "transmission") can read imports.
             chown transmission:transmission ${transmissionRoot}
             chmod 0750 ${transmissionRoot}
             chown -R transmission:transmission ${transmissionRoot}/downloads
@@ -98,6 +107,7 @@
 
       users.users.sonarr.extraGroups = [ "transmission" ];
       users.users.radarr.extraGroups = [ "transmission" ];
+      users.users.lidarr.extraGroups = [ "transmission" ];
       users.users.bazarr.extraGroups = [ "transmission" ];
       users.users.jellyfin.extraGroups = [
         "transmission"
@@ -142,6 +152,12 @@
       services.radarr = {
         enable = true;
         package = pkgs-for-homelab.radarr;
+        openFirewall = false;
+      };
+
+      services.lidarr = {
+        enable = true;
+        package = pkgs-for-homelab.lidarr;
         openFirewall = false;
       };
 
