@@ -56,7 +56,7 @@
 
         gluetunImage = lib.mkOption {
           type = lib.types.str;
-          default = "docker.io/qmcgaw/gluetun:v3";
+          default = "docker.io/qmcgaw/gluetun:v3.41.1";
           description = "Gluetun OCI image.";
         };
 
@@ -121,6 +121,9 @@
               #!/bin/sh
               set -eu
               port="$1"
+              case "$port" in
+                ''''|*[!0-9]*|0) echo "set-transmission-port: refusing invalid peer port: $port" >&2; exit 1 ;;
+              esac
               rpc="http://127.0.0.1:${toString cfg.rpcPort}/transmission/rpc"
               for attempt in $(seq 1 40); do
                 session=$(
@@ -218,7 +221,7 @@
                   podman exec transmission-gluetun wget -qO- http://127.0.0.1:8000/v1/portforward 2>/dev/null \
                     | ${pkgs.jq}/bin/jq -r .port
                 ) || true
-                if [ -n "''${port:-}" ] && [ "''${port}" != "null" ]; then
+                if [ -n "''${port:-}" ] && [ "''${port}" != "null" ] && [ "''${port}" -gt 0 ] 2>/dev/null; then
                   if podman exec transmission-gluetun /bin/sh /gluetun/set-transmission-port.sh "''${port}"; then
                     echo "transmission-vpn-port-sync: peer port set to ''${port}"
                     exit 0
@@ -237,6 +240,58 @@
             ];
           };
 
+          systemd.services.transmission-gluetun-watchdog = {
+            description = "Restart Gluetun when VPN health stays failed (escalates past in-container loops)";
+            path = [
+              pkgs.podman
+              pkgs.coreutils
+              pkgs.systemd
+            ];
+            serviceConfig = {
+              Type = "oneshot";
+            };
+            script = ''
+              statefile=/var/lib/transmission-gluetun/unhealthy-streak
+              mkdir -p /var/lib/transmission-gluetun
+
+              if ! podman container exists transmission-gluetun 2>/dev/null; then
+                echo 0 > "$statefile"
+                exit 0
+              fi
+
+              health=$(podman inspect transmission-gluetun --format '{{.State.Health.Status}}' 2>/dev/null || echo unknown)
+              if [ "$health" = healthy ]; then
+                echo 0 > "$statefile"
+                exit 0
+              fi
+
+              streak=$(cat "$statefile" 2>/dev/null || echo 0)
+              streak=$((streak + 1))
+              echo "$streak" > "$statefile"
+
+              # Timer fires every 2 min; 3 strikes ≈ 6 min unhealthy before restart.
+              if [ "$streak" -ge 3 ]; then
+                echo "transmission-gluetun-watchdog: unhealthy ($health) for $streak checks, restarting VPN stack" >&2
+                echo 0 > "$statefile"
+                systemctl restart podman-transmission-gluetun.service
+                systemctl restart podman-transmission.service
+                systemctl start --no-block transmission-vpn-port-sync.service
+              else
+                echo "transmission-gluetun-watchdog: unhealthy ($health), streak $streak/3" >&2
+              fi
+            '';
+          };
+
+          systemd.timers.transmission-gluetun-watchdog = {
+            description = "Periodic Gluetun VPN health check";
+            wantedBy = [ "timers.target" ];
+            timerConfig = {
+              OnBootSec = "5min";
+              OnUnitActiveSec = "2min";
+              AccuracySec = "30s";
+            };
+          };
+
           virtualisation.oci-containers.containers.transmission-gluetun = {
             image = cfg.gluetunImage;
             autoStart = true;
@@ -252,6 +307,8 @@
               FIREWALL = "on";
               DOT = "on";
               FIREWALL_OUTBOUND_SUBNETS = "127.0.0.0/8";
+              # In-container VPN restarts leave stale routes and spiral; watchdog does full restarts.
+              HEALTH_RESTART_VPN = "off";
               VPN_PORT_FORWARDING_UP_COMMAND = "/bin/sh /gluetun/set-transmission-port.sh {{PORT}}";
             };
             environmentFiles = [ config.age.secrets.transmission-pia-vpn.path ];
@@ -263,6 +320,7 @@
             ];
             extraOptions = [
               "--cap-add=NET_ADMIN"
+              "--cap-add=NET_RAW"
               # Host Tailscale MagicDNS adds search dab-octatonic.ts.net; without this,
               # Gluetun health/DNS checks for github.com also query github.com.<tailnet>.
               "--dns-search=."
