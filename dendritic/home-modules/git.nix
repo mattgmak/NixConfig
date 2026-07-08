@@ -11,6 +11,8 @@
             email = "u3592095@connect.hku.hk";
           };
           fetch.prune = true;
+          fetch.recurseSubmodules = "on-demand";
+          clone.recurseSubmodules = true;
           # Goofeus: nix flake metadata --refresh fans out many submodule ls-remote
           # calls; serialise fetches and prefer HTTP/1.1 under burst load.
           # Do NOT set http.lowSpeed* here — it aborts large ls-remote bodies (e.g. nixpkgs).
@@ -27,6 +29,7 @@
           # cacheOptions = "--timeout 604800";
           # };
           push.recurseSubmodules = "on-demand";
+          # Implies --recurse-submodules on checkout/pull (replaces githooks).
           submodule.recurse = true;
         }
         // (

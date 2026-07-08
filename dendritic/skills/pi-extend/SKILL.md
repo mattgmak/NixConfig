@@ -236,7 +236,19 @@ git clone --recurse-submodules <NixConfig-url>
 git submodule update --init --recursive
 ```
 
-Git config in `dendritic/home-modules/git.nix` sets `submodule.recurse = true` and `push.recurseSubmodules = on-demand`.
+Git config in `dendritic/home-modules/git.nix` handles day-to-day submodule sync (no githooks):
+
+- `submodule.recurse = true` — checkout/pull update submodules to recorded SHAs
+- `fetch.recurseSubmodules = on-demand` — fetch submodule commits only when the superproject gitlink moves
+- `clone.recurseSubmodules = true` — init submodules on clone
+
+For a full upstream fetch across all ~21 vendor submodules (e.g. before bumping pins), run:
+
+```bash
+~/NixConfig/githooks/submodule-refresh.sh
+```
+
+Do **not** re-add `post-checkout`/`post-merge` hooks that run `git submodule foreach fetch` — that blocks lazygit on every branch switch and file discard.
 
 ### Fork workflow
 
