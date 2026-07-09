@@ -4,13 +4,13 @@
     let
       lean-ctx = pkgs.rustPlatform.buildRustPackage rec {
         pname = "lean-ctx";
-        version = "3.8.8";
+        version = "3.9.3";
 
         src = pkgs.fetchFromGitHub {
           owner = "mattgmak";
           repo = "lean-ctx";
-          rev = "ca9397ddc1ff6b15e1dbc0a31287b73579cf8102";
-          hash = "sha256-aiErff8RhLE/3SVPYFhZIIioMmwpl6vdDQdu+tzIg1Y=";
+          rev = "79b7df01c7dbaacd461e32f33b2a3c46b3c5357e";
+          hash = "sha256-Fbo3znpZPEbrBlJdvAWvAFPMPv6dlmVc/IIC1/y10EU=";
         };
 
         buildAndTestSubdir = "rust";
