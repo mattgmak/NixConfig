@@ -334,5 +334,6 @@ return {
       ---@see NoNeckPain.bufferOptionsScratchPad `:h NoNeckPain.bufferOptionsScratchPad`
       scratchPad = NoNeckPain.bufferOptionsScratchPad,
     }
+    vim.keymap.del('n', '<leader>nd')
   end,
 }
