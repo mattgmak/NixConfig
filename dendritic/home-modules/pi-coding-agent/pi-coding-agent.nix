@@ -12,6 +12,7 @@
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
       extensionsDir = "${piAgentRoot}/extensions";
+      leanCtx = self.packages.${system}.lean-ctx;
 
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
@@ -104,7 +105,7 @@
           for vendor in "$EXTENSIONS/vendor"/*; do
             [ -d "$vendor" ] || continue
             case "$(basename "$vendor")" in
-              pi-packages|fgladisch-pi-extensions|engram) continue ;;
+              lean-ctx|pi-packages|fgladisch-pi-extensions|engram) continue ;;
             esac
             install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
           done
@@ -119,6 +120,17 @@
           if [ -f "$FGLADISCH_PI/package.json" ]; then
             echo "pi-npm-i: vendor/fgladisch-pi-extensions (npm ci)"
             (cd "$FGLADISCH_PI" && npm ci --omit=dev --ignore-scripts)
+          fi
+
+          PI_LEAN_CTX="$EXTENSIONS/vendor/lean-ctx/packages/pi-lean-ctx"
+          if [ -f "$PI_LEAN_CTX/package.json" ]; then
+            echo "pi-npm-i: vendor/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
+            if [ -f "$PI_LEAN_CTX/package-lock.json" ]; then
+              (cd "$PI_LEAN_CTX" && npm ci)
+            else
+              (cd "$PI_LEAN_CTX" && npm install --no-package-lock)
+            fi
+            (cd "$PI_LEAN_CTX" && npm run build:vendor)
           fi
 
           ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"
@@ -197,5 +209,9 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
       home.file.".pi/web-search.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+
+      home.sessionVariables = {
+        LEAN_CTX_BIN = lib.getExe leanCtx;
+      };
     };
 }
