@@ -32,6 +32,14 @@
             ;
         };
         backupFileExtension = "hm-backup-1";
+        sharedModules = [
+          ({ lib, ... }: {
+            # Stylix KDE target sets XDG_CONFIG_DIRS with unexpanded shell syntax
+            # (${XDG_CONFIG_DIRS:+:...}). Apps that split on ':' (e.g. Neovim) then
+            # hit E79 errors and can SIGABRT. We use Hyprland, not Plasma.
+            stylix.targets.kde.enable = lib.mkForce false;
+          })
+        ];
       };
 
       # Enable networking
