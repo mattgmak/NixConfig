@@ -36,7 +36,7 @@
                 patchFlags = old.patchFlags or [ ];
                 name = "${old.pname}-${old.version}-npm-deps";
                 fetcherVersion = 2;
-                hash = "sha256-hyr417eI7qtHcLhDweQKhl0KG4ukeWypgUEzqESTuaI=";
+                hash = "sha256-juE8EY3zL27SJ80AgMrIVhq9Ok8YVEddNslPAC5+p4Q=";
                 postPatch = modelsPatch;
               };
               npmDepsHash = "sha256-hyr417eI7qtHcLhDweQKhl0KG4ukeWypgUEzqESTuaI=";
