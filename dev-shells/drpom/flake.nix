@@ -39,7 +39,7 @@
             ];
             systemImageTypes = [ "google_apis_playstore" ];
             abiVersions = [
-              "armeabi-v7a"
+              "x86_64"
               "arm64-v8a"
             ];
             includeNDK = true;
@@ -51,7 +51,10 @@
             includeSystemImages = true;
             includeExtras = [ "extras;google;auto" ];
           };
-          androidStudio = pkgs.android-studio.withSdk androidComp.androidsdk;
+          androidStudio = (pkgs.android-studio.override {
+            tiling_wm = true;
+            forceWayland = true;
+          }).withSdk androidComp.androidsdk;
           ANDROID_HOME = "${androidComp.androidsdk}/libexec/android-sdk";
           ANDROID_NDK_ROOT = "${ANDROID_HOME}/ndk-bundle";
 
@@ -164,7 +167,6 @@
                 ++ (
                   if pkgs.stdenv.isLinux then
                     [
-                      android-studio
                       androidenv.androidPkgs.platform-tools
                       androidStudio
                       androidComp.androidsdk
