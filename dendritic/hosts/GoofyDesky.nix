@@ -29,6 +29,7 @@
           GoofyDesky
           GoofyDeskyHardware
           orca-slicer
+          ardour
           steam
           vr
           tailscale
