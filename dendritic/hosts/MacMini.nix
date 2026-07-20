@@ -314,11 +314,19 @@ in
           };
           dock = {
             autohide = true;
+            autohide-delay = 0.0;
+            autohide-time-modifier = 0.2;
+            expose-animation-duration = 0.2;
             persistent-apps = [ ];
           };
           NSGlobalDomain = {
             ApplePressAndHoldEnabled = false;
             _HIHideMenuBar = true;
+          };
+          CustomUserPreferences = {
+            "com.apple.loginwindow" = {
+              LoginwindowLaunchesRelaunchApps = false;
+            };
           };
         };
         primaryUser = username;
