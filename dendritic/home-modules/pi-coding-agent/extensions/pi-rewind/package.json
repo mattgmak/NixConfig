@@ -1,0 +1,10 @@
+{
+  "name": "pi-rewind",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-rewind (vendored arpagon/pi-rewind submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
