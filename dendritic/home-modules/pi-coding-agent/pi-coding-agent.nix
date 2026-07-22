@@ -93,53 +93,40 @@
             fi
           }
 
-          discard_vendor_changes
-          link_powerline_theme
-
-          for ext in "$EXTENSIONS"/*; do
-            [ -d "$ext" ] || continue
-            [ "$(basename "$ext")" = "vendor" ] && continue
-            install_npm_deps "$ext" "$(basename "$ext")"
-          done
-
-          for vendor in "$EXTENSIONS/vendor"/*; do
-            [ -d "$vendor" ] || continue
-            case "$(basename "$vendor")" in
-              lean-ctx|pi-packages|fgladisch-pi-extensions|engram) continue ;;
-            esac
-            install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
-          done
-
-          PI_PACKAGES="$EXTENSIONS/vendor/pi-packages"
-          if [ -f "$PI_PACKAGES/pnpm-lock.yaml" ]; then
+          install_pi_packages() {
+            local dir="$EXTENSIONS/vendor/pi-packages"
+            [ -f "$dir/pnpm-lock.yaml" ] || return 0
             echo "pi-npm-i: vendor/pi-packages (pnpm install --frozen-lockfile)"
-            (cd "$PI_PACKAGES" && pnpm install --frozen-lockfile)
-          fi
+            (cd "$dir" && pnpm install --frozen-lockfile)
+          }
 
-          FGLADISCH_PI="$EXTENSIONS/vendor/fgladisch-pi-extensions"
-          if [ -f "$FGLADISCH_PI/package.json" ]; then
+          install_fgladisch_pi() {
+            local dir="$EXTENSIONS/vendor/fgladisch-pi-extensions"
+            [ -f "$dir/package.json" ] || return 0
             echo "pi-npm-i: vendor/fgladisch-pi-extensions (npm ci)"
-            (cd "$FGLADISCH_PI" && npm ci --omit=dev --ignore-scripts)
-          fi
+            (cd "$dir" && npm ci --omit=dev --ignore-scripts)
+          }
 
-          PI_LEAN_CTX="$EXTENSIONS/vendor/lean-ctx/packages/pi-lean-ctx"
-          if [ -f "$PI_LEAN_CTX/package.json" ]; then
+          install_lean_ctx_pi() {
+            local dir="$EXTENSIONS/vendor/lean-ctx/packages/pi-lean-ctx"
+            [ -f "$dir/package.json" ] || return 0
             echo "pi-npm-i: vendor/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
-            if [ -f "$PI_LEAN_CTX/package-lock.json" ]; then
-              (cd "$PI_LEAN_CTX" && npm ci)
+            if [ -f "$dir/package-lock.json" ]; then
+              (cd "$dir" && npm ci)
             else
-              (cd "$PI_LEAN_CTX" && npm install --no-package-lock)
+              (cd "$dir" && npm install --no-package-lock)
             fi
-            (cd "$PI_LEAN_CTX" && npm run build:vendor)
-          fi
+            (cd "$dir" && npm run build:vendor)
+          }
 
-          ENGRAM_PI="$EXTENSIONS/vendor/engram/plugin/pi"
-          ENGRAM_DEPS_DIR="$EXTENSIONS/vendor/.engram-deps"
-          if [ -f "$ENGRAM_PI/package.json" ]; then
+          install_engram_deps() {
+            local engram_pi="$EXTENSIONS/vendor/engram/plugin/pi"
+            local engram_deps_dir="$EXTENSIONS/vendor/.engram-deps"
+            [ -f "$engram_pi/package.json" ] || return 0
             echo "pi-npm-i: gentle-engram deps (vendor/.engram-deps)"
             rm -f "$EXTENSIONS/node_modules"
-            rm -rf "$EXTENSIONS/.engram-deps"
-            mkdir -p "$ENGRAM_DEPS_DIR"
+            rm -rf "$engram_deps_dir"
+            mkdir -p "$engram_deps_dir"
             node -e "
               const fs = require('node:fs');
               const src = JSON.parse(fs.readFileSync(process.argv[1], 'utf8'));
@@ -148,10 +135,58 @@
                 private: true,
                 dependencies: src.dependencies || {},
               }, null, 2));
-            " "$ENGRAM_PI/package.json" "$ENGRAM_DEPS_DIR/package.json"
-            (cd "$ENGRAM_DEPS_DIR" && npm install --omit=dev --no-package-lock)
+            " "$engram_pi/package.json" "$engram_deps_dir/package.json"
+            (cd "$engram_deps_dir" && npm install --omit=dev --no-package-lock)
             ln -sfn ".engram-deps/node_modules" "$EXTENSIONS/vendor/node_modules"
-          fi
+          }
+
+          PARALLEL_PIDS=()
+          PARALLEL_FAIL=0
+
+          queue_parallel() {
+            (
+              set -euo pipefail
+              "$@"
+            ) &
+            PARALLEL_PIDS+=($!)
+          }
+
+          wait_parallel() {
+            local pid
+            for pid in "''${PARALLEL_PIDS[@]}"; do
+              if ! wait "$pid"; then
+                PARALLEL_FAIL=1
+              fi
+            done
+            PARALLEL_PIDS=()
+            if [ "$PARALLEL_FAIL" -ne 0 ]; then
+              exit 1
+            fi
+          }
+
+          discard_vendor_changes
+          link_powerline_theme
+
+          for ext in "$EXTENSIONS"/*; do
+            [ -d "$ext" ] || continue
+            [ "$(basename "$ext")" = "vendor" ] && continue
+            queue_parallel install_npm_deps "$ext" "$(basename "$ext")"
+          done
+
+          for vendor in "$EXTENSIONS/vendor"/*; do
+            [ -d "$vendor" ] || continue
+            case "$(basename "$vendor")" in
+              lean-ctx|pi-packages|fgladisch-pi-extensions|engram) continue ;;
+            esac
+            queue_parallel install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
+          done
+
+          queue_parallel install_pi_packages
+          queue_parallel install_fgladisch_pi
+          queue_parallel install_lean_ctx_pi
+          queue_parallel install_engram_deps
+
+          wait_parallel
 
           link_extension_node_modules \
             "$EXTENSIONS/pi-lens" \
