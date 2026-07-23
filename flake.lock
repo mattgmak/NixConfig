@@ -240,6 +240,27 @@
         "type": "github"
       }
     },
+    "codegraph": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784793380,
+        "narHash": "sha256-EV2OpvubGsfMkVoIeUtvhXGe9Np5vbBNim6r62pETbU=",
+        "owner": "mattgmak",
+        "repo": "codegraph",
+        "rev": "50c70164372bea800244983808041eb0f91669d7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mattgmak",
+        "ref": "implement-nix-flake-support",
+        "repo": "codegraph",
+        "type": "github"
+      }
+    },
     "coding-agents": {
       "inputs": {
         "hermes-agent": "hermes-agent",
@@ -2482,6 +2503,7 @@
       "inputs": {
         "agenix": "agenix",
         "caelestia-shell": "caelestia-shell",
+        "codegraph": "codegraph",
         "coding-agents": "coding-agents",
         "copyparty": "copyparty",
         "flake-parts": "flake-parts_2",

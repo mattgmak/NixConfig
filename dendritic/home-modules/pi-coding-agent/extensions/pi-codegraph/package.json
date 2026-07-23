@@ -1,0 +1,10 @@
+{
+  "name": "pi-codegraph",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for @vndv/pi-codegraph (vendored vndv/pi-codegraph submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

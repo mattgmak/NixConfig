@@ -260,6 +260,7 @@
         cursor-cli
         systemctl-tui
         vesktop
+        inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
 
       programs.gpu-screen-recorder.enable = true;

@@ -135,6 +135,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    codegraph = {
+      url = "github:mattgmak/codegraph/implement-nix-flake-support";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     copyparty = {
       url = "github:9001/copyparty";
       inputs.nixpkgs.follows = "nixpkgs";

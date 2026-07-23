@@ -64,3 +64,6 @@
 [submodule "arpagon/pi-rewind"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-rewind
 	url = https://github.com/arpagon/pi-rewind.git
+[submodule "vndv/pi-codegraph"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-codegraph
+	url = https://github.com/vndv/pi-codegraph.git
