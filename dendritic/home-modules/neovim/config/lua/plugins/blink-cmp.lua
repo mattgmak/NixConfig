@@ -20,7 +20,14 @@ return {
     },
     sources = {
       default = { 'filemention', 'lsp', 'path', 'snippets', 'buffer' },
+      per_filetype = {
+        ['pi-prompt'] = { 'pi' },
+      },
       providers = {
+        pi = {
+          name = 'pi',
+          module = 'pi-bridge.blink_source',
+        },
         filemention = {
           name = 'filemention',
           module = 'filemention.sources.blink',

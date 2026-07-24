@@ -1,0 +1,10 @@
+{
+  "name": "pi-nvim-bridge",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-nvim-bridge (vendored dabstractor/pi-nvim-bridge submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

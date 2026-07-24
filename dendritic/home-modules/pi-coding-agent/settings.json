@@ -1,4 +1,5 @@
 {
+  "externalEditor": "nvim",
   "lastChangelogVersion": "0.80.7",
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5",

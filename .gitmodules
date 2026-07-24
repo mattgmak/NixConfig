@@ -67,3 +67,6 @@
 [submodule "vndv/pi-codegraph"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-codegraph
 	url = https://github.com/vndv/pi-codegraph.git
+[submodule "dabstractor/pi-nvim-bridge"]
+	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-nvim-bridge
+	url = https://github.com/dabstractor/pi-nvim-bridge.git
