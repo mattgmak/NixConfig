@@ -243,6 +243,8 @@
         kdePackages.kdeconnect-kde
         lazyjournal
         stylua
+        shfmt
+        shellcheck
         inputs.wiremix.packages.${pkgs.stdenv.hostPlatform.system}.wiremix
         ffmpeg-full
         uwsm

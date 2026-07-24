@@ -154,6 +154,9 @@ in
           inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
           nightlight
+          bash-language-server
+          shfmt
+          shellcheck
         ]
         ++ (with pkgs.darwin; [
           file_cmds

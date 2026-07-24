@@ -26,6 +26,9 @@
         extraPackages = with pkgs; [
           lua-language-server
           nixd
+          bash-language-server
+          shfmt
+          shellcheck
           gcc
           gnumake
           go

@@ -15,6 +15,17 @@ return {
     vim.lsp.enable('lua_ls')
     vim.lsp.enable('nixd')
     vim.lsp.enable('biome')
+    vim.lsp.config('bashls', {
+      settings = {
+        bashIde = {
+          shellcheckPath = 'shellcheck',
+          shfmt = {
+            path = 'shfmt',
+          },
+        },
+      },
+    })
+    vim.lsp.enable('bashls')
     vim.lsp.config('tailwindcss', {
       settings = {
         tailwindCSS = {
