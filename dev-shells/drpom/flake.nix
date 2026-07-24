@@ -165,6 +165,7 @@
                   easCli
                   yaml-language-server
                   act
+                  railway
                 ]
                 ++ (if pkgs.stdenv.isDarwin then [ argent ] else [ ])
                 ++ (
@@ -204,7 +205,12 @@
                     ''
                       export ANDROID_HOME=${ANDROID_HOME}
                       export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
-                      export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.libsecret pkgs.glib ]}:$LD_LIBRARY_PATH"
+                      export LD_LIBRARY_PATH="${
+                        pkgs.lib.makeLibraryPath [
+                          pkgs.libsecret
+                          pkgs.glib
+                        ]
+                      }:$LD_LIBRARY_PATH"
                     ''
                 }
               '';
