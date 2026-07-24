@@ -163,6 +163,7 @@
                 # devtools.toolsidebar-width.inspector = 536;
                 # devtools.toolsidebar-width.inspector.splitsidebar = 229;
                 "findbar.highlightAll" = true;
+                "general.autoScroll" = true;
                 "font.name.monospace.x-western" = "IosevkaTerm Nerd Font";
                 "font.name.sans-serif.x-western" = "Inter";
                 "font.name.serif.x-western" = "Inter";
