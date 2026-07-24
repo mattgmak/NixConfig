@@ -70,6 +70,10 @@
               name = "searchjump";
               pkg = pkgs.callPackage self.yaziPluginSearchjump { };
             }
+            {
+              name = "folder-rules";
+              pkg = pkgs.callPackage self.yaziPluginFolderRules { };
+            }
           ];
         in
         (builtins.listToAttrs (
