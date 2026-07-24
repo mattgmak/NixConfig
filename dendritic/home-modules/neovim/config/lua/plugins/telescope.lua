@@ -68,6 +68,20 @@ return {
       end,
       { desc = 'Find files' }
     )
+    vim.keymap.set({ 'n' }, '<leader><S-Space>', function()
+      builtin.find_files({ hidden = true })
+    end, { desc = 'Find files (hidden)' })
+    vim.keymap.set(
+      { 'v' },
+      '<leader><S-Space>',
+      function()
+        builtin.find_files({
+          hidden = true,
+          default_text = get_selection(),
+        })
+      end,
+      { desc = 'Find files (hidden)' }
+    )
     vim.keymap.set('n', '<leader>js', function() builtin.lsp_document_symbols() end, { desc = 'Goto symbol in file' })
     vim.keymap.set(
       'n',
