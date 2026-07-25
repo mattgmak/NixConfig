@@ -31,6 +31,8 @@
           push.recurseSubmodules = "on-demand";
           # Implies --recurse-submodules on checkout/pull (replaces githooks).
           submodule.recurse = true;
+          # Clone new vendor submodules on pull/ff without manual --init.
+          submodule.autoInit = true;
         }
         // (
           if hostname == "GoofyWSL" then
