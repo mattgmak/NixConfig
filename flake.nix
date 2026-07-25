@@ -115,6 +115,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    woomer = {
+      url = "github:coffeeispower/woomer";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     tree-sitter = {
       url = "github:tree-sitter/tree-sitter";
       inputs.nixpkgs.follows = "nixpkgs";

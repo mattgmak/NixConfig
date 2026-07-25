@@ -35,6 +35,7 @@
         swaylock-effects
         wl-clipboard
         wlogout
+        inputs.woomer.packages.${pkgs.stdenv.hostPlatform.system}.default
       ];
       xdg.configFile."uwsm/env".source =
         "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
@@ -73,6 +74,11 @@
             # cursorLaunchFlags =
             #   "--enable-features=UseOzonePlatform --ozone-platform=x11 --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
             electronLaunchFlags = "--enable-features=UseOzonePlatform --ozone-platform=wayland --enable-wayland-ime --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers";
+            woomerLaunch =
+              if hostname == "GoofyDesky" then
+                "woomer --monitor ${deskyMonitors.primary} --output ${deskyMonitors.primary}"
+              else
+                "woomer";
           in
           {
             binds = {
@@ -98,7 +104,6 @@
               "ALT, R, focuswindow, initialtitle:(Zen Browser)"
               "ALT, E, focuswindow, class:(.*[Cc]ursor.*)"
               "ALT, W, focuswindow, class:(.*ghostty.*)"
-              "ALT, Z, focuswindow, class:(vesktop)"
               "ALT, O, focuswindow, class:(OrcaSlicer)"
             ];
             bind = [
@@ -158,7 +163,7 @@
               "SUPER, R, exec, zen-beta"
               "SUPER, E, exec, cursor"
               "SUPER, W, exec, ghostty"
-              "SUPER, Z, exec, vesktop ${electronLaunchFlags}"
+              "ALT, Z, exec, ${woomerLaunch}"
               # hyprsunset bind
               "SUPER, F, exec, hyprctl hyprsunset temperature 4500"
               # animation bind
