@@ -3,7 +3,9 @@
   flake.homeModules.caelestia =
     {
       pkgs,
+      lib,
       config,
+      hostname,
       ...
     }:
     {
@@ -93,6 +95,13 @@
           settings = {
             theme.enableGtk = false;
           };
+        };
+      };
+
+      # Keep in sync with dendritic/home-modules/hyprland/hyprland.nix (deskyMonitors.secondary).
+      xdg.configFile."caelestia/monitors/HDMI-A-5/shell.json" = lib.mkIf (hostname == "GoofyDesky") {
+        text = builtins.toJSON {
+          lock.enabled = false;
         };
       };
 
