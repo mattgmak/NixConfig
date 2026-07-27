@@ -26,6 +26,7 @@ return {
       },
     })
     vim.lsp.enable('bashls')
+
     vim.lsp.config('tailwindcss', {
       settings = {
         tailwindCSS = {
@@ -39,8 +40,27 @@ return {
         },
       },
     })
-    vim.lsp.enable('tsgo')
     vim.lsp.enable('tailwindcss')
+
+    vim.lsp.config('tsgo', {
+      cmd = function(dispatchers, config)
+        local root = config and config.root_dir
+        local candidates = { 'tsc', 'tsgo' }
+
+        for _, name in ipairs(candidates) do
+          local cmd = name
+          if root then
+            local local_cmd = vim.fs.joinpath(root, 'node_modules/.bin', name)
+            if vim.fn.executable(local_cmd) == 1 then cmd = local_cmd end
+          end
+          if vim.fn.executable(cmd) == 1 then return vim.lsp.rpc.start({ cmd, '--lsp', '--stdio' }, dispatchers) end
+        end
+
+        vim.notify('No TS 7 LSP binary found (tried tsc, tsgo)', vim.log.levels.ERROR)
+      end,
+    })
+    vim.lsp.enable('tsgo')
+
     vim.lsp.enable('zls')
     vim.lsp.enable('yamlls')
   end,
