@@ -11,6 +11,9 @@
         "get_issue",
         "list_issues"
       ]
+    },
+    "codegraph": {
+      "directTools": true
     }
   }
 }
