@@ -157,6 +157,7 @@ in
           bash-language-server
           shfmt
           shellcheck
+          uv
         ]
         ++ (with pkgs.darwin; [
           file_cmds
