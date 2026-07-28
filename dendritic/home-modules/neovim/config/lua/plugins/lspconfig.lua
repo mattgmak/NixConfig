@@ -42,18 +42,39 @@ return {
     })
     vim.lsp.enable('tailwindcss')
 
+    local tsc_major_cache = {}
+
     vim.lsp.config('tsgo', {
       cmd = function(dispatchers, config)
         local root = config and config.root_dir
-        local candidates = { 'tsc', 'tsgo' }
 
-        for _, name in ipairs(candidates) do
+        local function tsc_major_version(cmd)
+          local key = vim.fn.exepath(cmd) or cmd
+          if tsc_major_cache[key] ~= nil then return tsc_major_cache[key] end
+
+          local result = vim.system({ cmd, '--version' }, { text = true }):wait()
+          local major = 0
+          if result.code == 0 then
+            major = tonumber(result.stdout:match('Version (%d+)')) or 0
+          end
+          tsc_major_cache[key] = major
+          return major
+        end
+
+        local function resolve(name)
           local cmd = name
           if root then
             local local_cmd = vim.fs.joinpath(root, 'node_modules/.bin', name)
             if vim.fn.executable(local_cmd) == 1 then cmd = local_cmd end
           end
-          if vim.fn.executable(cmd) == 1 then return vim.lsp.rpc.start({ cmd, '--lsp', '--stdio' }, dispatchers) end
+          if vim.fn.executable(cmd) ~= 1 then return nil end
+          if name == 'tsc' and tsc_major_version(cmd) < 7 then return nil end
+          return cmd
+        end
+
+        for _, name in ipairs({ 'tsc', 'tsgo' }) do
+          local cmd = resolve(name)
+          if cmd then return vim.lsp.rpc.start({ cmd, '--lsp', '--stdio' }, dispatchers) end
         end
 
         vim.notify('No TS 7 LSP binary found (tried tsc, tsgo)', vim.log.levels.ERROR)
