@@ -118,4 +118,15 @@ in
       MacMini
     ];
   };
+
+  "context7-api-key.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
+    ];
+  };
 }

@@ -31,6 +31,16 @@
           ''
         else
           null;
+      context7ApiKeySecret = ../../../secrets/context7-api-key.age;
+      hasContext7ApiKeySecret = builtins.pathExists context7ApiKeySecret;
+      readContext7ApiKeyScript =
+        if hasContext7ApiKeySecret then
+          pkgs.writeShellScript "read-context7-api-key" ''
+            set -euo pipefail
+            cat "${config.age.secrets.context7-api-key.path}"
+          ''
+        else
+          null;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -38,6 +48,7 @@
       age.secrets = {
         opencode-api-key.file = lib.mkIf hasOpencodeApiKeySecret opencodeApiKeySecret;
         mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
+        context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
       };
 
       programs.nushell = {
@@ -85,6 +96,17 @@
             $env.MERCURY_AI_TOKEN = (
               try {
                 (^${readMercuryAiTokenScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
+          + lib.optionalString hasContext7ApiKeySecret ''
+
+            # context7-api-key.age: one line, raw API key (no CONTEXT7_API_KEY= prefix)
+            $env.CONTEXT7_API_KEY = (
+              try {
+                (^${readContext7ApiKeyScript} | str trim)
               } catch {
                 ""
               }
