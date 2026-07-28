@@ -33,6 +33,7 @@ Deployed at runtime:
 | `home-modules/pi-coding-agent/themes/` | `themes/` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/models.json` | `models.json` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/mcp.json` | `mcp.json` | `home.file` → `mkOutOfStoreSymlink` |
+| `home-modules/pi-coding-agent/lean-ctx/config.toml` | `~/.config/lean-ctx/config.toml` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/AGENTS.md` | `AGENTS.md` | `coding-agents.agentsMdPath` → `mkOutOfStoreSymlink` |
 
 `pi-coding-agent.nix` also imports `inputs.coding-agents.homeManagerModules.default`, enables `pi-coding-agent`, and adds `nodejs_22`.
@@ -337,6 +338,8 @@ Common failures:
 | Custom models/providers | `dendritic/home-modules/pi-coding-agent/models.json` |
 | MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json` |
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
+| lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
+| Agent shell permission rules | `dendritic/home-modules/pi-coding-agent/extensions/pi-permission-system/config.json` |
 | Add/update extension | `dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>/` + loader dir |
 | Register submodule | `.gitmodules` + `git submodule add` under `extensions/vendor/` |
 | Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |

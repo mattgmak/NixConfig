@@ -2,6 +2,9 @@
   "debugLog": false,
   "permissionReviewLog": true,
   "yoloMode": false,
+  "shellTools": {
+    "ctx_shell": { "commandArgument": "command" }
+  },
   "permission": {
     "*": "allow",
     "path": {
@@ -12,6 +15,13 @@
     },
     "bash": {
       "rm -rf *": "deny",
+      "lean-ctx allow *": "deny",
+      "lean-ctx allow": "deny",
+      "lean-ctx config set shell_allowlist*": "deny",
+      "lean-ctx config set shell_allowlist_extra*": "deny",
+      "lean-ctx config set shell_security*": "deny",
+      "lean-ctx security *": "deny",
+      "lean-ctx harden undo*": "deny",
       "sudo *": "ask"
     },
     "external_directory": "allow"

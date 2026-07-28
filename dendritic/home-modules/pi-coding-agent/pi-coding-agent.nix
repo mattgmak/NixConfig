@@ -244,6 +244,8 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
       home.file.".pi/web-search.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+      home.file.".config/lean-ctx/config.toml".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
 
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;

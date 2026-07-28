@@ -1,0 +1,26 @@
+# Managed lean-ctx global config (live-edit via Home Manager symlink).
+# Path: ~/.config/lean-ctx/config.toml
+# Agents cannot self-modify this list — pi-permission-system denies `lean-ctx allow`.
+# Add binaries here manually when a command is blocked by the shell allowlist.
+
+shell_allowlist_extra = [
+  "engram",
+  "glab",
+  "direnv",
+  "pi",
+  "time",
+  "sh",
+  "bash",
+  "nu",
+  "nix-prefetch-git",
+  "act",
+  "docker",
+  "colima",
+  "open",
+  "podman",
+  "tesseract",
+  "pdftotext",
+  "codegraph",
+  "wt",
+  "sesh",
+]
