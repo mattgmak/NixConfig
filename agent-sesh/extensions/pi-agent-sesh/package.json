@@ -1,0 +1,10 @@
+{
+  "name": "pi-agent-sesh",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Registers pi sessions with agent-sesh for tmux picker integration",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

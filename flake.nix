@@ -150,6 +150,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    agent-sesh = {
+      url = "path:./agent-sesh";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     trek-src = {
       url = "github:mauriceboe/TREK/e65acb3de765f3c958dd4e139064b11fbbde79d1";
       flake = false;
