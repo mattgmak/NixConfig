@@ -142,6 +142,26 @@
             };
           };
 
+          droastVersion = "1.4.11";
+          droast = pkgs.rustPlatform.buildRustPackage {
+            pname = "dockerfile-roast";
+            version = droastVersion;
+            src = pkgs.fetchFromGitHub {
+              owner = "immanuwell";
+              repo = "dockerfile-roast";
+              rev = droastVersion;
+              hash = "sha256-PcrCsunROEsihepKUX15mLLxXdkawECXQXOM5kDLvY0=";
+            };
+            cargoHash = "sha256-Uz0FIxSO7nx/JSKIt3OXg9UHmGXY4mXjVOSB9fgi9aU=";
+            doCheck = false;
+            meta = {
+              description = "Dockerfile linter with personality";
+              homepage = "https://github.com/immanuwell/dockerfile-roast";
+              license = pkgs.lib.licenses.mit;
+              mainProgram = "droast";
+            };
+          };
+
           # Use the same buildToolsVersion here
           # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
         in
@@ -163,6 +183,7 @@
                   postgresql
                   tailwindcss-language-server
                   easCli
+                  droast
                   yaml-language-server
                   act
                   railway
