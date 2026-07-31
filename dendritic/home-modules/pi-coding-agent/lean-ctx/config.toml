@@ -23,4 +23,5 @@ shell_allowlist_extra = [
     "codegraph",
     "wt",
     "sesh",
+    "droast",
 ]
