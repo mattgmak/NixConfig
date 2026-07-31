@@ -182,7 +182,7 @@ in
           "android-platform-tools"
           "locationsimulator"
           "zulu@17"
-          "chromium"
+          # "chromium"
           "ghostty"
         ];
         brews = [
