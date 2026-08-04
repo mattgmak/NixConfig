@@ -30,6 +30,7 @@ return {
     vim.lsp.config('tailwindcss', {
       settings = {
         tailwindCSS = {
+          classFunctions = { 'cva', 'cn' },
           experimental = {
             classRegex = {
               "[a-zA-Z]*ClassName='([^']+)'",
