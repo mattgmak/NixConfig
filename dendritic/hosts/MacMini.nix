@@ -184,6 +184,7 @@ in
           "zulu@17"
           # "chromium"
           "ghostty"
+          "figma"
         ];
         brews = [
           "xcode-build-server"
