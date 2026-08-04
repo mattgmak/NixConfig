@@ -80,10 +80,24 @@
               type = lib.types.str;
               default = "90%";
             };
+            useFzf = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = ''
+                Use an sesh-style fzf picker (`agent-sesh fzf`) instead of the
+                built-in Bubble Tea UI. Requires fzf with tmux integration.
+              '';
+            };
+            fzfPackage = lib.mkPackageOption pkgs "fzf" { nullable = true; };
           };
 
           config = lib.mkIf config.programs.agent-sesh.enable {
-            home.packages = [ config.programs.agent-sesh.package ];
+            home.packages = [
+              config.programs.agent-sesh.package
+            ]
+            ++ lib.optional (
+              config.programs.agent-sesh.useFzf && config.programs.agent-sesh.fzfPackage != null
+            ) config.programs.agent-sesh.fzfPackage;
             programs.tmux.plugins = [
               {
                 plugin = self.packages.${system}.agent-sesh-tmux;
@@ -92,6 +106,7 @@
                   set -g @agent-sesh-popup-width '${config.programs.agent-sesh.popupWidth}'
                   set -g @agent-sesh-popup-height '${config.programs.agent-sesh.popupHeight}'
                   set -g @agent-sesh-bin '${lib.getExe config.programs.agent-sesh.package}'
+                  set -g @agent-sesh-mode '${if config.programs.agent-sesh.useFzf then "fzf" else "tui"}'
                 '';
               }
             ];

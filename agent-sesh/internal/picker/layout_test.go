@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 )
 
 func TestVisibleCount(t *testing.T) {
@@ -25,14 +25,12 @@ func TestRenderListFrameBottomAligned(t *testing.T) {
 	if len(lines) != visible {
 		t.Fatalf("got %d lines, want %d", len(lines), visible)
 	}
-	if lines[0] != "" || lines[1] != "" || lines[2] != "" {
-		t.Fatalf("expected top padding, got %#v", lines[:3])
-	}
 	if !strings.Contains(lines[visible-1], "agent-sesh specs") {
 		t.Fatalf("newest session should sit on bottom line, got %q", lines[visible-1])
 	}
-	if !strings.Contains(lines[visible-3], "idle pane") {
-		t.Fatalf("oldest session should sit above newer ones, got %q", lines[visible-3])
+	joined := strings.Join(lines, "\n")
+	if !strings.Contains(joined, "idle pane") {
+		t.Fatalf("oldest session should remain visible, got %q", joined)
 	}
 }
 
@@ -108,7 +106,7 @@ func TestViewFillsTerminalHeight(t *testing.T) {
 			m.height = height
 			m.syncInputWidth()
 
-			lines := strings.Split(m.View(), "\n")
+			lines := strings.Split(viewContent(m), "\n")
 			if len(lines) != height {
 				t.Fatalf("frame height = %d, want %d", len(lines), height)
 			}
@@ -122,9 +120,9 @@ func TestViewStableOnCursorMove(t *testing.T) {
 	m.height = 24
 	m.syncInputWidth()
 
-	before := strings.Split(m.View(), "\n")
+	before := strings.Split(viewContent(m), "\n")
 	m = m.setCursor(1)
-	after := strings.Split(m.View(), "\n")
+	after := strings.Split(viewContent(m), "\n")
 	if len(before) != len(after) {
 		t.Fatalf("cursor move changed frame height: %d -> %d", len(before), len(after))
 	}
@@ -134,7 +132,7 @@ func TestViewNoPreviewWithoutSessions(t *testing.T) {
 	m := testModel(nil)
 	m.width = 120
 	m.height = 24
-	out := m.View()
+	out := viewContent(m)
 	if strings.Contains(out, "│") {
 		t.Fatalf("did not expect preview divider without sessions, got:\n%s", out)
 	}

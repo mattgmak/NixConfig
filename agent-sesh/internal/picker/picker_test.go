@@ -4,10 +4,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/charmbracelet/bubbles/textinput"
+	"charm.land/bubbles/v2/textinput"
 
 	"github.com/mattgmak/agent-sesh/internal/registry"
 )
+
+func viewContent(m model) string {
+	return m.View().Content
+}
 
 func testModel(sessions []registry.Session) model {
 	filter := textinput.New()
@@ -176,7 +180,7 @@ func TestViewShowsSessionsInSplitMode(t *testing.T) {
 	m.height = 24
 	m.syncInputWidth()
 
-	out := m.View()
+	out := viewContent(m)
 	if !strings.Contains(out, "agent-sesh specs") {
 		t.Fatalf("expected session title in split view, got:\n%s", out)
 	}
@@ -188,7 +192,7 @@ func TestPreviewLoadingOnlyBeforeFirstFetch(t *testing.T) {
 	m.height = 24
 	m.syncInputWidth()
 
-	out := m.View()
+	out := viewContent(m)
 	if !strings.Contains(out, "Loading preview") {
 		t.Fatalf("expected loading before first preview, got:\n%s", out)
 	}
@@ -197,7 +201,7 @@ func TestPreviewLoadingOnlyBeforeFirstFetch(t *testing.T) {
 	m.previewContent = "\x1b[31mcolored\x1b[0m"
 	m.previewPending = "2"
 
-	out = m.View()
+	out = viewContent(m)
 	if strings.Contains(out, "Loading preview") {
 		t.Fatalf("expected previous preview while pending fetch, got:\n%s", out)
 	}
@@ -214,9 +218,9 @@ func TestBottomAlignedCursorMovesUpToOlderSession(t *testing.T) {
 	m.selectedID = "1"
 	m.reconcileCursor()
 
-	before := m.View()
+	before := viewContent(m)
 	m = m.setCursor(m.cursor + 1)
-	after := m.View()
+	after := viewContent(m)
 
 	session, ok := m.selected()
 	if !ok || session.ID != "2" {

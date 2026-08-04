@@ -2,12 +2,13 @@ package picker
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/bubbles/v2/textinput"
+	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 
 	"github.com/mattgmak/agent-sesh/internal/registry"
 	"github.com/mattgmak/agent-sesh/internal/tmux"
@@ -79,15 +80,9 @@ type model struct {
 	previewSeq     int
 }
 
-var (
-	cursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("2")).Bold(true)
-	matchStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("1")).Bold(true)
-	normalStyle = lipgloss.NewStyle()
-	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("245")).Faint(true)
-	mutedStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("241")).Faint(true)
-)
-
 func Run() error {
+	initTerminalColors()
+
 	path, err := registry.DefaultPath()
 	if err != nil {
 		return err
@@ -119,9 +114,15 @@ func Run() error {
 	}
 	m.reconcileCursor()
 
+	profile := detectColorProfile()
+	opts := []tea.ProgramOption{tea.WithColorProfile(profile)}
+	if term := strings.TrimSpace(os.Getenv("TERM")); term != "" {
+		opts = append(opts, tea.WithEnvironment(append(os.Environ(), "TERM="+term)))
+	}
+
 	// tmux display-popup -E already owns the pane; alt-screen fights it and bleeds
 	// the underlying pi UI through the picker.
-	if _, err := tea.NewProgram(m).Run(); err != nil {
+	if _, err := tea.NewProgram(m, opts...).Run(); err != nil {
 		return err
 	}
 	return nil
@@ -299,10 +300,11 @@ func (m model) setCursor(index int) model {
 }
 
 func (m model) syncInputWidth() {
-	m.filter.Width = m.contentWidth() - 4
-	if m.filter.Width < 8 {
-		m.filter.Width = 8
+	width := m.contentWidth() - 4
+	if width < 8 {
+		width = 8
 	}
+	m.filter.SetWidth(width)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -337,7 +339,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, tea.Batch(m.schedulePreview(), scheduleRefresh())
 
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		if m.mode == modeRename {
 			switch msg.String() {
 			case "esc":
@@ -500,19 +502,6 @@ func statusIcon(status registry.Status) string {
 	}
 }
 
-func statusLabelStyle(status registry.Status) lipgloss.Style {
-	switch status {
-	case registry.StatusWorking:
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("82")).Bold(true)
-	case registry.StatusWaiting:
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("220"))
-	case registry.StatusToolCall:
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("117")).Bold(true)
-	default:
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
-	}
-}
-
 func shortCWD(path string) string {
 	if path == "" {
 		return ""
@@ -530,10 +519,13 @@ func formatSessionLine(session registry.Session, width int) string {
 	if session.Branch != "" {
 		title = dimStyle.Render(session.Branch) + " " + title
 	}
+	first := truncateLine(icon+" "+title, width)
 	if session.Status == registry.StatusToolCall && session.ToolName != "" {
-		title += " " + matchStyle.Render(session.ToolName)
+		indent := strings.Repeat(" ", lipgloss.Width(icon)+1)
+		second := truncateLine(indent+matchStyle.Render(session.ToolName), width)
+		return first + "\n" + second
 	}
-	return truncateLine(icon+" "+title, width)
+	return first
 }
 
 func (m model) headerView() string {
@@ -549,12 +541,12 @@ func (m model) contentWidth() int {
 	return listCols(m.width, m.splitActive())
 }
 
-func (m model) View() string {
+func (m model) View() tea.View {
 	if m.quitting && m.attach {
-		return ""
+		return tea.NewView("")
 	}
 	if m.width == 0 || m.height == 0 {
-		return "Loading..."
+		return tea.NewView("Loading...")
 	}
 
 	var b strings.Builder
@@ -589,5 +581,5 @@ func (m model) View() string {
 		)
 	}
 
-	return content
+	return tea.NewView(content)
 }

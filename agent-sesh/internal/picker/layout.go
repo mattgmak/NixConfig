@@ -3,7 +3,7 @@ package picker
 import (
 	"strings"
 
-	"github.com/charmbracelet/lipgloss"
+	"charm.land/lipgloss/v2"
 
 	"github.com/mattgmak/agent-sesh/internal/registry"
 )
@@ -87,13 +87,7 @@ type listRenderOpts struct {
 }
 
 func truncateLine(line string, width int) string {
-	if width < 1 {
-		return ""
-	}
-	if lipgloss.Width(line) <= width {
-		return line
-	}
-	return lipgloss.NewStyle().MaxWidth(width).Render(line)
+	return truncateANSI(line, width)
 }
 
 func renderListFrame(
@@ -124,22 +118,31 @@ func renderListFrame(
 	}
 
 	_, end := listWindow(cursor, offset, len(items), visible)
-	shown := end - offset
-	padTop := visible - shown
 
-	for i := 0; i < padTop; i++ {
-		lines = append(lines, "")
-	}
-
-	// Bottom-aligned: oldest row higher on screen, newest nearest the bottom.
+	rows := make([]string, 0, len(items)*2)
 	for i := end - 1; i >= offset; i-- {
 		prefix := "  "
 		if opts.showCursor && i == cursor {
 			prefix = cursorStyle.Render("> ")
 		}
 		body := renderLine(items[i], lineWidth-lipgloss.Width(prefix))
-		lines = append(lines, prefix+body)
+		for j, part := range strings.Split(body, "\n") {
+			linePrefix := prefix
+			if j > 0 {
+				linePrefix = strings.Repeat(" ", lipgloss.Width(prefix))
+			}
+			rows = append(rows, linePrefix+part)
+		}
 	}
+
+	if len(rows) > visible {
+		rows = rows[len(rows)-visible:]
+	}
+	padTop := visible - len(rows)
+	for i := 0; i < padTop; i++ {
+		lines = append(lines, "")
+	}
+	lines = append(lines, rows...)
 
 	for len(lines) < visible {
 		lines = append(lines, "")
@@ -172,13 +175,9 @@ func clipLinesRange(text string, width, rows int, tail bool) string {
 		}
 	}
 
-	clip := lipgloss.NewStyle().MaxWidth(width)
 	for i, line := range lines {
-		line = clip.Render(line)
-		if strings.Contains(line, "\x1b") && !strings.HasSuffix(line, "\x1b[0m") {
-			line += "\x1b[0m"
-		}
-		lines[i] = line
+		line = truncateANSI(line, width)
+		lines[i] = ensureResetSuffix(line)
 	}
 	return strings.Join(lines, "\n")
 }
@@ -198,28 +197,36 @@ func padFrame(content string, height int) string {
 }
 
 func renderPreviewPane(content string, cols, rows int, previewErr error, loading bool) string {
-	faint := lipgloss.NewStyle().Faint(true)
+	innerWidth := cols - previewChrome()
+	innerRows := rows
 
 	var body string
 	switch {
 	case previewErr != nil:
-		body = faint.Render("Preview unavailable: " + previewErr.Error())
+		body = faintStyle.Render("Preview unavailable: " + previewErr.Error())
 	case loading:
-		body = faint.Render("Loading preview...")
+		body = faintStyle.Render("Loading preview...")
 	case strings.TrimSpace(content) == "":
-		body = faint.Render("No preview")
+		body = faintStyle.Render("No preview")
 	default:
-		body = content
+		body = clipLinesTail(content, innerWidth, innerRows)
 	}
 
-	body = clipLinesTail(body, cols-previewChrome(), rows)
-
-	return lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, false, false, true).
-		BorderForeground(lipgloss.Color("8")).
-		PaddingLeft(previewPadding).
-		PaddingTop(headerLines).
-		Width(cols).
-		Height(headerLines + rows).
-		Render(body)
+	border := borderStyle.Render("│")
+	pad := strings.Repeat(" ", previewPadding)
+	lines := strings.Split(body, "\n")
+	out := make([]string, 0, headerLines+innerRows)
+	for i := 0; i < headerLines; i++ {
+		out = append(out, "")
+	}
+	for _, line := range lines {
+		out = append(out, pad+border+line)
+	}
+	for len(out) < headerLines+innerRows {
+		out = append(out, "")
+	}
+	if len(out) > headerLines+innerRows {
+		out = out[:headerLines+innerRows]
+	}
+	return strings.Join(out, "\n")
 }
