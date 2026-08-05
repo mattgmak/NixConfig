@@ -109,6 +109,11 @@
         source = ../nixos-modules/style/beautiful-mountains-landscape.jpg;
       };
 
-      home.packages = [ pkgs.quickshell ];
+      home.file.".config/swappy/config".source = ./caelestia/swappy-config;
+
+      home.packages = with pkgs; [
+        quickshell
+        swappy
+      ];
     };
 }
