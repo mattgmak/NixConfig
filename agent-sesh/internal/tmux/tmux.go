@@ -20,22 +20,20 @@ func CapturePane(target string, lines int) (string, error) {
 		return "", fmt.Errorf("empty pane target")
 	}
 
-	// Match sesh: capture-pane -e -p -t TARGET (colors + visible pane).
-	out, err := exec.Command("tmux", "capture-pane", "-e", "-p", "-t", target).Output()
-	if err == nil && strings.TrimSpace(string(out)) != "" {
-		return string(out), nil
+	// Pi and other full-screen TUIs render on the alternate screen; try that
+	// first so we avoid a wasted capture on the main screen (sesh only needs
+	// one call for shell sessions, but agent-sesh lists pi panes exclusively).
+	if content, ok := capturePaneAltScreen(target); ok {
+		return content, nil
 	}
-
-	// Full-screen TUIs (pi) render on the alternate screen.
-	out, err = exec.Command("tmux", "capture-pane", "-e", "-p", "-a", "-q", "-t", target).Output()
-	if err == nil && strings.TrimSpace(string(out)) != "" {
-		return string(out), nil
+	if content, ok := capturePaneVisible(target); ok {
+		return content, nil
 	}
 
 	if lines <= 0 {
 		lines = 200
 	}
-	out, err = exec.Command(
+	out, err := exec.Command(
 		"tmux", "capture-pane", "-e", "-p", "-J", "-S", fmt.Sprintf("-%d", lines), "-t", target,
 	).Output()
 	if err != nil {
@@ -44,7 +42,32 @@ func CapturePane(target string, lines int) (string, error) {
 	return string(out), nil
 }
 
+func capturePaneVisible(target string) (string, bool) {
+	out, err := exec.Command("tmux", "capture-pane", "-e", "-p", "-t", target).Output()
+	if err != nil || strings.TrimSpace(string(out)) == "" {
+		return "", false
+	}
+	return string(out), true
+}
+
+func capturePaneAltScreen(target string) (string, bool) {
+	out, err := exec.Command("tmux", "capture-pane", "-e", "-p", "-a", "-q", "-t", target).Output()
+	if err != nil || strings.TrimSpace(string(out)) == "" {
+		return "", false
+	}
+	return string(out), true
+}
+
 func SwitchClient(target string) error {
+	target = strings.TrimSpace(target)
+	if target == "" {
+		return fmt.Errorf("empty pane target")
+	}
+	if kind, _ := ParseTarget(target); kind == TargetPane {
+		if err := exec.Command("tmux", "select-pane", "-t", target).Run(); err != nil {
+			return err
+		}
+	}
 	return exec.Command("tmux", "switch-client", "-t", target).Run()
 }
 

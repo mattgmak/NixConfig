@@ -22,7 +22,7 @@ func List(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	sessions = pruneAndPersist(path, sessions)
+	sessions = sanitizeAndPersist(path, sessions)
 	for _, session := range sessions {
 		if _, err := fmt.Fprintln(w, formatFzfLine(session)); err != nil {
 			return err
@@ -43,22 +43,33 @@ func Preview(w io.Writer, key string) error {
 	}
 
 	key = strings.TrimSpace(key)
-	var target string
-	for _, session := range sessions {
-		if session.ID == key || session.TmuxTarget == key || session.Title == key {
-			target = session.TmuxTarget
+	var session registry.Session
+	var found bool
+	for _, s := range sessions {
+		if s.ID == key || s.TmuxTarget == key || s.Title == key {
+			session = s
+			found = true
 			break
 		}
 	}
-	if target == "" {
-		target = key
+	target := key
+	revision := ""
+	if found {
+		target = session.TmuxTarget
+		revision = previewRevision(session)
 	}
-	if !tmux.PaneExists(target) {
-		return fmt.Errorf("pane %s is gone", target)
+	if revision != "" {
+		if content, err, ok := getPreviewCache(target, revision); ok {
+			_, err = io.WriteString(w, content)
+			return err
+		}
 	}
 	content, err := tmux.CapturePane(target, 0)
 	if err != nil {
 		return err
+	}
+	if revision != "" {
+		setPreviewCache(target, revision, content, nil)
 	}
 	_, err = io.WriteString(w, content)
 	return err
@@ -66,6 +77,15 @@ func Preview(w io.Writer, key string) error {
 
 // RunFzf launches an sesh-style fzf picker with multiline ANSI preview.
 func RunFzf() error {
+	if _, err := initProfile(); err != nil {
+		return fmt.Errorf("init profile: %w", err)
+	}
+	defer func() {
+		if path := closeProfile(); path != "" {
+			fmt.Fprintf(os.Stderr, "agent-sesh: profile log %s\n", path)
+		}
+	}()
+
 	path, err := registry.DefaultPath()
 	if err != nil {
 		return err
@@ -74,7 +94,7 @@ func RunFzf() error {
 	if err != nil {
 		return err
 	}
-	sessions = pruneAndPersist(path, sessions)
+	sessions = sanitizeAndPersist(path, sessions)
 	if len(sessions) == 0 {
 		return nil
 	}
@@ -90,11 +110,14 @@ func RunFzf() error {
 		"--tmux", "90%,90%",
 		"--no-sort",
 		"--ansi",
+		"--border", "rounded",
 		"--border-label", " agent-sesh ",
-		"--prompt", "⚡  ",
-		"--header", "  Enter attach  ^x kill pane  ^X kill session  ^t new window  / filter",
+		"--input-border", "rounded",
+		"--preview-border", "rounded",
+		"--prompt", "> ",
+		"--header", "  Enter attach  ^x kill pane  ^X kill session  ^t new window",
 		"--bind", "tab:down,btab:up",
-		"--preview-window", "right:55%",
+		"--preview-window", "right:40%",
 		"--preview", preview,
 		"--delimiter", "\t",
 		"--with-nth", "2..",

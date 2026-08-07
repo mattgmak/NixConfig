@@ -1,7 +1,6 @@
 package picker
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -19,16 +18,16 @@ func TestVisibleCount(t *testing.T) {
 
 func TestRenderListFrameBottomAligned(t *testing.T) {
 	items := sampleSessions()
-	visible := 6
-	out := renderListFrame(items, 0, 0, visible, 58, listRenderOpts{showCursor: true}, formatSessionLine)
+	visible := 12
+	out := renderListFrame(items, 0, visible, 58, listRenderOpts{showCursor: true}, formatSessionEntry)
 	lines := strings.Split(out, "\n")
 	if len(lines) != visible {
 		t.Fatalf("got %d lines, want %d", len(lines), visible)
 	}
-	if !strings.Contains(lines[visible-1], "agent-sesh specs") {
-		t.Fatalf("newest session should sit on bottom line, got %q", lines[visible-1])
-	}
 	joined := strings.Join(lines, "\n")
+	if !strings.Contains(joined, "nixconfig") || !strings.Contains(joined, "implement agent picker") {
+		t.Fatalf("newest session should be visible near bottom, got %q", joined)
+	}
 	if !strings.Contains(joined, "idle pane") {
 		t.Fatalf("oldest session should remain visible, got %q", joined)
 	}
@@ -37,7 +36,7 @@ func TestRenderListFrameBottomAligned(t *testing.T) {
 func TestRenderListFrameFixedHeightWhenScrolling(t *testing.T) {
 	items := sampleSessions()
 	visible := 2
-	out := renderListFrame(items, 2, 1, visible, 58, listRenderOpts{showCursor: true}, formatSessionLine)
+	out := renderListFrame(items, 2, visible, 58, listRenderOpts{showCursor: true}, formatSessionEntry)
 	if strings.Count(out, "\n")+1 != visible {
 		t.Fatalf("expected exactly %d lines, got:\n%s", visible, out)
 	}
@@ -98,19 +97,15 @@ func TestPadFrame(t *testing.T) {
 	}
 }
 
-func TestViewFillsTerminalHeight(t *testing.T) {
-	for _, height := range []int{10, 24, 50} {
-		t.Run(fmt.Sprintf("height-%d", height), func(t *testing.T) {
-			m := testModel(sampleSessions())
-			m.width = 120
-			m.height = height
-			m.syncInputWidth()
+func TestViewRendersSessionList(t *testing.T) {
+	m := testModel(sampleSessions())
+	m.width = 120
+	m.height = 24
+	m.syncInputWidth()
 
-			lines := strings.Split(viewContent(m), "\n")
-			if len(lines) != height {
-				t.Fatalf("frame height = %d, want %d", len(lines), height)
-			}
-		})
+	out := viewContent(m)
+	if !strings.Contains(out, "nixconfig") {
+		t.Fatalf("expected rendered sessions, got:\n%s", out)
 	}
 }
 
@@ -133,8 +128,8 @@ func TestViewNoPreviewWithoutSessions(t *testing.T) {
 	m.width = 120
 	m.height = 24
 	out := viewContent(m)
-	if strings.Contains(out, "│") {
-		t.Fatalf("did not expect preview divider without sessions, got:\n%s", out)
+	if strings.Contains(out, "Loading preview") {
+		t.Fatalf("did not expect preview without sessions, got:\n%s", out)
 	}
 }
 

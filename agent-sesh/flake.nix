@@ -91,26 +91,34 @@
             fzfPackage = lib.mkPackageOption pkgs "fzf" { nullable = true; };
           };
 
-          config = lib.mkIf config.programs.agent-sesh.enable {
-            home.packages = [
-              config.programs.agent-sesh.package
-            ]
-            ++ lib.optional (
-              config.programs.agent-sesh.useFzf && config.programs.agent-sesh.fzfPackage != null
-            ) config.programs.agent-sesh.fzfPackage;
-            programs.tmux.plugins = [
-              {
-                plugin = self.packages.${system}.agent-sesh-tmux;
-                extraConfig = ''
-                  set -g @agent-sesh-bind '${config.programs.agent-sesh.tmuxKey}'
-                  set -g @agent-sesh-popup-width '${config.programs.agent-sesh.popupWidth}'
-                  set -g @agent-sesh-popup-height '${config.programs.agent-sesh.popupHeight}'
-                  set -g @agent-sesh-bin '${lib.getExe config.programs.agent-sesh.package}'
-                  set -g @agent-sesh-mode '${if config.programs.agent-sesh.useFzf then "fzf" else "tui"}'
-                '';
-              }
-            ];
-          };
+          config = lib.mkIf config.programs.agent-sesh.enable (
+            let
+              bin = lib.getExe config.programs.agent-sesh.package;
+              key = config.programs.agent-sesh.tmuxKey;
+              width = config.programs.agent-sesh.popupWidth;
+              height = config.programs.agent-sesh.popupHeight;
+            in
+            {
+              home.packages = [
+                config.programs.agent-sesh.package
+              ]
+              ++ lib.optional (
+                config.programs.agent-sesh.useFzf && config.programs.agent-sesh.fzfPackage != null
+              ) config.programs.agent-sesh.fzfPackage;
+
+              # Bind after plugins — plugin run-shell scripts can fail to register prefix binds during load.
+              programs.tmux.extraConfig = lib.mkAfter (
+                if config.programs.agent-sesh.useFzf then
+                  ''
+                    bind-key -T prefix -N "agent-sesh: picker (fzf)" ${key} run-shell "${bin} fzf"
+                  ''
+                else
+                  ''
+                    bind-key -T prefix -N "agent-sesh: picker" ${key} display-popup -E -w "${width}" -h "${height}" "${bin}"
+                  ''
+              );
+            }
+          );
         };
     };
 }

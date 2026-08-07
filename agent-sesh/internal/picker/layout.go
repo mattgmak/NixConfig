@@ -14,8 +14,9 @@ const (
 	maxListWidth         = 60
 	minListWidth         = 40
 	previewPadding       = 1
-	previewWidthPct      = 55
-	previewMinWidth      = 100
+	previewWidthPct      = 40
+	previewMinWidth      = 80
+	entryLines           = 2
 )
 
 func visibleCount(height int) int {
@@ -26,12 +27,24 @@ func visibleCount(height int) int {
 	return available
 }
 
+func previewActive(width int) bool {
+	return width >= previewMinWidth
+}
+
 func previewChrome() int {
 	return previewPadding + 1
 }
 
-func previewCols(width int, split bool) int {
-	if !split || width < previewMinWidth {
+func splitActive(width, height int, hasSessions bool) bool {
+	return hasSessions && previewActive(width) && previewCols(width) > 0 && height >= headerLines+minListRows()
+}
+
+func minListRows() int {
+	return 4
+}
+
+func previewCols(width int) int {
+	if !previewActive(width) {
 		return 0
 	}
 	cols := width * previewWidthPct / 100
@@ -47,12 +60,9 @@ func previewCols(width int, split bool) int {
 	return cols
 }
 
-func listCols(width int, split bool) int {
-	w := width
-	if split {
-		w = width - previewCols(width, true)
-	}
-	if w < minListWidth {
+func contentWidth(totalWidth int) int {
+	w := totalWidth - previewCols(totalWidth)
+	if w < 30 {
 		w = minListWidth
 	}
 	if w > maxListWidth {
@@ -93,57 +103,95 @@ func truncateLine(line string, width int) string {
 func renderListFrame(
 	items []registry.Session,
 	cursor int,
-	offset int,
 	visible int,
 	lineWidth int,
 	opts listRenderOpts,
-	renderLine func(session registry.Session, width int) string,
+	renderEntry func(session registry.Session, width int) []string,
 ) string {
 	if visible < 1 {
 		return ""
 	}
-
-	lines := make([]string, 0, visible)
 
 	if len(items) == 0 {
 		empty := opts.emptyText
 		if empty == "" {
 			empty = "  (no sessions)"
 		}
-		lines = append(lines, empty)
+		lines := []string{empty}
 		for len(lines) < visible {
 			lines = append(lines, "")
 		}
 		return strings.Join(lines, "\n")
 	}
 
-	_, end := listWindow(cursor, offset, len(items), visible)
+	type entryBlock struct {
+		itemIndex int
+		lines     []string
+	}
 
-	rows := make([]string, 0, len(items)*2)
-	for i := end - 1; i >= offset; i-- {
+	blocks := make([]entryBlock, len(items))
+	allRows := make([]string, 0, len(items)*3)
+	rowStarts := make([]int, len(items))
+
+	for i := len(items) - 1; i >= 0; i-- {
+		item := items[i]
 		prefix := "  "
 		if opts.showCursor && i == cursor {
 			prefix = cursorStyle.Render("> ")
 		}
-		body := renderLine(items[i], lineWidth-lipgloss.Width(prefix))
-		for j, part := range strings.Split(body, "\n") {
+		indent := strings.Repeat(" ", lipgloss.Width(prefix))
+		bodyWidth := lineWidth - lipgloss.Width(prefix)
+		if bodyWidth < 1 {
+			bodyWidth = lineWidth
+		}
+
+		entryLines := renderEntry(item, bodyWidth)
+		styled := make([]string, 0, len(entryLines))
+		for j, part := range entryLines {
 			linePrefix := prefix
 			if j > 0 {
-				linePrefix = strings.Repeat(" ", lipgloss.Width(prefix))
+				linePrefix = indent
 			}
-			rows = append(rows, linePrefix+part)
+			styled = append(styled, linePrefix+part)
 		}
+		rowStarts[i] = len(allRows)
+		blocks[i] = entryBlock{itemIndex: i, lines: styled}
+		allRows = append(allRows, styled...)
 	}
 
-	if len(rows) > visible {
-		rows = rows[len(rows)-visible:]
+	if len(allRows) == 0 {
+		return strings.Repeat("\n", visible-1)
 	}
-	padTop := visible - len(rows)
+
+	cursorStart := rowStarts[cursor]
+	cursorEnd := cursorStart + len(blocks[cursor].lines)
+
+	start := len(allRows) - visible
+	if start < 0 {
+		start = 0
+	}
+	if cursorStart < start {
+		start = cursorStart
+	}
+	if cursorEnd > start+visible {
+		start = cursorEnd - visible
+	}
+	if start < 0 {
+		start = 0
+	}
+
+	end := start + visible
+	if end > len(allRows) {
+		end = len(allRows)
+	}
+	window := allRows[start:end]
+
+	padTop := visible - len(window)
+	lines := make([]string, 0, visible)
 	for i := 0; i < padTop; i++ {
 		lines = append(lines, "")
 	}
-	lines = append(lines, rows...)
-
+	lines = append(lines, window...)
 	for len(lines) < visible {
 		lines = append(lines, "")
 	}
@@ -182,6 +230,30 @@ func clipLinesRange(text string, width, rows int, tail bool) string {
 	return strings.Join(lines, "\n")
 }
 
+func renderPreviewPane(content string, cols, rows int, previewErr error, loading bool) string {
+	faint := faintStyle
+	var body string
+	switch {
+	case previewErr != nil:
+		body = faint.Render("Preview unavailable: " + previewErr.Error())
+	case loading:
+		body = faint.Render("Loading preview...")
+	case strings.TrimSpace(content) == "":
+		body = faint.Render("No preview")
+	default:
+		body = clipLinesTail(content, cols-previewChrome(), rows)
+	}
+
+	return lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder(), false, false, false, true).
+		BorderForeground(lipgloss.ANSIColor(8)).
+		PaddingLeft(previewPadding).
+		PaddingTop(headerLines).
+		Width(cols).
+		Height(headerLines + rows).
+		Render(body)
+}
+
 func padFrame(content string, height int) string {
 	if height < 1 {
 		return content
@@ -196,37 +268,14 @@ func padFrame(content string, height int) string {
 	return strings.Join(lines, "\n")
 }
 
-func renderPreviewPane(content string, cols, rows int, previewErr error, loading bool) string {
-	innerWidth := cols - previewChrome()
-	innerRows := rows
+func loadingLine(text string) string {
+	return faintStyle.Render("  " + text)
+}
 
-	var body string
-	switch {
-	case previewErr != nil:
-		body = faintStyle.Render("Preview unavailable: " + previewErr.Error())
-	case loading:
-		body = faintStyle.Render("Loading preview...")
-	case strings.TrimSpace(content) == "":
-		body = faintStyle.Render("No preview")
-	default:
-		body = clipLinesTail(content, innerWidth, innerRows)
+func formatLoadingBody(visible int, text string) string {
+	lines := []string{loadingLine(text)}
+	for i := 1; i < visible; i++ {
+		lines = append(lines, "")
 	}
-
-	border := borderStyle.Render("│")
-	pad := strings.Repeat(" ", previewPadding)
-	lines := strings.Split(body, "\n")
-	out := make([]string, 0, headerLines+innerRows)
-	for i := 0; i < headerLines; i++ {
-		out = append(out, "")
-	}
-	for _, line := range lines {
-		out = append(out, pad+border+line)
-	}
-	for len(out) < headerLines+innerRows {
-		out = append(out, "")
-	}
-	if len(out) > headerLines+innerRows {
-		out = out[:headerLines+innerRows]
-	}
-	return strings.Join(out, "\n")
+	return strings.Join(lines, "\n")
 }

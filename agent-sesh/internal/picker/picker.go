@@ -18,89 +18,97 @@ type mode int
 
 const (
 	modeNormal mode = iota
-	modeFilter
 	modeRename
 )
 
 const (
 	refreshInterval = 3 * time.Second
-	previewDebounce = 60 * time.Millisecond
 )
 
-// Nerd Font / MDI symbols (require a Nerd Font in the terminal).
+// Nerd Font 3 MDI codepoints (from nerd-fonts bin/scripts/lib/i_md.sh).
 const (
-	iconIdle     = "\U000F0765" // 󰝥 circle-outline
-	iconWorking  = "\U000F095F" // 󰥟 run
-	iconToolCall = "\U000F08BB" // 󰢻 hammer-screwdriver
-	iconWaiting  = "\U000F09FA" // 󰧺 clock-outline
-	iconFolder   = "\U000F024B" // 󰉋 folder-outline
+	iconIdle     = "\U000F0766" // 󰝦 circle-outline
+	iconWorking  = "\U000F070E" // 󰜎 run
+	iconToolCall = "\U000F1322" // 󱌢 hammer-screwdriver
+	iconWaiting  = "\U000F0150" // 󰅐 clock-outline
+	iconFolder   = "\U000F0256" // 󰉖 folder-outline
 	iconBranch   = "\U000F062C" // 󰘬 source-branch
-	iconAgent    = "\U000F06B8" // 󰚩 robot
-	iconAttach   = "\U000F0C5B" // 󰱝 link-variant
-	iconKillPane = "\U000F0A7A" // 󰩺 close-box-outline
-	iconKillSess = "\U000F0B7E" // 󰭾 delete-forever
-	iconNewWin   = "\U000F02E0" // 󰋠 window-plus (approx)
+	iconAgent    = "\U000F06A9" // 󰚩 robot
+	iconSession  = "\U000F018D" // 󰆍 console
+	iconPane     = "\U000F0BCC" // 󰯌 view-split-vertical
+	iconPrompt   = "\U000F036A" // 󰍪 message-text-outline
+	iconAttach   = "\U000F0339" // 󰌹 link-variant
+	iconKillPane = "\U000F0158" // 󰅘 close-box-outline
+	iconKillSess = "\U000F05E8" // 󰗨 delete-forever
+	iconNewWin   = "\U000F05B1" // 󰖱 window-open
 	iconFilter   = "\U000F0349" // 󰍉 magnify
-	iconRename   = "\U000F0648" // 󰙈 rename-box
-	iconQuit     = "\U000F05AD" // 󰖭 exit-to-app
+	iconRename   = "\U000F0455" // 󰑕 rename-box
+	iconQuit     = "\U000F0206" // 󰈆 exit-to-app
 )
 
 type tickMsg struct{}
 
-type previewFetchMsg struct {
-	seq int
-	id  string
+type previewLoadedMsg struct {
+	seq      int
+	id       string
+	revision string
+	content  string
+	err      error
 }
 
-type previewLoadedMsg struct {
-	seq     int
-	id      string
-	content string
-	err     error
+type sessionsLoadedMsg struct {
+	sessions []registry.Session
+	err      error
 }
 
 type model struct {
-	sessions       []registry.Session
-	cursor         int
-	listOffset     int
-	selectedID     string
-	filter         textinput.Model
-	rename         textinput.Model
-	mode           mode
-	width          int
-	height         int
-	registry       string
-	statusLine     string
-	quitting       bool
-	attach         bool
-	previewContent string
-	previewErr     error
-	previewPending string
-	previewName    string
-	previewSeq     int
+	sessions        []registry.Session
+	cursor          int
+	selectedID      string
+	filter          textinput.Model
+	rename          textinput.Model
+	mode            mode
+	width           int
+	height          int
+	registry        string
+	statusLine      string
+	quitting        bool
+	attach          bool
+	previewContent  string
+	previewErr      error
+	previewPending  string
+	previewName     string
+	previewRevision string
+	previewSeq      int
+	loading         bool
 }
 
 func Run() error {
 	initTerminalColors()
+
+	if _, err := initProfile(); err != nil {
+		return fmt.Errorf("init profile: %w", err)
+	}
+	defer func() {
+		if path := closeProfile(); path != "" {
+			fmt.Fprintf(os.Stderr, "agent-sesh: profile log %s\n", path)
+		}
+	}()
 
 	path, err := registry.DefaultPath()
 	if err != nil {
 		return err
 	}
 
-	sessions, err := registry.Load(path)
+	sessions, err := loadSessionsFast(path)
 	if err != nil {
 		return err
 	}
-	sessions = pruneAndPersist(path, sessions)
-	if len(sessions) == 0 {
-		return nil
-	}
 
 	filter := textinput.New()
-	filter.Prompt = "⚡  "
-	filter.Placeholder = "filter sessions"
+	filter.Prompt = "> "
 	filter.CharLimit = 120
+	filter.Focus()
 
 	rename := textinput.New()
 	rename.Prompt = iconRename + " "
@@ -111,6 +119,7 @@ func Run() error {
 		filter:   filter,
 		rename:   rename,
 		registry: path,
+		loading:  true,
 	}
 	m.reconcileCursor()
 
@@ -129,17 +138,19 @@ func Run() error {
 }
 
 func pruneAndPersist(path string, sessions []registry.Session) []registry.Session {
-	pruned := registry.PruneMissingPanes(sessions, tmux.PaneExists)
-	if len(pruned) != len(sessions) {
-		if err := registry.Save(path, pruned); err == nil {
-			return pruned
-		}
-	}
-	return pruned
+	return sanitizeAndPersist(path, sessions)
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(textinput.Blink, scheduleRefresh(), m.schedulePreview())
+	return tea.Batch(textinput.Blink, scheduleRefresh(), m.loadSessionsAsync(), m.schedulePreview())
+}
+
+func (m model) loadSessionsAsync() tea.Cmd {
+	path := m.registry
+	return func() tea.Msg {
+		sessions, err := loadSessionsFull(path)
+		return sessionsLoadedMsg{sessions: sessions, err: err}
+	}
 }
 
 func scheduleRefresh() tea.Cmd {
@@ -157,6 +168,11 @@ func (m model) filteredSessions() []registry.Session {
 	for _, session := range m.sessions {
 		searchKey := strings.ToLower(strings.Join([]string{
 			session.Title,
+			session.LastPrompt,
+			session.TmuxSession,
+			session.TmuxWindow,
+			session.TmuxPane,
+			sessionPaneLabel(session),
 			session.CWD,
 			session.Branch,
 			string(session.Status),
@@ -183,7 +199,6 @@ func (m *model) reconcileCursor() {
 	items := m.filteredSessions()
 	if len(items) == 0 {
 		m.cursor = 0
-		m.listOffset = 0
 		m.selectedID = ""
 		return
 	}
@@ -192,7 +207,6 @@ func (m *model) reconcileCursor() {
 		for i, session := range items {
 			if session.ID == m.selectedID {
 				m.cursor = i
-				m.listOffset, _ = listWindow(m.cursor, m.listOffset, len(items), visibleCount(m.height))
 				return
 			}
 		}
@@ -205,11 +219,10 @@ func (m *model) reconcileCursor() {
 		m.cursor = 0
 	}
 	m.selectedID = items[m.cursor].ID
-	m.listOffset, _ = listWindow(m.cursor, m.listOffset, len(items), visibleCount(m.height))
 }
 
 func (m model) splitActive() bool {
-	return len(m.filteredSessions()) > 0 && m.width >= previewMinWidth
+	return splitActive(m.width, m.height, len(m.filteredSessions()) > 0)
 }
 
 func (m model) highlightedID() (string, bool) {
@@ -223,55 +236,80 @@ func (m model) highlightedID() (string, bool) {
 func (m *model) schedulePreview() tea.Cmd {
 	if !m.splitActive() {
 		m.previewSeq++
-		m.previewName, m.previewPending, m.previewContent, m.previewErr = "", "", "", nil
+		m.previewName, m.previewPending, m.previewContent, m.previewErr, m.previewRevision = "", "", "", nil, ""
 		return nil
 	}
 
-	id, ok := m.highlightedID()
+	session, ok := m.selected()
 	if !ok {
 		m.previewSeq++
-		m.previewName, m.previewPending, m.previewContent, m.previewErr = "", "", "", nil
+		m.previewName, m.previewPending, m.previewContent, m.previewErr, m.previewRevision = "", "", "", nil, ""
 		return nil
 	}
-	if id == m.previewName || id == m.previewPending {
+
+	id := session.ID
+	rev := previewRevision(session)
+	if id == m.previewName && rev == m.previewRevision && m.previewPending == "" {
 		return nil
+	}
+	if id == m.previewPending {
+		return nil
+	}
+
+	target := strings.TrimSpace(session.TmuxTarget)
+	if content, err, hit := getPreviewCache(target, rev); hit {
+		profileNote("schedulePreview", "cache hit "+target)
+		m.previewName = id
+		m.previewRevision = rev
+		m.previewContent = content
+		m.previewErr = err
+		m.previewPending = ""
+		return nil
+	}
+
+	if content, err, _, hit := getPreviewCacheAny(target); hit {
+		m.previewName = id
+		m.previewContent = content
+		m.previewErr = err
 	}
 
 	m.previewSeq++
 	m.previewPending = id
 	seq := m.previewSeq
-	return tea.Tick(previewDebounce, func(time.Time) tea.Msg {
-		return previewFetchMsg{seq: seq, id: id}
-	})
+	return m.fetchPreview(seq, id, target, rev)
 }
 
-func (m model) fetchPreview(seq int, id string) tea.Cmd {
+func (m model) fetchPreview(seq int, id, target, revision string) tea.Cmd {
 	return func() tea.Msg {
-		var target string
-		for _, session := range m.sessions {
-			if session.ID == id {
-				target = session.TmuxTarget
-				break
-			}
-		}
+		defer profileStart("fetchPreview " + target)()
 		if target == "" {
-			return previewLoadedMsg{seq: seq, id: id, content: "", err: nil}
-		}
-		if !tmux.PaneExists(target) {
-			return previewLoadedMsg{seq: seq, id: id, err: fmt.Errorf("pane %s is gone", target)}
+			return previewLoadedMsg{seq: seq, id: id, revision: revision, content: "", err: nil}
 		}
 		content, err := tmux.CapturePane(target, 0)
-		return previewLoadedMsg{seq: seq, id: id, content: content, err: err}
+		setPreviewCache(target, revision, content, err)
+		return previewLoadedMsg{seq: seq, id: id, revision: revision, content: content, err: err}
 	}
 }
 
 func (m model) reload() model {
-	sessions, err := registry.Load(m.registry)
+	defer profileStart("reload")()
+	fresh, err := registry.Load(m.registry)
 	if err != nil {
 		m.statusLine = err.Error()
 		return m
 	}
-	m.sessions = pruneAndPersist(m.registry, sessions)
+	m.sessions = refreshSessionsFromRegistry(m.sessions, fresh)
+	if len(m.sessions) == 0 {
+		m.quitting = true
+		return m
+	}
+	m.reconcileCursor()
+	return m
+}
+
+func (m model) reloadFull() model {
+	defer profileStart("reloadFull")()
+	m.sessions = pruneAndPersist(m.registry, m.sessions)
 	if len(m.sessions) == 0 {
 		m.quitting = true
 		return m
@@ -295,7 +333,6 @@ func (m model) setCursor(index int) model {
 	}
 	m.cursor = index
 	m.selectedID = items[index].ID
-	m.listOffset, _ = listWindow(m.cursor, m.listOffset, len(items), visibleCount(m.height))
 	return m
 }
 
@@ -309,35 +346,53 @@ func (m model) syncInputWidth() {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case previewFetchMsg:
-		if msg.seq != m.previewSeq {
-			return m, nil
-		}
-		return m, m.fetchPreview(msg.seq, msg.id)
-
 	case previewLoadedMsg:
 		if msg.seq != m.previewSeq {
 			return m, nil
 		}
 		m.previewPending = ""
 		m.previewName = msg.id
+		m.previewRevision = msg.revision
 		m.previewContent = msg.content
 		m.previewErr = msg.err
 		return m, nil
+
+	case sessionsLoadedMsg:
+		if msg.err != nil {
+			m.statusLine = msg.err.Error()
+			m.loading = false
+			return m, nil
+		}
+		m.loading = false
+		m.sessions = msg.sessions
+		if len(m.sessions) == 0 {
+			m.quitting = true
+			return m, tea.Quit
+		}
+		m.reconcileCursor()
+		return m, m.schedulePreview()
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
 		m.syncInputWidth()
 		m.reconcileCursor()
-		return m, nil
+		return m, m.schedulePreview()
 
 	case tickMsg:
+		oldRev := ""
+		if session, ok := m.selected(); ok {
+			oldRev = previewRevision(session)
+		}
 		m = m.reload()
 		if m.quitting {
 			return m, tea.Quit
 		}
-		return m, tea.Batch(m.schedulePreview(), scheduleRefresh())
+		cmd := scheduleRefresh()
+		if session, ok := m.selected(); ok && previewRevision(session) != oldRev {
+			cmd = tea.Batch(cmd, m.schedulePreview())
+		}
+		return m, cmd
 
 	case tea.KeyPressMsg:
 		if m.mode == modeRename {
@@ -346,12 +401,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.mode = modeNormal
 				m.rename.SetValue("")
 				m.statusLine = ""
+				m.filter.Focus()
 				return m, nil
 			case "enter":
 				name := strings.TrimSpace(m.rename.Value())
 				session, ok := m.selected()
 				if !ok {
 					m.mode = modeNormal
+					m.filter.Focus()
 					return m, nil
 				}
 				sessionName, err := tmux.SessionName(session.TmuxTarget)
@@ -370,6 +427,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				m.mode = modeNormal
 				m.rename.SetValue("")
+				m.filter.Focus()
 				return m, nil
 			}
 			var cmd tea.Cmd
@@ -377,29 +435,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, cmd
 		}
 
-		if m.mode == modeFilter {
-			switch msg.String() {
-			case "esc":
-				m.mode = modeNormal
+		switch msg.String() {
+		case "ctrl+c", "q":
+			m.quitting = true
+			return m, tea.Quit
+		case "esc":
+			if strings.TrimSpace(m.filter.Value()) != "" {
 				m.filter.SetValue("")
-				m.filter.Blur()
-				m.listOffset = 0
 				m.reconcileCursor()
 				return m, m.schedulePreview()
-			case "enter":
-				m.mode = modeNormal
-				m.filter.Blur()
-				return m, m.schedulePreview()
 			}
-			var cmd tea.Cmd
-			m.filter, cmd = m.filter.Update(msg)
-			m.listOffset = 0
-			m.reconcileCursor()
-			return m, tea.Batch(cmd, m.schedulePreview())
-		}
-
-		switch msg.String() {
-		case "ctrl+c", "q", "esc":
 			m.quitting = true
 			return m, tea.Quit
 		case "up", "k":
@@ -408,12 +453,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "down", "j":
 			m = m.setCursor(m.cursor - 1)
 			return m, m.schedulePreview()
-		case "/":
-			m.mode = modeFilter
-			m.filter.Focus()
-			m.syncInputWidth()
-			return m, textinput.Blink
 		case "enter":
+			if m.loading {
+				return m, nil
+			}
 			session, ok := m.selected()
 			if !ok {
 				return m, nil
@@ -434,7 +477,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.statusLine = err.Error()
 				return m, nil
 			}
-			m = m.reload()
+			m = m.reloadFull()
 			if m.quitting {
 				return m, tea.Quit
 			}
@@ -453,7 +496,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.statusLine = err.Error()
 				return m, nil
 			}
-			m = m.reload()
+			m = m.reloadFull()
 			if m.quitting {
 				return m, tea.Quit
 			}
@@ -484,6 +527,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.rename.Focus()
 			return m, textinput.Blink
 		}
+
+		prevValue := m.filter.Value()
+		var cmd tea.Cmd
+		m.filter, cmd = m.filter.Update(msg)
+		if m.filter.Value() != prevValue {
+			m.cursor = 0
+			m.reconcileCursor()
+			return m, tea.Batch(cmd, m.schedulePreview())
+		}
+		return m, cmd
 	}
 
 	return m, nil
@@ -502,6 +555,36 @@ func statusIcon(status registry.Status) string {
 	}
 }
 
+const (
+	maxPromptLines = 2
+)
+
+func limitRunes(text string, max int) string {
+	if max < 1 {
+		return ""
+	}
+	runes := []rune(text)
+	if len(runes) <= max {
+		return text
+	}
+	if max == 1 {
+		return "…"
+	}
+	return string(runes[:max-1]) + "…"
+}
+
+func limitPromptLines(lines []string, width, maxLines int) []string {
+	if maxLines < 1 || len(lines) <= maxLines {
+		return lines
+	}
+	lines = lines[:maxLines]
+	last := lines[len(lines)-1]
+	if !strings.HasSuffix(last, "…") {
+		lines[len(lines)-1] = truncateANSI(last, width-1) + "…"
+	}
+	return lines
+}
+
 func shortCWD(path string) string {
 	if path == "" {
 		return ""
@@ -513,19 +596,55 @@ func shortCWD(path string) string {
 	return ".../" + strings.Join(parts[len(parts)-3:], "/")
 }
 
+func formatSessionEntry(session registry.Session, width int) []string {
+	status := statusLabelStyle(session.Status).Render(statusIcon(session.Status))
+	sessionName := strings.TrimSpace(session.TmuxSession)
+	if sessionName == "" {
+		sessionName = "?"
+	}
+	agent := strings.TrimSpace(session.Agent)
+	if agent == "" {
+		agent = "pi"
+	}
+
+	metaParts := []string{
+		status,
+		normalStyle.Render(iconSession + " " + sessionName),
+	}
+	if paneLabel := sessionPaneLabel(session); paneLabel != "" {
+		metaParts = append(metaParts, normalStyle.Render(iconPane+" "+paneLabel))
+	}
+	metaParts = append(metaParts, normalStyle.Render(iconAgent+" "+agent))
+	if branch := strings.TrimSpace(session.Branch); branch != "" {
+		metaParts = append(metaParts, branchStyle.Render(iconBranch+" "+branch))
+	}
+	if tool := strings.TrimSpace(session.ToolName); tool != "" {
+		metaParts = append(metaParts, toolStyle.Render(iconToolCall+" "+tool))
+	}
+	if cwd := shortCWD(strings.TrimSpace(session.CWD)); cwd != "" {
+		metaParts = append(metaParts, mutedStyle.Render(iconFolder+" "+cwd))
+	}
+
+	lines := wrapANSI(strings.Join(metaParts, " "), width)
+
+	prompt := strings.TrimSpace(session.LastPrompt)
+	if prompt == "" {
+		prompt = strings.TrimSpace(session.Title)
+	}
+	if prompt == "" {
+		prompt = "(no prompt)"
+	}
+	prompt = limitRunes(prompt, width*maxPromptLines)
+	promptLines := wrapANSI(dimStyle.Render(iconPrompt+" "+prompt), width)
+	promptLines = limitPromptLines(promptLines, width, maxPromptLines)
+	for i := 1; i < len(promptLines); i++ {
+		promptLines[i] = strings.Repeat(" ", 2) + promptLines[i]
+	}
+	return append(lines, promptLines...)
+}
+
 func formatSessionLine(session registry.Session, width int) string {
-	icon := statusLabelStyle(session.Status).Render(statusIcon(session.Status))
-	title := normalStyle.Render(session.Title)
-	if session.Branch != "" {
-		title = dimStyle.Render(session.Branch) + " " + title
-	}
-	first := truncateLine(icon+" "+title, width)
-	if session.Status == registry.StatusToolCall && session.ToolName != "" {
-		indent := strings.Repeat(" ", lipgloss.Width(icon)+1)
-		second := truncateLine(indent+matchStyle.Render(session.ToolName), width)
-		return first + "\n" + second
-	}
-	return first
+	return strings.Join(formatSessionEntry(session, width), "\n")
 }
 
 func (m model) headerView() string {
@@ -538,7 +657,10 @@ func (m model) headerView() string {
 }
 
 func (m model) contentWidth() int {
-	return listCols(m.width, m.splitActive())
+	if m.width < 1 {
+		return maxListWidth
+	}
+	return contentWidth(m.width)
 }
 
 func (m model) View() tea.View {
@@ -550,35 +672,42 @@ func (m model) View() tea.View {
 	}
 
 	var b strings.Builder
+	visible := visibleCount(m.height)
+	listWidth := m.contentWidth()
+	items := m.filteredSessions()
+
 	b.WriteString(m.headerView())
 	b.WriteString("\n\n")
 
-	visible := visibleCount(m.height)
-	lineWidth := m.contentWidth()
-	items := m.filteredSessions()
-	listBody := renderListFrame(
-		items,
-		m.cursor,
-		m.listOffset,
-		visible,
-		lineWidth,
-		listRenderOpts{showCursor: true},
-		formatSessionLine,
-	)
-	b.WriteString(listBody)
+	if m.loading && len(items) == 0 {
+		b.WriteString(formatLoadingBody(visible, "Loading sessions..."))
+	} else {
+		listBody := renderListFrame(
+			items,
+			m.cursor,
+			visible,
+			listWidth,
+			listRenderOpts{showCursor: true},
+			formatSessionEntry,
+		)
+		b.WriteString(listBody)
+	}
 
 	content := strings.TrimSuffix(b.String(), "\n")
-	if cols := previewCols(m.width, m.splitActive()); cols > 0 {
-		loading := m.previewName == ""
+
+	if cols := previewCols(m.width); m.splitActive() && cols > 0 {
 		list := lipgloss.NewStyle().
-			Width(lineWidth).
-			MaxWidth(lineWidth).
+			Width(listWidth).
+			MaxWidth(listWidth).
 			Render(content)
-		content = lipgloss.JoinHorizontal(
-			lipgloss.Top,
-			list,
-			renderPreviewPane(m.previewContent, cols, visible, m.previewErr, loading),
+		preview := renderPreviewPane(
+			m.previewContent,
+			cols,
+			visible,
+			m.previewErr,
+			m.previewName == "",
 		)
+		content = lipgloss.JoinHorizontal(lipgloss.Top, list, preview)
 	}
 
 	return tea.NewView(content)

@@ -16,6 +16,8 @@ var (
 	matchStyle  = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(1)).Bold(true)
 	normalStyle = lipgloss.NewStyle()
 	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8)).Faint(true)
+	branchStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(14)).Bold(true)
+	toolStyle   = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(5)).Bold(true)
 	mutedStyle  = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8)).Faint(true)
 	faintStyle  = lipgloss.NewStyle().Faint(true)
 	borderStyle = lipgloss.NewStyle().Foreground(lipgloss.ANSIColor(8))

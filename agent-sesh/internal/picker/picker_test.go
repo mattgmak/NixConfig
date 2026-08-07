@@ -15,27 +15,33 @@ func viewContent(m model) string {
 
 func testModel(sessions []registry.Session) model {
 	filter := textinput.New()
-	filter.Prompt = "⚡  "
+	filter.Prompt = "> "
 	return model{sessions: sessions, filter: filter, height: 24, width: 80}
 }
 
 func sampleSessions() []registry.Session {
 	return []registry.Session{
 		{
-			ID:         "1",
-			TmuxTarget: "%1",
-			CWD:        "/Users/you/NixConfig/agent-sesh",
-			Branch:     "main",
-			Title:      "agent-sesh specs",
-			Status:     registry.StatusWorking,
-			Agent:      "pi",
+			ID:          "1",
+			TmuxTarget:  "%1",
+			TmuxSession: "nixconfig",
+			TmuxWindow:  "1",
+			TmuxPane:    "1",
+			CWD:         "/Users/you/NixConfig/agent-sesh",
+			Branch:      "main",
+			Title:       "agent-sesh specs",
+			LastPrompt:  "implement agent picker",
+			Status:      registry.StatusWorking,
+			Agent:       "pi",
 		},
 		{
 			ID:         "2",
 			TmuxTarget: "%2",
+			TmuxSession: "other",
 			CWD:        "/Users/you/other-project",
 			Branch:     "dev",
 			Title:      "other work",
+			LastPrompt: "run go tests",
 			Status:     registry.StatusToolCall,
 			ToolName:   "Shell: go test",
 			Agent:      "pi",
@@ -43,8 +49,10 @@ func sampleSessions() []registry.Session {
 		{
 			ID:         "3",
 			TmuxTarget: "%3",
+			TmuxSession: "scratch",
 			CWD:        "/tmp",
 			Title:      "idle pane",
+			LastPrompt: "idle pane",
 			Status:     registry.StatusIdle,
 			Agent:      "pi",
 		},
@@ -165,6 +173,7 @@ func TestShortCWD(t *testing.T) {
 }
 
 func TestReloadQuitsWhenSessionsEmpty(t *testing.T) {
+	t.Setenv("AGENT_SESH_DISABLE_DISCOVER", "1")
 	m := testModel(sampleSessions())
 	m.registry = t.TempDir() + "/missing.json"
 	m.sessions = nil
@@ -181,8 +190,8 @@ func TestViewShowsSessionsInSplitMode(t *testing.T) {
 	m.syncInputWidth()
 
 	out := viewContent(m)
-	if !strings.Contains(out, "agent-sesh specs") {
-		t.Fatalf("expected session title in split view, got:\n%s", out)
+	if !strings.Contains(out, "nixconfig") {
+		t.Fatalf("expected session name in split view, got:\n%s", out)
 	}
 }
 
@@ -231,9 +240,31 @@ func TestBottomAlignedCursorMovesUpToOlderSession(t *testing.T) {
 	}
 }
 
+func TestFormatSessionLineMultiline(t *testing.T) {
+	line := formatSessionLine(sampleSessions()[0], 120)
+	if !strings.Contains(line, "\n") {
+		t.Fatalf("expected multiline entry, got %q", line)
+	}
+	if !strings.Contains(line, iconSession) || !strings.Contains(line, "nixconfig") {
+		t.Fatalf("expected tmux session on first line, got %q", line)
+	}
+	if !strings.Contains(line, iconPrompt) || !strings.Contains(line, "implement agent picker") {
+		t.Fatalf("expected last prompt on second line, got %q", line)
+	}
+}
+
+func TestPreviewActiveRequiresWidth(t *testing.T) {
+	if previewActive(10) {
+		t.Fatal("preview should be inactive on narrow terminals")
+	}
+	if !previewActive(120) {
+		t.Fatal("preview should be active on wide terminals")
+	}
+}
+
 func TestHeaderViewUsesFilterByDefault(t *testing.T) {
 	m := testModel(sampleSessions())
-	if !strings.Contains(m.headerView(), "⚡") {
+	if !strings.Contains(m.headerView(), ">") {
 		t.Fatalf("expected sesh-style prompt in header, got %q", m.headerView())
 	}
 }

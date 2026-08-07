@@ -27,8 +27,8 @@ resolved_bin="$(tmux show-option -gvq "$agent_sesh_bin" 2>/dev/null || echo "$ag
 
 if [ "$resolved_mode" = "fzf" ]; then
   tmux bind-key -N "agent-sesh: picker (fzf)" -T "$resolved_table" "$resolved_bind" \
-    run-shell "$resolved_bin fzf"
+    run-shell "\"$resolved_bin\" fzf"
 else
   tmux bind-key -N "agent-sesh: picker" -T "$resolved_table" "$resolved_bind" \
-    display-popup -E -w "$resolved_width" -h "$resolved_height" "$resolved_bin"
+    run-shell "tmux display-popup -E -w \"$resolved_width\" -h \"$resolved_height\" \"$resolved_bin\""
 fi

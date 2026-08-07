@@ -19,17 +19,18 @@ func TestFormatSessionLineHasColorWhenProfileSet(t *testing.T) {
 	}
 }
 
-func TestFormatSessionLineIncludesToolOnSecondLine(t *testing.T) {
+func TestFormatSessionLineIncludesToolOnFirstLine(t *testing.T) {
 	compat.Profile = colorprofile.ANSI256
 	t.Cleanup(func() { compat.Profile = colorprofile.Ascii })
 
 	s := sampleSessions()[1]
-	line := formatSessionLine(s, 80)
-	if !strings.Contains(line, "\n") {
+	line := formatSessionLine(s, 120)
+	lines := strings.Split(line, "\n")
+	if len(lines) < 2 {
 		t.Fatalf("expected multiline tool_call entry, got %q", line)
 	}
-	if !strings.Contains(line, "go test") {
-		t.Fatalf("expected tool name on second line, got %q", line)
+	if !strings.Contains(lines[0], "go test") {
+		t.Fatalf("expected tool name on first line, got %q", lines[0])
 	}
 }
 

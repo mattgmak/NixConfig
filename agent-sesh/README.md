@@ -111,7 +111,19 @@ prefix-a  →  display-popup  →  agent-sesh pick
 ```bash
 cd agent-sesh
 go mod tidy
-go run ./cmd/agent-sesh pick
+go run ./cmd/agent-sesh
+```
+
+### Debug CLI
+
+After rebuilding, inspect live registry/tmux state:
+
+```bash
+agent-sesh debug registry    # raw sessions.json
+agent-sesh debug validate    # sanitize report (kept vs pruned)
+agent-sesh debug panes       # registry rows vs live tmux panes
+agent-sesh debug discover    # pi panes missing from registry
+agent-sesh debug pane %0     # one pane snapshot (JSON)
 ```
 
 ## Roadmap

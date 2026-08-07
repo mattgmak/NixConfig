@@ -15,9 +15,13 @@ export type AgentSeshStatus = "idle" | "working" | "tool_call" | "waiting";
 export interface AgentSeshSession {
 	id: string;
 	tmux_target: string;
+	tmux_session?: string;
+	tmux_window?: string;
+	tmux_pane?: string;
 	cwd: string;
 	branch?: string;
 	title: string;
+	last_prompt?: string;
 	status: AgentSeshStatus;
 	tool_name?: string;
 	model?: string;
@@ -57,6 +61,45 @@ async function writeRegistry(file: RegistryFile): Promise<void> {
 	const path = registryPath();
 	await mkdir(dirname(path), { recursive: true });
 	await writeFile(path, `${JSON.stringify(file, null, 2)}\n`, "utf8");
+}
+
+async function tmuxSessionName(): Promise<string | undefined> {
+	if (!process.env.TMUX) {
+		return undefined;
+	}
+	try {
+		const { stdout } = await execFileAsync("tmux", [
+			"display-message",
+			"-p",
+			"#{session_name}",
+		]);
+		const name = stdout.trim();
+		return name || undefined;
+	} catch {
+		return undefined;
+	}
+}
+
+async function tmuxPaneLocation(): Promise<
+	{ window: string; pane: string } | undefined
+> {
+	if (!process.env.TMUX) {
+		return undefined;
+	}
+	try {
+		const { stdout } = await execFileAsync("tmux", [
+			"display-message",
+			"-p",
+			"#{window_index}\t#{pane_index}",
+		]);
+		const [window, pane] = stdout.trim().split("\t");
+		if (!window || !pane) {
+			return undefined;
+		}
+		return { window, pane };
+	} catch {
+		return undefined;
+	}
 }
 
 async function tmuxTarget(): Promise<string | null> {
@@ -131,6 +174,7 @@ export async function upsertSession(partial: {
 	id: string;
 	cwd: string;
 	title: string;
+	last_prompt?: string;
 	status?: AgentSeshStatus;
 	tool_name?: string;
 	model?: string;
@@ -141,15 +185,21 @@ export async function upsertSession(partial: {
 	}
 
 	const branch = await gitBranch(partial.cwd);
+	const tmuxSession = await tmuxSessionName();
+	const paneLocation = await tmuxPaneLocation();
 	const file = await readRegistry();
 	const now = new Date().toISOString();
 	const existing = file.sessions.find((session) => session.id === partial.id);
 	const next: AgentSeshSession = {
 		id: partial.id,
 		tmux_target: target,
+		tmux_session: tmuxSession ?? existing?.tmux_session,
+		tmux_window: paneLocation?.window ?? existing?.tmux_window,
+		tmux_pane: paneLocation?.pane ?? existing?.tmux_pane,
 		cwd: partial.cwd,
 		branch,
 		title: partial.title,
+		last_prompt: partial.last_prompt ?? existing?.last_prompt,
 		status: partial.status ?? existing?.status ?? "idle",
 		tool_name: partial.tool_name ?? existing?.tool_name,
 		model: partial.model ?? existing?.model,
@@ -159,7 +209,11 @@ export async function upsertSession(partial: {
 
 	file.sessions = [
 		next,
-		...file.sessions.filter((session) => session.id !== partial.id),
+		...file.sessions.filter(
+			(session) =>
+				session.id !== partial.id &&
+				session.tmux_target !== target,
+		),
 	];
 	await writeRegistry(file);
 }
@@ -214,11 +268,13 @@ export default function piAgentSeshExtension(pi: ExtensionAPI): void {
 		if (!id) {
 			return;
 		}
+		const prompt = event.prompt?.trim();
 		lastTitle = sessionTitle(pi, ctx, event.prompt);
 		await upsertSession({
 			id,
 			cwd: ctx.sessionManager.getCwd(),
 			title: lastTitle,
+			last_prompt: prompt || undefined,
 			model: modelLabel(ctx),
 			status: "working",
 		});
@@ -251,7 +307,15 @@ export default function piAgentSeshExtension(pi: ExtensionAPI): void {
 		if (!id) {
 			return;
 		}
+		const target = await tmuxTarget();
 		await removeSession(id);
+		if (target) {
+			const file = await readRegistry();
+			file.sessions = file.sessions.filter(
+				(session) => session.tmux_target !== target,
+			);
+			await writeRegistry(file);
+		}
 		sessionId = undefined;
 	});
 }
