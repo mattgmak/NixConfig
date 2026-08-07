@@ -41,6 +41,16 @@
           ''
         else
           null;
+      githubMcpTokenSecret = ../../../secrets/github-mcp-token.age;
+      hasGithubMcpTokenSecret = builtins.pathExists githubMcpTokenSecret;
+      readGithubMcpTokenScript =
+        if hasGithubMcpTokenSecret then
+          pkgs.writeShellScript "read-github-mcp-token" ''
+            set -euo pipefail
+            cat "${config.age.secrets.github-mcp-token.path}"
+          ''
+        else
+          null;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -49,6 +59,7 @@
         opencode-api-key.file = lib.mkIf hasOpencodeApiKeySecret opencodeApiKeySecret;
         mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
         context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
+        github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
       };
 
       programs.nushell = {
@@ -107,6 +118,17 @@
             $env.CONTEXT7_API_KEY = (
               try {
                 (^${readContext7ApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
+          + lib.optionalString hasGithubMcpTokenSecret ''
+
+            # github-mcp-token.age: one line, raw GitHub PAT (no GITHUB_MCP_TOKEN= prefix)
+            $env.GITHUB_MCP_TOKEN = (
+              try {
+                (^${readGithubMcpTokenScript} | str trim)
               } catch {
                 ""
               }

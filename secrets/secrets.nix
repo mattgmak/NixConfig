@@ -129,4 +129,15 @@ in
       MacMini
     ];
   };
+
+  "github-mcp-token.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
+    ];
+  };
 }
