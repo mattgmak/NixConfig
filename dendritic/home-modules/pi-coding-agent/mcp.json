@@ -15,6 +15,24 @@
         "list_issues"
       ]
     },
+    "github-readonly": {
+      "url": "https://api.githubcopilot.com/mcp/readonly",
+      "auth": "bearer",
+      "bearerToken": "${GITHUB_MCP_TOKEN}",
+      "directTools": [
+        "pull_request_read",
+        "get_file_contents",
+        "search_code",
+        "search_issues",
+        "search_pull_requests",
+        "issue_read",
+        "list_commits",
+        "get_commit",
+        "list_branches",
+        "list_pull_requests",
+        "search_repositories"
+      ]
+    },
     "codegraph": {
       "directTools": true
     },
