@@ -24,6 +24,7 @@
         hypridle
         hyprpicker
         hyprpolkitagent
+        inputs.hyprland.inputs.hyprland-guiutils.packages.${pkgs.stdenv.hostPlatform.system}.default
         hyprsunset
         hdrop
         libinput
@@ -62,6 +63,10 @@
         ];
 
         sourceFirst = true;
+        extraConfig = ''
+          permission = /run/current-system/sw/bin/steam, cursorpos, allow
+          permission = /run/current-system/sw/bin/steam, keyboard, allow
+        '';
         settings =
           let
             deskyMonitors = {
@@ -81,6 +86,9 @@
                 "woomer";
           in
           {
+            ecosystem = {
+              enforce_permissions = true;
+            };
             binds = {
               scroll_event_delay = 100;
             };
