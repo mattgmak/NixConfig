@@ -11,6 +11,7 @@
       # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
       programs.fzf = {
         enable = true;
+        enableNushellIntegration = false;
         tmux.enableShellIntegration = true;
       };
 

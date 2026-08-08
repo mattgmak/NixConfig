@@ -275,9 +275,8 @@
       programs.hyprland = {
         enable = true;
         withUWSM = true;
-        package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-        portalPackage =
-          inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+        package = pkgs.hyprland;
+        portalPackage = pkgs.xdg-desktop-portal-hyprland;
       };
 
       # termfilepickers portal is installed via home-manager, but NIX_XDG_DESKTOP_PORTAL_DIR

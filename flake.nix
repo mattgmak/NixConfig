@@ -31,13 +31,13 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
-    hyprland.url = "github:hyprwm/Hyprland";
+    hyprland.url = "github:hyprwm/Hyprland?ref=v0.56.2";
     hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
+      url = "github:hyprwm/hyprland-plugins?rev=81516add9b432b6ffc9f0906b92c9302c479c236";
       inputs.hyprland.follows = "hyprland";
     };
     hyprgrass = {
-      url = "github:horriblename/hyprgrass?ref=hl-0.54.0";
+      url = "github:horriblename/hyprgrass?ref=hl-0.56.1";
       inputs.hyprland.follows = "hyprland";
     };
 
@@ -171,7 +171,9 @@
     let
       lib = inputs.nixpkgs.lib;
       flake = flake-parts.lib.mkFlake { inherit inputs; } (
-        (import-tree.filterNot (lib.hasInfix "/vendor/")) ./dendritic
+        (import-tree.filterNot (
+          path: lib.hasInfix "/vendor/" path || lib.hasInfix "/hyprland/lua/" path
+        )) ./dendritic
       );
     in
     flake

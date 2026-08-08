@@ -3,7 +3,7 @@
   imports = [ inputs.home-manager.flakeModules.home-manager ];
   flake = {
     homeModules.main = {
-      home.stateVersion = "24.11"; # Please read the comment before changing.
+      home.stateVersion = "26.05"; # Please read the comment before changing.
       programs.home-manager.enable = true;
     };
 
