@@ -24,7 +24,7 @@ The slug after `/` embeds the issue id (`prd-239` → `PRD-239`).
 
 Use `mcp_pi_shell` (or `mcp_pi_ctx_shell`) for all shell commands — native Shell may be unavailable.
 
-`wt` and `sesh` are pre-allowed in the managed lean-ctx config (`home-modules/pi-coding-agent/lean-ctx/config.toml`). Agents **cannot** run `lean-ctx allow` to widen the shell allowlist — that is denied by pi-permission-system.
+`wt`, `sesh`, `tmux`, and `jq` are pre-allowed in the managed lean-ctx config (`home-modules/pi-coding-agent/lean-ctx/config.toml`). Agents **cannot** run `lean-ctx allow` to widen the shell allowlist — that is denied by pi-permission-system.
 
 If a command returns `[BLOCKED — DO NOT RETRY]`, stop and ask the user to add the binary to `lean-ctx/config.toml` (then `/reload` or restart Pi). Do not retry blindly.
 
@@ -96,15 +96,36 @@ Implement a configurable on-press open link URL for the dashboard banner. When u
 Explore the codebase, implement a fix, and verify with tests. Start by understanding how the dashboard banner is configured and rendered.
 ```
 
-### 5. Launch the session
+### 5. Launch the session (detached)
+
+**Do not run `sesh connect`** — it always `switch-client`s when `$TMUX` is set and will yank you out of your current session.
+
+Create the tmux session in the background instead (same mechanics sesh uses internally: `new-session -d`, then `send-keys`).
 
 ```bash
-sesh connect <worktree_path> -c "pi '<initial_prompt>'"
+# 1) Reuse an existing tmux session already rooted at this worktree
+session=$(sesh list -j | jq -r --arg p "$worktree_path" '.[] | select(.Path == $p and .Src == "tmux") | .Name' | head -1)
+
+# 2) Otherwise derive the sesh-style git name (matches gitName + convertToValidName)
+if [ -z "$session" ]; then
+  main_root=$(git -C "$worktree_path" worktree list --porcelain | awk '/^worktree /{print $2; exit}')
+  rel="${worktree_path#$main_root}"
+  repo_parts=$(printf '%s' "$main_root" | tr '/' '\n' | tail -2 | paste -sd/ -)
+  session=$(printf '%s%s' "$repo_parts" "$rel" | tr '.:' '__' | tr ' ' '_')
+fi
+
+# 3) Create detached session + start pi (skip -c if session already exists — same as sesh)
+if tmux has-session -t "=$session" 2>/dev/null; then
+  : # session already running at this worktree
+else
+  tmux new-session -d -s "$session" -c "$worktree_path"
+  tmux send-keys -t "=$session" "pi '<initial_prompt>'" Enter
+fi
 ```
 
 Use the parsed worktree path. Escape any single quotes inside the prompt (`'\''`).
 
-`sesh connect` may return no output on success — that is normal. Only treat non-zero exit or stderr as failure.
+`tmux new-session -d` returns immediately and leaves your current tmux client untouched. Only treat non-zero exit or stderr as failure.
 
 ### 6. Report back
 
@@ -116,8 +137,9 @@ Give the user a short summary:
 | Status | from Linear |
 | Worktree | absolute path |
 | Branch | branch name |
+| Tmux session | session name (attach later with `sesh connect <worktree_path>` or `tmux attach -t <session>`) |
 
-Confirm the Pi session was launched. If launch failed or the user needs to reconnect, include the full `sesh connect ...` command as a copy-paste fallback.
+Confirm the Pi session was launched in the background. If launch failed, include the detached-launch commands as a copy-paste fallback.
 
 ## Error handling
 
@@ -128,7 +150,7 @@ Confirm the Pi session was launched. If launch failed or the user needs to recon
 | Linear issue not found | Show extracted id; ask user to confirm |
 | `wt switch` fails | Show stderr; suggest `wt list` to inspect existing worktrees |
 | Cannot parse worktree path | Parse `worktree @ <path>` from stdout; or ask user for the path |
-| `sesh connect` fails | Show stderr; give worktree path + full connect command for manual use |
+| `tmux` / `jq` / detached launch fails | Show stderr; give worktree path + session name + manual attach command |
 
 ## Example
 
@@ -136,10 +158,10 @@ Confirm the Pi session was launched. If launch failed or the user needs to recon
 /work-on-linear-ticket mattmak/prd-239-dashboard-banner-add-url do a configurable on press openLink url
 ```
 
-1. Uses `wt` / `sesh` (already in managed lean-ctx allowlist)
+1. Uses `wt` / `sesh` / `tmux` / `jq` (in managed lean-ctx allowlist)
 2. Extracts `PRD-239`; notes → "do a configurable on press openLink url"
 3. Fetches issue from Linear (in parallel with `git rev-parse`)
 4. Runs `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
 5. Parses worktree path (e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`)
-6. Runs `sesh connect <path> -c "pi 'Work on PRD-239: ...'"`
-7. Reports issue link, worktree path, and branch
+6. Creates a detached tmux session and starts `pi 'Work on PRD-239: ...'` (does **not** switch your current session)
+7. Reports issue link, worktree path, branch, and tmux session name
