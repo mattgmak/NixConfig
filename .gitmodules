@@ -76,3 +76,6 @@
 [submodule "mattgmak/agent-sesh"]
 	path = vendor/agent-sesh
 	url = https://github.com/mattgmak/agent-sesh.git
+[submodule "mattgmak/woomer"]
+	path = vendor/woomer
+	url = https://github.com/mattgmak/woomer.git

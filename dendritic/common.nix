@@ -38,6 +38,10 @@
             # (${XDG_CONFIG_DIRS:+:...}). Apps that split on ':' (e.g. Neovim) then
             # hit E79 errors and can SIGABRT. We use Hyprland, not Plasma.
             stylix.targets.kde.enable = lib.mkForce false;
+            # HM 26.11 requires explicit pointerCursor enable (stylix sets the
+            # rest of the attrs via stylix.cursor, so this only satisfies the
+            # new option contract — no behavior change).
+            home.pointerCursor.enable = true;
           })
         ];
       };

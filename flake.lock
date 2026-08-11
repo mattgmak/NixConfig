@@ -3168,18 +3168,14 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1782685056,
-        "narHash": "sha256-WJasTKjf1hcxdCc+jKL3dU5RIL2zdYJ/OBFTmIUbuXc=",
-        "owner": "coffeeispower",
-        "repo": "woomer",
-        "rev": "a7a0b288f70b98d168eaa0e8714816d3583c33b1",
-        "type": "github"
+        "path": "./vendor/woomer",
+        "type": "path"
       },
       "original": {
-        "owner": "coffeeispower",
-        "repo": "woomer",
-        "type": "github"
-      }
+        "path": "./vendor/woomer",
+        "type": "path"
+      },
+      "parent": []
     },
     "worktrunk": {
       "inputs": {

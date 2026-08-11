@@ -14,7 +14,11 @@
     };
 
   flake.stylixCommon =
-    { pkgs, ... }:
+    {
+      lib,
+      pkgs,
+      ...
+    }:
     {
       stylix = {
         enable = true;
@@ -25,6 +29,14 @@
         # base16Scheme = "${pkgs.base16-schemes}/share/themes/gigavolt.yaml";
         # base16Scheme = "${pkgs.base16-schemes}/share/themes/moonlight.yaml";
         image = ./beautiful-mountains-landscape.jpg;
+
+        # Stylix auto-detects the DE: with GNOME enabled (GDM/keyring) it picks
+        # `qt.platform = "gnome"`, which is deprecated in HM (→ adwaita) and
+        # unsupported in stylix (→ qtct), and drags in the unmaintained
+        # qgnomeplatform packages. We use Hyprland, so force the supported qtct
+        # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
+        # stylix module assigns the auto-detected value at default priority.
+        targets.qt.platform = lib.mkForce "qtct";
         fonts = {
           monospace = {
             package = pkgs.nerd-fonts.iosevka-term;

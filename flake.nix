@@ -116,7 +116,7 @@
     };
 
     woomer = {
-      url = "github:coffeeispower/woomer";
+      url = "path:./vendor/woomer";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
