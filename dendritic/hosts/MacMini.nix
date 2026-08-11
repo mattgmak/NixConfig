@@ -158,6 +158,7 @@ in
           shfmt
           shellcheck
           uv
+          devenv
         ]
         ++ (with pkgs.darwin; [
           file_cmds
