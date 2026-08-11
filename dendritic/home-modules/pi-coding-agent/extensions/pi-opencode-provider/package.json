@@ -1,0 +1,10 @@
+{
+  "name": "pi-opencode-provider",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-opencode-provider (vendored mdsitton/pi-opencode-provider submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
