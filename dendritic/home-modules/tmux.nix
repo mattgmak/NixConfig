@@ -1,6 +1,7 @@
 {
   flake.homeModules.tmux =
     {
+      inputs,
       pkgs,
       hostname,
       config,
@@ -8,6 +9,15 @@
       ...
     }:
     {
+      imports = [ inputs.agent-sesh.homeModules.agent-sesh ];
+
+      programs.agent-sesh = {
+        enable = true;
+        tmuxKey = "a";
+        popupWidth = "90%";
+        popupHeight = "90%";
+      };
+
       # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
       programs.fzf = {
         enable = true;

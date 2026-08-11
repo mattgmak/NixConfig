@@ -150,6 +150,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    agent-sesh = {
+      url = "path:./vendor/agent-sesh";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     trek-src = {
       url = "github:mauriceboe/TREK/e65acb3de765f3c958dd4e139064b11fbbde79d1";
       flake = false;
@@ -171,9 +176,8 @@
     let
       lib = inputs.nixpkgs.lib;
       flake = flake-parts.lib.mkFlake { inherit inputs; } (
-        (import-tree.filterNot (
-          path: lib.hasInfix "/vendor/" path || lib.hasInfix "/hyprland/lua/" path
-        )) ./dendritic
+        (import-tree.filterNot (path: lib.hasInfix "/vendor/" path || lib.hasInfix "/hyprland/lua/" path))
+          ./dendritic
       );
     in
     flake
