@@ -2,13 +2,16 @@
 {
   flake.homeModules.whisper-dictation =
     {
+      config,
       pkgs,
       lib,
       ...
     }:
     let
+      cfg = config.whisperDictation;
+
       whisper-dictation-pkg =
-        inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.${cfg.packageName};
 
       typelibPath = lib.makeSearchPathOutput "out" "lib/girepository-1.0" (
         with pkgs;
@@ -58,7 +61,21 @@
       '';
     in
     {
-      systemd.user.services = {
+      options.whisperDictation = {
+        packageName = lib.mkOption {
+          type = lib.types.str;
+          default = "default";
+          description = "Attribute name of the package in the whisper-dictation flake. Use \"whisper-dictation-vulkan\" for GPU acceleration (Vulkan).";
+        };
+        useGpu = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Enable whisper.use_gpu; only matters on GPU-enabled builds (Vulkan/CUDA/ROCm), CPU-only builds ignore it.";
+        };
+      };
+
+      config = {
+        systemd.user.services = {
         whisper-dictation = {
           Unit = {
             Description = "Whisper Dictation";
@@ -123,6 +140,7 @@
           model: base
           language: en
           threads: 16
+          use_gpu: ${lib.boolToString cfg.useGpu}
         ui:
           show_waveform: true
           theme: dark
@@ -131,5 +149,6 @@
           auto_capitalize: false
           auto_punctuate: false
       '';
+      };
     };
 }

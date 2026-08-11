@@ -3125,11 +3125,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1771198514,
-        "narHash": "sha256-5Dd0zVTh+nUf3lxrDpgQSHbr0pU40hGh/hUuRbwG790=",
+        "lastModified": 1785743674,
+        "narHash": "sha256-gyyr6g7C8ioAvJLLuqGWUAI+gkY8fw5Cb70pqqfnyJ4=",
         "owner": "jacopone",
         "repo": "whisper-dictation",
-        "rev": "20190a148d8bce6f0d0b78a56cc22afe02844e8f",
+        "rev": "cc86d7e1c47395fc682d590e19ac18518f9707e9",
         "type": "github"
       },
       "original": {

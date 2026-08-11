@@ -84,6 +84,9 @@
         opencode
         bash
       ];
+      whisperDictation = {
+        packageName = "whisper-dictation-vulkan";
+      };
     };
 
     nixosModules.GoofyDesky =

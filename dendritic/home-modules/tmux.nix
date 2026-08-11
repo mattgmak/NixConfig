@@ -1,7 +1,7 @@
+{ inputs, ... }:
 {
   flake.homeModules.tmux =
     {
-      inputs,
       pkgs,
       hostname,
       config,

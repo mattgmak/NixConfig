@@ -77,6 +77,9 @@
         tailscale-systray
         bash
       ];
+      whisperDictation = {
+        useGpu = false;
+      };
     };
 
     nixosModules.GoofyEnvy =
