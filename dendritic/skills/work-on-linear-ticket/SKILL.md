@@ -24,9 +24,9 @@ The slug after `/` embeds the issue id (`prd-239` → `PRD-239`).
 
 Use `mcp_pi_shell` (or `mcp_pi_ctx_shell`) for all shell commands — native Shell may be unavailable.
 
-`wt`, `sesh`, `tmux`, and `jq` are pre-allowed in the managed lean-ctx config (`home-modules/pi-coding-agent/lean-ctx/config.toml`). Agents **cannot** run `lean-ctx allow` to widen the shell allowlist — that is denied by pi-permission-system.
+`wt`, `sesh`, `tmux`, and `jq` are pre-allowed in the managed lean-ctx config (`home-modules/pi-coding-agent/lean-ctx/config.toml`). To widen the allowlist, run `lean-ctx allow <binary>` — pi-permission-system prompts the user for approval.
 
-If a command returns `[BLOCKED — DO NOT RETRY]`, stop and ask the user to add the binary to `lean-ctx/config.toml` (then `/reload` or restart Pi). Do not retry blindly.
+If a command returns `[BLOCKED — DO NOT RETRY]`, run `lean-ctx allow <binary>` to prompt the user. If the user declines, ask them to add the binary to `lean-ctx/config.toml` (then `home-manager switch` or restart Pi). Do not retry blindly.
 
 ### 1. Parse the branch name
 
@@ -145,7 +145,7 @@ Confirm the Pi session was launched in the background. If launch failed, include
 
 | Failure | Action |
 |---------|--------|
-| Command blocked by shell allowlist | Ask user to add the binary to `home-modules/pi-coding-agent/lean-ctx/config.toml`; do **not** run `lean-ctx allow` |
+| Command blocked by shell allowlist | Run `lean-ctx allow <binary>` (prompts user for approval); if declined, ask user to add it to `home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Not in a git repo | Tell user to `cd` into the repo first |
 | Linear issue not found | Show extracted id; ask user to confirm |
 | `wt switch` fails | Show stderr; suggest `wt list` to inspect existing worktrees |

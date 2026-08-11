@@ -1,3 +1,4 @@
 {
-  "mode": "replace"
+  "mode": "replace",
+  "disableTools": ["shell"]
 }

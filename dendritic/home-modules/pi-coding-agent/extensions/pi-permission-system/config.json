@@ -15,8 +15,8 @@
     },
     "bash": {
       "rm -rf *": "deny",
-      "lean-ctx allow *": "deny",
-      "lean-ctx allow": "deny",
+      "lean-ctx allow *": "ask",
+      "lean-ctx allow": "ask",
       "lean-ctx config set shell_allowlist*": "deny",
       "lean-ctx config set shell_allowlist_extra*": "deny",
       "lean-ctx config set shell_security*": "deny",
