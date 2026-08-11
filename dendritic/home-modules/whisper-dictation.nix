@@ -11,7 +11,11 @@
       cfg = config.whisperDictation;
 
       whisper-dictation-pkg =
-        inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.${cfg.packageName};
+        (inputs.whisper-dictation.packages.${pkgs.stdenv.hostPlatform.system}.${cfg.packageName}).overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [
+            ./whisper-blank-filter.patch
+          ];
+        });
 
       typelibPath = lib.makeSearchPathOutput "out" "lib/girepository-1.0" (
         with pkgs;
