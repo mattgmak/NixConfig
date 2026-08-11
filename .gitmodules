@@ -73,6 +73,6 @@
 [submodule "mdsitton/pi-opencode-provider"]
 	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-opencode-provider
 	url = https://github.com/mdsitton/pi-opencode-provider.git
-[submodule "vendor/agent-sesh"]
+[submodule "mattgmak/agent-sesh"]
 	path = vendor/agent-sesh
 	url = https://github.com/mattgmak/agent-sesh.git
