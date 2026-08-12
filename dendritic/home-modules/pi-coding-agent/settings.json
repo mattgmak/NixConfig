@@ -2,7 +2,7 @@
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.80.7",
   "defaultProvider": "opencode-go",
-  "defaultModel": "deepseek-v4-flash",
+  "defaultModel": "deepseek-v4-pro",
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {
@@ -30,6 +30,6 @@
     "opencode-go/deepseek-v4-flash",
     "opencode-go/deepseek-v4-pro"
   ],
-  "showHardwareCursor": true,
+  "showHardwareCursor": false,
   "hideThinkingBlock": true
 }
