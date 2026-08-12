@@ -11,13 +11,8 @@
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
       gtk.gtk4.theme = config.gtk.theme;
-      gtk = {
-        enable = true;
-        iconTheme = {
-          name = "Fluent";
-          package = pkgs.fluent-icon-theme;
-        };
-      };
+      # Icon theme managed by stylix.icons (shared with Qt via qt5ct/qt6ct).
+      gtk.enable = true;
 
       programs.caelestia = {
         enable = true;

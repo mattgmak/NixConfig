@@ -93,22 +93,42 @@ let
   ++ [
     (bind "ALT + SHIFT + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
     (bind "ALT + mouse:272" "hl.dsp.window.resize()" { mouse = true; })
-    (bind "ALT + i" "hl.dsp.window.resize({ x = 0, y = -20 })" { repeating = true; })
-    (bind "ALT + u" "hl.dsp.window.resize({ x = 0, y = 20 })" { repeating = true; })
-    (bind "ALT + y" "hl.dsp.window.resize({ x = -20, y = 0 })" { repeating = true; })
-    (bind "ALT + o" "hl.dsp.window.resize({ x = 20, y = 0 })" { repeating = true; })
-    (bind "ALT + SHIFT + i" "hl.dsp.window.move({ x = 0, y = -20 })" { repeating = true; })
-    (bind "ALT + SHIFT + u" "hl.dsp.window.move({ x = 0, y = 20 })" { repeating = true; })
-    (bind "ALT + SHIFT + y" "hl.dsp.window.move({ x = -20, y = 0 })" { repeating = true; })
-    (bind "ALT + SHIFT + o" "hl.dsp.window.move({ x = 20, y = 0 })" { repeating = true; })
-    (bind "ALT + Prior" "hl.dsp.window.resize({ x = 0, y = -20 })" { repeating = true; })
-    (bind "ALT + Next" "hl.dsp.window.resize({ x = 0, y = 20 })" { repeating = true; })
-    (bind "ALT + Home" "hl.dsp.window.resize({ x = -20, y = 0 })" { repeating = true; })
-    (bind "ALT + End" "hl.dsp.window.resize({ x = 20, y = 0 })" { repeating = true; })
-    (bind "ALT + SHIFT + Prior" "hl.dsp.window.move({ x = 0, y = -20 })" { repeating = true; })
-    (bind "ALT + SHIFT + Next" "hl.dsp.window.move({ x = 0, y = 20 })" { repeating = true; })
-    (bind "ALT + SHIFT + Home" "hl.dsp.window.move({ x = -20, y = 0 })" { repeating = true; })
-    (bind "ALT + SHIFT + End" "hl.dsp.window.move({ x = 20, y = 0 })" { repeating = true; })
+    (bind "ALT + i" "hl.dsp.window.resize({ x = 0, y = -20, relative = true })" { repeating = true; })
+    (bind "ALT + u" "hl.dsp.window.resize({ x = 0, y = 20, relative = true })" { repeating = true; })
+    (bind "ALT + y" "hl.dsp.window.resize({ x = -20, y = 0, relative = true })" { repeating = true; })
+    (bind "ALT + o" "hl.dsp.window.resize({ x = 20, y = 0, relative = true })" { repeating = true; })
+    (bind "ALT + SHIFT + i" "hl.dsp.window.move({ x = 0, y = -20, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + u" "hl.dsp.window.move({ x = 0, y = 20, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + y" "hl.dsp.window.move({ x = -20, y = 0, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + o" "hl.dsp.window.move({ x = 20, y = 0, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + Prior" "hl.dsp.window.resize({ x = 0, y = -20, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + Next" "hl.dsp.window.resize({ x = 0, y = 20, relative = true })" { repeating = true; })
+    (bind "ALT + Home" "hl.dsp.window.resize({ x = -20, y = 0, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + End" "hl.dsp.window.resize({ x = 20, y = 0, relative = true })" { repeating = true; })
+    (bind "ALT + SHIFT + Prior" "hl.dsp.window.move({ x = 0, y = -20, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + Next" "hl.dsp.window.move({ x = 0, y = 20, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + Home" "hl.dsp.window.move({ x = -20, y = 0, relative = true })" {
+      repeating = true;
+    })
+    (bind "ALT + SHIFT + End" "hl.dsp.window.move({ x = 20, y = 0, relative = true })" {
+      repeating = true;
+    })
     (bind "XF86AudioRaiseVolume" "hl.dsp.exec_cmd(\"wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 5%+\")"
       {
         repeating = true;

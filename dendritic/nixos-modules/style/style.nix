@@ -37,6 +37,16 @@
         # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
         # stylix module assigns the auto-detected value at default priority.
         targets.qt.platform = lib.mkForce "qtct";
+
+        # Icon theme shared by GTK + Qt (via qt5ct/qt6ct icon_theme). Without
+        # this, the qtct platform leaves Qt tray icons (kdeconnect, caelestia
+        # SNI tray) on Qt's minimal built-in theme.
+        icons = {
+          enable = true;
+          package = pkgs.papirus-icon-theme;
+          dark = "Papirus-Dark";
+          light = "Papirus";
+        };
         fonts = {
           monospace = {
             package = pkgs.nerd-fonts.iosevka-term;
