@@ -131,6 +131,7 @@ in
           nvd
           nix-output-monitor
           fastfetch
+          stats
           base16-shell-preview
           jq
           mas
