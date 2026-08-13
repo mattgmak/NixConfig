@@ -14,6 +14,7 @@
       imports = [
         self.fonts
         self.stylixCommon
+        self.stylixLinux
         self.stylixCursor
         inputs.home-manager.nixosModules.home-manager
         inputs.stylix.nixosModules.stylix

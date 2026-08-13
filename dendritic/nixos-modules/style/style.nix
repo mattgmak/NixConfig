@@ -30,23 +30,6 @@
         # base16Scheme = "${pkgs.base16-schemes}/share/themes/moonlight.yaml";
         image = ./beautiful-mountains-landscape.jpg;
 
-        # Stylix auto-detects the DE: with GNOME enabled (GDM/keyring) it picks
-        # `qt.platform = "gnome"`, which is deprecated in HM (→ adwaita) and
-        # unsupported in stylix (→ qtct), and drags in the unmaintained
-        # qgnomeplatform packages. We use Hyprland, so force the supported qtct
-        # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
-        # stylix module assigns the auto-detected value at default priority.
-        targets.qt.platform = lib.mkForce "qtct";
-
-        # Icon theme shared by GTK + Qt (via qt5ct/qt6ct icon_theme). Without
-        # this, the qtct platform leaves Qt tray icons (kdeconnect, caelestia
-        # SNI tray) on Qt's minimal built-in theme.
-        icons = {
-          enable = true;
-          package = pkgs.papirus-icon-theme;
-          dark = "Papirus-Dark";
-          light = "Papirus";
-        };
         fonts = {
           monospace = {
             package = pkgs.nerd-fonts.iosevka-term;
@@ -65,6 +48,33 @@
             name = "Noto Color Emoji";
           };
         };
+      };
+    };
+
+  flake.stylixLinux =
+    {
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+      # Stylix auto-detects the DE: with GNOME enabled (GDM/keyring) it picks
+      # `qt.platform = "gnome"`, which is deprecated in HM (→ adwaita) and
+      # unsupported in stylix (→ qtct), and drags in the unmaintained
+      # qgnomeplatform packages. We use Hyprland, so force the supported qtct
+      # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
+      # stylix module assigns the auto-detected value at default priority.
+      targets.qt.platform = lib.mkForce "qtct";
+
+      # Icon theme shared by GTK + Qt (via qt5ct/qt6ct icon_theme). Without
+      # this, the qtct platform leaves Qt tray icons (kdeconnect, caelestia
+      # SNI tray) on Qt's minimal built-in theme.
+      # stylix.icons is a NixOS-only option — skip on darwin.
+      stylix.icons = {
+        enable = true;
+        package = pkgs.papirus-icon-theme;
+        dark = "Papirus-Dark";
+        light = "Papirus";
       };
     };
 
