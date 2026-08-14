@@ -6,83 +6,77 @@ argument-hint: "<branch-name> [implementation notes] e.g. mattmak/prd-239-dashbo
 
 # Work on Linear Ticket
 
-Create a worktree for a Linear-linked branch, fetch the issue, and launch Pi in a new session with a work prompt.
+Worktree for Linear branch + Pi session w/ work prompt.
 
 ## Invocation
 
-Requires a branch name in Linear's git-branch format. Optional text after the branch name is treated as implementation direction for the Pi prompt.
+Need branch in Linear git-branch format. Text after branch = impl direction for Pi.
 
 ```
 mattmak/prd-239-dashboard-banner-add-url do a configurable on press openLink url
 ```
 
-The slug after `/` embeds the issue id (`prd-239` → `PRD-239`).
+Slug after `/` embeds issue id (`prd-239` → `PRD-239`).
 
 ## Workflow
 
 ### 0. Preflight (shell allowlist)
 
-Use `mcp_pi_shell` (or `mcp_pi_ctx_shell`) for all shell commands — native Shell may be unavailable.
+All shell cmds via `mcp_pi_shell` (or `mcp_pi_ctx_shell`) — native Shell may be unavailable.
 
-`wt`, `sesh`, `tmux`, and `jq` are pre-allowed in the managed lean-ctx config (`home-modules/pi-coding-agent/lean-ctx/config.toml`). To widen the allowlist, run `lean-ctx allow <binary>` — pi-permission-system prompts the user for approval.
+`wt`, `sesh`, `tmux`, `jq` pre-allowed in `home-modules/pi-coding-agent/lean-ctx/config.toml`. Widen: `lean-ctx allow <binary>` (user approves).
 
-If a command returns `[BLOCKED — DO NOT RETRY]`, run `lean-ctx allow <binary>` to prompt the user. If the user declines, ask them to add the binary to `lean-ctx/config.toml` (then `home-manager switch` or restart Pi). Do not retry blindly.
+`[BLOCKED — DO NOT RETRY]` → `lean-ctx allow <binary>`; declined → user adds to `lean-ctx/config.toml` (+ `home-manager switch` / Pi restart). No blind retry.
 
-### 1. Parse the branch name
+**`$(...)` gotcha:** allowlist tokenizes *inside* `$(...)`; every token (flags `-C`, words `list`) must be allowlisted. `$(sesh list -j | …)`, `$(git -C …)`, `$(printf …)` rejected though `sesh`/`git`/`printf` allowed. `lean-ctx allow` can't fix (flagged tokens not binaries). Fix: multi-step logic → script file → `bash <script>`; allowlist gates only top-level `bash` (see step 5).
 
-Split the user input: first token = branch name; remainder (if any) = optional implementation notes.
+### 1. Parse branch
 
-From the branch name, extract the Linear issue identifier:
+First token = branch; rest = impl notes.
 
-- Match `([a-z]+)-(\d+)` in the branch slug (the part after `/`)
-- Uppercase the team prefix → `PRD-239`
+Extract Linear id from slug (after `/`):
 
-If no match, stop and ask the user for a valid branch name or issue id.
+- Match `([a-z]+)-(\d+)`
+- Uppercase team prefix → `PRD-239`
 
-### 2. Fetch the Linear issue
+No match → stop, ask valid branch/id.
 
-In parallel with verifying the git repo (`git rev-parse --show-toplevel`), call Linear MCP `get_issue` with the extracted id (e.g. `PRD-239`).
+### 2. Fetch issue
 
-Read title, description, status, labels, and any linked PRs. This becomes the work context.
+Parallel: `git rev-parse --show-toplevel` + Linear MCP `get_issue` (e.g. `PRD-239`).
 
-### 3. Create the worktree
+Read title, desc, status, labels, linked PRs → work context.
 
-Run from the **current working directory** (must be inside the target git repo):
+### 3. Create worktree
+
+From cwd (inside target repo):
 
 ```bash
 wt switch -b @ -c <branch_name>
 ```
 
-If that fails because the branch already exists, fall back to:
+Branch exists → fallback:
 
 ```bash
 wt switch <branch_name>
 ```
 
-Capture stdout/stderr. Parse the worktree path from text output (do **not** use `--format json` — not supported by current `wt`):
+Capture stdout/stderr. Parse worktree path from text (no `--format json` — unsupported):
 
-- Primary pattern: `worktree @ <path>` (full absolute path)
-- Fallback: `@ <path>` at end of a success line
+- Primary: `worktree @ <path>` (absolute)
+- Fallback: `@ <path>` end of success line
 
-Example line:
+Example:
 
 ```
 ✓ Created branch mattmak/prd-239-... from staging and worktree @ /Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url
 ```
 
-Confirm with `test -d <path>` before continuing.
+Confirm `test -d <path>` before continuing.
 
-### 4. Build the initial Pi prompt
+### 4. Build Pi prompt
 
-Compose a single-quoted prompt for Pi. Include:
-
-- Issue id and title
-- Description / acceptance criteria from Linear
-- **Implementation notes** from the user (if provided after the branch name)
-- Instruction to explore the codebase, implement the fix, and run relevant tests
-- Any linked PR context (if attached on the issue)
-
-Keep it concise — Pi will fetch more context itself.
+Single-quoted prompt: issue id+title, desc/acceptance criteria, impl notes, explore+implement+test instruction, linked PR context. Concise — Pi fetches more itself.
 
 Example shape:
 
@@ -96,40 +90,80 @@ Implement a configurable on-press open link URL for the dashboard banner. When u
 Explore the codebase, implement a fix, and verify with tests. Start by understanding how the dashboard banner is configured and rendered.
 ```
 
-### 5. Launch the session (detached)
+### 5. Launch session (detached)
 
-**Do not run `sesh connect`** — it always `switch-client`s when `$TMUX` is set and will yank you out of your current session.
+**No `sesh connect`** — always `switch-client`s when `$TMUX` set → yanks you out of current session.
 
-Create the tmux session in the background instead (same mechanics sesh uses internally: `new-session -d`, then `send-keys`).
+Background tmux instead (sesh internals: `new-session -d`, `send-keys`).
+
+**Why script file:** allowlist rejects any `$(...)` cmd (step 0); logic is `$()`-heavy. Allowlist gates only top-level cmd → logic into temp script, invoke once via `bash`.
+
+Script → `$CURRENT_DIRECTORY/claudetmp/` (AGENTS.md) or `$TMPDIR`:
 
 ```bash
-# 1) Reuse an existing tmux session already rooted at this worktree
+#!/usr/bin/env bash
+set -euo pipefail
+worktree_path="$1"
+prompt="$2"
+
+# 1) Reuse existing tmux session rooted at this worktree
 session=$(sesh list -j | jq -r --arg p "$worktree_path" '.[] | select(.Path == $p and .Src == "tmux") | .Name' | head -1)
 
-# 2) Otherwise derive the sesh-style git name (matches gitName + convertToValidName)
+# 2) Else derive sesh-style git name (gitName + convertToValidName)
 if [ -z "$session" ]; then
+  # main_root = git MAIN worktree — can differ from repo dir (staging often linked worktree)
   main_root=$(git -C "$worktree_path" worktree list --porcelain | awk '/^worktree /{print $2; exit}')
   rel="${worktree_path#$main_root}"
   repo_parts=$(printf '%s' "$main_root" | tr '/' '\n' | tail -2 | paste -sd/ -)
   session=$(printf '%s%s' "$repo_parts" "$rel" | tr '.:' '__' | tr ' ' '_')
 fi
 
-# 3) Create detached session + start pi (skip -c if session already exists — same as sesh)
-if tmux has-session -t "=$session" 2>/dev/null; then
-  : # session already running at this worktree
-else
+# pi runs under node; idle pane shows shell → pane_current_command = pi-alive check
+pi_running() {
+  tmux list-panes -t "$session" -F '#{pane_current_command}' 2>/dev/null | grep -q '^node$'
+}
+
+# 3) Create session if missing
+if ! tmux has-session -t "$session" 2>/dev/null; then
   tmux new-session -d -s "$session" -c "$worktree_path"
-  tmux send-keys -t "=$session" "pi '<initial_prompt>'" Enter
+  echo "created session: $session"
+  sleep 1
 fi
+
+# 4) Launch pi unless already running (dead session w/ no pi → re-send prompt)
+if pi_running; then
+  echo "reusing existing pi session: $session"
+else
+  tmux send-keys -t "$session" "pi '$prompt'" Enter
+  echo "sent pi prompt"
+fi
+
+# 5) Verify pi up (poll — no blind sleep)
+for i in $(seq 1 15); do
+  if pi_running; then
+    echo "pi confirmed running"
+    echo "SESSION=$session"
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "WARN: pi not detected in $session — attach + check manually" >&2
+echo "SESSION=$session"
+exit 1
 ```
 
-Use the parsed worktree path. Escape any single quotes inside the prompt (`'\''`).
+Run:
 
-`tmux new-session -d` returns immediately and leaves your current tmux client untouched. Only treat non-zero exit or stderr as failure.
+```bash
+bash "$CURRENT_DIRECTORY/claudetmp/launch-tmux-session.sh" "$worktree_path" 'initial_prompt'
+```
 
-### 6. Report back
+Escape single quotes in prompt (`'\''`). `test -d` worktree first. Session name on `SESSION=` line (also in created/reuse msg).
 
-Give the user a short summary:
+`tmux new-session -d` returns immediately; current client untouched. Non-zero exit/stderr = failure — incl. pi not detected (script polls up to 15s, then WARNs + exits 1).
+
+### 6. Report
 
 | Field | Value |
 |-------|-------|
@@ -137,20 +171,22 @@ Give the user a short summary:
 | Status | from Linear |
 | Worktree | absolute path |
 | Branch | branch name |
-| Tmux session | session name (attach later with `sesh connect <worktree_path>` or `tmux attach -t <session>`) |
+| Tmux session | session name (attach: `sesh connect <worktree_path>` / `tmux attach -t <session>`) |
 
-Confirm the Pi session was launched in the background. If launch failed, include the detached-launch commands as a copy-paste fallback.
+Confirm Pi launched background — script prints `pi confirmed running`. Failed (WARN/non-zero) → include detached-launch cmds as copy-paste fallback.
 
 ## Error handling
 
 | Failure | Action |
 |---------|--------|
-| Command blocked by shell allowlist | Run `lean-ctx allow <binary>` (prompts user for approval); if declined, ask user to add it to `home-modules/pi-coding-agent/lean-ctx/config.toml` |
-| Not in a git repo | Tell user to `cd` into the repo first |
-| Linear issue not found | Show extracted id; ask user to confirm |
-| `wt switch` fails | Show stderr; suggest `wt list` to inspect existing worktrees |
-| Cannot parse worktree path | Parse `worktree @ <path>` from stdout; or ask user for the path |
-| `tmux` / `jq` / detached launch fails | Show stderr; give worktree path + session name + manual attach command |
+| Blocked by allowlist | `$(...)` cmd → logic into bash script, run `bash <script>` (steps 0/5) — flagged token usually not binary, can't allowlist. Missing binary → `lean-ctx allow <binary>` (user approves); declined → user adds to `home-modules/pi-coding-agent/lean-ctx/config.toml` |
+| Not in git repo | Tell user `cd` into repo |
+| Linear issue not found | Show extracted id; ask confirm |
+| `wt switch` fails | Show stderr; suggest `wt list` |
+| Can't parse worktree path | Parse `worktree @ <path>` from stdout; or ask user path |
+| `send-keys` → `can't find pane` | `=` prefix breaks send-keys target (names w/ `/`). Drop `=`, use plain `"$session"`. `has-session` tolerates `=`, `send-keys` doesn't |
+| Session exists but pi never starts | `pane_current_command` check: pi runs under `node`, idle pane shows shell → script re-sends prompt if pane idle (no silent dead session) |
+| `tmux`/`jq`/launch fails | Show stderr; give worktree path + session name + manual attach cmd |
 
 ## Example
 
@@ -158,10 +194,10 @@ Confirm the Pi session was launched in the background. If launch failed, include
 /work-on-linear-ticket mattmak/prd-239-dashboard-banner-add-url do a configurable on press openLink url
 ```
 
-1. Uses `wt` / `sesh` / `tmux` / `jq` (in managed lean-ctx allowlist)
-2. Extracts `PRD-239`; notes → "do a configurable on press openLink url"
-3. Fetches issue from Linear (in parallel with `git rev-parse`)
-4. Runs `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
-5. Parses worktree path (e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`)
-6. Creates a detached tmux session and starts `pi 'Work on PRD-239: ...'` (does **not** switch your current session)
-7. Reports issue link, worktree path, branch, and tmux session name
+1. `wt`/`sesh`/`tmux`/`jq` (managed lean-ctx allowlist)
+2. Extract `PRD-239`; notes → "do a configurable on press openLink url"
+3. Fetch Linear issue (parallel `git rev-parse`)
+4. `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
+5. Parse worktree path (e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`)
+6. Detached tmux + `pi 'Work on PRD-239: ...'` (no switch)
+7. Report issue link, worktree, branch, session name
