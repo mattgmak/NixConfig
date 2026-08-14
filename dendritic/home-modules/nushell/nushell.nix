@@ -134,6 +134,34 @@
               }
             )
           ''
+          + ''
+
+            # Nushell has no per-command history ignore (0.112 only ships
+            # ignore_space_prefixed), so scrub `pi "..."` prompt launches out of
+            # history.txt once they are written, before the next prompt shows.
+            $env.config.hooks.pre_prompt = (
+              $env.config.hooks.pre_prompt?
+              | default []
+              | append {||
+                let history_path = $nu.history-path
+                if ($history_path | path exists) {
+                  let current = (open --raw $history_path)
+                  let cleaned = (
+                    $current
+                    | lines
+                    | where {|line|
+                        not (($line | str starts-with 'pi "') or ($line | str starts-with "pi '"))
+                      }
+                    | str join "\n"
+                    | if ($in | is-empty) { $in } else { $in + "\n" }
+                  )
+                  if $cleaned != $current {
+                    $cleaned | save --force $history_path
+                  }
+                }
+              }
+            )
+          ''
         );
         environmentVariables = lib.mkMerge [
           config.home.sessionVariables
