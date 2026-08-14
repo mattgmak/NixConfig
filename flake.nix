@@ -151,7 +151,7 @@
     };
 
     agent-sesh = {
-      url = "path:./vendor/agent-sesh";
+      url = "git+file:./vendor/agent-sesh";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
