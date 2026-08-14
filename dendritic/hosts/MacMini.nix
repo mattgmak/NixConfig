@@ -75,6 +75,11 @@ in
       nixpkgs.config = common-nixpkgs-config;
       nixpkgs.hostPlatform = "aarch64-darwin";
       system.stateVersion = 6;
+      # The "options.json ... without a proper context" eval warning actually
+      # came from home-manager's reference manpage (manual.manpages.enable,
+      # disabled in home-modules/home.nix), not from nix-darwin. Keep the
+      # nix-darwin manual disabled anyway — it is unnecessary on macOS.
+      documentation.enable = false;
       nix = {
         enable = false;
       };

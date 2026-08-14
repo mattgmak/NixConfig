@@ -20,7 +20,10 @@
           if pkgs.stdenv.isLinux then
             inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
           else
-            pkgs.emptyDirectory;
+            # Ghostty is installed via homebrew on macOS; null keeps the HM
+            # module from getExe'ing a fake package (the module's config
+            # `onChange` validator calls `getExe cfg.package`).
+            null;
         settings = {
           font-size = if pkgs.stdenv.isLinux then 14 else 18;
           font-family = [
@@ -126,7 +129,7 @@
       config,
       ...
     }:
-    lib.mkIf pkgs.stdenv.isDarwin {
+    lib.mkIf (pkgs.stdenv.isDarwin && config.programs.ghostty.package != null) {
       programs = {
         ghostty.installBatSyntax = false;
         bat = {

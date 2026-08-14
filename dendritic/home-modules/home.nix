@@ -5,6 +5,14 @@
     homeModules.main = {
       home.stateVersion = "26.05"; # Please read the comment before changing.
       programs.home-manager.enable = true;
+
+      # Skip installing the HM reference manpage. Its drv embeds
+      # `${hmOptionsDocs.optionsJSON}/share/doc/nixos/options.json`
+      # (nixosOptionsDoc = runCommand "options.json" with
+      # unsafeDiscardStringContext'd module paths), so merely forcing its
+      # outPath during the per-user profile buildEnv eval emits the
+      # "references the store path ... without a proper context" warning.
+      # manual.manpages.enable = false;
     };
 
     # TODO: refactor this
