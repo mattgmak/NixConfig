@@ -312,9 +312,17 @@
         swapDevices = [
           {
             device = "/swapfile";
-            size = 16 * 1024;
+            size = 48 * 1024;
           }
         ];
+
+        # Fast RAM-compressed swap tier, filled before disk swap (priority 5 vs
+        # kernel-chosen negative). Absorbs memory spikes (llama-cpp CUDA build)
+        # without disk thrash / OOM. zstd default, ~2x compression.
+        zramSwap = {
+          enable = true;
+          memoryPercent = 50; # 16 GiB zram on 32 GiB RAM
+        };
 
         users.users.${username}.openssh.authorizedKeys.keys = [
           self.sshKeys.Droid
