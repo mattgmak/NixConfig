@@ -1,7 +1,11 @@
-{ inputs, ... }:
 {
   flake.homeModules.neovim =
-    { config, pkgs, hostname, ... }:
+    {
+      config,
+      pkgs,
+      hostname,
+      ...
+    }:
     let
       treesitterPkg = pkgs.tree-sitter;
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
@@ -36,7 +40,7 @@
           fd
           treesitterPkg
           imagemagick
-          ueberzugpp
+          # ueberzugpp
           config.programs.yazi.package
         ];
       };
