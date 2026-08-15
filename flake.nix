@@ -100,7 +100,7 @@
     };
 
     whisper-dictation = {
-      url = "github:jacopone/whisper-dictation";
+      url = "git+file:./vendor/whisper-dictation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

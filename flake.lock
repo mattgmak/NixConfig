@@ -3031,17 +3031,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1785743674,
-        "narHash": "sha256-gyyr6g7C8ioAvJLLuqGWUAI+gkY8fw5Cb70pqqfnyJ4=",
-        "owner": "jacopone",
-        "repo": "whisper-dictation",
-        "rev": "cc86d7e1c47395fc682d590e19ac18518f9707e9",
-        "type": "github"
+        "lastModified": 1786769916,
+        "narHash": "sha256-UAVuAsjVKRRnDkqjEEVf2aTdEQ3diw/GhqZXEj1jbu0=",
+        "ref": "refs/heads/main",
+        "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
+        "revCount": 28,
+        "type": "git",
+        "url": "file:./vendor/whisper-dictation"
       },
       "original": {
-        "owner": "jacopone",
-        "repo": "whisper-dictation",
-        "type": "github"
+        "type": "git",
+        "url": "file:./vendor/whisper-dictation"
       }
     },
     "wiremix": {

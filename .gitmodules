@@ -79,3 +79,6 @@
 [submodule "mattgmak/woomer"]
 	path = vendor/woomer
 	url = https://github.com/mattgmak/woomer.git
+[submodule "vendor/whisper-dictation"]
+	path = vendor/whisper-dictation
+	url = https://github.com/mattgmak/whisper-dictation.git

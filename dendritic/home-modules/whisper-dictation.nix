@@ -54,8 +54,6 @@
           pkgs.gobject-introspection
         ];
 
-        patches = [ ./whisper-blank-filter.patch ];
-
         installPhase = ''
           mkdir -p $out/bin
           mkdir -p $out/lib/whisper-dictation
