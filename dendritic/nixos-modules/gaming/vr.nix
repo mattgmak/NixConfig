@@ -1,15 +1,15 @@
 {
   flake.nixosModules.vr =
-    { pkgs-for-vr, ... }:
+    { mv, ... }:
     {
       services.wivrn = {
         enable = true;
         openFirewall = true;
         autoStart = true;
-        package = pkgs-for-vr.wivrn;
+        package = mv.vr.wivrn;
       };
 
-      environment.systemPackages = with pkgs-for-vr; [
+      environment.systemPackages = with mv.vr; [
         bs-manager
         sidequest
       ];

@@ -4,7 +4,7 @@
     {
       config,
       lib,
-      pkgs-for-homelab,
+      mv,
       ...
     }:
     let
@@ -13,7 +13,7 @@
     {
       services.glance = {
         enable = true;
-        package = pkgs-for-homelab.glance;
+        package = mv.homelab.glance;
         openFirewall = false;
         environmentFile = lib.mkIf config.services.glance.enable config.age.secrets.glance-env.path;
         settings = {

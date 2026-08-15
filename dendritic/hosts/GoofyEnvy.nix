@@ -7,18 +7,18 @@
 {
   flake = {
     nixosConfigurations.GoofyEnvy = withSystem "x86_64-linux" (
-      { config, inputs', ... }:
+      {
+        self',
+        config,
+        inputs',
+        ...
+      }:
       inputs.nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs inputs';
           inherit (self.constants) username;
           inherit (config) packages common-overlays common-nixpkgs-config;
-          inherit (config.legacyPackages)
-            pkgs-stable
-            pkgs-for-cursor
-            pkgs-for-homelab
-            pkgs-for-kernel
-            ;
+          mv = self'.legacyPackages.mv;
           hostname = self.constants.laptopName;
         };
         modules = with self.nixosModules; [
@@ -86,7 +86,6 @@
       {
         pkgs,
         username,
-        pkgs-stable,
         common-overlays,
         common-nixpkgs-config,
         ...

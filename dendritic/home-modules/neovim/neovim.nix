@@ -3,7 +3,7 @@
   flake.homeModules.neovim =
     { config, pkgs, hostname, ... }:
     let
-      treesitterPkg = inputs.tree-sitter.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      treesitterPkg = pkgs.tree-sitter;
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       neovimRoot = "${repoRoot}/home-modules/neovim";
     in

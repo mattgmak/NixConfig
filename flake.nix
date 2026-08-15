@@ -4,23 +4,11 @@
     self.submodules = true;
     import-tree.url = "github:vic/import-tree";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs-stable = {
-      url = "github:nixos/nixpkgs?ref=nixos-25.05";
-    };
     nixpkgs = {
       url = "github:nixos/nixpkgs/nixos-unstable";
     };
-    nixpkgs-for-homelab = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
-    };
-    nixpkgs-for-cursor = {
-      url = "github:nixos/nixpkgs/master";
-    };
-    nixpkgs-for-vr = {
-      url = "github:nixos/nixpkgs/master";
-    };
-    nixpkgs-for-kernel = {
-      url = "github:nixos/nixpkgs/master";
+    multiverse = {
+      url = "github:fzakaria/nixpkgs-multiverse";
     };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
@@ -92,6 +80,7 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
       inputs.home-manager.follows = "home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nix-gaming.url = "github:fufexan/nix-gaming";
@@ -120,10 +109,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    tree-sitter = {
-      url = "github:tree-sitter/tree-sitter";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # tree-sitter flake removed — neovim uses pkgs.tree-sitter (nixpkgs, hydra-cached)
 
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
@@ -183,7 +169,7 @@
     flake
     // {
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = flake.legacyPackages.aarch64-linux.pkgs-unstable;
+        pkgs = flake.legacyPackages.aarch64-linux.mv.unstable;
         modules = [ flake.nixOnDroidConfiguration ];
       };
     };

@@ -7,19 +7,18 @@
 {
   flake = {
     nixosConfigurations.GoofyDesky = withSystem "x86_64-linux" (
-      { config, inputs', ... }:
+      {
+        self',
+        config,
+        inputs',
+        ...
+      }:
       inputs.nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs inputs';
           inherit (config) packages common-overlays common-nixpkgs-config;
           inherit (self.constants) username;
-          inherit (config.legacyPackages)
-            pkgs-stable
-            pkgs-for-cursor
-            pkgs-for-vr
-            pkgs-for-homelab
-            pkgs-for-kernel
-            ;
+          mv = self'.legacyPackages.mv;
           hostname = self.constants.desktopName;
         };
         modules = with self.nixosModules; [
@@ -86,6 +85,7 @@
       ];
       whisperDictation = {
         packageName = "whisper-dictation-vulkan";
+        inputDevice = "Svalboard lightly";
       };
     };
 
@@ -94,7 +94,6 @@
         config,
         lib,
         pkgs,
-        pkgs-stable,
         inputs,
         username,
         packages,
@@ -109,6 +108,8 @@
           {
             cudaSupport = true;
             packageOverrides = pkgs: {
+              # CUDA llama-cpp override: ~50GB source compile (llama.cpp b9190 + nvcc +
+              # GGML_NATIVE) that previously OOM'd the build. Swap/zram added so it can run.
               # TODO: when ggml-org/llama.cpp#22673 lands upstream, revisit Gemma 4
               # MTP support. The current b9058 build has speculative decoding flags, but
               # not the --spec-type mtp / --mtp-head path needed for Gemma 4 assistants.
@@ -316,9 +317,6 @@
           }
         ];
 
-        # Fast RAM-compressed swap tier, filled before disk swap (priority 5 vs
-        # kernel-chosen negative). Absorbs memory spikes (llama-cpp CUDA build)
-        # without disk thrash / OOM. zstd default, ~2x compression.
         zramSwap = {
           enable = true;
           memoryPercent = 50; # 16 GiB zram on 32 GiB RAM

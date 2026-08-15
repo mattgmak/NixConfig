@@ -5,7 +5,7 @@
     {
       config,
       pkgs,
-      pkgs-for-homelab,
+      mv,
       ...
     }:
     let
@@ -14,7 +14,7 @@
     {
       services.radicale = {
         enable = true;
-        package = pkgs-for-homelab.radicale;
+        package = mv.homelab.radicale;
         settings = {
           server.hosts = [ "127.0.0.1:5232" ];
           auth = {

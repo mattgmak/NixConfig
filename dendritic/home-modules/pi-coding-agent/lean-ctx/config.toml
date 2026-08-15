@@ -38,4 +38,5 @@ shell_allowlist_extra = [
     "journalctl",
     "hyprctl",
     "devenv",
+    "nixfmt",
 ]

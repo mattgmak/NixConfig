@@ -10,7 +10,7 @@
     }:
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
-      gtk.gtk4.theme = config.gtk.theme;
+      gtk.gtk4.theme.name = config.gtk.theme.name;
       # Icon theme managed by stylix.icons (shared with Qt via qt5ct/qt6ct).
       gtk.enable = true;
 

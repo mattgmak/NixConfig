@@ -6,8 +6,7 @@
       pkgs,
       hostname,
       username,
-      pkgs-for-cursor,
-      pkgs-stable,
+      mv,
       ...
     }:
     {
@@ -28,8 +27,7 @@
           inherit
             hostname
             username
-            pkgs-for-cursor
-            pkgs-stable
+            mv
             ;
         };
         backupFileExtension = "hm-backup-1";

@@ -3,7 +3,7 @@
     {
       config,
       options,
-      pkgs-for-homelab,
+      mv,
       lib,
       ...
     }:
@@ -17,7 +17,9 @@
       tailnetFqdn = "goofeus.${tailnetBaseDomain}";
       transmissionRpcEnabled =
         config.services.transmission.enable
-        || (lib.isOption options.services.transmissionGluetun && config.services.transmissionGluetun.enable);
+        || (
+          lib.isOption options.services.transmissionGluetun && config.services.transmissionGluetun.enable
+        );
       transmissionRpcPort =
         if config.services.transmission.enable then
           config.services.transmission.settings.rpc-port
@@ -27,7 +29,7 @@
     {
       services.caddy = {
         enable = true;
-        package = pkgs-for-homelab.caddy.withPlugins {
+        package = mv.homelab.caddy.withPlugins {
           plugins = [
             "github.com/caddy-dns/cloudflare@v0.2.3"
           ];

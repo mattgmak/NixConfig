@@ -122,7 +122,7 @@
           default = pkgs.code-cursor;
           defaultText = literalExpression "pkgs.code-cursor";
           description = "The cursor package to use as the base for injection";
-          example = literalExpression "pkgs-for-cursor.code-cursor";
+          example = literalExpression "mv.cursor.code-cursor";
         };
 
         electron = mkOption {
@@ -165,7 +165,7 @@
         #   '')
         # ];
 
-        # Apply the overlay to the pinned pkgs-for-cursor instance and use the modified package
+        # Apply the overlay to the pinned mv.cursor instance and use the modified package
         programs.vscode.package = lib.mkForce extendedCursor;
         home.sessionPath = [ "${extendedCursor}/bin" ];
       };

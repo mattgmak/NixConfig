@@ -21,7 +21,7 @@
       options,
       lib,
       pkgs,
-      pkgs-for-homelab,
+      mv,
       ...
     }:
     let
@@ -119,7 +119,7 @@
       # Post-rebuild: hard-refresh browser (Ctrl+F5) to clear cached web UI.
       services.jellyfin = {
         enable = true;
-        package = pkgs-for-homelab.jellyfin;
+        package = mv.homelab.jellyfin;
         openFirewall = false;
         hardwareAcceleration = {
           enable = true;
@@ -145,31 +145,31 @@
 
       services.sonarr = {
         enable = true;
-        package = pkgs-for-homelab.sonarr;
+        package = mv.homelab.sonarr;
         openFirewall = false;
       };
 
       services.radarr = {
         enable = true;
-        package = pkgs-for-homelab.radarr;
+        package = mv.homelab.radarr;
         openFirewall = false;
       };
 
       services.lidarr = {
         enable = true;
-        package = pkgs-for-homelab.lidarr;
+        package = mv.homelab.lidarr;
         openFirewall = false;
       };
 
       services.prowlarr = {
         enable = true;
-        package = pkgs-for-homelab.prowlarr;
+        package = mv.homelab.prowlarr;
         openFirewall = false;
       };
 
       services.flaresolverr = {
         enable = true;
-        package = pkgs-for-homelab.flaresolverr;
+        package = mv.homelab.flaresolverr;
         openFirewall = false;
       };
 
@@ -178,7 +178,7 @@
 
       services.bazarr = {
         enable = true;
-        package = pkgs-for-homelab.bazarr;
+        package = mv.homelab.bazarr;
         openFirewall = false;
       };
 
@@ -187,7 +187,7 @@
           (!(lib.isOption options.services.transmissionGluetun && config.services.transmissionGluetun.enable))
           {
             enable = true;
-            package = pkgs-for-homelab.transmission_4;
+            package = mv.homelab.transmission_4;
             home = transmissionHome;
             downloadDirPermissions = "2775";
             openPeerPorts = true;

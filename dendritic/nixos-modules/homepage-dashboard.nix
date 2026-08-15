@@ -1,6 +1,6 @@
 {
   flake.nixosModules.homepage-dashboard =
-    { config, pkgs-for-homelab, ... }:
+    { config, mv, ... }:
     let
       port = config.services.homepage-dashboard.listenPort;
       immichPort = config.services.immich.port;
@@ -8,7 +8,7 @@
     {
       services.homepage-dashboard = {
         enable = true;
-        package = pkgs-for-homelab.homepage-dashboard;
+        package = mv.homelab.homepage-dashboard;
         openFirewall = false;
         allowedHosts = "100.111.11.128:${toString port},goofeus:${toString port}";
         widgets = [

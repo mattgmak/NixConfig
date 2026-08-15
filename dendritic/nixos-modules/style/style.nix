@@ -64,7 +64,7 @@
       # qgnomeplatform packages. We use Hyprland, so force the supported qtct
       # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
       # stylix module assigns the auto-detected value at default priority.
-      targets.qt.platform = lib.mkForce "qtct";
+      stylix.targets.qt.platform = lib.mkForce "qtct";
 
       # Icon theme shared by GTK + Qt (via qt5ct/qt6ct icon_theme). Without
       # this, the qtct platform leaves Qt tray icons (kdeconnect, caelestia

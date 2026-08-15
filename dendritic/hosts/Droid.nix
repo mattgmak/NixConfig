@@ -103,6 +103,7 @@
       '';
       nix = {
         substituters = [
+          "https://cache.nixos.org"
           "https://yazi.cachix.org"
         ];
         trustedPublicKeys = [

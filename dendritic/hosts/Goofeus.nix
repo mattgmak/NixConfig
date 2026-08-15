@@ -7,18 +7,18 @@
 {
   flake = {
     nixosConfigurations.Goofeus = withSystem "x86_64-linux" (
-      { config, inputs', ... }:
+      {
+        self',
+        config,
+        inputs',
+        ...
+      }:
       inputs.nixpkgs.lib.nixosSystem {
         specialArgs = {
           inherit inputs inputs';
           inherit (config) packages common-overlays common-nixpkgs-config;
           username = "root";
-          inherit (config.legacyPackages)
-            pkgs-stable
-            pkgs-for-cursor
-            pkgs-for-homelab
-            pkgs-for-kernel
-            ;
+          mv = self'.legacyPackages.mv;
           hostname = self.constants.serverName;
         };
         modules = with self.nixosModules; [
@@ -69,10 +69,9 @@
     nixosModules.Goofeus =
       {
         pkgs,
-        pkgs-stable,
         username,
         hostname,
-        pkgs-for-cursor,
+        mv,
         common-overlays,
         common-nixpkgs-config,
         ...
@@ -88,8 +87,7 @@
             inherit
               hostname
               username
-              pkgs-for-cursor
-              pkgs-stable
+              mv
               ;
           };
           backupFileExtension = "hm-backup-1";

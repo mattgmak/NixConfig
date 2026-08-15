@@ -2,7 +2,7 @@
   flake.nixosModules.immich =
     {
       pkgs,
-      pkgs-for-homelab,
+      mv,
       ...
     }:
     {
@@ -10,7 +10,7 @@
         enable = true;
         host = "0.0.0.0";
         mediaLocation = "/mnt/2TBSeagateHDD/immich";
-        package = pkgs-for-homelab.immich;
+        package = mv.homelab.immich;
       };
 
       systemd.services.immich-media-dir = {

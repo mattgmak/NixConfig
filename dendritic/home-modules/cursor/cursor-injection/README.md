@@ -53,7 +53,7 @@ The approach is safer than runtime file modification because:
 
 ```nix
 # In a Home Manager module
-{ pkgs-for-cursor, ... }: {
+{ mv, ... }: {
   # Create custom CSS/JS files in ~/.cursor/extensions/custom/
   home.file = {
     ".cursor/extensions/custom/custom.css".source = ./custom.css;
@@ -63,7 +63,7 @@ The approach is safer than runtime file modification because:
   programs.cursor-injection = {
     enable = true;
     # Optional: use a pinned/custom cursor package
-    package = pkgs-for-cursor.code-cursor;
+    package = mv.cursor.code-cursor;
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";
@@ -244,10 +244,10 @@ electron = {
 
 ```nix
 # When using a pinned nixpkgs instance for Cursor
-{ pkgs-for-cursor, ... }: {
+{ mv, ... }: {
   programs.cursor-injection = {
     enable = true;
-    package = pkgs-for-cursor.code-cursor;
+    package = mv.cursor.code-cursor;
     electron = {
       frame = false;
       titleBarStyle = "hiddenInset";

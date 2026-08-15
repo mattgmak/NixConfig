@@ -5,6 +5,7 @@
       nix = {
         settings = {
           substituters = [
+            "https://cache.nixos.org"
             "https://hyprland.cachix.org"
             "https://nix-community.cachix.org"
             "https://nix-gaming.cachix.org"
