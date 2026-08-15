@@ -106,14 +106,12 @@
         nixpkgs.config = lib.mkMerge [
           common-nixpkgs-config
           {
-            cudaSupport = true;
+            cudaSupport = false;
             packageOverrides = pkgs: {
-              # CUDA llama-cpp override: ~50GB source compile (llama.cpp b9190 + nvcc +
-              # GGML_NATIVE) that previously OOM'd the build. Swap/zram added so it can run.
-              # TODO: when ggml-org/llama.cpp#22673 lands upstream, revisit Gemma 4
-              # MTP support. The current b9058 build has speculative decoding flags, but
-              # not the --spec-type mtp / --mtp-head path needed for Gemma 4 assistants.
-              # Override llama-cpp to latest version b6150 with CUDA support
+              # CUDA llama-cpp: nixpkgs default is CPU-only. This enables CUDA + OpenBLAS
+              # + native CPU flags. Version follows nixpkgs (no more version/src pin -
+              # ggml-org/llama.cpp#22673 MTP support landed upstream 2026-05-16, so the
+              # old b9190 pin's reason is gone and nixpkgs is newer anyway).
               llama-cpp =
                 (pkgs.llama-cpp.override {
                   cudaSupport = true;
@@ -123,21 +121,7 @@
                   # This is crucial for models using split-mode or CPU offloading
                   blasSupport = true;
                 }).overrideAttrs
-                  (oldAttrs: rec {
-                    version = "9190";
-                    src = pkgs.fetchFromGitHub {
-                      owner = "ggml-org";
-                      repo = "llama.cpp";
-                      tag = "b${version}";
-                      hash = "sha256-zajArFzrLUUVsfG1xBttwzwaT9QNlKzDbvSxvof+FMQ=";
-                      leaveDotGit = true;
-                      postFetch = ''
-                        git -C "$out" rev-parse --short HEAD > $out/COMMIT
-                        find "$out" -name .git -print0 | xargs -0 rm -rf
-                      '';
-                    };
-                    npmRoot = "tools/ui";
-                    npmDepsHash = "sha256-WaEePrEZ7O/7deP2KJhe0AwiSKYA8HOqETmMHUkmBe0=";
+                  (oldAttrs: {
                     # Enable native CPU optimizations for massively better CPU performance
                     # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
                     # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
@@ -154,7 +138,6 @@
                       export NIX_ENFORCE_NO_NATIVE=0
                       ${oldAttrs.preConfigure or ""}
                     '';
-
                   });
 
               # llama-swap from GitHub releases

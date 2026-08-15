@@ -16,9 +16,15 @@
         hash = "sha256-l0mNqZIS3IAPpcIxN17JOuc09UHYmzRtRR8/fGu3oe8=";
       };
 
+      # ya.mgr_emit was removed in yazi nightly (26.5.6pre) — ya.emit is the
+      # replacement and exists in stable 26.5.6 too (mgr_emit only deprecated there)
+      patchPhase = ''
+        sed -i 's/ya\.mgr_emit/ya.emit/g' main.lua
+      '';
+
       installPhase = ''
         mkdir -p $out/share/yazi/plugins/searchjump
-        cp -r $src/* $out/share/yazi/plugins/searchjump/
+        cp -r ./* $out/share/yazi/plugins/searchjump/
         chmod -R +x $out/share/yazi/plugins/searchjump/
       '';
 

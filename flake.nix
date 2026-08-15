@@ -85,7 +85,7 @@
 
     nix-gaming.url = "github:fufexan/nix-gaming";
 
-    yazi.url = "github:sxyazi/yazi";
+    yazi.url = "github:sxyazi/yazi/v26.5.6";
 
     nix-on-droid = {
       # url = "github:nix-community/nix-on-droid/release-24.05";

@@ -4,7 +4,7 @@
 
     stdenv.mkDerivation {
       pname = "yaziPlugins-piper";
-      version = "unstable-2025-08-18";
+      version = "unstable-2026-05-05";
 
       src = ./piper;
 

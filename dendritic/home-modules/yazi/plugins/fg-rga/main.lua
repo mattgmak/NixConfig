@@ -212,7 +212,7 @@ function M:entry(job)
   elseif default_action == 'cursor' or get_option() == 'cursor' then
     os.execute('cursor -g ' .. file_url .. ':' .. line_number)
   elseif (default_action == 'jump' or get_option() == 'jump') and file_url ~= '' then
-    ya.mgr_emit(file_url:match('[/\\]$') and 'cd' or 'reveal', { file_url })
+    ya.emit(file_url:match('[/\\]$') and 'cd' or 'reveal', { file_url })
   else
     return
   end
@@ -242,7 +242,7 @@ function M:redraw()
 end
 
 function M.fail(s, ...)
-  ya.mgr_emit('plugin', { 'mount', 'refresh' })
+  ya.emit('plugin', { 'mount', 'refresh' })
   ya.notify({ title = 'fg-rga', content = string.format(s, ...), timeout = 10, level = 'error' })
 end
 

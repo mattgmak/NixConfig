@@ -1,6 +1,6 @@
 # A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/yazi.json"
+#:schema https://yazi-rs.github.io/schemas/yazi.json
 
 [mgr]
 ratio = [1, 4, 3]
@@ -134,9 +134,9 @@ prepend_previewers = [
 
 fetchers = [
 	# Mimetype
-	{ id = "mime", url = "*/", run = "mime.dir", prio = "high" },
-	{ id = "mime", url = "local://*", run = "mime.local", prio = "high" },
-	{ id = "mime", url = "remote://*", run = "mime.remote", prio = "high" },
+	{ group = "mime", url = "*/", run = "mime.dir", prio = "high" },
+	{ group = "mime", url = "local://*", run = "mime.local", prio = "high" },
+	{ group = "mime", url = "remote://*", run = "mime.remote", prio = "high" },
 ]
 spotters = [
 	{ url = "*/", run = "folder" },
@@ -203,6 +203,12 @@ previewers = [
 	{ mime = "null/*", run = "null" },
 	# Fallback
 	{ url = "*", run = "file" },
+]
+
+# NOTE: must stay inside [plugin] - prepend_fetchers under [which] is silently ignored
+prepend_fetchers = [
+	{ group = "git", url = "*", run = "git" },
+	{ group = "git", url = "*/", run = "git" },
 ]
 
 [input]
@@ -277,13 +283,6 @@ sort_sensitive = false
 sort_reverse = false
 sort_translit = false
 
-# extra
-
-prepend_fetchers = [
-	{ id = "git", url = "*", run = "git" },
-	{ id = "git", url = "*/", run = "git" },
-]
-
 [[opener.bulk-rename]]
-run = 'nvim "$@"'
+run = 'nvim %s'
 block = true
