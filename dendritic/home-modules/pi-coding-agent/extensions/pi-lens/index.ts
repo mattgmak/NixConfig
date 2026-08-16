@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-lens/index.ts";
+export { default } from "../vendor/mattgmak/pi-lens/index.ts";

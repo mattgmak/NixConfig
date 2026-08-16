@@ -12,6 +12,7 @@
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
       extensionsDir = "${piAgentRoot}/extensions";
+      vendorRoot = "${config.home.homeDirectory}/NixConfig/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
       piNpmI = pkgs.writeShellApplication {
@@ -24,9 +25,10 @@
         text = ''
           set -euo pipefail
           EXTENSIONS=${lib.escapeShellArg extensionsDir}
+          VENDOR_ROOT=${lib.escapeShellArg vendorRoot}
 
           discard_vendor_changes() {
-            for vendor in "$EXTENSIONS/vendor"/*; do
+            for vendor in "$VENDOR_ROOT"/*/*; do
               [ -d "$vendor" ] || continue
               toplevel=$(git -C "$vendor" rev-parse --show-toplevel 2>/dev/null || true)
               [ -n "$toplevel" ] || continue
@@ -48,9 +50,9 @@
 
           link_powerline_theme() {
             local theme="$EXTENSIONS/pi-powerline-footer/theme.json"
-            local vendor="$EXTENSIONS/vendor/pi-powerline-footer"
+            local vendor="$VENDOR_ROOT/nicobailon/pi-powerline-footer"
             if [ -f "$theme" ] && [ -d "$vendor" ]; then
-              ln -sfn ../../pi-powerline-footer/theme.json "$vendor/theme.json"
+              ln -sfn "$theme" "$vendor/theme.json"
             fi
           }
 
@@ -94,23 +96,23 @@
           }
 
           install_pi_packages() {
-            local dir="$EXTENSIONS/vendor/pi-packages"
+            local dir="$VENDOR_ROOT/gotgenes/pi-packages"
             [ -f "$dir/pnpm-lock.yaml" ] || return 0
-            echo "pi-npm-i: vendor/pi-packages (pnpm install --frozen-lockfile)"
+            echo "pi-npm-i: vendor/gotgenes/pi-packages (pnpm install --frozen-lockfile)"
             (cd "$dir" && pnpm install --frozen-lockfile)
           }
 
           install_fgladisch_pi() {
-            local dir="$EXTENSIONS/vendor/fgladisch-pi-extensions"
+            local dir="$VENDOR_ROOT/fgladisch/pi-extensions"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/fgladisch-pi-extensions (npm ci)"
+            echo "pi-npm-i: vendor/fgladisch/pi-extensions (npm ci)"
             (cd "$dir" && npm ci --omit=dev --ignore-scripts)
           }
 
           install_lean_ctx_pi() {
-            local dir="$EXTENSIONS/vendor/lean-ctx/packages/pi-lean-ctx"
+            local dir="$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
+            echo "pi-npm-i: vendor/mattgmak/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
             if [ -f "$dir/package-lock.json" ]; then
               (cd "$dir" && npm ci)
             else
@@ -120,8 +122,8 @@
           }
 
           install_engram_deps() {
-            local engram_pi="$EXTENSIONS/vendor/engram/plugin/pi"
-            local engram_deps_dir="$EXTENSIONS/vendor/.engram-deps"
+            local engram_pi="$VENDOR_ROOT/Gentleman-Programming/engram/plugin/pi"
+            local engram_deps_dir="$VENDOR_ROOT/.engram-deps"
             [ -f "$engram_pi/package.json" ] || return 0
             echo "pi-npm-i: gentle-engram deps (vendor/.engram-deps)"
             rm -f "$EXTENSIONS/node_modules"
@@ -137,7 +139,7 @@
               }, null, 2));
             " "$engram_pi/package.json" "$engram_deps_dir/package.json"
             (cd "$engram_deps_dir" && npm install --omit=dev --no-package-lock)
-            ln -sfn ".engram-deps/node_modules" "$EXTENSIONS/vendor/node_modules"
+            ln -sfn ".engram-deps/node_modules" "$VENDOR_ROOT/node_modules"
           }
 
           PARALLEL_PIDS=()
@@ -169,14 +171,20 @@
 
           for ext in "$EXTENSIONS"/*; do
             [ -d "$ext" ] || continue
-            [ "$(basename "$ext")" = "vendor" ] && continue
             queue_parallel install_npm_deps "$ext" "$(basename "$ext")"
           done
 
-          for vendor in "$EXTENSIONS/vendor"/*; do
+          # vendored pi extensions (vendor/<owner>/<repo>); skip repos with
+          # dedicated installers (exact path — two repos are both named pi-extensions)
+          # and non-extension repos (themes/skills/zen/tools)
+          for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
+            case "$vendor" in
+              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram") continue ;;
+            esac
             case "$(basename "$vendor")" in
-              lean-ctx|pi-packages|fgladisch-pi-extensions|engram) continue ;;
+              pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
+              skills|zen-wireframe-2|agent-sesh|woomer|whisper-dictation) continue ;;
             esac
             queue_parallel install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
           done
@@ -190,10 +198,10 @@
 
           link_extension_node_modules \
             "$EXTENSIONS/pi-lens" \
-            "../vendor/pi-lens/node_modules"
+            "../vendor/mattgmak/pi-lens/node_modules"
           link_extension_node_modules \
             "$EXTENSIONS/pi-permission-system" \
-            "../vendor/pi-packages/packages/pi-permission-system/node_modules"
+            "../vendor/gotgenes/pi-packages/packages/pi-permission-system/node_modules"
 
           discard_vendor_changes
         '';

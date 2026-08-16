@@ -6,6 +6,6 @@
   "description": "Pi loader for pi-lens (vendored apmantza/pi-lens submodule)",
   "pi": {
     "extensions": ["./index.ts"],
-    "skills": ["../vendor/pi-lens/skills"]
+    "skills": ["../vendor/mattgmak/pi-lens/skills"]
   }
 }

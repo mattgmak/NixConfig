@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-mcp-adapter/index.ts";
+export { default } from "../vendor/nicobailon/pi-mcp-adapter/index.ts";

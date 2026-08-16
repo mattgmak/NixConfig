@@ -34,15 +34,14 @@
       "locked": {
         "lastModified": 1786692703,
         "narHash": "sha256-7vxVU8eLT8VTtQFaFlBOle3oGvXznwLTWkF+1NpSR+c=",
-        "ref": "refs/heads/main",
         "rev": "a4a14a0d84ee60ba18b12230de5cab9e27dd391c",
         "revCount": 18,
         "type": "git",
-        "url": "file:./vendor/agent-sesh"
+        "url": "file:./vendor/mattgmak/agent-sesh"
       },
       "original": {
         "type": "git",
-        "url": "file:./vendor/agent-sesh"
+        "url": "file:./vendor/mattgmak/agent-sesh"
       }
     },
     "aquamarine": {
@@ -3020,11 +3019,11 @@
         "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
         "revCount": 28,
         "type": "git",
-        "url": "file:./vendor/whisper-dictation"
+        "url": "file:./vendor/mattgmak/whisper-dictation"
       },
       "original": {
         "type": "git",
-        "url": "file:./vendor/whisper-dictation"
+        "url": "file:./vendor/mattgmak/whisper-dictation"
       }
     },
     "wiremix": {
@@ -3057,11 +3056,11 @@
         "systems": "systems_10"
       },
       "locked": {
-        "path": "./vendor/woomer",
+        "path": "./vendor/mattgmak/woomer",
         "type": "path"
       },
       "original": {
-        "path": "./vendor/woomer",
+        "path": "./vendor/mattgmak/woomer",
         "type": "path"
       },
       "parent": []

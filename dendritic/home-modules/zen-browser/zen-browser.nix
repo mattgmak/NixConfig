@@ -334,8 +334,8 @@
               # Find this in about:config or prefs.js of your profile
               keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 19;
 
-              userChrome = ./zen-wireframe-2/userChrome.css;
-              userContent = ./zen-wireframe-2/userContent.css;
+              userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
+              userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
 
               containersForce = true;
               containers = {
@@ -376,11 +376,11 @@
             configDir =
               if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles" else ".config/zen";
             modules = {
-              source = ./zen-wireframe-2/modules;
+              source = ../../../vendor/mattgmak/zen-wireframe-2/modules;
               recursive = true;
             };
             elements = {
-              source = ./zen-wireframe-2/elements;
+              source = ../../../vendor/mattgmak/zen-wireframe-2/elements;
               recursive = true;
             };
           in

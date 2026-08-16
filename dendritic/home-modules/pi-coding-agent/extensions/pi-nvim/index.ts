@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-nvim/extension.ts";
+export { default } from "../vendor/carderne/pi-nvim/extension.ts";

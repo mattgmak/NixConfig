@@ -6,7 +6,7 @@
         pname = "lean-ctx";
         version = "3.9.9";
 
-        src = pkgs.lib.cleanSource ../home-modules/pi-coding-agent/extensions/vendor/lean-ctx;
+        src = pkgs.lib.cleanSource ../../vendor/mattgmak/lean-ctx;
 
         buildAndTestSubdir = "rust";
 

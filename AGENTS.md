@@ -1,0 +1,21 @@
+# Vendoring convention
+
+Third-party repos = git submodules. All under root `vendor/` — nothing else.
+
+```
+vendor/<Owner>/<repo>/
+```
+
+- `<Owner>` — GitHub owner dir, URL casing (`mattgmak`, `MattDevy`, `Gentleman-Programming`)
+- `<repo>` — bare repo name (`pi-lens`, `pi-extensions`, `zen-wireframe-2`)
+
+Rules:
+
+- **No vendor dirs outside `vendor/`** — extensions, themes, skills, zen, tools all share it. Never `vendor/` under `dendritic/...`.
+- **`.gitmodules` name = `owner/repo`** from git URL, not checkout path (`[submodule "mattgmak/pi-lens"]`).
+- **Pi extensions**: thin loader dir `dendritic/home-modules/pi-coding-agent/extensions/<name>/` — `package.json` (`pi.extensions: ["./index.ts"]`, optional `pi.skills`) + `index.ts` re-export `../vendor/<Owner>/<repo>/…`. Pi resolves loader imports against live `~/.pi/agent/extensions/<name>/` — depth fixed at 1 up, lands on `extensions/vendor` compat symlink → repo root `vendor/`. Submodule never inside `extensions/`.
+- **Themes**: symlink `…/themes/<name>.json` → `../../../../vendor/<Owner>/<repo>/…`.
+- **Skills**: symlink `dendritic/skills/<name>` → `../../vendor/<owner>/<repo>/…`.
+- `pi-npm-i` installs vendor extension deps; skips non-extension repos (themes/skills/zen/tools) + special-cases `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`.
+
+New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.gitmodules` name → `owner/repo` if git used path. Full workflow + fork handling: `dendritic/skills/pi-setup/REFERENCE.md`.

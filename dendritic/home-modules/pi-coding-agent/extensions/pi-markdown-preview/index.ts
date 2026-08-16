@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-markdown-preview/index.ts";
+export { default } from "../vendor/omaclaren/pi-markdown-preview/index.ts";

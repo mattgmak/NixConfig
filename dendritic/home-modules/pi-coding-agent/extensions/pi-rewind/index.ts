@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-rewind/src/index.ts";
+export { default } from "../vendor/arpagon/pi-rewind/src/index.ts";

@@ -1,1 +1,1 @@
-export { default } from "../vendor/cursor-provider/index.ts";
+export { default } from "../vendor/mattgmak/pi-cursor-provider/index.ts";

@@ -5,22 +5,22 @@ Companion to [SKILL.md](SKILL.md). Layout, conventions, and debugging for pi in 
 ## Layout
 
 ```
-dendritic/
-├── skills/                          # global pi skills (SKILL.md dirs)
-│   ├── vendor/                      # git submodules (upstream skill repos)
-│   │   └── mattpocock-skills/       # mattpocock/skills checkout
-│   ├── <skill-name>/                # local skill or symlink → vendor/.../skills/...
-│   └── pi-setup/                    # repo-owned skill
-└── home-modules/pi-coding-agent/
-    ├── pi-coding-agent.nix          # wiring module
-    ├── models.json                  # custom providers/models
-    ├── mcp.json                     # Pi global MCP override (~/.pi/agent/mcp.json)
-    ├── extensions/                  # pi TypeScript extensions
-    │   ├── vendor/                  # git submodules (upstream sources)
-    │   │   └── <name>/              # e.g. vendor/cursor-provider/
-    │   └── <loader>/                # thin loader dir (package.json + index.ts → vendor/)
-    ├── prompts/                     # prompt templates (.md)
-    └── themes/                      # e.g. git submodule of theme repo
+NixConfig/
+├── vendor/                          # ALL git submodules, grouped <Owner>/<repo>
+│   ├── <owner>/<repo>/              # e.g. vendor/mattgmak/pi-lens
+│   └── …                            # extensions, themes, skills, zen, tools
+└── dendritic/
+    ├── skills/                      # global pi skills (SKILL.md dirs)
+    │   ├── <skill-name>/            # local skill or symlink → ../../vendor/.../skills/...
+    │   └── pi-setup/                # repo-owned skill
+    └── home-modules/pi-coding-agent/
+        ├── pi-coding-agent.nix      # wiring module
+        ├── models.json              # custom providers/models
+        ├── mcp.json                 # Pi global MCP override (~/.pi/agent/mcp.json)
+        ├── extensions/              # pi TypeScript extensions
+        │   └── <loader>/            # thin loader dir (package.json + index.ts → ../vendor/...)
+        ├── prompts/                 # prompt templates (.md)
+        └── themes/                  # symlinks into ../../../../vendor/<owner>/<repo>
 ```
 
 Deployed at runtime:
@@ -44,48 +44,52 @@ Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github
 
 ### Examples (not exhaustive)
 
-**Extension submodule** — vendored under `extensions/vendor/<name>/`, exposed via loader dir `extensions/<name>/`:
+**Extension submodule** — vendored under `vendor/<owner>/<repo>/`, exposed via loader dir `extensions/<name>/`:
 
 ```
-extensions/vendor/cursor-provider/
-extensions/cursor-provider/index.ts  → ../vendor/cursor-provider/index.ts
-extensions/pi-nvim/index.ts          → ../vendor/pi-nvim/extension.ts
+vendor/mattgmak/pi-cursor-provider/
+extensions/cursor-provider/index.ts  → ../vendor/mattgmak/pi-cursor-provider/index.ts
+extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
 ```
 
 **Loader package** — thin dir with `package.json` + `./index.ts` re-export:
 
 ```
-extensions/mcp-nixos/index.ts       → ../vendor/mcp-nixos/...
-extensions/pi-simplify/index.ts     → ../vendor/pi-extensions/...
-extensions/rpiv-todo/index.ts       → ../vendor/rpiv-mono/...
+extensions/mcp-nixos/index.ts       → ../vendor/utensils/mcp-nixos/...
+extensions/pi-simplify/index.ts     → ../vendor/MattDevy/pi-extensions/...
+extensions/rpiv-todo/index.ts       → ../vendor/juicesharp/rpiv-mono/...
 ```
 
 Use `./index.ts` in `pi.extensions` so pi shows `<name>/index.ts`, not nested vendor paths.
 
-**Theme submodules** — vendored under `themes/vendor/`, exposed via symlinks at `themes/*.json`:
+**Loader path depth is fixed at one level up (`../vendor/...`).** Pi resolves loader
+imports relative to the **live path** `~/.pi/agent/extensions/<name>/` (textual, no
+symlink-following), so repo-relative depths break at runtime. `../vendor` lands on the
+`extensions/vendor` **compat symlink** → repo root `vendor/`, which resolves both in the
+repo tree and through the live HM `mkOutOfStoreSymlink` chain. Things directly inside
+`extensions/` (smoke test, `pi-agent-sesh`) use `vendor/...` (0 ups). Never use absolute
+paths or repo-relative depths in loaders.
+
+**Theme submodules** — vendored under `vendor/<owner>/<repo>/`, exposed via symlinks at `themes/*.json`:
 
 ```
-themes/vendor/dracula/dracula.json
-themes/dracula.json     -> vendor/dracula/dracula.json
-themes/ansi-dark.json   -> vendor/pi-ansi-themes/themes/ansi-dark.json
+vendor/dracula/pi-coding-agent/dracula.json
+themes/dracula.json     -> ../../../../vendor/dracula/pi-coding-agent/dracula.json
+themes/ansi-dark.json   -> ../../../../vendor/leblancfg/pi-ansi-themes/themes/ansi-dark.json
 ```
-
-`themes/.gitignore` lists `vendor/` (same pattern as `extensions/`).
 
 **Skill (local)** — markdown under `dendritic/skills/<name>/SKILL.md`.
 
 **Skill (vendored)** — submodule + top-level symlink:
 
 ```
-skills/vendor/mattpocock-skills/
-skills/tdd -> vendor/mattpocock-skills/skills/engineering/tdd
+vendor/mattpocock/skills/
+skills/tdd -> ../../vendor/mattpocock/skills/skills/engineering/tdd
 ```
-
-`skills/.gitignore` lists `vendor/` so pi does not treat the submodule root as a skill.
 
 Vendored extensions are usually pi packages (`keywords: ["pi-package"]`). Pi discovers subdirs via `package.json` → `pi.extensions` array, or `index.ts`/`index.js`. Skills = `SKILL.md` in a directory.
 
-`extensions/.gitignore` lists `vendor/` so pi auto-discovery skips duplicate scans of submodule checkouts. Top-level loader dirs are what pi loads.
+Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at the repo-root `vendor/`.
 
 ## Extensions vs skills
 
@@ -130,8 +134,7 @@ Discovery rules in `extensions/` (one level):
 1. `*.ts` / `*.js` at top level → load directly
 2. Subdir with `package.json` + `pi.extensions` → load declared entrypoints
 3. Subdir with `index.ts` / `index.js` → load index
-4. `vendor/` ignored via `extensions/.gitignore`
-5. No deeper recursion — complex packages must declare paths in `pi.extensions`
+4. No deeper recursion — complex packages must declare paths in `pi.extensions`
 
 Bundled pi imports: `@mariozechner/pi-coding-agent`, `@mariozechner/pi-ai`, `@mariozechner/pi-tui`, `@mariozechner/pi-agent-core`, `typebox`.
 
@@ -145,9 +148,9 @@ Name each submodule in `.gitmodules` as **`owner/repo`** parsed from the git URL
 
 | URL | Submodule name | Path (may differ) |
 |-----|----------------|-------------------|
-| `https://github.com/dracula/pi-coding-agent.git` | `dracula/pi-coding-agent` | `.../themes` |
-| `https://github.com/mattgmak/zen-wireframe-2.0` | `mattgmak/zen-wireframe-2.0` | `.../zen-wireframe-2` |
-| `https://github.com/nicobailon/pi-web-access.git` | `nicobailon/pi-web-access` | `.../extensions/vendor/pi-web-access` |
+| `https://github.com/dracula/pi-coding-agent.git` | `dracula/pi-coding-agent` | `vendor/dracula/pi-coding-agent` |
+| `https://github.com/mattgmak/zen-wireframe-2.0` | `mattgmak/zen-wireframe-2.0` | `vendor/mattgmak/zen-wireframe-2` |
+| `https://github.com/nicobailon/pi-web-access.git` | `nicobailon/pi-web-access` | `vendor/nicobailon/pi-web-access` |
 
 When adding:
 
@@ -192,10 +195,10 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 
 | Loader / vendor dir | Submodule URL (fork) | Upstream | Upstream branch |
 |---------------------|----------------------|----------|-----------------|
-| `cursor-provider` | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` |
-| `pi-lens` | `mattgmak/pi-lens` | `https://github.com/apmantza/pi-lens.git` | `master` |
-| `lean-ctx` | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
-| `pi-simplify` (`vendor/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
+| `cursor-provider` (`vendor/mattgmak/pi-cursor-provider`) | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` |
+| `pi-lens` (`vendor/mattgmak/pi-lens`) | `mattgmak/pi-lens` | `https://github.com/apmantza/pi-lens.git` | `master` |
+| `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
+| `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
 
 Add new rows here when vendoring through a fork.
 
@@ -209,7 +212,7 @@ grep -E 'url = https://github.com/(mattgmak|MattDevy)/' .gitmodules
 #### Upstream comparison (per fork)
 
 ```bash
-VENDOR=dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+VENDOR=vendor/<owner>/<name>
 UPSTREAM_URL=https://github.com/<owner>/<repo>.git
 UPSTREAM_BRANCH=main   # pi-lens uses master
 
@@ -248,7 +251,7 @@ git -C "$VENDOR" log --oneline upstream/$UPSTREAM_BRANCH..HEAD | head -10
 #### Reconcile before bump (when upstream is ahead or diverged)
 
 ```bash
-cd dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+cd vendor/<owner>/<name>
 git checkout main   # or master for pi-lens
 git merge upstream/<branch>   # or rebase if you prefer linear history
 # resolve conflicts; preserve fork-only fixes
@@ -256,14 +259,14 @@ npm install --omit=dev   # if package.json changed
 git push origin HEAD
 
 cd ~/NixConfig
-git add dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+git add vendor/<owner>/<name>
 ```
 
 Then run `pi-npm-i` from the repo root if deps changed.
 
 ## Vendored skills (`mattpocock/skills`)
 
-Submodule at `dendritic/skills/vendor/mattpocock-skills`. Expose skills via symlinks at `dendritic/skills/<name>` → `vendor/mattpocock-skills/skills/{engineering,productivity}/<name>`.
+Submodule at `vendor/mattpocock/skills`. Expose skills via symlinks at `dendritic/skills/<name>` → `../../vendor/mattpocock/skills/skills/{engineering,productivity}/<name>`.
 
 Run **`/setup-matt-pocock-skills` once per target repo** before engineering skills that need issue tracker / triage labels / `docs/agents/` layout.
 
@@ -280,7 +283,7 @@ Commit directly in NixConfig (not submodule).
 
 ## Install extension deps (`pi-npm-i`)
 
-Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `extensions/vendor/*` submodules, running `npm i --omit=dev` where `package.json` has deps.
+Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`).
 
 Run after submodule add/update when an extension has runtime deps.
 
@@ -309,8 +312,8 @@ home-manager switch --flake .#<host>
 - Commit `node_modules/` in NixConfig-owned extensions unless intentional
 - Edit files under `~/.pi/agent/extensions` or `skills` directly — they symlink to repo
 - Forget `npm install --omit=dev` / `pi-npm-i` after submodule add/update when extension has runtime deps
-- Remove `extensions/.gitignore` `vendor/` entry — pi would double-discover vendor checkouts
-- Remove `skills/.gitignore` `vendor/` entry — pi would treat the submodule root as a skill
+- Vendor a repo anywhere except `vendor/<owner>/<repo>` — all submodules live under the root `vendor/`, grouped by owner, named `owner/repo` in `.gitmodules`
+- Break the `extensions/vendor` compat symlink (→ repo root `vendor/`) — loaders resolve `../vendor/...` through it; treat it as read-only plumbing
 - Symlink mattpocock `caveman` over local `skills/caveman/` — keep the local copy
 
 ## Debugging
@@ -340,7 +343,7 @@ Common failures:
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
 | lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Agent shell permission rules | `dendritic/home-modules/pi-coding-agent/extensions/pi-permission-system/config.json` |
-| Add/update extension | `dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>/` + loader dir |
-| Register submodule | `.gitmodules` + `git submodule add` under `extensions/vendor/` |
+| Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
+| Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
 | Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent build tweaks) |

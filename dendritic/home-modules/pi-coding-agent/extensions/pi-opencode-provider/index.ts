@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-opencode-provider/src/index.ts";
+export { default } from "../vendor/mdsitton/pi-opencode-provider/src/index.ts";

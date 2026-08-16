@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-observational-memory/src/index.ts";
+export { default } from "../vendor/elpapi42/pi-observational-memory/src/index.ts";

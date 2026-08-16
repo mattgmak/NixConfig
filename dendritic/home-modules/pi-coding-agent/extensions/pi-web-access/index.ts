@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-web-access/index.ts";
+export { default } from "../vendor/nicobailon/pi-web-access/index.ts";

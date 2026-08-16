@@ -1,84 +1,84 @@
 [submodule "mattgmak/zen-wireframe-2.0"]
-	path = dendritic/home-modules/zen-browser/zen-wireframe-2
+	path = vendor/mattgmak/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0
 [submodule "mattgmak/pi-cursor-provider"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/cursor-provider
+	path = vendor/mattgmak/pi-cursor-provider
 	url = https://github.com/mattgmak/pi-cursor-provider.git
 [submodule "carderne/pi-nvim"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-nvim
+	path = vendor/carderne/pi-nvim
 	url = https://github.com/carderne/pi-nvim.git
 [submodule "nicobailon/pi-web-access"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-web-access
+	path = vendor/nicobailon/pi-web-access
 	url = https://github.com/nicobailon/pi-web-access.git
 [submodule "nicobailon/pi-mcp-adapter"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-mcp-adapter
+	path = vendor/nicobailon/pi-mcp-adapter
 	url = https://github.com/nicobailon/pi-mcp-adapter.git
 [submodule "utensils/mcp-nixos"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/mcp-nixos
+	path = vendor/utensils/mcp-nixos
 	url = https://github.com/utensils/mcp-nixos.git
 [submodule "juicesharp/rpiv-mono"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/rpiv-mono
+	path = vendor/juicesharp/rpiv-mono
 	url = https://github.com/juicesharp/rpiv-mono.git
 [submodule "MattDevy/pi-extensions"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-extensions
+	path = vendor/MattDevy/pi-extensions
 	url = https://github.com/MattDevy/pi-extensions.git
 [submodule "mattgmak/pi-lens"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-lens
+	path = vendor/mattgmak/pi-lens
 	url = https://github.com/mattgmak/pi-lens.git
 [submodule "gotgenes/pi-packages"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-packages
+	path = vendor/gotgenes/pi-packages
 	url = https://github.com/gotgenes/pi-packages.git
 [submodule "fgladisch/pi-extensions"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/fgladisch-pi-extensions
+	path = vendor/fgladisch/pi-extensions
 	url = https://github.com/fgladisch/pi-extensions.git
 [submodule "mattpocock/skills"]
-	path = dendritic/skills/vendor/mattpocock-skills
+	path = vendor/mattpocock/skills
 	url = https://github.com/mattpocock/skills.git
 [submodule "omaclaren/pi-markdown-preview"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-markdown-preview
+	path = vendor/omaclaren/pi-markdown-preview
 	url = https://github.com/omaclaren/pi-markdown-preview.git
 [submodule "dracula/pi-coding-agent"]
-	path = dendritic/home-modules/pi-coding-agent/themes/vendor/dracula
+	path = vendor/dracula/pi-coding-agent
 	url = https://github.com/dracula/pi-coding-agent.git
 [submodule "leblancfg/pi-ansi-themes"]
-	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-ansi-themes
+	path = vendor/leblancfg/pi-ansi-themes
 	url = https://github.com/leblancfg/pi-ansi-themes.git
 [submodule "otahontas/pi-coding-agent-catppuccin"]
-	path = dendritic/home-modules/pi-coding-agent/themes/vendor/pi-coding-agent-catppuccin
+	path = vendor/otahontas/pi-coding-agent-catppuccin
 	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git
 [submodule "elpapi42/pi-observational-memory"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-observational-memory
+	path = vendor/elpapi42/pi-observational-memory
 	url = https://github.com/elpapi42/pi-observational-memory.git
 [submodule "mattgmak/lean-ctx"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/lean-ctx
+	path = vendor/mattgmak/lean-ctx
 	url = https://github.com/mattgmak/lean-ctx.git
 [submodule "michalvavra/agents"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/michalvavra-agents
+	path = vendor/michalvavra/agents
 	url = https://github.com/michalvavra/agents.git
 [submodule "Gentleman-Programming/engram"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/engram
+	path = vendor/Gentleman-Programming/engram
 	url = https://github.com/Gentleman-Programming/engram.git
 [submodule "nicobailon/pi-powerline-footer"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-powerline-footer
+	path = vendor/nicobailon/pi-powerline-footer
 	url = https://github.com/nicobailon/pi-powerline-footer.git
 [submodule "arpagon/pi-rewind"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-rewind
+	path = vendor/arpagon/pi-rewind
 	url = https://github.com/arpagon/pi-rewind.git
 [submodule "vndv/pi-codegraph"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-codegraph
+	path = vendor/vndv/pi-codegraph
 	url = https://github.com/vndv/pi-codegraph.git
-[submodule "dabstractor/pi-nvim-bridge"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-nvim-bridge
-	url = https://github.com/dabstractor/pi-nvim-bridge.git
 [submodule "mdsitton/pi-opencode-provider"]
-	path = dendritic/home-modules/pi-coding-agent/extensions/vendor/pi-opencode-provider
+	path = vendor/mdsitton/pi-opencode-provider
 	url = https://github.com/mdsitton/pi-opencode-provider.git
 [submodule "mattgmak/agent-sesh"]
-	path = vendor/agent-sesh
+	path = vendor/mattgmak/agent-sesh
 	url = https://github.com/mattgmak/agent-sesh.git
 [submodule "mattgmak/woomer"]
-	path = vendor/woomer
+	path = vendor/mattgmak/woomer
 	url = https://github.com/mattgmak/woomer.git
-[submodule "vendor/whisper-dictation"]
-	path = vendor/whisper-dictation
+[submodule "mattgmak/whisper-dictation"]
+	path = vendor/mattgmak/whisper-dictation
 	url = https://github.com/mattgmak/whisper-dictation.git
+[submodule "dabstractor/pi-nvim-bridge"]
+	path = vendor/dabstractor/pi-nvim-bridge
+	url = https://github.com/dabstractor/pi-nvim-bridge.git

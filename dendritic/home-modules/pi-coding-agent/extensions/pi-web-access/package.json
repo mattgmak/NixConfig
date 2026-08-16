@@ -6,6 +6,6 @@
   "description": "Pi loader for pi-web-access (vendored nicobailon/pi-web-access submodule)",
   "pi": {
     "extensions": ["./index.ts"],
-    "skills": ["../vendor/pi-web-access/skills"]
+    "skills": ["../vendor/nicobailon/pi-web-access/skills"]
   }
 }

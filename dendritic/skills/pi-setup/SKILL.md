@@ -36,9 +36,9 @@ Use when adding something new to pi in this repo.
 
 Ask what to install if not specified:
 
-- **Extension** (TypeScript, `extensions/vendor/` + loader)
+- **Extension** (TypeScript, `vendor/` submodule + loader dir in `extensions/`)
 - **Skill** (markdown `SKILL.md`, `dendritic/skills/`)
-- **Theme** (`themes/vendor/` + symlink)
+- **Theme** (`vendor/` submodule + symlink)
 
 ### 2. Gather upstream info
 
@@ -53,7 +53,7 @@ List what is already installed:
 ```bash
 ls dendritic/skills/
 ls dendritic/home-modules/pi-coding-agent/extensions/
-ls dendritic/home-modules/pi-coding-agent/extensions/vendor/
+ls vendor/
 cat .gitmodules
 ```
 
@@ -65,22 +65,22 @@ Follow [REFERENCE.md](REFERENCE.md) for the exact steps. Summary:
 
 ```bash
 # From NixConfig root
-git submodule add <url> dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+git submodule add <url> vendor/<owner>/<name>
 
 # Expose to pi discovery (loader dir)
 cd dendritic/home-modules/pi-coding-agent/extensions
 mkdir <name>
 # package.json: { "pi": { "extensions": ["./index.ts"] } }
-# index.ts: export { default } from "../vendor/<name>/index.ts";
+# index.ts: export { default } from "../vendor/<owner>/<name>/index.ts";  # depth fixed: ../vendor lands on extensions/vendor compat symlink → repo root vendor/
 
-cd vendor/<name> && npm install --omit=dev   # if package.json has deps
+cd ~/NixConfig/vendor/<owner>/<name> && npm install --omit=dev   # if package.json has deps
 ```
 
 **Skill (local)** — `mkdir dendritic/skills/<name>/` + `SKILL.md` with frontmatter.
 
-**Skill (vendored)** — submodule under `skills/vendor/` + symlink at `skills/<name>`.
+**Skill (vendored)** — submodule under `vendor/<owner>/<repo>` + symlink at `skills/<name>`.
 
-**Theme** — submodule under `themes/vendor/` + `ln -sfn` each `*.json` to `themes/`.
+**Theme** — submodule under `vendor/<owner>/<repo>` + `ln -sfn` each `*.json` to `themes/`.
 
 Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the checkout path.
 
@@ -103,7 +103,7 @@ Use when upgrading pi itself or vendored extension submodules.
 |-----------|---------|
 | `pi` / `pi-coding-agent` | pi only (coding-agents flake input) |
 | `<extension-name>` | that extension's vendor submodule (match loader dir name or `.gitmodules` path) |
-| `all` or nothing specified | **pi + every extension** under `extensions/vendor/` |
+| `all` or nothing specified | **pi + every extension** under `vendor/` |
 
 Also accept comma-separated lists (e.g. `pi, pi-lens, cursor-provider`).
 
@@ -130,7 +130,7 @@ nix flake metadata github:kissgyorgy/coding-agents --json | jq '.lastModified, .
 **Extension submodule**
 
 ```bash
-VENDOR=dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+VENDOR=vendor/<owner>/<name>
 git -C "$VENDOR" rev-parse HEAD                    # current
 git -C "$VENDOR" fetch origin
 git -C "$VENDOR" rev-parse origin/HEAD             # proposed (or user-specified tag)
@@ -210,10 +210,10 @@ home-manager switch --flake .#<host>   # ask user for host if unknown
 For **fork vendored extensions** where upstream is ahead or diverged: reconcile in the fork first (merge upstream → push) — see [REFERENCE.md — Fork vendored extensions](REFERENCE.md#fork-vendored-extensions). Only then bump the submodule pointer.
 
 ```bash
-cd dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+cd vendor/<owner>/<name>
 git checkout <proposed-ref>    # tag, branch, or commit from step 1
 cd ~/NixConfig
-git add dendritic/home-modules/pi-coding-agent/extensions/vendor/<name>
+git add vendor/<owner>/<name>
 ```
 
 **Deps + verify**

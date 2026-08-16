@@ -99,12 +99,12 @@
     };
 
     whisper-dictation = {
-      url = "git+file:./vendor/whisper-dictation";
+      url = "git+file:./vendor/mattgmak/whisper-dictation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     woomer = {
-      url = "path:./vendor/woomer";
+      url = "path:./vendor/mattgmak/woomer";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -136,7 +136,7 @@
     };
 
     agent-sesh = {
-      url = "git+file:./vendor/agent-sesh";
+      url = "git+file:./vendor/mattgmak/agent-sesh";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

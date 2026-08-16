@@ -1,1 +1,1 @@
-export { default } from "../vendor/pi-codegraph/extensions/codegraph.ts";
+export { default } from "../vendor/vndv/pi-codegraph/extensions/codegraph.ts";
