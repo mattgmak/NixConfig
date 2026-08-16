@@ -9,6 +9,7 @@ shell_allowlist_extra = [
     "glab",
     "direnv",
     "pi",
+    "pi-npm-i",
     "time",
     "sh",
     "bash",
