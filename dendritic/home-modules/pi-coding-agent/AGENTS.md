@@ -10,9 +10,6 @@
 
 # Running commands
 
-- Use ripgrep (`rg` command) instead of `grep`. It's much faster, respects gitignore and
-  you can use regular expressions.
-
 - NEVER run find on big directories like `/` or `/nix` or `~`!
   It would never complete and might even crash the terminal you are running in.
 
@@ -27,10 +24,10 @@
 
 - When you want to write one-off scripts, data or temporary files for
   experiments, exploration, testing, answering questions, triggering runs or
-  whatever, you can use `$CURRENT_DIRECTORY/claudetmp/` directory to write and
+  whatever, you can use `$TMPDIR/agent-tmp/<project_name>` directory to write and
   run them.
 
-- Never delete anything from `claudetmp/`
+- Never delete anything from `$TMPDIR/agent-tmp/`
 
 - Don't write one-off scripts inline, write reusable scripts in files instead
   and run them afterwards.
@@ -49,8 +46,14 @@
 
 - NEVER modify previous commits, only when explicitly asked by the user.
 
-- When making commits, explain in details **WHY** you did what you did. What was
-  the problem you solved, why a specific design decision was made. Everything
+- NEVER make commits, unless when explicitly asked by the user.
+
+- When making commits, default to only writing commit subject with empty message.
+  Always follow project commit convention.
+
+- If the user explicitly specifies to make commits with message, explain in details 
+  **WHY** you did what you did. What was the problem you solved, 
+  why a specific design decision was made. Everything
   that you know but cannot seen in the code. Make sure the most important
   details are explained in the commit message.
 
