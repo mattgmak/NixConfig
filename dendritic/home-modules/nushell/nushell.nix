@@ -62,6 +62,13 @@
         github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
       };
 
+      # Servers (root user): decrypt headless with the passphrase-less SSH host
+      # key; desktop users keep the default ~/.ssh identities.
+      age.identityPaths = lib.mkIf (username == "root") [
+        "/etc/ssh/ssh_host_ed25519_key"
+      ];
+
+
       programs.nushell = {
         enable = true;
         configFile.source = ./config/config.nu;
