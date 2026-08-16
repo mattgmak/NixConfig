@@ -73,7 +73,7 @@
         sourceFirst = true;
 
         extraConfig =
-          builtins.readFile ./lua/permissions.lua
+          import ./lua/permissions.nix
           + import ./lua/monitors.nix { inherit hostname lib; }
           + "\n"
           + import ./lua/window-rules.nix { inherit hostname lib; }
