@@ -10,6 +10,8 @@
 
 # Running commands
 
+- When grepping via the shell tool, always use `rg` over `grep` as it is faster.
+
 - NEVER run find on big directories like `/` or `/nix` or `~`!
   It would never complete and might even crash the terminal you are running in.
 
