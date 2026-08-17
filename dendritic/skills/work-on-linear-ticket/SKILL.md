@@ -6,35 +6,35 @@ argument-hint: "<branch-name> [implementation notes] e.g. mattmak/prd-239-dashbo
 
 # Work on Linear Ticket
 
-Worktree for Linear branch + Pi session w/ work prompt.
+Worktree + Pi session for Linear branch. Parent pi self-kills after handoff (step 6).
 
 ## Invocation
 
-Need branch in Linear git-branch format. Text after branch = impl direction for Pi.
+Branch in Linear git-branch format required. Text after branch → impl direction for Pi.
 
 ```
 mattmak/prd-239-dashboard-banner-add-url do a configurable on press openLink url
 ```
 
-Slug after `/` embeds issue id (`prd-239` → `PRD-239`).
+Slug after `/` = issue id (`prd-239` → `PRD-239`).
 
 ## Workflow
 
 ### 0. Preflight (shell allowlist)
 
-All shell cmds via `mcp_pi_shell` (or `mcp_pi_ctx_shell`) — native Shell may be unavailable.
+All shell cmds via `mcp_pi_shell` / `mcp_pi_ctx_shell` — native Shell maybe unavailable.
 
-`wt`, `sesh`, `tmux`, `jq` pre-allowed in `home-modules/pi-coding-agent/lean-ctx/config.toml`. Widen: `lean-ctx allow <binary>` (user approves).
+`wt`/`sesh`/`tmux`/`jq` pre-allowed in `home-modules/pi-coding-agent/lean-ctx/config.toml`. Widen: `lean-ctx allow <binary>` (user approves).
 
 `[BLOCKED — DO NOT RETRY]` → `lean-ctx allow <binary>`; declined → user adds to `lean-ctx/config.toml` (+ `home-manager switch` / Pi restart). No blind retry.
 
-**`$(...)` gotcha:** allowlist tokenizes *inside* `$(...)`; every token (flags `-C`, words `list`) must be allowlisted. `$(sesh list -j | …)`, `$(git -C …)`, `$(printf …)` rejected though `sesh`/`git`/`printf` allowed. `lean-ctx allow` can't fix (flagged tokens not binaries). Fix: multi-step logic → script file → `bash <script>`; allowlist gates only top-level `bash` (see step 5).
+**`$(...)` gotcha:** allowlist tokenizes *inside* `$(...)`; every token (flags `-C`, words `list`) must be allowlisted. `$(sesh list -j | …)`, `$(git -C …)`, `$(printf …)` rejected — even when `sesh`/`git`/`printf` allowed. `lean-ctx allow` can't fix (flagged tokens ≠ binaries). Fix: multi-step logic → script file → `bash <script>`; allowlist gates only top-level `bash` (step 5).
 
 ### 1. Parse branch
 
 First token = branch; rest = impl notes.
 
-Extract Linear id from slug (after `/`):
+Linear id from slug (after `/`):
 
 - Match `([a-z]+)-(\d+)`
 - Uppercase team prefix → `PRD-239`
@@ -61,7 +61,7 @@ Branch exists → fallback:
 wt switch <branch_name>
 ```
 
-Capture stdout/stderr. Parse worktree path from text (no `--format json` — unsupported):
+Capture stdout/stderr. Parse worktree path from text (`--format json` unsupported):
 
 - Primary: `worktree @ <path>` (absolute)
 - Fallback: `@ <path>` end of success line
@@ -92,11 +92,11 @@ Explore the codebase, implement a fix, and verify with tests. Start by understan
 
 ### 5. Launch session (detached)
 
-**No `sesh connect`** — always `switch-client`s when `$TMUX` set → yanks you out of current session.
+**No `sesh connect`** — `switch-client`s when `$TMUX` set → yanks you out of current session.
 
 Background tmux instead (sesh internals: `new-session -d`, `send-keys`).
 
-**Why script file:** allowlist rejects any `$(...)` cmd (step 0); logic is `$()`-heavy. Allowlist gates only top-level cmd → logic into temp script, invoke once via `bash`.
+**Why script file:** allowlist rejects `$(...)` cmds (step 0); logic `$()`-heavy. Allowlist gates only top-level cmd → logic into temp script, invoke once via `bash`.
 
 Script → `$CURRENT_DIRECTORY/claudetmp/` (AGENTS.md) or `$TMPDIR`:
 
@@ -143,43 +143,98 @@ for i in $(seq 1 15); do
   if pi_running; then
     echo "pi confirmed running"
     echo "SESSION=$session"
-    exit 0
+    break
   fi
   sleep 1
 done
 
-echo "WARN: pi not detected in $session — attach + check manually" >&2
-echo "SESSION=$session"
-exit 1
+if ! pi_running; then
+  echo "WARN: pi not detected in $session — attach + check manually" >&2
+  echo "SESSION=$session"
+  echo "NOTE: handoff failed — parent agent left alive" >&2
+  exit 1
+fi
+
+# 6) Handoff report — printed AND appended to file. Parent dies right after, so
+#    stdout may never render; the file is the durable record.
+branch="${3:-unknown}"
+issue="${4:-unknown}"
+url="${5:-unknown}"
+report_file="${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt"
+mkdir -p "$(dirname "$report_file")"
+{
+  echo ""
+  echo "=== Linear ticket handoff $(date '+%Y-%m-%d %H:%M:%S') ==="
+  echo "Issue:      $issue"
+  echo "URL:        $url"
+  echo "Branch:     $branch"
+  echo "Worktree:   $worktree_path"
+  echo "Tmux:       $session"
+  echo "Attach:     sesh connect $worktree_path   |   tmux attach -t $session"
+  echo "Report:     $report_file"
+} | tee -a "$report_file"
+
+# 7) Self-terminate: kill the parent pi agent that spawned this script.
+#    Walk up the ancestor chain (script -> shell -> lean-ctx -> pi/node).
+#    Agent = topmost pi*/node* ancestor (last match). The worker pi runs in a
+#    DIFFERENT tmux session — it is never in this chain, never touched.
+p=$$
+agent_pid=""
+while [ -n "$p" ] && [ "$p" -gt 1 ]; do
+  comm=$(ps -o comm= -p "$p" 2>/dev/null | tr -d ' ')
+  case "$comm" in
+    pi*|node*) agent_pid="$p" ;;
+  esac
+  p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')
+done
+
+if [ -n "$agent_pid" ]; then
+  echo "handoff complete — killing parent agent pid $agent_pid"
+  kill "$agent_pid" 2>/dev/null || true
+  # escalate: TERM ignored -> KILL (kill -0 stays true on zombies; kill -9 no-ops them)
+  for _ in 1 2 3 4; do
+    kill -0 "$agent_pid" 2>/dev/null || exit 0
+    sleep 0.5
+  done
+  kill -9 "$agent_pid" 2>/dev/null || true
+  exit 0
+else
+  echo "WARN: parent agent pid not found — leaving it alive" >&2
+  echo "handoff succeeded; session: $session; report: $report_file" >&2
+  exit 1
+fi
 ```
 
-Run:
+Run (extra args feed the handoff report — branch, issue id, Linear URL):
 
 ```bash
-bash "$CURRENT_DIRECTORY/claudetmp/launch-tmux-session.sh" "$worktree_path" 'initial_prompt'
+bash "$CURRENT_DIRECTORY/claudetmp/launch-tmux-session.sh" "$worktree_path" 'initial_prompt' "<branch>" "<issue_id>" "<issue_url>"
 ```
 
 Escape single quotes in prompt (`'\''`). `test -d` worktree first. Session name on `SESSION=` line (also in created/reuse msg).
 
-`tmux new-session -d` returns immediately; current client untouched. Non-zero exit/stderr = failure — incl. pi not detected (script polls up to 15s, then WARNs + exits 1).
+`tmux new-session -d` returns immediately; current client untouched. Non-zero exit/stderr = failure — incl. pi not detected (script polls up to 15s, then WARNs + exits 1, parent stays alive). Success → script kills parent pi; output may never render; durable report → `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`.
 
-### 6. Report
+### 6. Handoff — report then parent exit
+
+Success → script (step 5) prints handoff report + appends to `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`, then **kills parent pi agent** (self-terminate). Parent session ends — terminal back to shell prompt. Re-attach anytime: `sesh connect <worktree_path>` / `tmux attach -t <session>`.
 
 | Field | Value |
 |-------|-------|
-| Issue | `PRD-239` + title + Linear URL |
-| Status | from Linear |
+| Issue | arg 4 (id + title) |
+| URL | arg 5 (Linear link) |
 | Worktree | absolute path |
-| Branch | branch name |
+| Branch | arg 3 / branch name |
 | Tmux session | session name (attach: `sesh connect <worktree_path>` / `tmux attach -t <session>`) |
+| Report file | `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt` |
 
-Confirm Pi launched background — script prints `pi confirmed running`. Failed (WARN/non-zero) → include detached-launch cmds as copy-paste fallback.
+Parent exit only after confirmed handoff (`pi confirmed running`). WARN/non-zero (pi never started) → parent stays alive, prints failure + manual attach cmds. Never kill parent when worker failed (nothing to hand off to).
 
 ## Error handling
 
 | Failure | Action |
 |---------|--------|
-| Blocked by allowlist | `$(...)` cmd → logic into bash script, run `bash <script>` (steps 0/5) — flagged token usually not binary, can't allowlist. Missing binary → `lean-ctx allow <binary>` (user approves); declined → user adds to `home-modules/pi-coding-agent/lean-ctx/config.toml` |
+| Blocked by allowlist | `$(...)` cmd → bash script, run `bash <script>` (steps 0/5) — flagged token usually not binary, can't allowlist. Missing binary → `lean-ctx allow <binary>` (user approves); declined → user adds to `home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Not in git repo | Tell user `cd` into repo |
 | Linear issue not found | Show extracted id; ask confirm |
 | `wt switch` fails | Show stderr; suggest `wt list` |
@@ -187,6 +242,7 @@ Confirm Pi launched background — script prints `pi confirmed running`. Failed 
 | `send-keys` → `can't find pane` | `=` prefix breaks send-keys target (names w/ `/`). Drop `=`, use plain `"$session"`. `has-session` tolerates `=`, `send-keys` doesn't |
 | Session exists but pi never starts | `pane_current_command` check: pi runs under `node`, idle pane shows shell → script re-sends prompt if pane idle (no silent dead session) |
 | `tmux`/`jq`/launch fails | Show stderr; give worktree path + session name + manual attach cmd |
+| Parent-kill fails (agent pid not found) | Handoff already done; script WARNs + parent lives. Session/worktree in report file (also `sesh list`) |
 
 ## Example
 
@@ -200,4 +256,4 @@ Confirm Pi launched background — script prints `pi confirmed running`. Failed 
 4. `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
 5. Parse worktree path (e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`)
 6. Detached tmux + `pi 'Work on PRD-239: ...'` (no switch)
-7. Report issue link, worktree, branch, session name
+7. Script reports + kills parent (step 6); session/worktree in report file
