@@ -1,0 +1,10 @@
+{
+  "name": "pi-cursor",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-cursor (vendored Rahularya01/pi-cursor submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

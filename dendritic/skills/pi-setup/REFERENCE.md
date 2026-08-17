@@ -47,8 +47,10 @@ Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github
 **Extension submodule** — vendored under `vendor/<owner>/<repo>/`, exposed via loader dir `extensions/<name>/`:
 
 ```
-vendor/mattgmak/pi-cursor-provider/
-extensions/cursor-provider/index.ts  → ../vendor/mattgmak/pi-cursor-provider/index.ts
+vendor/Rahularya01/pi-cursor/
+extensions/pi-cursor/index.ts           → ../vendor/Rahularya01/pi-cursor/src/index.ts
+extensions/_stowed/cursor-provider/   → old loader (not discovered by pi)
+vendor/mattgmak/pi-cursor-provider/   → stowed upstream fork, kept for reference
 extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
 ```
 
@@ -195,7 +197,8 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 
 | Loader / vendor dir | Submodule URL (fork) | Upstream | Upstream branch |
 |---------------------|----------------------|----------|-----------------|
-| `cursor-provider` (`vendor/mattgmak/pi-cursor-provider`) | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` |
+| `pi-cursor` (`vendor/Rahularya01/pi-cursor`) | *(direct upstream)* | `https://github.com/Rahularya01/pi-cursor.git` | default |
+| `cursor-provider` (`vendor/mattgmak/pi-cursor-provider`) | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` — loader **stowed** in `extensions/_stowed/` |
 | `pi-lens` (`vendor/mattgmak/pi-lens`) | `mattgmak/pi-lens` | `https://github.com/apmantza/pi-lens.git` | `master` |
 | `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |

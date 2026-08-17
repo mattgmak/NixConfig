@@ -82,3 +82,6 @@
 [submodule "dabstractor/pi-nvim-bridge"]
 	path = vendor/dabstractor/pi-nvim-bridge
 	url = https://github.com/dabstractor/pi-nvim-bridge.git
+[submodule "vendor/Rahularya01/pi-cursor"]
+	path = vendor/Rahularya01/pi-cursor
+	url = https://github.com/Rahularya01/pi-cursor.git
