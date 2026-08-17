@@ -347,6 +347,86 @@
         guitarMonitor
       ];
 
+      # Mic (FL) + guitar (FR) on an internal bus, then downmixed to mono input.
+      services.pipewire.extraConfig.pipewire."52-combine-input" = {
+        "context.modules" = [
+          {
+            name = "libpipewire-module-combine-stream";
+            args = {
+              "combine.mode" = "source";
+              "combine.latency" = true;
+              "node.name" = "mic_guitar_combined";
+              "node.description" = "Mic + Guitar (internal)";
+              "combine.props" = {
+                "audio.position" = [
+                  "FL"
+                  "FR"
+                ];
+              };
+              "stream.props" = {
+                "stream.dont-remix" = true;
+              };
+              "stream.rules" = [
+                {
+                  matches = [
+                    {
+                      "media.class" = "Audio/Source";
+                      "node.name" = "alsa_input.usb-HP__Inc_HyperX_SoloCast-00.pro-input-0";
+                    }
+                  ];
+                  actions = {
+                    "create-stream" = {
+                      "audio.position" = [ "AUX0" ];
+                      "combine.audio.position" = [ "FL" ];
+                    };
+                  };
+                }
+                {
+                  matches = [
+                    {
+                      "media.class" = "Audio/Source";
+                      "node.name" = "alsa_input.usb-Jieli_Technology_USB_Composite_Device_3239323335184A16-00.pro-input-0";
+                    }
+                  ];
+                  actions = {
+                    "create-stream" = {
+                      "audio.position" = [ "AUX0" ];
+                      "combine.audio.position" = [ "FR" ];
+                    };
+                  };
+                }
+              ];
+            };
+          }
+        ];
+      };
+
+      # Downmix the internal bus to a mono capture device (select "Mic + Guitar Mono").
+      services.pipewire.extraConfig.pipewire."53-mono-mix" = {
+        "context.modules" = [
+          {
+            name = "libpipewire-module-loopback";
+            args = {
+              "node.description" = "Mic + Guitar Mono";
+              "audio.position" = [
+                "FL"
+                "FR"
+              ];
+              "capture.props" = {
+                "target.object" = "mic_guitar_combined";
+                "node.passive" = true;
+                "stream.dont-remix" = true;
+              };
+              "playback.props" = {
+                "node.name" = "mic_guitar_mono";
+                "media.class" = "Audio/Source";
+                "audio.position" = [ "MONO" ];
+              };
+            };
+          }
+        ];
+      };
+
       # Keep USB audio interfaces awake; use `guitar-monitor on` for input loopback.
       services.pipewire.wireplumber.extraConfig."51-usb-guitar" = {
         "monitor.alsa.rules" = [

@@ -41,4 +41,8 @@ shell_allowlist_extra = [
     "devenv",
     "nixfmt",
     "nohup",
+    "pactl",
+    "wpctl",
+    "pw-cli",
+    "systemctl",
 ]
