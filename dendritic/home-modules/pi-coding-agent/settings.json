@@ -2,7 +2,7 @@
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.2",
   "defaultProvider": "cursor",
-  "defaultModel": "cursor-grok-4.6",
+  "defaultModel": "composer-2.5",
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {
