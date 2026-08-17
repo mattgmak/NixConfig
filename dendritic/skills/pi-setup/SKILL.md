@@ -10,13 +10,13 @@ References are relative to `~/NixConfig/dendritic` unless noted.
 
 # Pi Setup (NixConfig)
 
-This repo manages pi via Home Manager + `coding-agents` flake module. Extensions/skills live in-repo; Home Manager links them into `~/.pi/agent/` via `mkOutOfStoreSymlink`.
+Repo manage pi via Home Manager + `coding-agents` flake module. Extensions/skills live in-repo; Home Manager link them into `~/.pi/agent/` via `mkOutOfStoreSymlink`.
 
 **Convention details** (layout, vendoring rules, debugging): see [REFERENCE.md](REFERENCE.md).
 
 ## Dispatch
 
-Parse the user's intent from the slash command or message:
+Parse user intent from slash command or message:
 
 | Invocation | Action |
 |------------|--------|
@@ -24,13 +24,13 @@ Parse the user's intent from the slash command or message:
 | `/pi-setup update …` | Run **update** (bump) |
 | `/pi-setup` (no subcommand) | **Ask the user** which subcommand: `extend` or `update` |
 
-Do not guess — if ambiguous, ask.
+Don't guess. Ambiguous → ask.
 
 ---
 
 ## `extend` — install extensions, skills, or themes
 
-Use when adding something new to pi in this repo.
+Add new thing to pi in this repo.
 
 ### 1. Clarify target
 
@@ -95,7 +95,7 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 
 ## `update` — bump pi and/or extensions
 
-Use when upgrading pi itself or vendored extension submodules.
+Upgrade pi or vendored extension submodules.
 
 ### Target resolution
 
@@ -107,11 +107,11 @@ Use when upgrading pi itself or vendored extension submodules.
 
 Also accept comma-separated lists (e.g. `pi, pi-lens, cursor-provider`).
 
-Themes and skill submodules are **out of scope** unless the user explicitly names them; mention they can be updated the same way if asked.
+Themes and skill submodules **out of scope** unless user names them explicitly; mention they can update same way if asked.
 
 ### Step 1 — Changelog report (required)
 
-For each target, determine **current** and **proposed** versions before changing anything.
+Per target: find **current** + **proposed** version. Before touching anything.
 
 **Pi (`coding-agents` flake input)**
 
@@ -140,7 +140,7 @@ git -C "$VENDOR" log --oneline HEAD..origin/HEAD   # commit summary
 
 **Fork vendored extensions (required when submodule URL is your fork)**
 
-Some vendor submodules point at **your fork** (`mattgmak/*`, `MattDevy/*`) because upstream needed local patches. For those, comparing pinned SHA to `origin/HEAD` only means “matches your fork” — **not** “matches upstream”.
+Some vendor submodules point at **your fork** (`mattgmak/*`, `MattDevy/*`) — upstream needed local patches. For those, pinned SHA vs `origin/HEAD` = “matches your fork”, **NOT** “matches upstream”.
 
 Before the preview report, run the fork upstream check for every target whose `.gitmodules` URL is a fork. See [REFERENCE.md — Fork vendored extensions](REFERENCE.md#fork-vendored-extensions) for the registry and commands.
 
@@ -152,9 +152,9 @@ For each fork target, report:
 - **Upstream-only commits** — what you would gain by merging upstream into the fork
 - **Proposed bump** — if upstream is ahead: merge/rebase upstream into the fork first, push, then propose the new fork SHA (do **not** silently propose `origin/HEAD` when upstream has unreconciled commits)
 
-Include a **Fork upstream** subsection in the preview when any fork targets are in scope.
+Include **Fork upstream** subsection in preview when any fork targets in scope.
 
-Present a **single report** covering all targets:
+**Single report**, all targets:
 
 ```markdown
 ## Pi setup update preview

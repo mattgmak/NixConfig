@@ -2,6 +2,10 @@
 
 Third-party repos = git submodules. All under root `vendor/` — nothing else.
 
+## Skill authoring
+
+Skills in `dendritic/skills/` (and any agent-written skill docs) are **caveman coded**: terse prose, no filler/hedging/articles. Keep all technical substance exact — commands, paths, code blocks, tables, frontmatter verbatim. Multi-step sequences stay unambiguous: don't compress away required order, warnings, or critical nuance.
+
 ```
 vendor/<Owner>/<repo>/
 ```
