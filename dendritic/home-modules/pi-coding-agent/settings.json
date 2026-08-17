@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "0.80.7",
+  "lastChangelogVersion": "0.84.2",
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4-flash",
   "defaultThinkingLevel": "medium",
