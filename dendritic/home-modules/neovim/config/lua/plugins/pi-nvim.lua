@@ -2,6 +2,10 @@ local is_vscode = vim.g.vscode ~= nil
 
 return {
   'carderne/pi-nvim',
+  -- Pin to the vendored submodule (see pi-bridge.lua for the same rationale):
+  -- the pi extension half loads from vendor/carderne/pi-nvim, so the nvim
+  -- plugin must match that exact revision.
+  dir = vim.fn.expand('$HOME') .. '/NixConfig/vendor/carderne/pi-nvim',
   cond = not is_vscode,
   config = function()
     require('pi-nvim').setup()
