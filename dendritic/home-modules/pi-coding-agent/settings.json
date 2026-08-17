@@ -1,13 +1,13 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.2",
-  "defaultProvider": "opencode-go",
-  "defaultModel": "deepseek-v4-flash",
+  "defaultProvider": "cursor",
+  "defaultModel": "cursor-grok-4.6",
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {
       "provider": "opencode",
-      "id": "deepseek-v4-flash-free"
+      "id": "mimo-v2.5-free"
     }
   },
   "theme": "catppuccin-mocha",
@@ -31,7 +31,8 @@
     "opencode-go/deepseek-v4-pro",
     "opencode-go/qwen3.7-plus",
     "opencode-go/mimo-v2.5",
-    "opencode-go/mimo-v2.5-pro"
+    "opencode-go/mimo-v2.5-pro",
+    "cursor/cursor-grok-4.6"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true
