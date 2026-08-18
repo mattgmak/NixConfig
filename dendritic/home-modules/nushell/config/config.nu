@@ -955,7 +955,9 @@ def --env l [...args] {
 }
 
 def --env v [...args] {
-    nvim ...$args
+    with-env { NVIM_PERSIST_SESSION: "1" } {
+        nvim ...$args
+    }
 }
 
 $env.EDITOR = "nvim"

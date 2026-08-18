@@ -65,6 +65,25 @@ vim.keymap.set('n', '<leader>s', function()
   vim.cmd('write')
 end, { silent = true, desc = 'Save and Format' })
 
+vim.keymap.set('n', '<leader>S', function()
+  if is_vscode then return end
+
+  local format = require('lib.lsp-format').format
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if
+      vim.api.nvim_buf_is_valid(buf)
+      and vim.bo[buf].buflisted
+      and vim.bo[buf].buftype == ''
+      and vim.bo[buf].modifiable
+      and vim.api.nvim_buf_get_name(buf) ~= ''
+      and vim.bo[buf].filetype ~= 'no-neck-pain'
+    then
+      format({ bufnr = buf, async = false })
+    end
+  end
+  vim.cmd('wall')
+end, { silent = true, desc = 'Format and save all buffers' })
+
 -- motion keys
 -- vim.keymap.set({ 'n', 'v' }, 'j', 'k')
 -- vim.keymap.set({ 'n', 'v' }, 'k', 'j')
