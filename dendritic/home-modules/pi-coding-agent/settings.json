@@ -32,7 +32,10 @@
     "opencode-go/qwen3.7-plus",
     "opencode-go/mimo-v2.5",
     "opencode-go/mimo-v2.5-pro",
-    "cursor/cursor-grok-4.6"
+    "cursor/cursor-grok-4.6",
+    "cursor/cursor-grok-4.5",
+    "cursor/cursor-grok-4.5-fast",
+    "cursor/cursor-grok-4.6-fast"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true
