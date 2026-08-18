@@ -6,8 +6,8 @@
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {
-      "provider": "opencode",
-      "id": "mimo-v2.5-free"
+      "provider": "opencode-go",
+      "id": "mimo-v2.5"
     }
   },
   "theme": "catppuccin-mocha",
