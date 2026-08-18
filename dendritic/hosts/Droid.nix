@@ -65,7 +65,7 @@
           carapace
           tmux
           nix-index-database
-          opencode
+          pi-coding-agent
         ];
         # Stylix enables gnome/gtk/kde on Linux by default; those use dconf and fail HM activation on Termux (no session dbus).
         stylix.targets.gnome.enable = lib.mkForce false;

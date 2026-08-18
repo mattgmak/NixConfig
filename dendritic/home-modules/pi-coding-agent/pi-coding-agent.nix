@@ -237,7 +237,6 @@
           uv
           bun
           piNpmI
-          self.packages.${system}.colgrep
           self.packages.${system}.lean-ctx
           self.packages.${system}.engram
         ]
