@@ -45,4 +45,9 @@ shell_allowlist_extra = [
     "wpctl",
     "pw-cli",
     "systemctl",
+    "log",
+    "agenix-home-manager-mount-secrets",
+    "agenix",
+    "launchctl",
+    "command",
 ]
