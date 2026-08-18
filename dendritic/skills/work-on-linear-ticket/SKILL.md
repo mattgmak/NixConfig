@@ -98,7 +98,7 @@ Background tmux instead (sesh internals: `new-session -d`, `send-keys`).
 
 **Why script file:** allowlist rejects `$(...)` cmds (step 0); logic `$()`-heavy. Allowlist gates only top-level cmd → logic into temp script, invoke once via `bash`.
 
-Script → `$CURRENT_DIRECTORY/claudetmp/` (AGENTS.md) or `$TMPDIR`:
+Write the script to a temp path you choose (e.g. under `$TMPDIR` or another scratch dir); do not commit it:
 
 ```bash
 #!/usr/bin/env bash
@@ -208,7 +208,7 @@ fi
 Run (extra args feed the handoff report — branch, issue id, Linear URL):
 
 ```bash
-bash "$CURRENT_DIRECTORY/claudetmp/launch-tmux-session.sh" "$worktree_path" 'initial_prompt' "<branch>" "<issue_id>" "<issue_url>"
+bash "<path-to-script>" "$worktree_path" 'initial_prompt' "<branch>" "<issue_id>" "<issue_url>"
 ```
 
 Escape single quotes in prompt (`'\''`). `test -d` worktree first. Session name on `SESSION=` line (also in created/reuse msg).
