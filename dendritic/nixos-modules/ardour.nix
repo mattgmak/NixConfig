@@ -347,7 +347,7 @@
         guitarMonitor
       ];
 
-      # Mic (FL) + guitar (FR) on an internal bus, then downmixed to mono input.
+      # Mic (FL) + guitar (FR) stereo bus; either channel is silent when that device is unplugged.
       services.pipewire.extraConfig.pipewire."52-combine-input" = {
         "context.modules" = [
           {
@@ -401,27 +401,50 @@
         ];
       };
 
-      # Downmix the internal bus to a mono capture device (select "Mic + Guitar Mono").
-      services.pipewire.extraConfig.pipewire."53-mono-mix" = {
+      # Mixed mono capture device (select "Mic + Guitar Mono").
+      # Each device feeds MONO independently so one, the other, or both work.
+      services.pipewire.extraConfig.pipewire."53-combine-mono" = {
         "context.modules" = [
           {
-            name = "libpipewire-module-loopback";
+            name = "libpipewire-module-combine-stream";
             args = {
+              "combine.mode" = "source";
+              "combine.latency" = true;
+              "node.name" = "mic_guitar_mono";
               "node.description" = "Mic + Guitar Mono";
-              "audio.position" = [
-                "FL"
-                "FR"
-              ];
-              "capture.props" = {
-                "target.object" = "mic_guitar_combined";
-                "node.passive" = true;
-                "stream.dont-remix" = true;
-              };
-              "playback.props" = {
-                "node.name" = "mic_guitar_mono";
-                "media.class" = "Audio/Source";
+              "combine.props" = {
                 "audio.position" = [ "MONO" ];
               };
+              "stream.rules" = [
+                {
+                  matches = [
+                    {
+                      "media.class" = "Audio/Source";
+                      "node.name" = "alsa_input.usb-HP__Inc_HyperX_SoloCast-00.pro-input-0";
+                    }
+                  ];
+                  actions = {
+                    "create-stream" = {
+                      "audio.position" = [ "AUX0" ];
+                      "combine.audio.position" = [ "MONO" ];
+                    };
+                  };
+                }
+                {
+                  matches = [
+                    {
+                      "media.class" = "Audio/Source";
+                      "node.name" = "alsa_input.usb-Jieli_Technology_USB_Composite_Device_3239323335184A16-00.pro-input-0";
+                    }
+                  ];
+                  actions = {
+                    "create-stream" = {
+                      "audio.position" = [ "AUX0" ];
+                      "combine.audio.position" = [ "MONO" ];
+                    };
+                  };
+                }
+              ];
             };
           }
         ];
