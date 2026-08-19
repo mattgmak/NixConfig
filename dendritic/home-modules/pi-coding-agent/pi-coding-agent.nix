@@ -37,10 +37,7 @@
               status=$(git -C "$vendor" status --porcelain 2>/dev/null || true)
               [ -n "$status" ] || continue
               name=$(basename "$vendor")
-              if echo "$status" | grep -Ev '^(\?\?|!!)' >/dev/null; then
-                echo "pi-npm-i: discard tracked changes in vendor/$name"
-                git -C "$vendor" restore .
-              fi
+              restore_vendor_tracked_changes "$vendor" "$name"
               if echo "$status" | grep -E '^(\?\?|!!)' >/dev/null; then
                 echo "pi-npm-i: remove untracked files in vendor/$name"
                 git -C "$vendor" clean -fd
@@ -121,6 +118,38 @@
             (cd "$dir" && npm run build:vendor)
           }
 
+          restore_vendor_tracked_changes() {
+            local dir="$1"
+            local label="$2"
+            git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+            status=$(git -C "$dir" status --porcelain 2>/dev/null || true)
+            [ -n "$status" ] || return 0
+            if echo "$status" | grep -Ev '^(\?\?|!!)' >/dev/null; then
+              echo "pi-npm-i: discard tracked changes in vendor/$label"
+              git -C "$dir" restore .
+            fi
+          }
+
+          install_pi_cursor_sdk() {
+            local dir="$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"
+            [ -f "$dir/package.json" ] || return 0
+            echo "pi-npm-i: vendor/fitchmultz/pi-cursor-sdk (npm ci --ignore-scripts; build dist/)"
+            # prepare runs npm install --include=dev when dev deps are absent, which
+            # mutates package-lock.json; build explicitly instead (same as prepare.mjs).
+            if [ -f "$dir/package-lock.json" ]; then
+              (cd "$dir" && npm ci --ignore-scripts)
+            else
+              (cd "$dir" && npm install --omit=dev --no-package-lock --ignore-scripts)
+            fi
+            (cd "$dir" && node scripts/build.mjs)
+            (cd "$dir" && npm prune --omit=dev --ignore-scripts)
+            if [ ! -f "$dir/dist/index.js" ]; then
+              echo "pi-npm-i: pi-cursor-sdk dist/index.js missing after build" >&2
+              exit 1
+            fi
+            restore_vendor_tracked_changes "$dir" "pi-cursor-sdk"
+          }
+
           install_engram_deps() {
             local engram_pi="$VENDOR_ROOT/Gentleman-Programming/engram/plugin/pi"
             local engram_deps_dir="$VENDOR_ROOT/.engram-deps"
@@ -180,7 +209,7 @@
           for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
             case "$vendor" in
-              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram") continue ;;
+              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk") continue ;;
             esac
             case "$(basename "$vendor")" in
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
@@ -192,6 +221,7 @@
           queue_parallel install_pi_packages
           queue_parallel install_fgladisch_pi
           queue_parallel install_lean_ctx_pi
+          queue_parallel install_pi_cursor_sdk
           queue_parallel install_engram_deps
 
           wait_parallel

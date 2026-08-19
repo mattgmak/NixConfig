@@ -18,4 +18,9 @@ if (src.includes('function getPackageDir()')) {
 console.log('permission-system imports ok');
 EOF
 
+echo "Testing pi-cursor-sdk dist (built by pi-npm-i prepare)..."
+test -f vendor/fitchmultz/pi-cursor-sdk/dist/index.js
+node --check vendor/fitchmultz/pi-cursor-sdk/dist/index.js
+echo "pi-cursor-sdk dist ok"
+
 echo "All extension smoke tests passed"

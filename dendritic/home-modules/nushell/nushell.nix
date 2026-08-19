@@ -51,6 +51,16 @@
           ''
         else
           null;
+      cursorApiKeySecret = ../../../secrets/cursor-api-key.age;
+      hasCursorApiKeySecret = builtins.pathExists cursorApiKeySecret;
+      readCursorApiKeyScript =
+        if hasCursorApiKeySecret then
+          pkgs.writeShellScript "read-cursor-api-key" ''
+            set -euo pipefail
+            cat "${config.age.secrets.cursor-api-key.path}"
+          ''
+        else
+          null;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -60,6 +70,7 @@
         mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
         context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
         github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
+        cursor-api-key.file = lib.mkIf hasCursorApiKeySecret cursorApiKeySecret;
       };
 
       # Servers (root user): decrypt headless with the passphrase-less SSH host
@@ -136,6 +147,17 @@
             $env.GITHUB_MCP_TOKEN = (
               try {
                 (^${readGithubMcpTokenScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
+          + lib.optionalString hasCursorApiKeySecret ''
+
+            # cursor-api-key.age: one line, raw Cursor SDK API key (no CURSOR_API_KEY= prefix)
+            $env.CURSOR_API_KEY = (
+              try {
+                (^${readCursorApiKeyScript} | str trim)
               } catch {
                 ""
               }

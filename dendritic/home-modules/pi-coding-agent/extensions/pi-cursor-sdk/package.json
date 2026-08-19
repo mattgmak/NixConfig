@@ -1,0 +1,10 @@
+{
+  "name": "pi-cursor-sdk",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-cursor-sdk (vendored fitchmultz/pi-cursor-sdk submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

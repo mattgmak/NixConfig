@@ -85,3 +85,6 @@
 [submodule "vendor/Rahularya01/pi-cursor"]
 	path = vendor/Rahularya01/pi-cursor
 	url = https://github.com/Rahularya01/pi-cursor.git
+[submodule "fitchmultz/pi-cursor-sdk"]
+	path = vendor/fitchmultz/pi-cursor-sdk
+	url = https://github.com/fitchmultz/pi-cursor-sdk.git

@@ -48,9 +48,11 @@ Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github
 
 ```
 vendor/Rahularya01/pi-cursor/
-extensions/pi-cursor/index.ts           → ../vendor/Rahularya01/pi-cursor/src/index.ts
-extensions/_stowed/cursor-provider/   → old loader (not discovered by pi)
-vendor/mattgmak/pi-cursor-provider/   → stowed upstream fork, kept for reference
+extensions/_stowed/pi-cursor/index.ts   → old loader (not discovered by pi)
+vendor/mattgmak/pi-cursor-provider/   → fork of offbynan/pi-cursor-provider, kept for reference
+extensions/_stowed/cursor-provider/   → its loader (not discovered by pi)
+vendor/fitchmultz/pi-cursor-sdk/
+extensions/pi-cursor-sdk/index.ts     → ../vendor/fitchmultz/pi-cursor-sdk/dist/index.js (built by pi-npm-i)
 extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
 ```
 
@@ -197,8 +199,9 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 
 | Loader / vendor dir | Submodule URL (fork) | Upstream | Upstream branch |
 |---------------------|----------------------|----------|-----------------|
-| `pi-cursor` (`vendor/Rahularya01/pi-cursor`) | *(direct upstream)* | `https://github.com/Rahularya01/pi-cursor.git` | default |
+| `pi-cursor` (`vendor/Rahularya01/pi-cursor`) | *(direct upstream)* | `https://github.com/Rahularya01/pi-cursor.git` | default — loader **stowed** in `extensions/_stowed/` |
 | `cursor-provider` (`vendor/mattgmak/pi-cursor-provider`) | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` — loader **stowed** in `extensions/_stowed/` |
+| `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) | *(direct upstream)* | `https://github.com/fitchmultz/pi-cursor-sdk.git` | default — active loader `extensions/pi-cursor-sdk/`; provider `cursor` |
 | `pi-lens` (`vendor/mattgmak/pi-lens`) | `mattgmak/pi-lens` | `https://github.com/apmantza/pi-lens.git` | `master` |
 | `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
@@ -286,7 +289,9 @@ Commit directly in NixConfig (not submodule).
 
 ## Install extension deps (`pi-npm-i`)
 
-Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`).
+Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
+
+`pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-npm-i` fails if missing.
 
 Run after submodule add/update when an extension has runtime deps.
 

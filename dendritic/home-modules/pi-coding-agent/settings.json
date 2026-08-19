@@ -2,7 +2,7 @@
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.2",
   "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5",
+  "defaultModel": "composer-2.5:fast",
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {
@@ -17,8 +17,6 @@
   },
   "enabledModels": [
     "opencode/big-pickle",
-    "cursor/composer-2.5",
-    "cursor/composer-2.5-fast",
     "opencode/deepseek-v4-flash-free",
     "opencode/mimo-v2.5-free",
     "opencode/nemotron-3-ultra-free",
@@ -32,10 +30,12 @@
     "opencode-go/qwen3.7-plus",
     "opencode-go/mimo-v2.5",
     "opencode-go/mimo-v2.5-pro",
-    "cursor/cursor-grok-4.6",
-    "cursor/cursor-grok-4.5",
-    "cursor/cursor-grok-4.5-fast",
-    "cursor/cursor-grok-4.6-fast"
+    "cursor/grok-4.6:fast",
+    "cursor/grok-4.5:fast",
+    "cursor/composer-2.5:fast",
+    "cursor/composer-2.5:slow",
+    "cursor/grok-4.5:slow",
+    "cursor/grok-4.6:slow"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true
