@@ -15,7 +15,7 @@
     ${
       if hostname == "GoofyDesky" then
         ''
-          hl.exec_cmd("hyprctl dispatch movecursor 1280 720")
+          hl.dispatch(hl.dsp.cursor.move({ x = 1280, y = 720 }))
           hl.exec_cmd("uwsm app -- vesktop ${electronLaunchFlags}")
         ''
       else

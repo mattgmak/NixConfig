@@ -28,4 +28,5 @@ if ($selected | is-empty) {
 let selected_index = ($selected | split row "\t" | first | into int)
 let client = ($clients_without_active | get $selected_index)
 let selected_client_address = $client.address | into string
-hyprctl dispatch focuswindow $"address:($selected_client_address)"
+let focus_lua = "hl.dispatch(hl.dsp.focus({ window = 'address:" + $selected_client_address + "' }))"
+hyprctl eval $focus_lua
