@@ -15,6 +15,7 @@
             scrollHeight = 10;
           };
           git = {
+            ignoreWhitespaceInDiffView = true;
             pagers = [
               {
                 colorArg = "always";
