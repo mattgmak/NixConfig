@@ -13,7 +13,7 @@ plugin_get_metadata() {
 
 plugin_declare_options() {
   declare_option "icon" "icon" $'\U000F0489' "Application icon"
-  declare_option "cache_ttl" "number" "1" "Cache duration in seconds"
+  declare_option "cache_ttl" "number" "0" "Cache duration in seconds"
 }
 
 plugin_get_content_type() { printf 'dynamic'; }
