@@ -1,0 +1,7 @@
+# NixConfig-owned pi extension loaders (not vendor submodules).
+# npm artifacts from local dev/typecheck or pi-npm-i — never commit.
+# No trailing slash on node_modules: also matches node_modules symlinks.
+node_modules
+package-lock.json
+dist/
+*.tsbuildinfo
