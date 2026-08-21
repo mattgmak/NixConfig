@@ -23,4 +23,9 @@ test -f vendor/fitchmultz/pi-cursor-sdk/dist/index.js
 node --check vendor/fitchmultz/pi-cursor-sdk/dist/index.js
 echo "pi-cursor-sdk dist ok"
 
+echo "Testing pi-agent-browser-native dist (built by pi-npm-i)..."
+test -f vendor/fitchmultz/pi-agent-browser-native/dist/extensions/agent-browser/index.js
+node --check vendor/fitchmultz/pi-agent-browser-native/dist/extensions/agent-browser/index.js
+echo "pi-agent-browser-native dist ok"
+
 echo "All extension smoke tests passed"

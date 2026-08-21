@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
   perSystem =
     { system, ... }:
@@ -57,6 +57,7 @@
         (_: _: {
           ghostty = inputs.ghostty.packages.${system}.default;
         })
+        self.agentBrowser034Overlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {
             doCheck = false;

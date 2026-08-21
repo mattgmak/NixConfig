@@ -88,3 +88,6 @@
 [submodule "fitchmultz/pi-cursor-sdk"]
 	path = vendor/fitchmultz/pi-cursor-sdk
 	url = https://github.com/fitchmultz/pi-cursor-sdk.git
+[submodule "fitchmultz/pi-agent-browser-native"]
+	path = vendor/fitchmultz/pi-agent-browser-native
+	url = https://github.com/fitchmultz/pi-agent-browser-native.git

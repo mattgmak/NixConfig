@@ -2,7 +2,7 @@
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.2",
   "defaultProvider": "cursor",
-  "defaultModel": "grok-4.5:slow",
+  "defaultModel": "composer-2.5:slow",
   "defaultThinkingLevel": "medium",
   "observational-memory": {
     "model": {

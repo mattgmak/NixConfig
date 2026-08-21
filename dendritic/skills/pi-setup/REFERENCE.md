@@ -293,6 +293,8 @@ Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and 
 
 `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-npm-i` fails if missing.
 
+`pi-agent-browser-native` (`vendor/fitchmultz/pi-agent-browser-native`) uses the same build pattern. Loader needs `dist/extensions/agent-browser/index.js`.
+
 Run after submodule add/update when an extension has runtime deps.
 
 ## Apply config changes
