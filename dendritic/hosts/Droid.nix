@@ -65,7 +65,9 @@
           carapace
           tmux
           nix-index-database
-          pi-coding-agent
+          # pi-coding-agent pulls lean-ctx (Rust); remote builder paths need trusted sigs on device.
+          # Re-enable after builder/cache keys wired or lean-ctx substitutes for aarch64-linux exist.
+          # pi-coding-agent
         ];
         # Stylix enables gnome/gtk/kde on Linux by default; those use dconf and fail HM activation on Termux (no session dbus).
         stylix.targets.gnome.enable = lib.mkForce false;
