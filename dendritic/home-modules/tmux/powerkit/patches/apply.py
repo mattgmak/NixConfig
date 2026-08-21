@@ -224,6 +224,25 @@ def patch_render_cache(path: pathlib.Path) -> None:
     path.write_text(text.replace(old, new, 1))
 
 
+def patch_format_native_escape(path: pathlib.Path) -> None:
+    text = path.read_text()
+    old = """    icon=$(_escape_tmux_format "$icon")
+    content=$(_escape_tmux_format "$content")
+    local state="$3"
+"""
+    new = """    icon=$(_escape_tmux_format "$icon")
+    if [[ "$content" == '#{'* ]]; then
+        : # tmux format-native plugin (Catppuccin-style live #{...} expansion)
+    else
+        content=$(_escape_tmux_format "$content")
+    fi
+    local state="$3"
+"""
+    if old not in text:
+        raise SystemExit(f"format-native escape patch: pattern not found in {path}")
+    path.write_text(text.replace(old, new, 1))
+
+
 def patch_plugin_text_contrast(path: pathlib.Path) -> None:
     text = path.read_text()
     old = """get_health_text_color() {
@@ -263,6 +282,7 @@ def main() -> None:
     patch_session_mode_text_no_prefix(root / "src/renderer/entities/session.sh")
     patch_session_mode_bg(root / "src/renderer/entities/session.sh")
     patch_render_cache(root / "bin/powerkit-render")
+    patch_format_native_escape(root / "src/renderer/segment_builder.sh")
     patch_plugin_text_contrast(root / "src/core/color_palette.sh")
     patch_datetime_health(root / "src/plugins/datetime.sh")
 

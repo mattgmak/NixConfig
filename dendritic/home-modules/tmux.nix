@@ -83,7 +83,7 @@
         chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/bin
         install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
-        # Patched: session/window/plugin pill caps, session mode, render cache TTL
+        # Patched: pill caps, session mode, format-native escape, render cache TTL
         ${pkgs.python3}/bin/python3 ${./tmux/powerkit/patches/apply.py} $out
       '';
       tmuxPowerkit = pkgs.tmuxPlugins.mkTmuxPlugin {
@@ -173,9 +173,11 @@
 
           bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
 
-          # Refresh status bar on focus (pwd/app plugins track active pane)
+          # Redraw status on pane/cwd change (format-native cwd/app plugins)
           set-hook -g pane-focus-in 'refresh-client -S'
           set-hook -g client-focus-in 'refresh-client -S'
+          set-hook -g after-select-pane 'refresh-client -S'
+          set-hook -g pane-directory-changed 'refresh-client -S'
 
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
           set -g extended-keys on
