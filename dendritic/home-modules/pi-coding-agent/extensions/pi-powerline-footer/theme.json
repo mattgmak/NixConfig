@@ -1,8 +1,8 @@
 {
   "colors": {
-    "model": "pink",
+    "model": "#d787af",
     "shellMode": "accent",
-    "path": "teal",
+    "path": "#00afaf",
     "gitDirty": "warning",
     "gitClean": "success",
     "thinking": "thinkingOff",
