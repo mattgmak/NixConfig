@@ -31,7 +31,7 @@
             [session-prefix-bg]="${hex "base0A"}"
             [session-copy-bg]="${hex "base0C"}"
             [session-search-bg]="${hex "base09"}"
-            [session-command-bg]="${hex "base0D"}"
+            [session-command-bg]="${hex "base0F"}"
 
             [window-active-base]="${hex "base0E"}"
             [window-active-style]="bold"
@@ -44,7 +44,7 @@
             [pane-border-active]="${hex "base0D"}"
             [pane-border-inactive]="${hex "base03"}"
 
-            [ok-base]="${hex "base02"}"
+            [ok-base]="${hex "base03"}"
             [good-base]="${hex "base0B"}"
             [info-base]="${hex "base0D"}"
             [warning-base]="${hex "base0A"}"
@@ -80,10 +80,10 @@
       tmuxPowerkitRoot = "${tmuxPowerkitBase}/share/tmux-plugins/tmux-powerkit";
       tmuxPowerkitSrc = pkgs.runCommand "tmux-powerkit-src" { } ''
         cp -R ${tmuxPowerkitRoot}/. $out/
-        chmod -R u+w $out/src/plugins $out/src/renderer $out/bin
+        chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/bin
         install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
-        # Patched: session→windows gap, connected window group, render cache TTL
+        # Patched: session/window/plugin pill caps, session mode, render cache TTL
         ${pkgs.python3}/bin/python3 ${./tmux/powerkit/patches/apply.py} $out
       '';
       tmuxPowerkit = pkgs.tmuxPlugins.mkTmuxPlugin {
@@ -207,19 +207,25 @@
               set -g @powerkit_custom_theme_path "${config.home.homeDirectory}/.config/tmux-powerkit/themes/stylix.sh"
               set -g @powerkit_transparent "true"
               set -g @powerkit_separator_style "rounded"
-              set -g @powerkit_edge_separator_style "rounded"
+              set -g @powerkit_edge_separator_style "rounded:all"
+              set -g @powerkit_elements_spacing "false"
+              set -g @powerkit_inactive_window_fg "${hexOr "base05" "#ffffff"}"
               set -g @powerkit_status_position "top"
               set -g @powerkit_status_interval "1"
               set -g @powerkit_session_normal_color "${sessionBgHex}"
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
               set -g @powerkit_session_show_mode "true"
-              set -g @powerkit_session_copy_icon ""
+              set -g @powerkit_session_prefix_icon ""
+              set -g @powerkit_session_copy_icon ""
+              set -g @powerkit_session_search_icon ""
+              set -g @powerkit_session_command_icon ""
               set -g @powerkit_active_window_title "#W "
               set -g @powerkit_inactive_window_title "#W "
               set -g @powerkit_zoomed_window_icon "󮁁"
               set -g @powerkit_plugin_datetime_format "time"
               set -g @powerkit_plugin_directory_icon "󰉋"
+              set -g @powerkit_plugin_pane_application_icon ""
             '';
           }
           {

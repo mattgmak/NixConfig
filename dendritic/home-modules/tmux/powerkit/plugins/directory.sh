@@ -19,7 +19,7 @@ plugin_declare_options() {
 plugin_get_content_type() { printf 'dynamic'; }
 plugin_get_presence() { printf 'always'; }
 plugin_get_state() { printf 'active'; }
-plugin_get_health() { printf 'info'; }
+plugin_get_health() { printf 'ok'; }
 
 plugin_collect() {
   local path
