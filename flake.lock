@@ -2489,6 +2489,7 @@
         "nixpkgs": "nixpkgs_4",
         "sherlock": "sherlock",
         "stylix": "stylix",
+        "tmux-powerkit": "tmux-powerkit",
         "trek-src": "trek-src",
         "whisper-dictation": "whisper-dictation",
         "wiremix": "wiremix",
@@ -2897,6 +2898,27 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
+        "type": "github"
+      }
+    },
+    "tmux-powerkit": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786964392,
+        "narHash": "sha256-3YbEkLpwGyCWPC9pJDVr7S6tWluzXKtQhZIgfS9VWvI=",
+        "owner": "fabioluciano",
+        "repo": "tmux-powerkit",
+        "rev": "eb42c57934f7c483daa5e07aa2ba3a0ed4bc123a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fabioluciano",
+        "ref": "v7.1.0",
+        "repo": "tmux-powerkit",
         "type": "github"
       }
     },

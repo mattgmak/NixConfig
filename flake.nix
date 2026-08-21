@@ -139,6 +139,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    tmux-powerkit = {
+      url = "github:fabioluciano/tmux-powerkit/v7.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     trek-src = {
       url = "github:mauriceboe/TREK/e65acb3de765f3c958dd4e139064b11fbbde79d1";
       flake = false;

@@ -8,6 +8,86 @@
       lib,
       ...
     }:
+    let
+      system = pkgs.stdenv.hostPlatform.system;
+      powerkitPluginsDir = ./tmux/powerkit/plugins;
+
+      mkTmuxPowerkitTheme =
+        colors:
+        let
+          c = colors.withHashtag;
+          hex = name: c.${name} or "#000000";
+        in
+        ''
+          #!/usr/bin/env bash
+          declare -gA THEME_COLORS=(
+            [background]="${hex "base00"}"
+            [statusbar-bg]="${hex "base01"}"
+            [statusbar-fg]="${hex "base05"}"
+
+            [session-bg]="${hex "base0E"}"
+            [session-fg]="${hex "base00"}"
+            [session-prefix-bg]="${hex "base0A"}"
+            [session-copy-bg]="${hex "base0C"}"
+            [session-search-bg]="${hex "base0B"}"
+            [session-command-bg]="${hex "base0D"}"
+
+            [window-active-base]="${hex "base0E"}"
+            [window-active-style]="bold"
+            [window-inactive-base]="${hex "base02"}"
+            [window-inactive-style]="none"
+            [window-activity-style]="italics"
+            [window-bell-style]="bold"
+            [window-zoomed-bg]="${hex "base0C"}"
+
+            [pane-border-active]="${hex "base0D"}"
+            [pane-border-inactive]="${hex "base03"}"
+
+            [ok-base]="${hex "base02"}"
+            [good-base]="${hex "base0B"}"
+            [info-base]="${hex "base0D"}"
+            [warning-base]="${hex "base0A"}"
+            [error-base]="${hex "base08"}"
+            [disabled-base]="${hex "base04"}"
+
+            [message-bg]="${hex "base01"}"
+            [message-fg]="${hex "base05"}"
+
+            [popup-bg]="${hex "base01"}"
+            [popup-fg]="${hex "base05"}"
+            [popup-border]="${hex "base0E"}"
+            [menu-bg]="${hex "base01"}"
+            [menu-fg]="${hex "base05"}"
+            [menu-selected-bg]="${hex "base0E"}"
+            [menu-selected-fg]="${hex "base00"}"
+            [menu-border]="${hex "base0E"}"
+          )
+        '';
+
+      stylixColors = (config.lib.stylix or { }).colors or { };
+      accentHex =
+        if stylixColors != { } then stylixColors.withHashtag.base0E or "#cba6f7" else "magenta";
+
+      tmuxPowerkitBase = inputs.tmux-powerkit.packages.${system}.default;
+      tmuxPowerkitRoot = "${tmuxPowerkitBase}/share/tmux-plugins/tmux-powerkit";
+      tmuxPowerkitSrc = pkgs.runCommand "tmux-powerkit-src" { } ''
+        cp -R ${tmuxPowerkitRoot}/. $out/
+        chmod -R u+w $out/src/plugins
+        install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
+        install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
+      '';
+      tmuxPowerkit = pkgs.tmuxPlugins.mkTmuxPlugin {
+        pluginName = "tmux-powerkit";
+        version = tmuxPowerkitBase.version;
+        src = tmuxPowerkitSrc;
+        rtpFilePath = "tmux-powerkit.tmux";
+      };
+
+      tmuxPowerkitThemeFile = pkgs.writeTextFile {
+        name = "tmux-powerkit-stylix-theme.sh";
+        text = mkTmuxPowerkitTheme stylixColors;
+      };
+    in
     {
       imports = [ inputs.agent-sesh.homeModules.agent-sesh ];
 
@@ -42,7 +122,10 @@
       # sesh tmux bind uses fd for ctrl-f find mode (not added by programs.sesh)
       home.packages = [
         pkgs.fd
+        pkgs.bash
       ];
+
+      home.file.".config/tmux-powerkit/themes/stylix.sh".source = tmuxPowerkitThemeFile;
 
       programs.tmux = {
         enable = true;
@@ -58,8 +141,6 @@
           set -g detach-on-destroy off
           set -g set-clipboard on
           set -g status-position top
-          set -g pane-active-border-style 'fg=magenta,bg=default'
-          set -g pane-border-style 'fg=brightblack,bg=default'
           set -g allow-passthrough on
           set -g visual-activity off
           set -g focus-events on
@@ -104,40 +185,22 @@
             '';
           }
           {
-            plugin = catppuccin;
+            plugin = tmuxPowerkit;
             extraConfig = ''
-              # set -g @catppuccin_flavor 'mocha'
-              set -g @catppuccin_status_background "none"
-
-              set -g @catppuccin_window_status_style "custom"
-              set -g @catppuccin_window_left_separator "#[bg=default,fg=#{@thm_surface_0}]#[bg=#{@thm_overlay_2},fg=#{@thm_surface_0}]"
-              # set -g @catppuccin_window_middle_separator "#[bg=#{@thm_surface_0},fg=#{@thm_overlay_2}]"
-              set -g @catppuccin_window_middle_separator ""
-              set -g @catppuccin_window_right_separator "#[bg=default,fg=#{@thm_overlay_2}]"
-              set -g @catppuccin_window_text "#W "
-              set -g @catppuccin_window_number "#I"
-
-              set -g @catppuccin_window_current_left_separator "#[bg=default,fg=#{@thm_surface_1}]"
-              # set -g @catppuccin_window_current_middle_separator "#[bg=#{@thm_surface_1},fg=#{@thm_mauve}]#[bg=#{@thm_mauve},fg=#{@thm_bg}]"
-              set -g @catppuccin_window_current_middle_separator ""
-              set -g @catppuccin_window_current_right_separator "#[bg=default,fg=#{@thm_mauve}]"
-              set -g @catppuccin_window_number_position "right"
-              set -g @catppuccin_window_current_text "#W#{?window_zoomed_flag,(),} "
-              set -g @catppuccin_window_current_number "#I"
-
-              set -g @catppuccin_status_left_separator  ""
-              # set -g @catppuccin_status_middle_separator "#[bg=#{@thm_surface_0}]"
-              set -g @catppuccin_status_middle_separator ""
-              set -g @catppuccin_status_right_separator ""
-              set -g @catppuccin_status_fill "icon"
-              set -g @catppuccin_status_connect_separator "no"
-              set -g status-left-length 100
-              set -g status-right-length 100
-              set -g status-left "#{E:@catppuccin_status_session} "
-              set -g status-right "#{E:@catppuccin_status_directory} #{E:@catppuccin_status_application} #{E:@catppuccin_status_date_time}"
-              set -g @catppuccin_directory_text " #{b:pane_current_path}"
-              set -g @catppuccin_directory_icon "󰉋 "
-              set -g @catppuccin_date_time_text " %H:%M"
+              set -g @powerkit_status_order "session,windows,plugins"
+              set -g @powerkit_plugins "directory,pane_application,datetime"
+              set -g @powerkit_theme "custom"
+              set -g @powerkit_custom_theme_path "${config.home.homeDirectory}/.config/tmux-powerkit/themes/stylix.sh"
+              set -g @powerkit_transparent "true"
+              set -g @powerkit_separator_style "rounded"
+              set -g @powerkit_edge_separator_style "rounded"
+              set -g @powerkit_status_position "top"
+              set -g @powerkit_status_interval "5"
+              set -g @powerkit_active_window_title "#W "
+              set -g @powerkit_inactive_window_title "#W "
+              set -g @powerkit_zoomed_window_icon "󮁁"
+              set -g @powerkit_plugin_datetime_format "time"
+              set -g @powerkit_plugin_directory_icon "󰉋 "
             '';
           }
           {
@@ -145,7 +208,7 @@
             extraConfig = ''
               set -g @floax-width '80%'
               set -g @floax-height '80%'
-              set -g @floax-border-color 'magenta'
+              set -g @floax-border-color '${accentHex}'
               set -g @floax-text-color 'white'
               set -g @floax-bind 't'
               set -g @floax-bind-menu 'T'
@@ -177,17 +240,16 @@
                   baseName: prefix:
                   let
                     c = (config.lib.stylix or { }).colors or { };
-                    to255 = ch: builtins.floor ((builtins.fromJSON (c.${"${baseName}-dec-${ch}"} or "0")) * 255);
+                    to255 =
+                      ch: builtins.floor ((builtins.fromJSON (c.${"${baseName}-dec-${ch}"} or "0")) * 255);
                     r = to255 "r";
                     g = to255 "g";
                     b = to255 "b";
                   in
                   "${prefix}${toString r};${toString g};${toString b}m";
-                stylixColors = (config.lib.stylix or { }).colors or { };
-                # jumpBgColor =
-                #   if stylixColors != { } then "\\e[0m" + (decRgbToEsc "base02" "\\e[48;2;") else "\\e[0m\\e[90m";
                 jumpBgColor = "\\e[0m";
-                jumpFgColor = if stylixColors != { } then (decRgbToEsc "base08" "\\e[38;2;") else "\\e[1m\\e[31m";
+                jumpFgColor =
+                  if stylixColors != { } then (decRgbToEsc "base08" "\\e[38;2;") else "\\e[1m\\e[31m";
               in
               ''
                 set -g @jump-key 'Bspace'
