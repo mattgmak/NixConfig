@@ -61,6 +61,7 @@
 [submodule "nicobailon/pi-powerline-footer"]
 	path = vendor/nicobailon/pi-powerline-footer
 	url = https://github.com/nicobailon/pi-powerline-footer.git
+	ignore = untracked
 [submodule "arpagon/pi-rewind"]
 	path = vendor/arpagon/pi-rewind
 	url = https://github.com/arpagon/pi-rewind.git

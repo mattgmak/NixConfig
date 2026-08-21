@@ -5,3 +5,5 @@ node_modules
 package-lock.json
 dist/
 *.tsbuildinfo
+# HM/pi-npm-i Stylix symlink — recreated on activation
+pi-powerline-footer/theme.json
