@@ -10,6 +10,11 @@
         hostname = "Droid";
         osConfig = config;
       };
+
+      builderLines = map (
+        site:
+        "ssh-ng://${site.sshUser}@${site.hostName} ${lib.concatStringsSep "," site.systems} ${toString site.maxJobs} ${toString site.speedFactor} ${lib.concatStringsSep "," site.supportedFeatures} ${site.publicKey}"
+      ) (builtins.attrValues self.builderSites);
     in
     {
       imports = [
@@ -65,8 +70,7 @@
           carapace
           tmux
           nix-index-database
-          # pi-coding-agent pulls lean-ctx (Rust); remote builder paths need trusted sigs on device.
-          # Re-enable after builder/cache keys wired or lean-ctx substitutes for aarch64-linux exist.
+          # pi-coding-agent off until signed remote builders verified on device
           # pi-coding-agent
         ];
         # Stylix enables gnome/gtk/kde on Linux by default; those use dconf and fail HM activation on Termux (no session dbus).
@@ -99,9 +103,11 @@
       # Read the changelog before changing this value
       system.stateVersion = "24.05";
 
-      # Set up nix for flakes
+      # Set up nix for flakes + signed remote builders (GoofyDesky, Goofeus)
       nix.extraOptions = ''
         experimental-features = nix-command flakes
+        builders-use-substitutes = true
+        ${lib.concatStringsSep "\n" (map (line: "builders = ${line}") builderLines)}
       '';
       nix = {
         substituters = [
@@ -110,7 +116,7 @@
         ];
         trustedPublicKeys = [
           "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
-        ];
+        ] ++ self.builderPublicKeys;
       };
 
       # terminal.font is set by stylix/droid/fonts.nix from stylix.fonts.monospace (see stylixCommon).

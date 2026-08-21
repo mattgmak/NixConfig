@@ -68,6 +68,8 @@
 
     nixosModules.Goofeus =
       {
+        config,
+        lib,
         pkgs,
         username,
         hostname,
@@ -77,6 +79,20 @@
         ...
       }:
       {
+        age.secrets.nix-builder-key = {
+          file = ../../secrets/nix-builder-goofeus.age;
+          mode = "0400";
+        };
+
+        nix.settings = {
+          secret-key-files = [ config.age.secrets.nix-builder-key.path ];
+          trusted-users = lib.mkAfter [
+            "root"
+            "goofy"
+            "@wheel"
+          ];
+        };
+
         nixpkgs.overlays = common-overlays;
         nixpkgs.config = common-nixpkgs-config;
 

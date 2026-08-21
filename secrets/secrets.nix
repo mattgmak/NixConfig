@@ -151,4 +151,20 @@ in
       MacMini
     ];
   };
+
+  "nix-builder-goofydesky.age" = {
+    armor = true;
+    publicKeys = [
+      GoofyDesky
+      GoofyDeskyRoot
+    ];
+  };
+
+  "nix-builder-goofeus.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDesky
+    ];
+  };
 }
