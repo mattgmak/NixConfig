@@ -10,7 +10,7 @@
       "id": "mimo-v2.5"
     }
   },
-  "theme": "catppuccin-mocha",
+  "theme": "stylix",
   "powerline": {
     "preset": "full",
     "fixedEditor": false

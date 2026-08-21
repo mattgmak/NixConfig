@@ -15,6 +15,163 @@
       vendorRoot = "${config.home.homeDirectory}/NixConfig/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
+      piStaticThemes = [
+        "ansi-dark.json"
+        "ansi-light.json"
+        "catppuccin-frappe.json"
+        "catppuccin-latte.json"
+        "catppuccin-macchiato.json"
+        "catppuccin-mocha.json"
+        "dracula.json"
+      ];
+
+      mkPiStylixTheme =
+        colors:
+        let
+          c = colors.withHashtag;
+          hex = name: c.${name} or "#000000";
+
+          baseNames = [
+            "base00"
+            "base01"
+            "base02"
+            "base03"
+            "base04"
+            "base05"
+            "base06"
+            "base07"
+            "base08"
+            "base09"
+            "base0A"
+            "base0B"
+            "base0C"
+            "base0D"
+            "base0E"
+            "base0F"
+          ];
+
+          vars = builtins.listToAttrs (
+            map (name: {
+              inherit name;
+              value = hex name;
+            }) baseNames
+          );
+
+          theme = {
+            "$schema" = "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json";
+            name = "stylix";
+            inherit vars;
+            colors = {
+              accent = "base0E";
+              border = "base0D";
+              borderAccent = "base0C";
+              borderMuted = "base02";
+              success = "base0B";
+              error = "base08";
+              warning = "base0A";
+              muted = "base04";
+              dim = "base03";
+              text = "base05";
+              thinkingText = "base04";
+
+              selectedBg = "base02";
+              userMessageBg = "base02";
+              userMessageText = "base05";
+              customMessageBg = "base01";
+              customMessageText = "base05";
+              customMessageLabel = "base0E";
+              toolPendingBg = "base01";
+              toolSuccessBg = "base02";
+              toolErrorBg = "base01";
+              toolTitle = "base05";
+              toolOutput = "base04";
+
+              mdHeading = "base09";
+              mdLink = "base0D";
+              mdLinkUrl = "base04";
+              mdCode = "base0C";
+              mdCodeBlock = "base0B";
+              mdCodeBlockBorder = "base03";
+              mdQuote = "base04";
+              mdQuoteBorder = "base03";
+              mdHr = "base03";
+              mdListBullet = "base0E";
+
+              toolDiffAdded = "base0B";
+              toolDiffRemoved = "base08";
+              toolDiffContext = "base04";
+
+              syntaxComment = "base04";
+              syntaxKeyword = "base0E";
+              syntaxFunction = "base0D";
+              syntaxVariable = "base05";
+              syntaxString = "base0B";
+              syntaxNumber = "base09";
+              syntaxType = "base0A";
+              syntaxOperator = "base0C";
+              syntaxPunctuation = "base06";
+
+              thinkingOff = "base02";
+              thinkingMinimal = "base03";
+              thinkingLow = "base0D";
+              thinkingMedium = "base0C";
+              thinkingHigh = "base0E";
+              thinkingXhigh = "base0F";
+
+              bashMode = "base0B";
+            };
+            export = {
+              pageBg = "base00";
+              cardBg = "base01";
+              infoBg = "base02";
+            };
+          };
+        in
+        builtins.toJSON theme;
+
+      mkPiPowerlineTheme =
+        colors:
+        let
+          c = colors.withHashtag;
+          hex = name: c.${name} or "#000000";
+
+          theme = {
+            colors = {
+              model = hex "base0E";
+              shellMode = "accent";
+              path = hex "base0C";
+              gitDirty = "warning";
+              gitClean = "success";
+              thinking = "thinkingOff";
+              thinkingMinimal = "thinkingMinimal";
+              thinkingLow = "thinkingLow";
+              thinkingMedium = "thinkingMedium";
+              context = "dim";
+              contextWarn = "warning";
+              contextError = "error";
+              cost = "text";
+              tokens = "muted";
+              separator = "dim";
+              border = "borderMuted";
+            };
+            icons = {
+              auto = "↯";
+              warning = "";
+            };
+          };
+        in
+        builtins.toJSON theme;
+
+      piStylixThemeFile = pkgs.writeTextFile {
+        name = "pi-stylix-theme.json";
+        text = mkPiStylixTheme config.lib.stylix.colors;
+      };
+
+      piPowerlineThemeFile = pkgs.writeTextFile {
+        name = "pi-powerline-theme.json";
+        text = mkPiPowerlineTheme config.lib.stylix.colors;
+      };
+
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
         runtimeInputs = with pkgs; [
@@ -46,9 +203,12 @@
           }
 
           link_powerline_theme() {
-            local theme="$EXTENSIONS/pi-powerline-footer/theme.json"
+            local theme=${lib.escapeShellArg piPowerlineThemeFile}
+            local loader="$EXTENSIONS/pi-powerline-footer/theme.json"
             local vendor="$VENDOR_ROOT/nicobailon/pi-powerline-footer"
-            if [ -f "$theme" ] && [ -d "$vendor" ]; then
+            mkdir -p "$(dirname "$loader")"
+            ln -sfn "$theme" "$loader"
+            if [ -d "$vendor" ]; then
               ln -sfn "$theme" "$vendor/theme.json"
             fi
           }
@@ -292,7 +452,26 @@
         ]
         ++ markdownPreviewDeps;
 
-      home.file.".pi/agent/themes".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes";
+      home.activation.linkPiPowerlineTheme = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
+        ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
+        if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
+          ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
+        fi
+      '';
+
+      home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
+        map (name: {
+          inherit name;
+          path = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes/${name}";
+        }) piStaticThemes
+        ++ [
+          {
+            name = "stylix.json";
+            path = piStylixThemeFile;
+          }
+        ]
+      );
       home.file.".pi/agent/models.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
       home.file.".pi/agent/mcp.json".source =

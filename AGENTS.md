@@ -23,3 +23,8 @@ Rules:
 - `pi-npm-i` installs vendor extension deps; skips non-extension repos (themes/skills/zen/tools) + special-cases `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk` (`npm ci --ignore-scripts` + `build.mjs` → `dist/`).
 
 New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.gitmodules` name → `owner/repo` if git used path. Full workflow + fork handling: `dendritic/skills/pi-setup/REFERENCE.md`.
+
+## Commit convention
+
+- **Subject only** — one line, no body unless explicitly requested
+- Imperative mood, capitalize first word (e.g. `Generate pi themes from Stylix palette.`)
