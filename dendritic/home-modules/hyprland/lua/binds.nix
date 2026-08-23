@@ -30,7 +30,7 @@ let
     in
     [
       (bind "ALT + ${key}" "hl.dsp.focus({ workspace = \"${index}\" })" null)
-      (bind "ALT + SHIFT + ${key}" "hl.dsp.window.move({ workspace = \"${index}\", silent = true })" null)
+      (bind "ALT + SHIFT + ${key}" "hl.dsp.window.move({ workspace = \"${index}\", follow = false })" null)
     ]
   ) allWorkspacesIndex;
 
@@ -64,7 +64,7 @@ let
     (bind "ALT + d" "hl.dsp.window.close()" null)
     (bind "ALT + c" "hl.dsp.window.center()" null)
     (bind "ALT + G" "hl.dsp.focus({ workspace = \"name:Game\" })" null)
-    (bind "ALT + SHIFT + G" "hl.dsp.window.move({ workspace = \"name:Game\", silent = true })" null)
+    (bind "ALT + SHIFT + G" "hl.dsp.window.move({ workspace = \"name:Game\", follow = false })" null)
     (bind "XF86AudioMute" "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")" null)
     (bind "XF86AudioMicMute" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/mic-toggle.sh\")" null)
     (bind "ALT + SHIFT + M" "hl.dsp.exec_cmd(\"caelestia shell --kill; caelestia shell -d\")" null)
