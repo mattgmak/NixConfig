@@ -61,7 +61,7 @@ let
     (bind "ALT + SHIFT + Tab" "hl.dsp.layout(\"cycleprev\")" null)
     (bind "ALT + t" "hl.dsp.window.float({ action = \"toggle\" })" null)
     (bind "ALT + f" "hl.dsp.window.fullscreen()" null)
-    (bind "ALT + d" "hl.dsp.window.kill()" null)
+    (bind "ALT + d" "hl.dsp.window.close()" null)
     (bind "ALT + c" "hl.dsp.window.center()" null)
     (bind "ALT + G" "hl.dsp.focus({ workspace = \"name:Game\" })" null)
     (bind "ALT + SHIFT + G" "hl.dsp.window.move({ workspace = \"name:Game\", silent = true })" null)
