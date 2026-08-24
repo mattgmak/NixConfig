@@ -173,9 +173,8 @@
 
           bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
 
-          # Redraw status on pane/cwd change (format-native cwd/app plugins)
-          set-hook -g pane-focus-in 'refresh-client -S'
-          set-hook -g client-focus-in 'refresh-client -S'
+          # Redraw status on pane/cwd change (format-native cwd/app plugins).
+          # Skip focus hooks — they flash bar; pane select + directory change cover live updates.
           set-hook -g after-select-pane 'refresh-client -S'
           set-hook -g pane-directory-changed 'refresh-client -S'
 
@@ -213,7 +212,7 @@
               set -g @powerkit_elements_spacing "false"
               set -g @powerkit_inactive_window_fg "${hexOr "base05" "#ffffff"}"
               set -g @powerkit_status_position "top"
-              set -g @powerkit_status_interval "1"
+              set -g @powerkit_status_interval "3"
               set -g @powerkit_session_normal_color "${sessionBgHex}"
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
