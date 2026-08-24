@@ -75,6 +75,7 @@
       sessionSearchHex = hexOr "base09" "#ffc387";
       sessionCommandHex = sessionBgHex;
       accentHex = hexOr "base0E" "#cba6f7";
+      agentSeshBin = lib.getExe config.programs.agent-sesh.package;
 
       tmuxPowerkitBase = inputs.tmux-powerkit.packages.${system}.default;
       tmuxPowerkitRoot = "${tmuxPowerkitBase}/share/tmux-plugins/tmux-powerkit";
@@ -83,6 +84,7 @@
         chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/bin
         install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
+        install -Dm755 ${powerkitPluginsDir}/agent_counts.sh $out/src/plugins/agent_counts.sh
         # Patched: pill caps, session mode, format-native escape, render cache TTL
         ${pkgs.python3}/bin/python3 ${./tmux/powerkit/patches/apply.py} $out
       '';
@@ -203,7 +205,7 @@
             plugin = tmuxPowerkit;
             extraConfig = ''
               set -g @powerkit_status_order "session,plugins"
-              set -g @powerkit_plugins "directory,pane_application,datetime"
+              set -g @powerkit_plugins "directory,pane_application,agent_counts,datetime"
               set -g @powerkit_theme "custom"
               set -g @powerkit_custom_theme_path "${config.home.homeDirectory}/.config/tmux-powerkit/themes/stylix.sh"
               set -g @powerkit_transparent "true"
@@ -229,6 +231,9 @@
               set -g @powerkit_plugin_directory_max_length "24"
               set -g @powerkit_plugin_directory_ellipsis "…"
               set -g @powerkit_plugin_pane_application_icon ""
+              set -g @powerkit_plugin_agent_counts_icon "󰚩"
+              set -g @powerkit_plugin_agent_counts_bin "${agentSeshBin}"
+              set -g @powerkit_plugin_agent_counts_cache_ttl "2"
             '';
           }
           {
