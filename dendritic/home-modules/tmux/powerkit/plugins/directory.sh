@@ -14,6 +14,8 @@ plugin_get_metadata() {
 plugin_declare_options() {
   declare_option "icon" "icon" $'\U000F0153' "Directory icon"
   declare_option "cache_ttl" "number" "86400" "Cache duration in seconds"
+  declare_option "max_length" "number" "24" "Max cwd chars before ellipsis truncation"
+  declare_option "ellipsis" "string" $'…' "Truncation marker when cwd exceeds max_length"
 }
 
 plugin_get_content_type() { printf 'static'; }
@@ -25,7 +27,15 @@ plugin_get_health() { printf 'ok'; }
 plugin_collect() { return 0; }
 
 plugin_render() {
-  printf '%s' '#{b:pane_current_path}'
+  local max_len ellipsis
+  max_len=$(get_option "max_length")
+  ellipsis=$(get_option "ellipsis")
+  if [[ -z "$max_len" || "$max_len" -le 0 ]]; then
+    printf '%s' '#{b:pane_current_path}'
+    return
+  fi
+  # tmux #{=/N/marker:#{b:path}} — nested basename then width-truncate with marker
+  printf '#{=/%s/%s:#{b:pane_current_path}}' "$max_len" "$ellipsis"
 }
 
 plugin_get_icon() {

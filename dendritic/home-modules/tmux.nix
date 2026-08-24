@@ -227,6 +227,8 @@
               set -g @powerkit_zoomed_window_icon "󮁁"
               set -g @powerkit_plugin_datetime_format "time"
               set -g @powerkit_plugin_directory_icon "󰉋"
+              set -g @powerkit_plugin_directory_max_length "24"
+              set -g @powerkit_plugin_directory_ellipsis "…"
               set -g @powerkit_plugin_pane_application_icon ""
             '';
           }
