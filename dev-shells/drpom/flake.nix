@@ -203,7 +203,7 @@
                     [ ]
                 );
               NODE_OPTIONS = "--experimental-vm-modules";
-              BIOME_BINARY = "${biome-pin-pkgs.biome}/bin/biome";
+              # BIOME_BINARY = "${biome-pin-pkgs.biome}/bin/biome";
               shellHook = ''
                 export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
                 ${
