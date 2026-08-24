@@ -308,6 +308,36 @@
           esac
         '';
       };
+
+      ardourPw = pkgs.writeShellApplication {
+        name = "ardour9-pw";
+        runtimeInputs = with pkgs; [
+          ardour
+          pipewire.jack
+        ];
+        text = ''
+          exec pw-jack ardour9 "$@"
+        '';
+      };
+
+      ardourDesktopItem = pkgs.makeDesktopItem {
+        name = "ardour9-pipewire";
+        desktopName = "Ardour";
+        genericName = "Digital Audio Workstation";
+        icon = "ardour9";
+        exec = "ardour9-pw %F";
+        terminal = false;
+        type = "Application";
+        mimeTypes = [ "application/x-ardour" ];
+        categories = [
+          "AudioVideo"
+          "Audio"
+          "X-Recorders"
+          "X-Multitrack"
+          "X-Jack"
+        ];
+        startupWMClass = "Ardour";
+      };
     in
     {
       security.pam.loginLimits = [
@@ -340,7 +370,9 @@
       };
 
       environment.systemPackages = with pkgs; [
-        ardour
+        ardourPw
+        ardourDesktopItem
+        pipewire.jack # pw-jack — launch JACK clients against PipeWire
         qpwgraph
         lsp-plugins
         pavucontrol
@@ -396,6 +428,37 @@
                   };
                 }
               ];
+            };
+          }
+        ];
+      };
+
+      # Ardour Master -> virtual sink -> virtual source for Discord/other voice apps.
+      # qpwgraph: Ardour output_FL/FR -> ardour-discord-in playback; Discord mic = "Ardour Mix (Discord)".
+      services.pipewire.extraConfig.pipewire."54-ardour-discord" = {
+        "context.modules" = [
+          {
+            name = "libpipewire-module-loopback";
+            args = {
+              "node.description" = "Ardour Discord Mix";
+              "capture.props" = {
+                "node.name" = "ardour-discord-in";
+                "node.description" = "Ardour Discord In";
+                "media.class" = "Audio/Sink";
+                "audio.position" = [
+                  "FL"
+                  "FR"
+                ];
+              };
+              "playback.props" = {
+                "node.name" = "ardour-discord-out";
+                "node.description" = "Ardour Mix (Discord)";
+                "media.class" = "Audio/Source";
+                "audio.position" = [
+                  "FL"
+                  "FR"
+                ];
+              };
             };
           }
         ];
