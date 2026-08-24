@@ -26,5 +26,5 @@ New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.git
 
 ## Commit convention
 
-- **Subject only** — one line, no body unless explicitly requested
+- **Subject only** — one line, no body, no trailers (`Co-authored-by`, etc.) unless explicitly requested
 - Imperative mood, capitalize first word (e.g. `Generate pi themes from Stylix palette.`)
