@@ -14,13 +14,13 @@ plugin_get_metadata() {
 plugin_declare_options() {
   declare_option "icon" "icon" $'\U000F06A9' "Agent icon (nf-md-robot)"
   declare_option "bin" "string" "agent-sesh" "agent-sesh CLI path"
-  declare_option "cache_ttl" "number" "2" "Cache duration in seconds"
+  declare_option "cache_ttl" "number" "0" "Cache duration in seconds (0 = always fresh)"
 }
 
 plugin_get_content_type() { printf 'dynamic'; }
 plugin_get_presence() { printf 'always'; }
 plugin_get_state() { printf 'active'; }
-plugin_get_health() { printf 'ok'; }
+plugin_get_health() { printf 'warning'; }
 
 _resolve_bin() {
   local configured fallback

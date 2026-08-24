@@ -214,7 +214,8 @@
               set -g @powerkit_elements_spacing "false"
               set -g @powerkit_inactive_window_fg "${hexOr "base05" "#ffffff"}"
               set -g @powerkit_status_position "top"
-              set -g @powerkit_status_interval "3"
+              set -g status-interval 1
+              set -g @powerkit_status_interval "1"
               set -g @powerkit_session_normal_color "${sessionBgHex}"
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
@@ -233,7 +234,7 @@
               set -g @powerkit_plugin_pane_application_icon ""
               set -g @powerkit_plugin_agent_counts_icon "󰚩"
               set -g @powerkit_plugin_agent_counts_bin "${agentSeshBin}"
-              set -g @powerkit_plugin_agent_counts_cache_ttl "2"
+              set -g @powerkit_plugin_agent_counts_cache_ttl "0"
             '';
           }
           {
