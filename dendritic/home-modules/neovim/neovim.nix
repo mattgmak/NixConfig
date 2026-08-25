@@ -15,6 +15,8 @@
       home.file = {
         ".config/nvim/after".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/after";
         ".config/nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua";
+        ".config/nvim/lazy-lock.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lazy-lock.json";
       };
       programs.neovim = {
         enable = true;
