@@ -26,5 +26,7 @@ New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.git
 
 ## Commit convention
 
-- **Subject only** — one line, no body, no trailers (`Co-authored-by`, etc.) unless explicitly requested
+- **Subject only** — one line, no body, no trailers (`Co-authored-by`, `Signed-off-by`, etc.) unless user explicitly requests one
+- **Never** pass `git commit --trailer` or append attribution trailers for Cursor, agents, or tooling — not default, not "helpful"
+- Use plain `git commit -m "$(cat <<'EOF' … EOF)"` — subject line only inside the heredoc
 - Imperative mood, capitalize first word (e.g. `Generate pi themes from Stylix palette.`)
