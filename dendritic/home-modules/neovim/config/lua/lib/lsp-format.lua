@@ -2,6 +2,7 @@ local M = {}
 
 local TS_FORMATTERS = {
   ts_ls = true,
+  tsc = true,
   tsgo = true,
 }
 

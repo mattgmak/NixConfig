@@ -4,7 +4,7 @@ return {
     vim.api.nvim_create_autocmd('LspAttach', {
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
-        if client and (client.name == 'ts_ls' or client.name == 'tsgo') then
+        if client and (client.name == 'ts_ls' or client.name == 'tsc' or client.name == 'tsgo') then
           client.server_capabilities.documentFormattingProvider = false
           client.server_capabilities.documentRangeFormattingProvider = false
         end
@@ -43,6 +43,9 @@ return {
     })
     vim.lsp.enable('tailwindcss')
 
+    -- Custom tsc/tsgo resolver (local node_modules first, tsc then tsgo).
+    -- Upstream nvim-lspconfig `tsc` does the same with deno/monorepo root logic.
+    --[[
     local tsc_major_cache = {}
 
     vim.lsp.config('tsgo', {
@@ -82,6 +85,8 @@ return {
       end,
     })
     vim.lsp.enable('tsgo')
+    --]]
+    vim.lsp.enable('tsc')
 
     vim.lsp.enable('zls')
     vim.lsp.enable('yamlls')
