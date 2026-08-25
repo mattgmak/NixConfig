@@ -1,15 +1,29 @@
+{ inputs, ... }:
 {
   flake.homeModules.neovim =
     {
       config,
       pkgs,
       hostname,
+      lib,
       ...
     }:
     let
       treesitterPkg = pkgs.tree-sitter;
       repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
       neovimRoot = "${repoRoot}/home-modules/neovim";
+      lockFile = "${neovimRoot}/config/lazy-lock.json";
+      restoreStamp = "${config.home.homeDirectory}/.local/state/nvim/lazy-restore.lock.sha256";
+      nvim = config.programs.neovim.package;
+      restorePath = lib.makeBinPath (
+        with pkgs;
+        [
+          coreutils
+          git
+          gnumake
+          gcc
+        ]
+      );
     in
     {
       home.file = {
@@ -49,5 +63,21 @@
       home.packages = [
         treesitterPkg
       ];
+
+      home.activation.restoreLazyPlugins = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        if [ ! -f ${lib.escapeShellArg lockFile} ]; then
+          exit 0
+        fi
+
+        mkdir -p "$(dirname ${lib.escapeShellArg restoreStamp})"
+        lock_hash=$(${pkgs.coreutils}/bin/sha256sum ${lib.escapeShellArg lockFile} | ${pkgs.coreutils}/bin/cut -d' ' -f1)
+        if [ -f ${lib.escapeShellArg restoreStamp} ] && [ "$(cat ${lib.escapeShellArg restoreStamp})" = "$lock_hash" ]; then
+          exit 0
+        fi
+
+        export PATH="${restorePath}:$PATH"
+        ${nvim}/bin/nvim --headless "+Lazy! restore" +qa
+        printf '%s' "$lock_hash" > ${lib.escapeShellArg restoreStamp}
+      '';
     };
 }
