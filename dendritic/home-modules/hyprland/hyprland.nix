@@ -166,6 +166,24 @@
           xdg-desktop-portal-hyprland
           xdg-desktop-portal-gtk
         ];
+        config = {
+          preferred = {
+            "org.freedesktop.impl.portal.Screenshot" = "hyprland";
+            "org.freedesktop.impl.portal.ScreenCast" = "hyprland";
+            "org.freedesktop.impl.portal.GlobalShortcuts" = "hyprland";
+            "org.freedesktop.impl.portal.InputCapture" = "hyprland";
+          };
+        };
+      };
+
+      # Upstream unit waits for graphical-session.target, but session units that
+      # need the portal block on that same target — start the backend with the
+      # main portal service instead.
+      systemd.user.services.xdg-desktop-portal-hyprland = {
+        unitConfig.After = lib.mkForce [
+          "dbus.socket"
+          "xdg-desktop-portal.service"
+        ];
       };
     };
 }

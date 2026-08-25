@@ -307,6 +307,25 @@
         };
         services.blueman.enable = true;
 
+        systemd.user.services.nvidia-gaming-settings = {
+          description = "NVIDIA max-performance PowerMizer";
+          after = [
+            "graphical-session-pre.target"
+            "xdg-desktop-portal.service"
+          ];
+          wantedBy = [ "graphical-session.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            # --no-config avoids blocking on org.freedesktop.portal.Settings when
+            # portal backends are still starting; partOf was removed because that
+            # blocked graphical-session.target for the full dbus timeout (~25s).
+            TimeoutStartSec = 5;
+            ExecStart =
+              "${config.hardware.nvidia.package.settings}/bin/nvidia-settings --no-config -a [gpu:0]/GPUPowerMizerMode=1";
+          };
+        };
+
         swapDevices = [
           {
             device = "/swapfile";
