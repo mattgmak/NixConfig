@@ -175,10 +175,9 @@
 
           bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
 
-          # Redraw status on pane/cwd change (format-native cwd/app plugins).
-          # Skip focus hooks — they flash bar; pane select + directory change cover live updates.
+          # Redraw status on pane switch (format-native cwd/app plugins).
+          # No tmux hook for in-pane cwd change; status-interval 1 covers cd updates.
           set-hook -g after-select-pane 'refresh-client -S'
-          set-hook -g pane-directory-changed 'refresh-client -S'
 
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
           set -g extended-keys on
