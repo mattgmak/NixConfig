@@ -152,6 +152,17 @@ in
     ];
   };
 
+  "cursor-usage-session-token.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
+    ];
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [

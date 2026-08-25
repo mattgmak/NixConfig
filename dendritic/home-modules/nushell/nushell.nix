@@ -61,6 +61,16 @@
           ''
         else
           null;
+      cursorUsageSessionTokenSecret = ../../../secrets/cursor-usage-session-token.age;
+      hasCursorUsageSessionTokenSecret = builtins.pathExists cursorUsageSessionTokenSecret;
+      readCursorUsageSessionTokenScript =
+        if hasCursorUsageSessionTokenSecret then
+          pkgs.writeShellScript "read-cursor-usage-session-token" ''
+            set -euo pipefail
+            cat "${config.age.secrets.cursor-usage-session-token.path}"
+          ''
+        else
+          null;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -71,6 +81,7 @@
         context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
         github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
         cursor-api-key.file = lib.mkIf hasCursorApiKeySecret cursorApiKeySecret;
+        cursor-usage-session-token.file = lib.mkIf hasCursorUsageSessionTokenSecret cursorUsageSessionTokenSecret;
       };
 
       # Servers (root user): decrypt headless with the passphrase-less SSH host
@@ -158,6 +169,17 @@
             $env.CURSOR_API_KEY = (
               try {
                 (^${readCursorApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
+          + lib.optionalString hasCursorUsageSessionTokenSecret ''
+
+            # cursor-usage-session-token.age: one line, raw WorkosCursorSessionToken cookie (no prefix)
+            $env.CURSOR_USAGE_SESSION_TOKEN = (
+              try {
+                (^${readCursorUsageSessionTokenScript} | str trim)
               } catch {
                 ""
               }
