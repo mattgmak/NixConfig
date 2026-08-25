@@ -10,11 +10,6 @@
         hostname = "Droid";
         osConfig = config;
       };
-
-      builderLines = map (
-        site:
-        "ssh-ng://${site.sshUser}@${site.hostName} ${lib.concatStringsSep "," site.systems} ${toString site.maxJobs} ${toString site.speedFactor} ${lib.concatStringsSep "," site.supportedFeatures} ${site.publicKey}"
-      ) (builtins.attrValues self.builderSites);
     in
     {
       imports = [
@@ -33,7 +28,7 @@
         killall
         diffutils
         findutils
-        utillinux
+        util-linux
         tzdata
         hostname
         man
@@ -81,6 +76,7 @@
         dconf.enable = false;
         programs.ssh = {
           enable = true;
+          enableDefaultConfig = false;
         };
         home = {
           stateVersion = "24.05";
@@ -103,11 +99,11 @@
       # Read the changelog before changing this value
       system.stateVersion = "24.05";
 
-      # Set up nix for flakes + signed remote builders (GoofyDesky, Goofeus)
+      # Flakes only. Remote builders (ssh-ng) break HM profile activation on Termux:
+      # "getting pseudoterminal attributes: Permission denied" building user-environment.
+      # Re-enable builders after ssh-ng verified from nix-on-droid proot env.
       nix.extraOptions = ''
         experimental-features = nix-command flakes
-        builders-use-substitutes = true
-        ${lib.concatStringsSep "\n" (map (line: "builders = ${line}") builderLines)}
       '';
       nix = {
         substituters = [
