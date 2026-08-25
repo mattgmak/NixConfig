@@ -32,11 +32,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787646681,
-        "narHash": "sha256-p655dhVPtakkeIDbA5IrBpwu58FvkwMhuV3GnaFds8E=",
+        "lastModified": 1787658396,
+        "narHash": "sha256-rEhmMSnRvq4lPmoNc4D1Y7/Vx7fkGj7F+Y7ZhguTSE8=",
         "ref": "refs/heads/main",
-        "rev": "9caf98e7abd8a2737598a4cae7868275061b5918",
-        "revCount": 26,
+        "rev": "1ab7508c5812c8c97db9b67325b03b19a803bfdc",
+        "revCount": 27,
         "type": "git",
         "url": "file:./vendor/mattgmak/agent-sesh"
       },
