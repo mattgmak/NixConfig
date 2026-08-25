@@ -15,6 +15,7 @@
     },
     "bash": {
       "rm -rf *": "deny",
+      "time *": "allow",
       "lean-ctx allow *": "ask",
       "lean-ctx allow": "ask",
       "lean-ctx config set shell_allowlist*": "deny",
