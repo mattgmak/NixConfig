@@ -15,6 +15,7 @@
     },
     "bash": {
       "rm -rf *": "deny",
+      "xargs*": "deny",
       "time *": "allow",
       "lean-ctx allow *": "ask",
       "lean-ctx allow": "ask",
@@ -27,6 +28,7 @@
     },
     "ctx_shell": {
       "rm -rf *": "deny",
+      "xargs*": "deny",
       "time *": "allow",
       "lean-ctx allow *": "ask",
       "lean-ctx allow": "ask",
