@@ -487,6 +487,7 @@
 
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;
+        PI_CURSOR_ASK_QUESTION = "0";
       };
     };
 }
