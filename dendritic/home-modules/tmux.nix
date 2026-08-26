@@ -99,6 +99,32 @@
         name = "tmux-powerkit-stylix-theme.sh";
         text = mkTmuxPowerkitTheme stylixColors;
       };
+
+      tmuxJumpVersion = "0.5.5";
+      tmuxJumpRev = "9773adb3997fc2474f160bfa65335b4ec25e349c";
+      tmuxJumpSrc = pkgs.fetchurl {
+        url = "https://git.j4hangir.com/tmux/tmux-jump/-/archive/${tmuxJumpRev}/tmux-jump-${tmuxJumpRev}.tar.gz";
+        hash = "sha256-1uvkQS8mNLjmegoY4zkLpQBS+eAJ20mKldI9efXFuHk=";
+      };
+      tmuxJumpBin = pkgs.buildGoModule {
+        pname = "tmux-jump";
+        version = tmuxJumpVersion;
+        src = tmuxJumpSrc;
+        vendorHash = null;
+        ldflags = [ "-s -w -X main.version=${tmuxJumpVersion}" ];
+        meta.mainProgram = "tmux-jump";
+      };
+      tmuxJump = pkgs.tmuxPlugins.mkTmuxPlugin {
+        pluginName = "tmux-jump";
+        version = tmuxJumpVersion;
+        src = tmuxJumpSrc;
+        rtpFilePath = "tmux-jump.tmux";
+        postInstall = ''
+          chmod +x $target/tmux-jump.tmux $target/tmux-jump.sh $target/install-wizard.sh
+          mkdir -p $target/bin
+          ln -s ${tmuxJumpBin}/bin/tmux-jump $target/bin/tmux-jump
+        '';
+      };
     in
     {
       imports = [ inputs.agent-sesh.homeModules.agent-sesh ];
@@ -266,29 +292,12 @@
             '';
           }
           {
-            plugin = jump;
-            extraConfig =
-              let
-                decRgbToEsc =
-                  baseName: prefix:
-                  let
-                    c = (config.lib.stylix or { }).colors or { };
-                    to255 =
-                      ch: builtins.floor ((builtins.fromJSON (c.${"${baseName}-dec-${ch}"} or "0")) * 255);
-                    r = to255 "r";
-                    g = to255 "g";
-                    b = to255 "b";
-                  in
-                  "${prefix}${toString r};${toString g};${toString b}m";
-                jumpBgColor = "\\e[0m";
-                jumpFgColor =
-                  if stylixColors != { } then (decRgbToEsc "base08" "\\e[38;2;") else "\\e[1m\\e[31m";
-              in
-              ''
-                set -g @jump-key 'Bspace'
-                set -g @jump-bg-color '${jumpBgColor}'
-                set -g @jump-fg-color '${jumpFgColor}'
-              '';
+            plugin = tmuxJump;
+            extraConfig = ''
+              set -g @jump-key 'Bspace'
+              set -g @jump-skip-wizard 1
+              set -g @jump-auto-hint-delay 100
+            '';
           }
         ];
       };
