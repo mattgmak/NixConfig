@@ -106,7 +106,7 @@
     };
 
     woomer = {
-      url = "path:./vendor/mattgmak/woomer";
+      url = "git+file:./vendor/mattgmak/woomer";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

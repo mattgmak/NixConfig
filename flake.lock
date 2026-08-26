@@ -3109,14 +3109,17 @@
         "systems": "systems_10"
       },
       "locked": {
-        "path": "./vendor/mattgmak/woomer",
-        "type": "path"
+        "lastModified": 1786465014,
+        "narHash": "sha256-UPzQJryidznrYGO+dmDtJ4RN7ZuefviVLdsmqmxuj1s=",
+        "rev": "172b4e3610d5f9a5145019da5685ed2a06f0af85",
+        "revCount": 48,
+        "type": "git",
+        "url": "file:./vendor/mattgmak/woomer"
       },
       "original": {
-        "path": "./vendor/mattgmak/woomer",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "file:./vendor/mattgmak/woomer"
+      }
     },
     "worktrunk": {
       "inputs": {
