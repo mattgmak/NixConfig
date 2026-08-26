@@ -91,7 +91,7 @@
       };
 
       # user.userName = self.constants.username;
-      user.shell = "${pkgs.nushell}/bin/nu";
+      user.shell = "${pkgs.bash}/bin/bash";
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
       environment.etcBackupExtension = ".bak";

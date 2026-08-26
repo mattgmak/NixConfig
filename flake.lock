@@ -34,15 +34,15 @@
       "locked": {
         "lastModified": 1787728760,
         "narHash": "sha256-jCjR6N7quPldZSN5s0pQCP+fk6Js1GGgT95xZ7aaW5Q=",
-        "ref": "refs/heads/main",
+        "owner": "mattgmak",
+        "repo": "agent-sesh",
         "rev": "16a831139688abbd92793683b43c04a3157c23c8",
-        "revCount": 28,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/agent-sesh"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/agent-sesh"
+        "owner": "mattgmak",
+        "repo": "agent-sesh",
+        "type": "github"
       }
     },
     "aquamarine": {
@@ -3068,15 +3068,15 @@
       "locked": {
         "lastModified": 1786769916,
         "narHash": "sha256-UAVuAsjVKRRnDkqjEEVf2aTdEQ3diw/GhqZXEj1jbu0=",
-        "ref": "refs/heads/main",
+        "owner": "mattgmak",
+        "repo": "whisper-dictation",
         "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
-        "revCount": 28,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/whisper-dictation"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/whisper-dictation"
+        "owner": "mattgmak",
+        "repo": "whisper-dictation",
+        "type": "github"
       }
     },
     "wiremix": {
@@ -3111,14 +3111,15 @@
       "locked": {
         "lastModified": 1786465014,
         "narHash": "sha256-UPzQJryidznrYGO+dmDtJ4RN7ZuefviVLdsmqmxuj1s=",
+        "owner": "mattgmak",
+        "repo": "woomer",
         "rev": "172b4e3610d5f9a5145019da5685ed2a06f0af85",
-        "revCount": 48,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/woomer"
+        "type": "github"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/woomer"
+        "owner": "mattgmak",
+        "repo": "woomer",
+        "type": "github"
       }
     },
     "worktrunk": {

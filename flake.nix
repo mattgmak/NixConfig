@@ -1,7 +1,7 @@
 {
   description = "NixOS config flake";
   inputs = {
-    self.submodules = true;
+    # self.submodules = true;
     import-tree.url = "github:vic/import-tree";
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs = {
@@ -100,13 +100,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # github: not git+file: — old nix-on-droid Nix resolves file:./vendor/... as /vendor/... (root).
     whisper-dictation = {
-      url = "git+file:./vendor/mattgmak/whisper-dictation";
+      url = "github:mattgmak/whisper-dictation";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     woomer = {
-      url = "git+file:./vendor/mattgmak/woomer";
+      url = "github:mattgmak/woomer";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -138,7 +139,7 @@
     };
 
     agent-sesh = {
-      url = "git+file:./vendor/mattgmak/agent-sesh";
+      url = "github:mattgmak/agent-sesh";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
