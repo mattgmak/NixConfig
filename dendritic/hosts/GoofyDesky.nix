@@ -29,6 +29,7 @@
           GoofyDeskyHardware
           orca-slicer
           ardour
+          gamemode
           steam
           vr
           tailscale
@@ -276,6 +277,16 @@
         services.xserver.wacom.enable = true;
 
         services.xserver.videoDrivers = [ "nvidia" ];
+
+        # NVIDIA gaming: max perf PowerMizer env + low-latency frame cap. VRR/G-Sync off.
+        environment.sessionVariables = {
+          GBM_BACKEND = "nvidia-drm";
+          __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+          __GL_VRR_ALLOWED = "0";
+          __GL_SYNC_TO_VBLANK = "0";
+          __GL_MaxFramesAllowed = "1";
+        };
+
         hardware = {
           graphics = {
             enable = true;
@@ -321,8 +332,7 @@
             # portal backends are still starting; partOf was removed because that
             # blocked graphical-session.target for the full dbus timeout (~25s).
             TimeoutStartSec = 5;
-            ExecStart =
-              "${config.hardware.nvidia.package.settings}/bin/nvidia-settings --no-config -a [gpu:0]/GPUPowerMizerMode=1";
+            ExecStart = "${config.hardware.nvidia.package.settings}/bin/nvidia-settings --no-config -a [gpu:0]/GPUPowerMizerMode=1";
           };
         };
 
