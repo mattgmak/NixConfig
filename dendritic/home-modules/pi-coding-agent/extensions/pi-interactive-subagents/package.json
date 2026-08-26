@@ -1,0 +1,10 @@
+{
+  "name": "pi-interactive-subagents",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for mattgmak/pi-interactive-subagents fork (curated subagent stack)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

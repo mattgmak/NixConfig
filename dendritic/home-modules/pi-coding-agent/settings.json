@@ -3,7 +3,7 @@
   "lastChangelogVersion": "0.84.2",
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5:slow",
-  "defaultThinkingLevel": "medium",
+  "defaultThinkingLevel": "off",
   "observational-memory": {
     "model": {
       "provider": "opencode-go",
@@ -13,7 +13,8 @@
   "theme": "stylix",
   "powerline": {
     "preset": "full",
-    "fixedEditor": false
+    "fixedEditor": false,
+    "welcome": false
   },
   "enabledModels": [
     "opencode/big-pickle",

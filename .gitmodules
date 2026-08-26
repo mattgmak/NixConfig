@@ -92,3 +92,6 @@
 [submodule "fitchmultz/pi-agent-browser-native"]
 	path = vendor/fitchmultz/pi-agent-browser-native
 	url = https://github.com/fitchmultz/pi-agent-browser-native.git
+[submodule "mattgmak/pi-interactive-subagents"]
+	path = vendor/mattgmak/pi-interactive-subagents
+	url = https://github.com/mattgmak/pi-interactive-subagents.git

@@ -204,6 +204,7 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) | *(direct upstream)* | `https://github.com/fitchmultz/pi-cursor-sdk.git` | default — active loader `extensions/pi-cursor-sdk/`; provider `cursor` |
 | `pi-lens` (`vendor/mattgmak/pi-lens`) | `mattgmak/pi-lens` | `https://github.com/apmantza/pi-lens.git` | `master` |
 | `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
+| `pi-interactive-subagents` (`vendor/mattgmak/pi-interactive-subagents`) | `mattgmak/pi-interactive-subagents` | `https://github.com/amosblomqvist/pi-interactive-subagents.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
 
 Add new rows here when vendoring through a fork.
@@ -343,6 +344,34 @@ Common failures:
 - Changes not visible → `/reload` or restart pi; rebuild HM only if Nix wiring changed
 - Pi package build fails after flake update → update `npmDepsHash` in `dendritic/overlays.nix`
 
+## pi-interactive-subagents fork (curated subagent stack)
+
+Fork: `vendor/mattgmak/pi-interactive-subagents` → loader `extensions/pi-interactive-subagents/`.
+
+Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extensions` plus explicit `-e` paths. The fork injects a **global base list** before tool-backed extensions:
+
+| Loader | Role |
+|--------|------|
+| `pi-lean-ctx` | ctx_* read/search/shell (replace mode) |
+| `pi-permission-system` | permission gates on ctx_shell |
+| `pi-cursor-sdk` | cursor provider models |
+| `pi-web-access` | web_search / fetch_content |
+| `pi-powerline-footer` | footer in tmux panes |
+| `pi-caveman` | caveman mode in subagents |
+| `pi-codegraph` | codegraph tools |
+
+**Conditional:** `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
+
+**Denied (implicit):** engram, observational-memory, agent-sesh, mcp-nixos, pi-nvim*, pi-lens, … — not in base list; `--no-extensions` blocks discovery.
+
+**Edit list:** `vendor/mattgmak/pi-interactive-subagents/pi-extension/subagents/index.ts` → `SUBAGENT_BASE_EXTENSIONS`. Run `npm test` in that submodule. Bump NixConfig submodule pointer after push to `mattgmak/pi-interactive-subagents`.
+
+**Agent tools:** use `ctx_read`, `ctx_grep`, `ctx_find`, `ctx_ls`, `ctx_shell` in `dendritic/home-modules/pi-coding-agent/agents/*.md` (not native `read`/`bash`).
+
+**Permissions:** mirror `bash` rules under `ctx_shell` in `extensions/pi-permission-system/config.json`.
+
+**Upstream merges:** fetch `upstream` (amosblomqvist), merge into fork, re-apply fork commits if needed, push `origin`, bump submodule SHA in NixConfig.
+
 ## Key files to edit
 
 | Task | File(s) |
@@ -353,6 +382,8 @@ Common failures:
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
 | lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Agent shell permission rules | `dendritic/home-modules/pi-coding-agent/extensions/pi-permission-system/config.json` |
+| Subagent curated extension list | `vendor/mattgmak/pi-interactive-subagents/pi-extension/subagents/index.ts` (`SUBAGENT_BASE_EXTENSIONS`) |
+| Subagent agent profiles | `dendritic/home-modules/pi-coding-agent/agents/*.md` |
 | Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
 | Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |

@@ -25,6 +25,18 @@
       "lean-ctx harden undo*": "deny",
       "sudo *": "ask"
     },
+    "ctx_shell": {
+      "rm -rf *": "deny",
+      "time *": "allow",
+      "lean-ctx allow *": "ask",
+      "lean-ctx allow": "ask",
+      "lean-ctx config set shell_allowlist*": "deny",
+      "lean-ctx config set shell_allowlist_extra*": "deny",
+      "lean-ctx config set shell_security*": "deny",
+      "lean-ctx security *": "deny",
+      "lean-ctx harden undo*": "deny",
+      "sudo *": "ask"
+    },
     "external_directory": "allow"
   }
 }

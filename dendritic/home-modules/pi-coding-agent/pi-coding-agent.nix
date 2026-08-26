@@ -478,6 +478,8 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
       home.file.".pi/agent/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
+      home.file.".pi/agent/agents".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
       home.file.".pi/web-search.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
       home.file.".config/lean-ctx/config.toml".source =

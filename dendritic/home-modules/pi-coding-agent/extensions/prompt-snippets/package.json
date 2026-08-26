@@ -1,0 +1,10 @@
+{
+  "name": "prompt-snippets",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Per-message prepend/append prompt rules (from amosblomqvist/pi-config)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

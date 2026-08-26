@@ -84,6 +84,8 @@ cd ~/NixConfig/vendor/<owner>/<name> && npm install --omit=dev   # if package.js
 
 Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the checkout path.
 
+**Fork when patching:** if upstream extension needs durable local changes (e.g. `pi-interactive-subagents` curated pass-through), fork to `mattgmak/<repo>`, point submodule URL at fork, register upstream in [REFERENCE.md — Fork vendored extensions](REFERENCE.md#fork-vendored-extensions). Patch in `vendor/mattgmak/<repo>/`, push fork, bump submodule pointer in NixConfig.
+
 ### 4. Finish
 
 - Run `pi-npm-i` if any extension has runtime deps
