@@ -3,7 +3,8 @@
 # version = "0.99.1"
 
 def create_left_prompt [] {
-    let dir = match (do --ignore-errors { $env.PWD | path relative-to $nu.home-path }) {
+    let home_dir = try { $nu.home-dir } catch { $nu.home-path }
+    let dir = match (do --ignore-errors { $env.PWD | path relative-to $home_dir }) {
         null => $env.PWD
         '' => '~'
         $relative_pwd => ([~ $relative_pwd] | path join)

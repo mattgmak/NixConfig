@@ -32,18 +32,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1787805781,
-        "narHash": "sha256-8rrYXcV16COYyBvlT9zPcvl1rHqUj7CxD+HEI5CGhsg=",
-        "ref": "refs/heads/main",
-        "rev": "f6453c827f03d34941c694b44405edf3f951bb06",
-        "revCount": 32,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/agent-sesh"
+        "path": "vendor/mattgmak/agent-sesh",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/agent-sesh"
-      }
+        "path": "vendor/mattgmak/agent-sesh",
+        "type": "path"
+      },
+      "parent": []
     },
     "aquamarine": {
       "inputs": {
@@ -3066,18 +3062,14 @@
         ]
       },
       "locked": {
-        "lastModified": 1786769916,
-        "narHash": "sha256-UAVuAsjVKRRnDkqjEEVf2aTdEQ3diw/GhqZXEj1jbu0=",
-        "ref": "refs/heads/main",
-        "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
-        "revCount": 28,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/whisper-dictation"
+        "path": "vendor/mattgmak/whisper-dictation",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/whisper-dictation"
-      }
+        "path": "vendor/mattgmak/whisper-dictation",
+        "type": "path"
+      },
+      "parent": []
     },
     "wiremix": {
       "inputs": {
@@ -3109,17 +3101,14 @@
         "systems": "systems_10"
       },
       "locked": {
-        "lastModified": 1786465014,
-        "narHash": "sha256-UPzQJryidznrYGO+dmDtJ4RN7ZuefviVLdsmqmxuj1s=",
-        "rev": "172b4e3610d5f9a5145019da5685ed2a06f0af85",
-        "revCount": 48,
-        "type": "git",
-        "url": "file:./vendor/mattgmak/woomer"
+        "path": "vendor/mattgmak/woomer",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "file:./vendor/mattgmak/woomer"
-      }
+        "path": "vendor/mattgmak/woomer",
+        "type": "path"
+      },
+      "parent": []
     },
     "worktrunk": {
       "inputs": {

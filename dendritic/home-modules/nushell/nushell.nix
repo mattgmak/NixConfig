@@ -100,8 +100,9 @@
           (builtins.readFile ./config/extra.nu)
           + (lib.optionalString (hostname == "Droid") ''
             do --env {
+              let temp_dir = try { $nu.temp-dir } catch { $nu.temp-path }
               let ssh_agent_file = (
-                $nu.temp-path | path join $"ssh-agent-(whoami).nuon"
+                $temp_dir | path join $"ssh-agent-(whoami).nuon"
               )
               if ($ssh_agent_file | path exists) {
                 let ssh_agent_env = open ($ssh_agent_file)
