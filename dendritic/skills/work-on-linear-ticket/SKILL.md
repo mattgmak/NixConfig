@@ -6,7 +6,7 @@ argument-hint: "<branch-name> [implementation notes] e.g. mattmak/prd-239-dashbo
 
 # Work on Linear Ticket
 
-Worktree + Pi session for Linear branch. Parent pi self-kills after handoff (step 6).
+Worktree + Pi session for Linear branch. Parent pi quits gracefully after handoff (step 6) — deferred `/quit`, never inline `kill`.
 
 ## Invocation
 
@@ -155,8 +155,8 @@ if ! pi_running; then
   exit 1
 fi
 
-# 6) Handoff report — printed AND appended to file. Parent dies right after, so
-#    stdout may never render; the file is the durable record.
+# 6) Handoff report — printed AND appended to file. Parent quits shortly after
+#    script returns (step 7), so stdout may never render; the file is durable.
 branch="${3:-unknown}"
 issue="${4:-unknown}"
 url="${5:-unknown}"
@@ -174,10 +174,48 @@ mkdir -p "$(dirname "$report_file")"
   echo "Report:     $report_file"
 } | tee -a "$report_file"
 
-# 7) Self-terminate: kill the parent pi agent that spawned this script.
-#    Walk up the ancestor chain (script -> shell -> lean-ctx -> pi/node).
-#    Agent = topmost pi*/node* ancestor (last match). The worker pi runs in a
-#    DIFFERENT tmux session — it is never in this chain, never touched.
+# 7) Graceful parent exit — NEVER kill parent inline while this script still runs
+#    as a pi tool call. Inline kill interrupts agent_settled → stale ctx errors in
+#    pi-agent-sesh, pi-lens, pi-observational-memory.
+#    Instead: script returns → tool completes → agent_settled → deferred /quit.
+#    Worker pi is in a DIFFERENT tmux session — never touched.
+
+resolve_parent_tmux_pane() {
+  if [ -n "${TMUX_PANE:-}" ]; then
+    printf '%s' "$TMUX_PANE"
+    return 0
+  fi
+  p=$$
+  while [ -n "$p" ] && [ "$p" -gt 1 ]; do
+    comm=$(ps -o comm= -p "$p" 2>/dev/null | tr -d ' ')
+    case "$comm" in
+      pi*|node*)
+        pane=$(ps eww -p "$p" 2>/dev/null | tr ' ' '\n' | sed -n 's/^TMUX_PANE=//p' | head -1)
+        if [ -n "$pane" ]; then
+          printf '%s' "$pane"
+          return 0
+        fi
+        ;;
+    esac
+    p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')
+  done
+  return 1
+}
+
+quit_delay="${PI_HANDOFF_QUIT_DELAY:-2}"
+parent_pane=$(resolve_parent_tmux_pane || true)
+
+if [ -n "$parent_pane" ]; then
+  (
+    sleep "$quit_delay"
+    tmux send-keys -t "$parent_pane" '/quit' Enter 2>/dev/null || true
+  ) >/dev/null 2>&1 &
+  disown 2>/dev/null || true
+  echo "handoff complete — parent /quit in ${quit_delay}s"
+  exit 0
+fi
+
+# Fallback (no tmux pane): deferred SIGTERM, still not inline
 p=$$
 agent_pid=""
 while [ -n "$p" ] && [ "$p" -gt 1 ]; do
@@ -189,20 +227,20 @@ while [ -n "$p" ] && [ "$p" -gt 1 ]; do
 done
 
 if [ -n "$agent_pid" ]; then
-  echo "handoff complete — killing parent agent pid $agent_pid"
-  kill "$agent_pid" 2>/dev/null || true
-  # escalate: TERM ignored -> KILL (kill -0 stays true on zombies; kill -9 no-ops them)
-  for _ in 1 2 3 4; do
-    kill -0 "$agent_pid" 2>/dev/null || exit 0
-    sleep 0.5
-  done
-  kill -9 "$agent_pid" 2>/dev/null || true
+  (
+    sleep "$quit_delay"
+    kill "$agent_pid" 2>/dev/null || true
+    sleep 2
+    kill -0 "$agent_pid" 2>/dev/null && kill -9 "$agent_pid" 2>/dev/null || true
+  ) >/dev/null 2>&1 &
+  disown 2>/dev/null || true
+  echo "handoff complete — parent SIGTERM in ${quit_delay}s (no tmux pane)"
   exit 0
-else
-  echo "WARN: parent agent pid not found — leaving it alive" >&2
-  echo "handoff succeeded; session: $session; report: $report_file" >&2
-  exit 1
 fi
+
+echo "WARN: parent tmux pane / agent pid not found — leaving parent alive" >&2
+echo "handoff succeeded; session: $session; report: $report_file" >&2
+exit 0
 ```
 
 Run (extra args feed the handoff report — branch, issue id, Linear URL):
@@ -213,11 +251,11 @@ bash "<path-to-script>" "$worktree_path" 'initial_prompt' "<branch>" "<issue_id>
 
 Escape single quotes in prompt (`'\''`). `test -d` worktree first. Session name on `SESSION=` line (also in created/reuse msg).
 
-`tmux new-session -d` returns immediately; current client untouched. Non-zero exit/stderr = failure — incl. pi not detected (script polls up to 15s, then WARNs + exits 1, parent stays alive). Success → script kills parent pi; output may never render; durable report → `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`.
+`tmux new-session -d` returns immediately; current client untouched. Non-zero exit/stderr = failure — incl. pi not detected (script polls up to 15s, then WARNs + exits 1, parent stays alive). Success → script schedules deferred parent `/quit` (default 2s, `PI_HANDOFF_QUIT_DELAY`); durable report → `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`.
 
-### 6. Handoff — report then parent exit
+### 6. Handoff — report then graceful parent exit
 
-Success → script (step 5) prints handoff report + appends to `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`, then **kills parent pi agent** (self-terminate). Parent session ends — terminal back to shell prompt. Re-attach anytime: `sesh connect <worktree_path>` / `tmux attach -t <session>`.
+Success → script (step 5) prints handoff report + appends to `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`, then **schedules deferred `/quit`** on parent pi (default 2s delay via detached subshell — lets `agent_settled` finish on live ctx). Parent session ends cleanly → shell prompt. Re-attach anytime: `sesh connect <worktree_path>` / `tmux attach -t <session>`.
 
 | Field | Value |
 |-------|-------|
@@ -227,8 +265,9 @@ Success → script (step 5) prints handoff report + appends to `${TMPDIR:-/tmp}/
 | Branch | arg 3 / branch name |
 | Tmux session | session name (attach: `sesh connect <worktree_path>` / `tmux attach -t <session>`) |
 | Report file | `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt` |
+| Quit delay | `PI_HANDOFF_QUIT_DELAY` (default `2` seconds) |
 
-Parent exit only after confirmed handoff (`pi confirmed running`). WARN/non-zero (pi never started) → parent stays alive, prints failure + manual attach cmds. Never kill parent when worker failed (nothing to hand off to).
+Parent exit only after confirmed handoff (`pi confirmed running`). WARN/non-zero (pi never started) → parent stays alive, prints failure + manual attach cmds. Never quit parent when worker failed (nothing to hand off to). **Never inline-kill parent** — causes stale-ctx extension errors during `agent_settled`.
 
 ## Error handling
 
@@ -242,7 +281,7 @@ Parent exit only after confirmed handoff (`pi confirmed running`). WARN/non-zero
 | `send-keys` → `can't find pane` | `=` prefix breaks send-keys target (names w/ `/`). Drop `=`, use plain `"$session"`. `has-session` tolerates `=`, `send-keys` doesn't |
 | Session exists but pi never starts | `pane_current_command` check: pi runs under `node`, idle pane shows shell → script re-sends prompt if pane idle (no silent dead session) |
 | `tmux`/`jq`/launch fails | Show stderr; give worktree path + session name + manual attach cmd |
-| Parent-kill fails (agent pid not found) | Handoff already done; script WARNs + parent lives. Session/worktree in report file (also `sesh list`) |
+| Parent quit fails (pane/pid not found) | Handoff already done; script WARNs + parent lives. Session/worktree in report file (also `sesh list`). Manual: `/quit` |
 
 ## Example
 
@@ -256,4 +295,4 @@ Parent exit only after confirmed handoff (`pi confirmed running`). WARN/non-zero
 4. `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
 5. Parse worktree path (e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`)
 6. Detached tmux + `pi 'Work on PRD-239: ...'` (no switch)
-7. Script reports + kills parent (step 6); session/worktree in report file
+7. Script reports + schedules parent `/quit` (step 6); session/worktree in report file
