@@ -272,6 +272,51 @@ def patch_datetime_health(path: pathlib.Path) -> None:
     path.write_text(text.replace(old, new, 1))
 
 
+def patch_window_zoom_icon_append(path: pathlib.Path) -> None:
+    text = path.read_text()
+    old = """    # State icons (zoomed/bell/marked) are always shown when relevant.
+    # Command-based icon (window_get_icon_format) is always shown for both
+    # active and inactive windows - show_icon only controls the legacy simple icon.
+    local state_conditional
+    if [[ "$type" == "active" ]]; then
+        state_conditional="#{?window_zoomed_flag,${zoomed_icon},#{?window_marked_flag,${marked_icon},$(window_get_icon_format "$window_icon")}}"
+    else
+        state_conditional="#{?window_zoomed_flag,${zoomed_icon},#{?window_bell_flag,${bell_icon},#{?window_marked_flag,${marked_icon},$(window_get_icon_format "$window_icon")}}}"
+    fi
+
+    # Build format string
+    local format=""
+
+    format+="${state_conditional}"
+    [[ "$show_name" == "true" ]] && format+=" ${window_title}"
+    [[ "$type" == "inactive" ]] && format+="#{?window_activity_flag, ${activity_icon},}"
+"""
+    new = """    # Zoom icon after title; bell/marked still replace command icon.
+    local state_conditional
+    if [[ "$type" == "active" ]]; then
+        state_conditional="#{?window_marked_flag,${marked_icon},$(window_get_icon_format "$window_icon")}"
+    else
+        state_conditional="#{?window_bell_flag,${bell_icon},#{?window_marked_flag,${marked_icon},$(window_get_icon_format "$window_icon")}}"
+    fi
+
+    # Build format string
+    local format=""
+
+    format+="${state_conditional}"
+    if [[ "$show_name" == "true" ]]; then
+        format+=" ${window_title}#{?window_zoomed_flag, ${zoomed_icon},}"
+    else
+        format+="#{?window_zoomed_flag, ${zoomed_icon},}"
+    fi
+    [[ "$type" == "inactive" ]] && format+="#{?window_activity_flag, ${activity_icon},}"
+"""
+    if old not in text:
+        if "Zoom icon after title" in text:
+            return
+        raise SystemExit(f"window zoom icon append patch: pattern not found in {path}")
+    path.write_text(text.replace(old, new, 1))
+
+
 def main() -> None:
     root = pathlib.Path(sys.argv[1])
     patch_compositor(root / "src/renderer/compositor.sh")
@@ -283,6 +328,7 @@ def main() -> None:
     patch_session_mode_bg(root / "src/renderer/entities/session.sh")
     patch_render_cache(root / "bin/powerkit-render")
     patch_format_native_escape(root / "src/renderer/segment_builder.sh")
+    patch_window_zoom_icon_append(root / "src/contract/window_contract.sh")
     patch_plugin_text_contrast(root / "src/core/color_palette.sh")
     patch_datetime_health(root / "src/plugins/datetime.sh")
 

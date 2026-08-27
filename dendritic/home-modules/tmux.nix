@@ -76,12 +76,22 @@
       sessionCommandHex = sessionBgHex;
       accentHex = hexOr "base0E" "#cba6f7";
       agentSeshBin = lib.getExe config.programs.agent-sesh.package;
+      agentSeshStyle = config.programs.agent-sesh.popupStyle;
+      agentSeshWidth = config.programs.agent-sesh.popupWidth;
+      agentSeshHeight = config.programs.agent-sesh.popupHeight;
+      agentSeshProfilePicker = pkgs.writeShellScript "agent-sesh-profile-picker" ''
+        tmux display-popup -E -b rounded -T "agent-sesh [profile]" \
+          -s '${agentSeshStyle}' \
+          -w '${agentSeshWidth}' \
+          -h '${agentSeshHeight}' \
+          "env AGENT_SESH_PROFILE=1 ${agentSeshBin}"
+      '';
 
       tmuxPowerkitBase = inputs.tmux-powerkit.packages.${system}.default;
       tmuxPowerkitRoot = "${tmuxPowerkitBase}/share/tmux-plugins/tmux-powerkit";
       tmuxPowerkitSrc = pkgs.runCommand "tmux-powerkit-src" { } ''
         cp -R ${tmuxPowerkitRoot}/. $out/
-        chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/bin
+        chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/src/contract $out/bin
         install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
         install -Dm755 ${powerkitPluginsDir}/agent_counts.sh $out/src/plugins/agent_counts.sh
@@ -201,6 +211,8 @@
 
           bind-key -N "sesh: last session" o run-shell "${lib.getExe config.programs.sesh.package} last"
 
+          bind-key -T prefix -N "agent-sesh: picker (profile)" C-a run-shell ${lib.escapeShellArg agentSeshProfilePicker}
+
           # Redraw status on pane switch (format-native cwd/app plugins).
           # No tmux hook for in-pane cwd change; status-interval 1 covers cd updates.
           set-hook -g after-select-pane 'refresh-client -S'
@@ -251,7 +263,7 @@
               set -g @powerkit_session_command_icon ""
               set -g @powerkit_active_window_title "#W "
               set -g @powerkit_inactive_window_title "#W "
-              set -g @powerkit_zoomed_window_icon "󮁁"
+              set -g @powerkit_zoomed_window_icon "󰊔"
               set -g @powerkit_plugin_datetime_format "time"
               set -g @powerkit_plugin_directory_icon "󰉋"
               set -g @powerkit_plugin_directory_max_length "24"
