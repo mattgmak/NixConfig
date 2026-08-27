@@ -4,7 +4,7 @@
  * Each snippet is a markdown file with frontmatter (name, description,
  * placement, order) stored in the `snippets/` directory next to this file.
  *
- * - Press alt+s or run /snippets to open the toggle menu (space: toggle,
+ * - Press ctrl+s or run /snippets to open the toggle menu (space: toggle,
  *   tab: preview, enter: apply, esc: cancel). The menu is a bordered,
  *   scrollable view.
  * - Active snippets appear as a widget above the editor, with prepend and
@@ -309,7 +309,7 @@ export default function (pi: ExtensionAPI) {
 		};
 	});
 
-	pi.registerShortcut("alt+s", {
+	pi.registerShortcut("ctrl+s", {
 		description: "Toggle prompt snippets",
 		handler: async (ctx) => {
 			await openMenu(ctx);
