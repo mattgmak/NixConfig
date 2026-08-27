@@ -1,7 +1,12 @@
 { self, inputs, ... }:
 {
   flake.nixOnDroidConfiguration =
-    { config, pkgs, lib, ... }:
+    {
+      config,
+      pkgs,
+      lib,
+      ...
+    }:
     let
       # Stylix's home-manager integration reads osConfig (see stylix/home-manager-integration.nix).
       # Nix-on-droid does not pass it like NixOS does; without this, HM infers osConfig lazily and hits infinite recursion.
@@ -91,7 +96,8 @@
       };
 
       # user.userName = self.constants.username;
-      user.shell = "${pkgs.nushell}/bin/nu";
+      # user.shell = "${pkgs.nushell}/bin/nu";
+      user.shell = "${pkgs.bash}/bin/bash";
 
       # Backup etc files instead of failing to activate generation if a file already exists in /etc
       environment.etcBackupExtension = ".bak";
@@ -114,7 +120,8 @@
         trustedPublicKeys = [
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
-        ] ++ self.builderPublicKeys;
+        ]
+        ++ self.builderPublicKeys;
       };
 
       # terminal.font is set by stylix/droid/fonts.nix from stylix.fonts.monospace (see stylixCommon).
