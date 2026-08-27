@@ -1,0 +1,9 @@
+{
+  "app.message.followUp": ["ctrl+shift+enter", "alt+enter"],
+
+  "app.tree.foldOrUp": "ctrl+shift+left",
+  "app.tree.unfoldOrDown": "ctrl+shift+right",
+  "app.message.dequeue": "ctrl+shift+up",
+  "app.models.reorderUp": "ctrl+shift+alt+up",
+  "app.models.reorderDown": "ctrl+shift+alt+down"
+}
