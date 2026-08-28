@@ -58,6 +58,7 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         self.agentBrowser034Overlay
+        self.tmuxMasterOverlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {
             doCheck = false;
