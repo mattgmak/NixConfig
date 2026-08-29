@@ -8,7 +8,14 @@
         "supportsDeveloperRole": false,
         "supportsReasoningEffort": false
       },
-      "models": [{ "id": "gemma-4:26b-a4b-q4" }, { "id": "qwen3.6:27b-q4" }]
+      "models": [
+        { "id": "gemma-4:26b-a4b-q4" },
+        {
+          "id": "qwen3.8:27b-iq2xxs",
+          "contextWindow": 16384,
+          "maxTokens": 2048
+        }
+      ]
     }
   }
 }

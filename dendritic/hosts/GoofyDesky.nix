@@ -122,38 +122,44 @@
           common-nixpkgs-config
           {
             cudaSupport = false;
-            packageOverrides = pkgs: {
-              # CUDA llama-cpp: nixpkgs default is CPU-only. This enables CUDA + OpenBLAS
-              # + native CPU flags. Version follows nixpkgs (no more version/src pin -
-              # ggml-org/llama.cpp#22673 MTP support landed upstream 2026-05-16, so the
-              # old b9190 pin's reason is gone and nixpkgs is newer anyway).
-              llama-cpp =
+            packageOverrides = pkgs: let
+              # CUDA llama-cpp: nixpkgs default is CPU-only. OpenBLAS + native CPU flags.
+              goofyCudaLlamaCpp =
                 (pkgs.llama-cpp.override {
                   cudaSupport = true;
                   rocmSupport = false;
                   metalSupport = false;
-                  # Enable BLAS for optimized CPU layer performance (OpenBLAS)
-                  # This is crucial for models using split-mode or CPU offloading
                   blasSupport = true;
                 }).overrideAttrs
                   (oldAttrs: {
-                    # Enable native CPU optimizations for massively better CPU performance
-                    # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
-                    # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
-                    # for reproducible builds). We sacrifice portability for faster CPU layers.
-                    cmakeFlags = (oldAttrs.cmakeFlags or [ ]) ++ [
-                      "-DGGML_NATIVE=ON"
-                      "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3070ti - needed since sandbox has no GPU
-                    ];
-
-                    # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
-                    # See: https://github.com/NixOS/nixpkgs/issues/357736
-                    # See: https://github.com/NixOS/nixpkgs/pull/377484 (intentionally contradicts this)
+                    # b10450 — fixes Qwen3.8 DeltaNet CUDA garbage output (ggml-org#27164).
+                    version = "10450";
+                    src = pkgs.fetchFromGitHub {
+                      owner = "ggml-org";
+                      repo = "llama.cpp";
+                      rev = "ece963f41b0b02d7a0d61436ae365762c073a4c8";
+                      hash = "sha256-E7b9asZsVnPydxHsHliMK9qSxZ2KZG7kff445MCD3ZQ=";
+                      leaveDotGit = true;
+                      postFetch = ''
+                        git -C "$out" rev-parse --short HEAD > $out/COMMIT
+                        find "$out" -name .git -print0 | xargs -0 rm -rf
+                      '';
+                    };
+                    npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+                    cmakeFlags =
+                      (lib.filter (f: !(lib.hasInfix "LLAMA_BUILD_NUMBER" f)) (oldAttrs.cmakeFlags or [ ]))
+                      ++ [
+                        (lib.cmakeFeature "LLAMA_BUILD_NUMBER" "10450")
+                        "-DGGML_NATIVE=ON"
+                        "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3070 Ti — sandbox has no GPU
+                      ];
                     preConfigure = ''
                       export NIX_ENFORCE_NO_NATIVE=0
                       ${oldAttrs.preConfigure or ""}
                     '';
                   });
+            in {
+              llama-cpp = goofyCudaLlamaCpp;
 
               # llama-swap from GitHub releases
               llama-swap = pkgs.runCommand "llama-swap" { } ''

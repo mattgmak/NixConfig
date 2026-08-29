@@ -44,25 +44,41 @@
               --cache-type-v q4_0
               --jinja
 
-          # Latest Unsloth Qwen3.6-27B dense MTP model, verified 2026-05-17.
-          # RTX 3070 Ti (8 GB): UD-Q4_K_XL + CPU offload; MTP disabled (needs extra VRAM).
-          # Source: https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF
-          "qwen3.6:27b-q4":
+          # Qwen3.8-27B UD-IQ2_XXS on RTX 3070 Ti (8 GB) via mainline llama.cpp b10450.
+          # b10450 fixes DeltaNet CUDA garbage (ggml-org#27164).
+          # UD-Q2_K_XL / UD-Q4_K_M hybrid CUDA still corrupt; IQ2_XXS + --fit works (~8 tok/s).
+          # Hybrid GPU+RAM: --fit offloads layers; default kv-offload spills KV to system RAM.
+          # q4_0 KV halves cache size; --cache-ram -1 allows unlimited prompt-cache RAM.
+          # --no-mmproj required (vision projector OOMs 8 GB). MTP off until stable.
+          # Client: enable_thinking false for routine; medium/xhigh for fragile coding.
+          # Source: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
+          "qwen3.8:27b-iq2xxs":
             cmd: |
               ${pkgs.llama-cpp}/bin/llama-server
-              -hf unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL
+              -hf unsloth/Qwen3.8-27B-GGUF:UD-IQ2_XXS
               --port ''${PORT}
-              --ctx-size 0
-              --fit on
-              --fit-target 768
-              --fit-ctx 4096
-              --parallel 1
-              --batch-size 512
-              --ubatch-size 256
-              --flash-attn on
-              --cache-type-k q4_0
-              --cache-type-v q4_0
               --jinja
+              --no-mmproj
+              --fit on
+              --fit-target 512
+              --fit-ctx 8192
+              -t 12
+              -tb 12
+              -c 16384
+              --parallel 1
+              -b 64
+              -ub 64
+              --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --cache-ram -1
+              --reasoning off
+              --temp 1.0
+              --top-p 0.95
+              --top-k 20
+              --min-p 0.0
+              --presence-penalty 0.0
+              --repeat-penalty 1.0
 
         healthCheckTimeout: 28800  # 8 hours for large model download + loading
 

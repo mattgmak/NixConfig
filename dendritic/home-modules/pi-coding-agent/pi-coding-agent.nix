@@ -405,9 +405,11 @@
 
           wait_parallel
 
-          link_extension_node_modules \
-            "$EXTENSIONS/pi-lens" \
-            "../vendor/mattgmak/pi-lens/node_modules"
+          if [ -d "$EXTENSIONS/pi-lens" ]; then
+            link_extension_node_modules \
+              "$EXTENSIONS/pi-lens" \
+              "../vendor/mattgmak/pi-lens/node_modules"
+          fi
           link_extension_node_modules \
             "$EXTENSIONS/pi-permission-system" \
             "../vendor/gotgenes/pi-packages/packages/pi-permission-system/node_modules"
