@@ -9,6 +9,7 @@
     }:
     let
       immichPort = config.services.immich.port;
+      piholeWebPort = config.services.pihole.webPort;
     in
     {
       services.glance = {
@@ -48,7 +49,7 @@
                     {
                       type = "dns-stats";
                       service = "pihole-v6";
-                      url = "http://finite.dab-octatonic.ts.net";
+                      url = "http://127.0.0.1:${toString piholeWebPort}";
                       allow-insecure = true;
                       username = "admin";
                       password = "\${PIHOLE_PASSWORD}";

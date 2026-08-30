@@ -10,7 +10,12 @@
       services.tailscale = {
         enable = true;
         useRoutingFeatures = "client";
-        extraSetFlags = [ "--accept-dns=true" ];
+        # Goofeus is the tailnet DNS server — don't accept pushed DNS (loop risk).
+        extraSetFlags =
+          if hostname == "Goofeus" then
+            [ "--accept-dns=false" ]
+          else
+            [ "--accept-dns=true" ];
         extraUpFlags = lib.optionals (hostname != "Goofeus") [ "--exit-node-allow-lan-access" ];
       };
 

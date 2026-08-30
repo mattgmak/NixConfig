@@ -25,6 +25,8 @@
           config.services.transmission.settings.rpc-port
         else
           config.services.transmissionGluetun.rpcPort;
+      piholeEnabled = config.virtualisation.oci-containers.containers ? pi-hole;
+      piholeWebPort = config.services.pihole.webPort;
     in
     {
       services.caddy = {
@@ -60,6 +62,15 @@
               hostName = "immich.${baseDomain}";
               extraConfig = ''
                 reverse_proxy :${toString config.services.immich.port}
+                import cloudflare
+              '';
+            };
+          }
+          // lib.optionalAttrs piholeEnabled {
+            pihole = {
+              hostName = "pihole.${baseDomain}";
+              extraConfig = ''
+                reverse_proxy 127.0.0.1:${toString piholeWebPort}
                 import cloudflare
               '';
             };
@@ -245,6 +256,7 @@
               || config.services.bazarr.enable
               || transmissionRpcEnabled
               || config.services.radicale.enable
+              || piholeEnabled
             )
           )
           (
@@ -289,6 +301,9 @@
               radicaleServe = lib.optionalString config.services.radicale.enable ''
                 tailscale serve --yes --service=svc:radicale --https=443 127.0.0.1:5232
               '';
+              piholeServe = lib.optionalString piholeEnabled ''
+                tailscale serve --yes --service=svc:pihole --https=443 http://127.0.0.1:${toString piholeWebPort}
+              '';
             in
             {
               description = "Tailscale serve for homelab HTTP services (incl. Jellyfin and *Arr)";
@@ -324,6 +339,7 @@
                 ${bazarrServe}
                 ${transmissionServe}
                 ${radicaleServe}
+                ${piholeServe}
                 ${nextcloudServe}
               '';
             }

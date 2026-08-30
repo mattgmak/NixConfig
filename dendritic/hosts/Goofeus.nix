@@ -30,6 +30,8 @@
           inputs.agenix.nixosModules.default
           self.nixConfig
           tailscale
+          unbound
+          pihole
           glance
           arr
           transmissionGluetun
