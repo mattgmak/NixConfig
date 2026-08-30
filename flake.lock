@@ -288,11 +288,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787784769,
-        "narHash": "sha256-dmMlSferLNuP+eYQSEI17DHIn8g15tWFQeeK3qca6lk=",
+        "lastModified": 1788054005,
+        "narHash": "sha256-6rSKINyvh24nPXi7DHZpOH3GELvpcyqWpaoLHE/27F8=",
         "owner": "kissgyorgy",
         "repo": "coding-agents",
-        "rev": "e707638b1908c174b78ea827b66e4dc5721559d1",
+        "rev": "dca593fc2c786b6701547c34b5ca640563db8d5f",
         "type": "github"
       },
       "original": {

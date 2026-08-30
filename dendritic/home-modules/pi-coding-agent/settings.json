@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "0.84.3",
+  "lastChangelogVersion": "0.84.4",
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5:slow",
   "defaultThinkingLevel": "off",
