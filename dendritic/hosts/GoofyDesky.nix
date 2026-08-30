@@ -30,6 +30,7 @@
           orca-slicer
           ardour
           gamemode
+          cpuTuning
           steam
           vr
           tailscale
@@ -122,57 +123,60 @@
           common-nixpkgs-config
           {
             cudaSupport = false;
-            packageOverrides = pkgs: let
-              # CUDA llama-cpp: nixpkgs default is CPU-only. OpenBLAS + native CPU flags.
-              goofyCudaLlamaCpp =
-                (pkgs.llama-cpp.override {
-                  cudaSupport = true;
-                  rocmSupport = false;
-                  metalSupport = false;
-                  blasSupport = true;
-                }).overrideAttrs
-                  (oldAttrs: {
-                    # b10450 — fixes Qwen3.8 DeltaNet CUDA garbage output (ggml-org#27164).
-                    version = "10450";
-                    src = pkgs.fetchFromGitHub {
-                      owner = "ggml-org";
-                      repo = "llama.cpp";
-                      rev = "ece963f41b0b02d7a0d61436ae365762c073a4c8";
-                      hash = "sha256-E7b9asZsVnPydxHsHliMK9qSxZ2KZG7kff445MCD3ZQ=";
-                      leaveDotGit = true;
-                      postFetch = ''
-                        git -C "$out" rev-parse --short HEAD > $out/COMMIT
-                        find "$out" -name .git -print0 | xargs -0 rm -rf
+            packageOverrides =
+              pkgs:
+              let
+                # CUDA llama-cpp: nixpkgs default is CPU-only. OpenBLAS + native CPU flags.
+                goofyCudaLlamaCpp =
+                  (pkgs.llama-cpp.override {
+                    cudaSupport = true;
+                    rocmSupport = false;
+                    metalSupport = false;
+                    blasSupport = true;
+                  }).overrideAttrs
+                    (oldAttrs: {
+                      # b10450 — fixes Qwen3.8 DeltaNet CUDA garbage output (ggml-org#27164).
+                      version = "10450";
+                      src = pkgs.fetchFromGitHub {
+                        owner = "ggml-org";
+                        repo = "llama.cpp";
+                        rev = "ece963f41b0b02d7a0d61436ae365762c073a4c8";
+                        hash = "sha256-E7b9asZsVnPydxHsHliMK9qSxZ2KZG7kff445MCD3ZQ=";
+                        leaveDotGit = true;
+                        postFetch = ''
+                          git -C "$out" rev-parse --short HEAD > $out/COMMIT
+                          find "$out" -name .git -print0 | xargs -0 rm -rf
+                        '';
+                      };
+                      npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+                      cmakeFlags =
+                        (lib.filter (f: !(lib.hasInfix "LLAMA_BUILD_NUMBER" f)) (oldAttrs.cmakeFlags or [ ]))
+                        ++ [
+                          (lib.cmakeFeature "LLAMA_BUILD_NUMBER" "10450")
+                          "-DGGML_NATIVE=ON"
+                          "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3070 Ti — sandbox has no GPU
+                        ];
+                      preConfigure = ''
+                        export NIX_ENFORCE_NO_NATIVE=0
+                        ${oldAttrs.preConfigure or ""}
                       '';
-                    };
-                    npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
-                    cmakeFlags =
-                      (lib.filter (f: !(lib.hasInfix "LLAMA_BUILD_NUMBER" f)) (oldAttrs.cmakeFlags or [ ]))
-                      ++ [
-                        (lib.cmakeFeature "LLAMA_BUILD_NUMBER" "10450")
-                        "-DGGML_NATIVE=ON"
-                        "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3070 Ti — sandbox has no GPU
-                      ];
-                    preConfigure = ''
-                      export NIX_ENFORCE_NO_NATIVE=0
-                      ${oldAttrs.preConfigure or ""}
-                    '';
-                  });
-            in {
-              llama-cpp = goofyCudaLlamaCpp;
+                    });
+              in
+              {
+                llama-cpp = goofyCudaLlamaCpp;
 
-              # llama-swap from GitHub releases
-              llama-swap = pkgs.runCommand "llama-swap" { } ''
-                mkdir -p $out/bin
-                tar -xzf ${
-                  pkgs.fetchurl {
-                    url = "https://github.com/mostlygeek/llama-swap/releases/download/v211/llama-swap_211_linux_amd64.tar.gz";
-                    hash = "sha256-/2KqcCz2axJlRvpjwOvKbQ1rzkp4H1ys+DTi583bRGU=";
-                  }
-                } -C $out/bin
-                chmod +x $out/bin/llama-swap
-              '';
-            };
+                # llama-swap from GitHub releases
+                llama-swap = pkgs.runCommand "llama-swap" { } ''
+                  mkdir -p $out/bin
+                  tar -xzf ${
+                    pkgs.fetchurl {
+                      url = "https://github.com/mostlygeek/llama-swap/releases/download/v211/llama-swap_211_linux_amd64.tar.gz";
+                      hash = "sha256-/2KqcCz2axJlRvpjwOvKbQ1rzkp4H1ys+DTi583bRGU=";
+                    }
+                  } -C $out/bin
+                  chmod +x $out/bin/llama-swap
+                '';
+              };
           }
         ];
 
@@ -361,6 +365,11 @@
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         system.stateVersion = "24.11";
+
+        services.cpuTuning = {
+          enable = true;
+          governor = "performance";
+        };
 
       };
 

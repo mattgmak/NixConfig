@@ -89,6 +89,10 @@ let
     (bind "SUPER + T" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/floating-terminal.nu\")" null)
     (bind "ALT + Comma" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/window-switcher.nu\")" null)
   ]
+  ++ lib.optionals (hostname == "GoofyDesky") [
+    # Super+, = comma key. Super+period reserved for whisper-dictation evdev pass-through.
+    (bind "SUPER + Comma" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/mangohud-toggle.sh\")" null)
+  ]
   ++ workspaceBinds
   ++ [
     (bind "ALT + SHIFT + mouse:272" "hl.dsp.window.drag()" { mouse = true; })
