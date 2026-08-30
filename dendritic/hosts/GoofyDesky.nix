@@ -31,6 +31,7 @@
           ardour
           gamemode
           cpuTuning
+          gpuTuning
           steam
           vr
           tailscale
@@ -368,7 +369,12 @@
 
         services.cpuTuning = {
           enable = true;
-          governor = "performance";
+          governor = "schedutil";
+        };
+
+        services.gpuTuning = {
+          enable = true;
+          lockGraphicsMhz = 1875;
         };
 
       };
