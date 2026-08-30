@@ -3,6 +3,8 @@
   flake.homeModules.yazi =
     { pkgs, ... }:
     {
+      stylix.targets.yazi.enable = true;
+
       programs.yazi = {
         enable = true;
         package = inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
@@ -91,7 +93,6 @@
           "${baseConfigPath}/keymap.toml" = {
             source = ./keymap.toml;
           };
-          # "${baseConfigPath}/theme.toml" = { source = ./theme.toml; };
           "${baseConfigPath}/scripts/cursor-open.nu".source = ./scripts/cursor-open.nu;
         };
     };

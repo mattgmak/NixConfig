@@ -136,15 +136,16 @@ vim.keymap.set('n', 'x', '"_x', {
 if is_vscode then
   -- vim.notify = vscode.notify
   -- vscode-multi-cursor
+  local pal = vim.g.stylix_palette or {}
   vim.api.nvim_set_hl(0, 'VSCodeCursor', {
-    bg = '#542fa4',
-    fg = 'white',
+    bg = pal.base0E or '#542fa4',
+    fg = pal.base07 or 'white',
     default = true,
   })
 
   vim.api.nvim_set_hl(0, 'VSCodeCursorRange', {
-    bg = '#542fa4',
-    fg = 'white',
+    bg = pal.base0E or '#542fa4',
+    fg = pal.base07 or 'white',
     default = true,
   })
 
@@ -369,19 +370,25 @@ else
 end
 
 -- flash
+local function stylix(name, fallback)
+  local pal = vim.g.stylix_palette
+  if pal and pal[name] then return pal[name] end
+  return fallback
+end
+
 vim.api.nvim_set_hl(0, 'FlashLabel', {
-  bg = '#A7005C',
-  fg = 'white',
+  bg = stylix('base0E', '#A7005C'),
+  fg = stylix('base07', 'white'),
 })
 
 vim.api.nvim_set_hl(0, 'FlashMatch', {
-  bg = '#7c634c',
-  fg = 'white',
+  bg = stylix('base03', '#7c634c'),
+  fg = stylix('base07', 'white'),
 })
 
 vim.api.nvim_set_hl(0, 'FlashCurrent', {
-  bg = '#7c634c',
-  fg = 'white',
+  bg = stylix('base04', '#7c634c'),
+  fg = stylix('base07', 'white'),
 })
 
 vim.opt.complete:append('o')
@@ -454,7 +461,7 @@ setup_diff_window_namespaces()
 local function setup_matchup_highlights()
   -- vim-matchup uses MatchParenCur for the delimiter under the cursor and
   -- MatchWord/MatchWordCur when treesitter include_match_words is enabled.
-  local matchup_hl = { bg = '#194224', bold = true }
+  local matchup_hl = { bg = stylix('base02', '#194224'), bold = true }
   vim.api.nvim_set_hl(0, 'MatchParen', matchup_hl)
   vim.api.nvim_set_hl(0, 'MatchParenCur', matchup_hl)
   vim.api.nvim_set_hl(0, 'MatchWord', matchup_hl)

@@ -45,7 +45,7 @@
       };
 
     homeModules.zen-browser =
-      { pkgs, lib, ... }:
+      { pkgs, lib, config, ... }:
       {
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
@@ -272,7 +272,7 @@
                 "zen.site-data-panel.show-callout" = false;
                 "zen.tab-unloader.timeout-minutes" = 90;
                 "zen.tabs.vertical.right-side" = true;
-                "zen.theme.accent-color" = "#f6b0ea";
+                "zen.theme.accent-color" = config.lib.stylix.colors.withHashtag.base0E;
                 "zen.theme.color-prefs.colorful" = true;
                 "zen.theme.pill-button" = true;
                 "zen.themes.disable-all" = false;

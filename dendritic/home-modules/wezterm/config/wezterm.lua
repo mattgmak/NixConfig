@@ -110,7 +110,6 @@ config.max_fps = 240
 config.animation_fps = 1
 config.term = "xterm-256color" -- Set the terminal type
 
-config.color_scheme = 'rebecca'
 config.font = wezterm.font_with_fallback {'IosevkaTerm Nerd Font', 'Noto Sans CJK HK'}
 config.default_cursor_style = "SteadyBlock"
 config.window_decorations = "RESIZE"
@@ -120,15 +119,6 @@ config.window_padding = {
     right = 4,
     top = 4,
     bottom = 4
-}
-
-config.window_frame = {
-    font = wezterm.font({
-        family = "IosevkaTerm Nerd Font",
-        weight = "Bold"
-    }),
-    active_titlebar_bg = '#232136',
-    inactive_titlebar_bg = '#232136'
 }
 
 config.initial_cols = 80

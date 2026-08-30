@@ -7,29 +7,12 @@ local function setup_tab_bar(config)
     config.tab_bar_at_bottom = true
     config.use_fancy_tab_bar = false
     config.tab_and_split_indices_are_zero_based = false
-    config.colors = {
-        tab_bar = {
-            background = '#232136',
-            active_tab = {
-                bg_color = '#7e5ce5',
-                fg_color = '#FFFFFF'
-            },
-            inactive_tab = {
-                bg_color = '#232136',
-                fg_color = '#FFFFFF'
-            },
-            new_tab = {
-                bg_color = '#232136',
-                fg_color = '#FFFFFF'
-            }
-        }
-    }
 
-    -- Set up tabline plugin
+    -- Tab bar colors come from the Stylix color scheme (programs.wezterm.settings).
     tabline.setup({
         options = {
             icons_enabled = true,
-            theme = 'duskfox',
+            theme = 'stylix',
             tabs_enabled = true,
             theme_overrides = {},
             section_separators = {

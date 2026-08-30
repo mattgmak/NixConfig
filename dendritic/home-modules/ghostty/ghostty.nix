@@ -5,6 +5,7 @@
 {
   flake.homeModules.ghostty =
     {
+      config,
       pkgs,
       lib,
       ...
@@ -36,7 +37,6 @@
           command = "${lib.getExe pkgs.nushell} -e ${lib.escapeShellArg "^tmux attach-session; if ($env.LAST_EXIT_CODE != 0) { ^tmux new-session }"}";
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
-          cursor-color = "#B757CA";
           window-decoration = "none";
           window-padding-x = 4;
           window-padding-y = 4;
@@ -119,6 +119,8 @@
           ];
         };
       };
+
+      programs.ghostty.themes.stylix.cursor-color = config.lib.stylix.colors.base0E;
 
       stylix.targets.ghostty.fonts.enable = false;
     };

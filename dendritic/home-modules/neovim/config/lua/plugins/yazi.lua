@@ -2,7 +2,7 @@ local is_vscode = vim.g.vscode ~= nil
 
 return {
   'mikavilpas/yazi.nvim',
-  version = '*',
+  version = false,
   cond = not is_vscode,
   event = 'VeryLazy',
   dependencies = {

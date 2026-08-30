@@ -2,6 +2,8 @@
   flake.homeModules.fcitx5 =
     { pkgs, lib, ... }:
     {
+      stylix.targets.fcitx5.enable = true;
+
       i18n.inputMethod = {
         type = "fcitx5";
         enable = true;
@@ -98,15 +100,9 @@
                   Font = lib.mkForce "Noto Sans Mono CJK HK 14";
                   MenuFont = lib.mkForce "Sans 14";
                   TrayFont = lib.mkForce "Sans Bold 14";
-                  TrayOutlineColor = "#000000";
-                  TrayTextColor = "#ffffff";
                   PreferTextIcon = false;
                   ShowLayoutNameInIcon = true;
                   UseInputMethodLanguageToDisplayText = true;
-                  # Theme = "stylix";
-                  DarkTheme = "default-dark";
-                  UseDarkTheme = false;
-                  # UseAccentColor = true;
                   PerScreenDPI = false;
                   ForceWaylandDPI = 0;
                   EnableFractionalScale = true;
