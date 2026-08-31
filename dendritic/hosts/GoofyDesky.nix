@@ -375,7 +375,7 @@
 
         services.gpuTuning = {
           enable = true;
-          lockGraphicsMhz = 1875;
+          # stock dynamic boost — no clock lock
         };
 
       };
