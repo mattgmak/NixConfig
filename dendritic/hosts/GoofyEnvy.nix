@@ -47,6 +47,7 @@
         delta
         gh
         direnv
+        devenv
         lazygit
         ghostty
         cursor

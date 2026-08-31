@@ -61,6 +61,7 @@
         delta
         gh
         direnv
+        devenv
         lazygit
         btop
         bat

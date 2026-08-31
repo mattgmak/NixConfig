@@ -66,6 +66,7 @@
           delta
           gh
           direnv
+          devenv
           lazygit
           carapace
           tmux

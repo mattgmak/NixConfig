@@ -56,6 +56,7 @@
         delta
         gh
         direnv
+        devenv
         lazygit
         mangohud
         ghostty

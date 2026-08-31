@@ -42,6 +42,7 @@ in
       delta
       gh
       direnv
+      devenv
       lazygit
       ghostty
       cursor
@@ -162,7 +163,6 @@ in
           shfmt
           shellcheck
           uv
-          devenv
         ]
         ++ (with pkgs.darwin; [
           file_cmds

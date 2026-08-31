@@ -269,7 +269,6 @@
         systemctl-tui
         vesktop
         inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
-        devenv
       ];
 
       programs.gpu-screen-recorder.enable = true;
