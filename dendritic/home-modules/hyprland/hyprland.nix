@@ -82,7 +82,10 @@
           + "\n"
           + import ./lua/csgo-vulkan-fix.nix
           + "\n"
-          + import ./lua/autostart.nix { inherit hostname pkgs electronLaunchFlags; }
+          + import ./lua/autostart.nix {
+            inherit hostname pkgs electronLaunchFlags;
+            deskyMonitors = lib.optionalAttrs (hostname == "GoofyDesky") deskyMonitors;
+          }
           + "\n"
           + import ./lua/binds.nix { inherit hostname lib woomerLaunch; };
 
