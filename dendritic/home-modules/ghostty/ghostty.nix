@@ -43,6 +43,7 @@
           window-padding-balance = true;
           window-padding-color = "extend";
           keybind = [
+            "ctrl+enter=unbind"
             "global:super+t=toggle_quick_terminal"
             # "super+alt+shift+j=write_screen_file:open"
             # "super+alt+shift+w=close_all_windows"

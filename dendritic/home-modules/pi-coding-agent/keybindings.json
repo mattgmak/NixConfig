@@ -1,5 +1,5 @@
 {
-  "app.message.followUp": ["ctrl+shift+enter", "alt+enter"],
+  "app.message.followUp": ["ctrl+enter", "alt+enter"],
 
   "app.tree.foldOrUp": "ctrl+shift+left",
   "app.tree.unfoldOrDown": "ctrl+shift+right",
