@@ -19,6 +19,7 @@
         inputs.stylix.nixosModules.stylix
         self.nixConfig
         self.nixosModules.syncthing
+        self.nixosModules.authNotify
       ];
       home-manager = {
         useGlobalPkgs = true;
