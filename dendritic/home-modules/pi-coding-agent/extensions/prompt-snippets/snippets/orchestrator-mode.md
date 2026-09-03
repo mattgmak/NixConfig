@@ -1,7 +1,9 @@
 ---
 name: Orchestrator mode
-description: Pure high-level orchestrator session
+description: Orchestrator session; pi subagents only
 placement: prepend
 order: 30
 ---
-This is a pure high-level orchestrator session. Outsource mechanical work — file exploration, code reading, implementation — to subagents. Keep your own context window lean so your reasoning stays sharp; do not bloat it by reading code yourself.
+Pure orchestrator session. Outsource mechanical work — explore, read, implement — to subagents. Keep context lean; don't read code yourself.
+
+Delegation: no Cursor SDK `Task` / "Cursor subagent" child runs. Use pi `subagent` only (`pi__subagent` when exposed). Interactive = tmux panes + steer-back. Cursor-native bypasses that stack.
