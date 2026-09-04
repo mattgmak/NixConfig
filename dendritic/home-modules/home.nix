@@ -15,16 +15,20 @@
       # manual.manpages.enable = false;
     };
 
-    # TODO: refactor this
     homeModules.nixos-home =
-      { username, ... }:
+      {
+        # home.username + home.homeDirectory are auto-set per user by
+        # home-manager's NixOS/darwin integration:
+        #   home.username     = users.users.<name>.name
+        #   home.homeDirectory = users.users.<name>.home
+        # NixOS sets users.users.root.home = "/root" and others /home/<name>,
+        # so repeated NixOS deployments (root + agent + desktop) derive the
+        # correct path per user without reading the host-global `username`
+        # specialArg (which is "root" on Goofeus for BOTH users).
+        ...
+      }:
       {
         imports = [ self.homeModules.main ];
-        home = {
-          inherit username;
-          # Must match NixOS/home-manager default for root (/root), not /home/root.
-          homeDirectory = if username == "root" then "/root" else "/home/${username}";
-        };
       };
 
     homeModules.darwin-home =

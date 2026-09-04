@@ -5,8 +5,21 @@ let
   GoofyEnvy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcf8d+U2aI4zO/axcvK97qP1FG9cfwp5CCUuKZEYRu5 goofy@GoofyEnvy";
   Droid = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPBhBPZ6RstKIkG1on6ny8fRJ3oOSvgqMPK+y8RNn8gX";
   MacMini = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILvHr70WhwFy98okSEV2hpsiUMZwqVuME+T97Gd6SGvP mattgmak@Matthews-Mac-mini.local";
+  # Agent user's dedicated age identity (generated 2026-09-04, passphrase-less ed25519).
+  # Used by agent@Goofeus to decrypt cursor/github/cline/opencode API secrets headlessly.
+  AgentAge = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC5KIsxMM9XNnktIidlFgdgLjkAM7hTETiVy5dBYtcgq agent@Goofeus";
 in
 {
+  # Encrypted private key for AgentAge (agent@Goofeus). Decryptable by Goofeus host
+  # key (root) + GoofyDesky; placed owner=agent so HM age.identityPaths can use it.
+  "agent-age-key.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDeskyRoot
+    ];
+  };
+
   "cloudflare-caddy.age" = {
     armor = true;
     publicKeys = [
@@ -104,6 +117,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -115,6 +129,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -126,6 +141,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -137,6 +153,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -148,6 +165,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -159,6 +177,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };
@@ -170,6 +189,7 @@ in
       GoofyDesky
       GoofyEnvy
       Goofeus
+      AgentAge
       MacMini
     ];
   };

@@ -69,6 +69,63 @@
       ];
     };
 
+    # Agent coding workspace: pi + tmux orchestrator + handmux phone frontend.
+    homeConfigurations.GoofeusAgent =
+      { lib, pkgs, ... }:
+      {
+        imports = with self.homeModules; [
+        nixos-home
+        atuin
+        zoxide
+        nushell
+        neovim
+        starship
+        yazi
+        git
+        delta
+        gh
+        direnv
+        devenv
+        lazygit
+        btop
+        bat
+        nix-index-database
+        pi-coding-agent
+        tmux
+        zellij
+        worktrunk
+        handmux
+        bash
+        carapace
+        nixconfig-sync
+      ];
+      programs.handmux = {
+        enable = true;
+        enableServer = true;
+      };
+      tools.nixconfigSync.enable = true;
+
+      # Agent decrypts API secrets with its own age identity (root uses the
+      # ssh host key via nushell's mkIf; agent gets the dedicated key path).
+      age.identityPaths = [ "/run/agenix/agent-age-key" ];
+
+      # Empty `agents` tmux session on boot — pi started manually after attach.
+      systemd.user.services.agents-tmux = {
+        Unit = {
+          Description = "Empty tmux session 'agents' (pi agent workspace)";
+          After = [ "handmux.service" ];
+        };
+        Service = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+        };
+        Install = {
+          WantedBy = [ "default.target" ];
+        };
+      };
+    };
+
     nixosModules.Goofeus =
       {
         config,
@@ -87,11 +144,22 @@
           mode = "0400";
         };
 
+        # Agent user's age identity: encrypted private key (recipients: Goofeus
+        # host key + GoofyDeskyRoot), decrypted by root at activation, made
+        # readable by agent so home-manager's age.identityPaths can use it.
+        age.secrets.agent-age-key = {
+          file = ../../secrets/agent-age-key.age;
+          owner = "agent";
+          group = "agent";
+          mode = "0400";
+        };
+
         nix.settings = {
           secret-key-files = [ config.age.secrets.nix-builder-key.path ];
           trusted-users = lib.mkAfter [
             "root"
             "goofy"
+            "agent"
             "@wheel"
           ];
         };
@@ -171,10 +239,27 @@
           ];
         };
 
+        # Agent coding workspace user (AFK / phone-driven pi).
+        users.users.agent = {
+          isNormalUser = true;
+          extraGroups = [ "networkmanager" ];
+          shell = pkgs.nushell;
+          openssh.authorizedKeys.keys = with self.sshKeys; [
+            GoofyDesky
+            GoofyEnvy
+            Droid
+          ];
+        };
+
+        # Primary group for the agent user (agenix chowns agent-age-key to
+        # agent:agent; isNormalUser alone does not create a same-named group).
+        users.groups.agent = { };
+
         # Enable the OpenSSH daemon.
         services.openssh.enable = true;
 
         home-manager.users.${username} = self.homeConfigurations.Goofeus;
+        home-manager.users.agent = self.homeConfigurations.GoofeusAgent;
 
         swapDevices = [
           {

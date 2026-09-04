@@ -3,7 +3,7 @@
     {
       lib,
       hostname,
-      username,
+      config,
       ...
     }:
     let
@@ -17,7 +17,7 @@
     {
       programs.atuin = {
         enable = true;
-        daemon.enable = hostname != "Droid" && username != "root" && hostname != "MacMini";
+        daemon.enable = hostname != "Droid" && config.home.username != "root" && hostname != "MacMini";
         enableBashIntegration = false;
         settings = {
           ctrl_n_shortcuts = true;

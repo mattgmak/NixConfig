@@ -10,7 +10,11 @@
       ...
     }:
     let
-      linuxHome = if username == "root" then "/root" else "/home/${username}";
+      # Per-user home dir (root→/root, others /home/<user>). Use config.home.username
+      # (auto-set per-user by home-manager integration) so this module also works
+      # for non-primary users (e.g. agent on Goofeus) whose username differs from
+      # the host's global `username` specialArg.
+      linuxHome = if config.home.username == "root" then "/root" else "/home/${config.home.username}";
       opencodeApiKeySecret = ../../../secrets/opencode-api-key.age;
       hasOpencodeApiKeySecret = builtins.pathExists opencodeApiKeySecret;
       readOpencodeApiKeyScript =
@@ -97,7 +101,7 @@
 
       # Servers (root user): decrypt headless with the passphrase-less SSH host
       # key; desktop users keep the default ~/.ssh identities.
-      age.identityPaths = lib.mkIf (username == "root") [
+      age.identityPaths = lib.mkIf (config.home.username == "root") [
         "/etc/ssh/ssh_host_ed25519_key"
       ];
 
@@ -241,7 +245,7 @@
           config.home.sessionVariables
           {
             NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${linuxHome}/NixConfig";
-            NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${username}/NixConfig#darwinConfigurations.MacMini";
+            NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${config.home.username}/NixConfig#darwinConfigurations.MacMini";
             DEVELOPER_DIR = lib.mkIf pkgs.stdenv.isDarwin "/Applications/Xcode.app/Contents/Developer";
           }
           # pi-lens (packages from pi-coding-agent home module)

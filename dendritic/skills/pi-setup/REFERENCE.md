@@ -388,3 +388,43 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
 | Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent build tweaks) |
+
+## Goofeus agent workspace (GoofeusAgent)
+
+`homeConfigurations.GoofeusAgent` on `dendritic/hosts/Goofeus.nix` — dedicated `agent` Linux user running pi + tmux orchestrator + `pi-interactive-subagents` + worktrunk + handmux (phone PWA) + zellij + bash/carapace. Root stays admin/builder (no pi).
+
+### Bootstrap from GoofyDesky (first deploy)
+
+```bash
+# on GoofyDesky, repo at ~/NixConfig
+git add -A && git commit -m "goofeus: agent workspace (pi+handmux+age key)"   # then push
+nh os switch --flake ~/NixConfig#Goofeus
+```
+
+First run creates `users.users.agent` + HM GoofeusAgent + NixOS `age.secrets.agent-age-key`. `~/NixConfig` is auto-cloned/fast-forwarded on every `home-manager switch` via `nixconfig-sync` home module (`main` = flake SSOT; agent coding work uses git worktrees via `worktrunk` — never main).
+
+### Post-bootstrap manual (once)
+
+```bash
+sudo passwd agent                     # set agent user password (needed for sudo)
+sudo -u agent -i
+cd ~/NixConfig && pi-npm-i           # install extension deps
+handmux setup                         # enable pi integration + push, write ~/.handmux/config.json
+handmux agent enable pi
+handmux service install               # systemd user autostart (alternative to HM-managed unit)
+```
+
+HM already starts an empty `agents` tmux session on boot (`systemd.user.services.agents-tmux`). Start pi inside it: `tmux attach -t agents` then `pi`.
+
+### Handmux runtime
+
+- Server unit: HM-managed `systemd.user.services.handmux` (Tailscale-bound `handmux start --port 19999`; PATH node_22 + tmux).
+- Phone: handmux PWA over Tailscale (Add to Home Screen). Desk: `ssh agent@goofeus -t tmux attach -t agents`.
+- Rebuilds: `agent` runs `nh os switch` with interactive sudo password — **never** passwordless sudo.
+
+### Secrets
+
+- `secrets/secrets.nix`: `AgentAge` pubkey added to the 7 pi API secrets (opencode/cursor/github-mcp/cline/mercury/context7/cursor-usage) + `agent-age-key.age` (agent's private age identity, encrypted to Goofeus host key + GoofyDeskyRoot).
+- NixOS: `age.secrets.agent-age-key` → `/run/agenix/agent-age-key` (owner=agent, 0400). Agent HM: `age.identityPaths = [ "/run/agenix/agent-age-key" ]`.
+- Rekey after adding/removing a recipient: `cd secrets && RULES=./secrets.nix agenix -r -i <decrypting-identity>` — ensure every `.age` file's recipients include an identity you hold, or comment that secret out of `secrets.nix` first (agent-age-key only decrypts with Goofeus host key / GoofyDeskyRoot, not a user key).
+- Agent's private key backup: `$TMPDIR/agent-tmp/agent-agekey/id_agent_age` (keep until Goofeus bootstrapped; needed to re-encrypt if recipient set grows).
