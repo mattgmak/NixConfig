@@ -45,7 +45,7 @@ in
       devenv
       lazygit
       ghostty
-      cursor
+      # cursor
       pi-coding-agent
       carapace
       zellij
@@ -180,7 +180,7 @@ in
       homebrew = {
         enable = true;
         casks = [
-          "google-chrome"
+          # "google-chrome"
           "github-copilot-for-xcode"
           "vial"
           "android-studio"
