@@ -95,3 +95,6 @@
 [submodule "mattgmak/pi-interactive-subagents"]
 	path = vendor/mattgmak/pi-interactive-subagents
 	url = https://github.com/mattgmak/pi-interactive-subagents.git
+[submodule "jellydn/pi-clinepass-provider"]
+	path = vendor/jellydn/pi-clinepass-provider
+	url = https://github.com/jellydn/pi-clinepass-provider.git

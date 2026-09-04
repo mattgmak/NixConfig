@@ -152,6 +152,17 @@ in
     ];
   };
 
+  "cline-api-key.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      MacMini
+    ];
+  };
+
   "cursor-usage-session-token.age" = {
     armor = true;
     publicKeys = [

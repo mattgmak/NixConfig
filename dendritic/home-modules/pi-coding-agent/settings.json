@@ -1,8 +1,8 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.4",
-  "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5:slow",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4-flash",
   "defaultThinkingLevel": "off",
   "observational-memory": {
     "model": {
@@ -39,5 +39,8 @@
     "cursor/grok-4.6:slow"
   ],
   "showHardwareCursor": false,
-  "hideThinkingBlock": true
+  "hideThinkingBlock": true,
+  "modelThinkingLevels": {
+    "opencode-go/deepseek-v4-flash": "low"
+  }
 }

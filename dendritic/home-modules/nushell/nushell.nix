@@ -61,6 +61,16 @@
           ''
         else
           null;
+      clineApiKeySecret = ../../../secrets/cline-api-key.age;
+      hasClineApiKeySecret = builtins.pathExists clineApiKeySecret;
+      readClineApiKeyScript =
+        if hasClineApiKeySecret then
+          pkgs.writeShellScript "read-cline-api-key" ''
+            set -euo pipefail
+            cat "${config.age.secrets.cline-api-key.path}"
+          ''
+        else
+          null;
       cursorUsageSessionTokenSecret = ../../../secrets/cursor-usage-session-token.age;
       hasCursorUsageSessionTokenSecret = builtins.pathExists cursorUsageSessionTokenSecret;
       readCursorUsageSessionTokenScript =
@@ -81,6 +91,7 @@
         context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
         github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
         cursor-api-key.file = lib.mkIf hasCursorApiKeySecret cursorApiKeySecret;
+        cline-api-key.file = lib.mkIf hasClineApiKeySecret clineApiKeySecret;
         cursor-usage-session-token.file = lib.mkIf hasCursorUsageSessionTokenSecret cursorUsageSessionTokenSecret;
       };
 
@@ -170,6 +181,17 @@
             $env.CURSOR_API_KEY = (
               try {
                 (^${readCursorApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
+          ''
+          + lib.optionalString hasClineApiKeySecret ''
+
+            # cline-api-key.age: one line, raw ClinePass API key (no CLINE_API_KEY= prefix)
+            $env.CLINE_API_KEY = (
+              try {
+                (^${readClineApiKeyScript} | str trim)
               } catch {
                 ""
               }

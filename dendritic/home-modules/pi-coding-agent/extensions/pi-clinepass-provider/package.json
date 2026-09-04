@@ -1,0 +1,10 @@
+{
+  "name": "pi-clinepass-provider",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-clinepass-provider (vendored jellydn/pi-clinepass-provider submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
