@@ -67,6 +67,28 @@
       };
 
       cfg = config.programs.handmux;
+
+      # Pi integration wrapper (~/.pi/agent/extensions/handmux/index.ts).
+      # Handmux's `agent enable pi` writes exactly this file (piExtension.js):
+      # a static wrapper importing the connector from the pinned store path
+      # with ?handmux=sha256(connector). We generate it in Nix — deterministic
+      # (pinned pkg), bump-proof, no runtime step. The file lands inside
+      # extensionsDir (repo symlink) → pi discovers it automatically.
+      piConnectorFile = "${cfg.package}/lib/node_modules/handmux/dist/connectors/pi/index.js";
+      piFingerprint = builtins.hashFile "sha256" piConnectorFile; # hex, matches handmux's digest('hex')
+      piEntryUrl = "file://${piConnectorFile}?handmux=${piFingerprint}";
+      piWrapperText = ''
+        // handmux-managed-pi-extension:v1
+        // handmux-entry:${piEntryUrl}
+        // This tiny wrapper is owned by Handmux. Pi loads it from its documented global extension path.
+        // Native ESM import preserves the fingerprint that Pi's jiti strips from static re-exports.
+        import { importPiConnector } from "data:text/javascript;base64,ZXhwb3J0IGZ1bmN0aW9uIGltcG9ydFBpQ29ubmVjdG9yKHNwZWNpZmllcikgeyByZXR1cm4gaW1wb3J0KHNwZWNpZmllcik7IH0K";
+        export default async function handmux(api) {
+          const connector = await importPiConnector("${piEntryUrl}");
+          return connector.default(api);
+        }
+      '';
+
     in
     {
       options.programs.handmux = {
@@ -83,11 +105,35 @@
           default = 19999;
           description = "handmux server listen port";
         };
+        # Name shown in browser tab + home-screen icon.
+        name = lib.mkOption {
+          type = lib.types.str;
+          default = "handmux";
+          description = "app name shown in the browser tab / home-screen icon";
+        };
+        # Pi integration: write ~/.pi/agent/extensions/handmux/index.ts wrapper
+        # (equivalent of `handmux agent enable pi`).
+        enableAgentPi = lib.mkEnableOption "Pi integration wrapper (~/.pi/agent/extensions/handmux/index.ts)";
+        # agenix EnvironmentFile (KEY=VALUE lines) holding HANDMUX_TOKEN=<persistent token>.
+        # Without a pinned token handmux mints a fresh one every start → phone re-pairs.
+        tokenFile = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          description = "EnvironmentFile path with HANDMUX_TOKEN=... (e.g. /run/agenix/handmux-token)";
+        };
       };
 
       config = lib.mkMerge [
         (lib.mkIf cfg.enable {
           home.packages = [ cfg.package pkgs.nodejs_22 ];
+
+          # Declarative replacement for `handmux setup`: LAN-only (Tailscale) config.
+          # Token NOT in file — comes from tokenFile env (agenix).
+          home.file.".handmux/config.json".text = builtins.toJSON {
+            tunnel = "none";
+            port = cfg.port;
+            name = cfg.name;
+          };
         })
         (lib.mkIf cfg.enableServer {
           # Handmux needs Node ≥ 22.16 at launch (bin shim checks runtime version);
@@ -106,6 +152,16 @@
             };
             Install.WantedBy = [ "default.target" ];
           };
+        })
+        (lib.mkIf (cfg.enableAgentPi) {
+          # Write the wrapper directly into the repo extensions dir (the
+          # ~/.pi/agent/extensions symlink points here) — deterministic, no
+          # dependency on symlink-creation order at activation. Lands in repo
+          # tree as an untracked file; pi discovers it as a normal loader.
+          home.file."${config.home.homeDirectory}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/handmux/index.ts".text = piWrapperText;
+        })
+        (lib.mkIf (cfg.enableServer && cfg.tokenFile != null) {
+          systemd.user.services.handmux.Service.EnvironmentFile = [ cfg.tokenFile ];
         })
       ];
     };

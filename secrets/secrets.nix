@@ -19,6 +19,16 @@ in
       GoofyDeskyRoot
     ];
   };
+  # Persistent handmux auth token (file content: `HANDMUX_TOKEN=…`), loaded by
+  # the handmux systemd user unit via EnvironmentFile. Decryptable by Goofeus
+  # host key (root) + GoofyDesky; placed owner=agent.
+  "handmux-token.age" = {
+    armor = true;
+    publicKeys = [
+      Goofeus
+      GoofyDeskyRoot
+    ];
+  };
 
   "cloudflare-caddy.age" = {
     armor = true;

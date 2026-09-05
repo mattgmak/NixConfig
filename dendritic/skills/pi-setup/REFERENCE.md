@@ -407,12 +407,15 @@ First run creates `users.users.agent` + HM GoofeusAgent + NixOS `age.secrets.age
 
 ```bash
 sudo passwd agent                     # set agent user password (needed for sudo)
-sudo -u agent -i
-cd ~/NixConfig && pi-npm-i           # install extension deps
-handmux setup                         # enable pi integration + push, write ~/.handmux/config.json
-handmux agent enable pi
-handmux service install               # systemd user autostart (alternative to HM-managed unit)
 ```
+
+Everything else is Nix-managed:
+
+- `pi-npm-i` runs automatically via HM activation (`autoPiNpmI`, stamp-guarded in `~/.local/state/pi-npm-i.stamp`) after the first `nixconfig-sync` clone and after vendor extension bumps.
+- `handmux setup` replaced by a declarative `~/.handmux/config.json`: `{ tunnel="none"; port=19999; name=<host>` (Tailscale-only; no interactive wizard).
+- `handmux agent enable pi` replaced by the handmux HM module generating `~/.pi/agent/extensions/handmux/index.ts` (repo `extensions/handmux/index.ts`) — fingerprint = `sha256(connector)`, computed via `builtins.hashFile`, so the wrapper auto-tracks packaging bumps.
+- Persistent auth token: agenix secret `handmux-token` (`HANDMUX_TOKEN=…` line), NixOS `age.secrets.handmux-token` → `/run/agenix/handmux-token`, loaded by the systemd unit via `EnvironmentFile`. Without a pinned token handmux mints a fresh one each start (phone would re-pair on every reboot).
+- `handmux service install` is NOT used — HM owns the `systemd.user.services.handmux` unit.
 
 HM already starts an empty `agents` tmux session on boot (`systemd.user.services.agents-tmux`). Start pi inside it: `tmux attach -t agents` then `pi`.
 

@@ -102,8 +102,31 @@
       programs.handmux = {
         enable = true;
         enableServer = true;
+        enableAgentPi = true;
+        name = "Goofeus";
+        tokenFile = "/run/agenix/handmux-token";
       };
       tools.nixconfigSync.enable = true;
+
+      # Auto-install pi extension deps when needed (first switch after clone,
+      # or after vendor extension bumps). Non-fatal: failure leaves pi usable,
+      # it only means an extension may need manual pi-npm-i.
+      home.activation.autoPiNpmI = lib.hm.dag.entryAfter [ "writeBoundary" "ensureNixConfig" ] ''
+        stamp="$HOME/.local/state/pi-npm-i.stamp"
+        repo="$HOME/NixConfig"
+        mkdir -p "$HOME/.local/state"
+        if [[ -f "$stamp" ]] && \
+           [[ -z "$(find "$repo/vendor" "$repo/dendritic/home-modules/pi-coding-agent/extensions" \
+                     -name package.json -newer "$stamp" -print -quit 2>/dev/null)" ]]; then
+          exit 0
+        fi
+        echo "pi-npm-i: installing pi extension deps..."
+        if PATH="$HOME/.nix-profile/bin:$PATH" pi-npm-i; then
+          touch "$stamp"
+        else
+          echo "pi-npm-i: failed (non-fatal) — run manually later"
+        fi
+      '';
 
       # Agent decrypts API secrets with its own age identity (root uses the
       # ssh host key via nushell's mkIf; agent gets the dedicated key path).
@@ -149,6 +172,16 @@
         # readable by agent so home-manager's age.identityPaths can use it.
         age.secrets.agent-age-key = {
           file = ../../secrets/agent-age-key.age;
+          owner = "agent";
+          group = "agent";
+          mode = "0400";
+        };
+
+        # Persistent handmux auth token (HANDMUX_TOKEN=… line). Without a pinned
+        # token handmux mints a fresh one each start → phone would re-pair on
+        # every reboot. Owner=agent so the systemd user unit can env-load it.
+        age.secrets.handmux-token = {
+          file = ../../secrets/handmux-token.age;
           owner = "agent";
           group = "agent";
           mode = "0400";
