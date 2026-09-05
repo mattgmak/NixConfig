@@ -141,6 +141,11 @@
         Service = {
           Type = "oneshot";
           RemainAfterExit = true;
+          # Panes spawned from this session inherit PATH — must include HM profile
+          # bins (starship/zoxide/…) or shells break (see handmux pane shell errors).
+          # Agent user is fixed (age.identityPaths etc. assume it); login PATH is
+          # ~/.nix-profile + /etc/profiles/per-user/agent + system sw.
+          Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
           ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
         };
         Install = {
