@@ -41,6 +41,8 @@
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
   "modelThinkingLevels": {
-    "opencode-go/deepseek-v4-flash": "low"
+    "opencode-go/deepseek-v4-flash": "low",
+    "k2-horizon:3.7b-q4km": "high",
+    "ling-3.0-tiny:q5km": "medium"
   }
 }

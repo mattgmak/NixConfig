@@ -129,6 +129,11 @@
               pkgs:
               let
                 # CUDA llama-cpp: nixpkgs default is CPU-only. OpenBLAS + native CPU flags.
+                # MBZUAI-IFM fork (model/K2Horizon @ 35999d1) — adds K2-Horizon arch
+                # (K2-Horizon-3.7B/7B; run 3.7B at Q6_K, 512K native ctx). Merge base = b10450
+                # (ece963f), so Qwen3.8 DeltaNet fix (ggml-org#27164) is preserved — fork is
+                # 221 commits NEWER than b10450, not older. USE MAINLINE ggml-org/llama.cpp
+                # when k2-horizon PR merges upstream: revert owner/rev/hash, recheck npmDepsHash.
                 goofyCudaLlamaCpp =
                   (pkgs.llama-cpp.override {
                     cudaSupport = true;
@@ -137,13 +142,13 @@
                     blasSupport = true;
                   }).overrideAttrs
                     (oldAttrs: {
-                      # b10450 — fixes Qwen3.8 DeltaNet CUDA garbage output (ggml-org#27164).
+                      # Version = fork's merge base (b10450); kept in lockstep with LLAMA_BUILD_NUMBER.
                       version = "10450";
                       src = pkgs.fetchFromGitHub {
-                        owner = "ggml-org";
+                        owner = "MBZUAI-IFM";
                         repo = "llama.cpp";
-                        rev = "ece963f41b0b02d7a0d61436ae365762c073a4c8";
-                        hash = "sha256-E7b9asZsVnPydxHsHliMK9qSxZ2KZG7kff445MCD3ZQ=";
+                        rev = "35999d101cf2233fc54f09c3c8d599da7303ce02";
+                        hash = "sha256-XQuUkBO6WbA7UiPdfv7SusIkpQNa0QCLKjzv/1qOuwc=";
                         leaveDotGit = true;
                         postFetch = ''
                           git -C "$out" rev-parse --short HEAD > $out/COMMIT

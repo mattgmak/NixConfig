@@ -11,6 +11,62 @@
 
         models:  # Ordered from newest to oldest
 
+          # Ling-3.0-tiny (7.9B total / 1.3B active MoE, bailingmoe3 arch) — agentic coding.
+          # Same MBZUAI-IFM fork serves it (bailingmoe3 supported). Q5_K_M 5.24 GB fits 8GB with
+          # ~1.5GB headroom (hybrid KDA+MLA KV is tiny: ~0.3GB @64k) → full GPU offload, fast decode.
+          # Q6_K would be ~7.1GB = same spill edge as K2 Q6 (7 tok/s). 128K native ctx.
+          # Independent AA: Intelligence 25, Agentic 16.
+          # Source: https://huggingface.co/inclusionAI/Ling-3.0-tiny-GGUF
+          "ling-3.0-tiny:q5km":
+            cmd: |
+              ${pkgs.llama-cpp}/bin/llama-server
+              -hf inclusionAI/Ling-3.0-tiny-GGUF:Q5_K_M
+              --port ''${PORT}
+              --jinja
+              -ngl 99
+              --fit on
+              --fit-target 900
+              --fit-ctx 4096
+              -c 65536
+              --parallel 1
+              -b 512
+              -ub 256
+              --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --reasoning on
+              --temp 1.0
+              --top-p 0.95
+
+          # K2-Horizon-3.7B Q4_K_M (512K native ctx) — agentic coding on RTX 3070 Ti.
+          # Served by MBZUAI-IFM llama.cpp fork (model/K2Horizon @ 35999d1); merge base
+          # = b10450 so the Qwen3.8 DeltaNet fix (ggml-org#27164) stays in effect.
+          # Fit math @64k ctx: KV 2.59 GB (q4_0) + Q4_K_M 2.94 GB + compute ~0.2 GB
+          #  ≈ 5.7 GB vs ~6.1 GB usable (8 GB minus sweep-next-edit persistent 1.6 +
+          #  desktop 0.7). Q5_K_M + compute 0.3 GB = 6.29 GB OOM'd. -b 256 shrinks pp
+          #  buffers; Q4_K_M beats Q4_0 (k-quant). Source: abenzerps/K2-Horizon-3.7B-GGUF
+          # Client: reasoning_effort high, temp 1.0, top_p 0.95; allow ≥32k output tokens.
+          "k2-horizon:3.7b-q4km":
+            cmd: |
+              ${pkgs.llama-cpp}/bin/llama-server
+              -hf abenzerps/K2-Horizon-3.7B-GGUF:Q4_K_M
+              --port ''${PORT}
+              --jinja
+              -ngl 99
+              --fit on
+              --fit-target 900
+              --fit-ctx 4096
+              -c 65536
+              --parallel 1
+              -b 256
+              -ub 128
+              --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --reasoning on
+              --temp 1.0
+              --top-p 0.95
+
           # Next-edit autocomplete (~1.5 GB Q8), fits fully on RTX 3070 Ti.
           # Source: https://huggingface.co/sweepai/sweep-next-edit-1.5B
           "sweep-next-edit:1.5b-q8":
@@ -81,6 +137,10 @@
               --repeat-penalty 1.0
 
         healthCheckTimeout: 28800  # 8 hours for large model download + loading
+
+        # Forward llama-server (child) stdout/stderr into the llama-swap log;
+        # default 'proxy' discards it, hiding load errors (e.g. CUDA OOM).
+        logToStdout: both
 
         # TTL keeps models in memory for specified seconds after last use
         ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
