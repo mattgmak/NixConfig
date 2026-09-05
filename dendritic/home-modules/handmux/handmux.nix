@@ -131,7 +131,9 @@
 
       config = lib.mkMerge [
         (lib.mkIf cfg.enable {
-          home.packages = [ cfg.package pkgs.nodejs_22 ];
+          # procps for `ps` — handmux scans the process table to enforce the
+          # single-supervisor invariant; NixOS has no /usr/bin/ps.
+          home.packages = [ cfg.package pkgs.nodejs_22 pkgs.procps ];
 
           # Declarative replacement for `handmux setup`: LAN-only (Tailscale) config.
           # Written via ACTIVATION (not home.file): handmux's PrivateStateStore
@@ -160,7 +162,7 @@ chmod 600 "$HOME/.handmux/config.json"
               Type = "simple";
               Restart = "always";
               RestartSec = 2;
-              Environment = "PATH=${lib.makeBinPath [ pkgs.nodejs_22 pkgs.tmux ]}:/usr/bin:/bin";
+              Environment = "PATH=${lib.makeBinPath [ pkgs.nodejs_22 pkgs.tmux pkgs.procps ]}:/usr/bin:/bin";
               ExecStart = "${lib.getExe cfg.package} start --port ${toString cfg.port}";
             };
             Install.WantedBy = [ "default.target" ];
