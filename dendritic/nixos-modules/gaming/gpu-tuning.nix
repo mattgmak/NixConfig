@@ -69,8 +69,9 @@
         fi
 
         WATTS="''${1:?watts required, e.g. 280}"
-        MW=$((WATTS * 1000))
-        ${nvidiaSmi} -i 0 -pl "$MW"
+        # NOTE: driver 595.84 nvidia-smi -pl takes WATTS, not milliwatts.
+        # The earlier MW=$((WATTS*1000)) was wrong — passed 280000 W, rejected.
+        ${nvidiaSmi} -i 0 -pl "$WATTS"
         echo "power limit: ''${WATTS} W"
       '';
 
@@ -152,7 +153,8 @@
               set -euo pipefail
               ${nvidiaSmi} -pm 1
               ${lib.optionalString (cfg.powerLimit != null) ''
-                ${nvidiaSmi} -i 0 -pl ${toString (cfg.powerLimit * 1000)}
+                # -pl takes watts on driver 595.84 (no * 1000 — that passed 341000 W, rejected)
+                ${nvidiaSmi} -i 0 -pl ${toString cfg.powerLimit}
               ''}
               ${lib.optionalString (cfg.lockGraphicsMhz != null) ''
                 ${nvidiaSmi} -i 0 -lgc ${toString cfg.lockGraphicsMhz},${toString cfg.lockGraphicsMhz}

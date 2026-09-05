@@ -376,6 +376,8 @@
         services.gpuTuning = {
           enable = true;
           # stock dynamic boost — no clock lock
+          # max PL: 3070 Ti power-limited, give boost headroom
+          powerLimit = 341;
         };
 
       };
