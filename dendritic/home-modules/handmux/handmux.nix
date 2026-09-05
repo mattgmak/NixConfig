@@ -89,6 +89,12 @@
         }
       '';
 
+      configJson = builtins.toJSON {
+        tunnel = "none";
+        port = cfg.port;
+        name = cfg.name;
+      };
+
     in
     {
       options.programs.handmux = {
@@ -128,12 +134,19 @@
           home.packages = [ cfg.package pkgs.nodejs_22 ];
 
           # Declarative replacement for `handmux setup`: LAN-only (Tailscale) config.
-          # Token NOT in file — comes from tokenFile env (agenix).
-          home.file.".handmux/config.json".text = builtins.toJSON {
-            tunnel = "none";
-            port = cfg.port;
-            name = cfg.name;
-          };
+          # Written via ACTIVATION (not home.file): handmux's PrivateStateStore
+          # chmod 600s config.json on read — a store-symlinked home.file is
+          # read-only → EROFS. Real writable file, regenerated each switch
+          # (idempotent, auto-tracks option changes). Token NOT in file — comes
+          # from tokenFile env (agenix).
+          home.activation.handmuxConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+mkdir -p "$HOME/.handmux"
+rm -f "$HOME/.handmux/config.json"   # drop stale store symlink if any
+cat > "$HOME/.handmux/config.json" <<'HEND'
+${configJson}
+HEND
+chmod 600 "$HOME/.handmux/config.json"
+'';
         })
         (lib.mkIf cfg.enableServer {
           # Handmux needs Node ≥ 22.16 at launch (bin shim checks runtime version);
@@ -153,12 +166,18 @@
             Install.WantedBy = [ "default.target" ];
           };
         })
-        (lib.mkIf (cfg.enableAgentPi) {
-          # Write the wrapper directly into the repo extensions dir (the
-          # ~/.pi/agent/extensions symlink points here) — deterministic, no
-          # dependency on symlink-creation order at activation. Lands in repo
-          # tree as an untracked file; pi discovers it as a normal loader.
-          home.file."${config.home.homeDirectory}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/handmux/index.ts".text = piWrapperText;
+        (lib.mkIf cfg.enableAgentPi {
+          # Equivalent of `handmux agent enable pi` — writes the wrapper into the
+          # repo extensions dir (the ~/.pi/agent/extensions symlink points here).
+          # Also via ACTIVATION: handmux rewrites/verifies this file (MANAGED_MARK
+          # check + chmod), so a read-only store symlink would EROFS.
+          home.activation.handmuxPiWrapper = lib.hm.dag.entryAfter [ "writeBoundary" "handmuxConfig" ] ''
+mkdir -p "${config.home.homeDirectory}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/handmux"
+rm -f "${config.home.homeDirectory}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/handmux/index.ts"   # drop stale store symlink if any
+cat > "${config.home.homeDirectory}/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/handmux/index.ts" <<'HEND'
+${piWrapperText}
+HEND
+'';
         })
         (lib.mkIf (cfg.enableServer && cfg.tokenFile != null) {
           systemd.user.services.handmux.Service.EnvironmentFile = [ cfg.tokenFile ];
