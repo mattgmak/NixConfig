@@ -421,8 +421,8 @@ HM already starts an empty `agents` tmux session on boot (`systemd.user.services
 
 ### Handmux runtime
 
-- Server unit: HM-managed `systemd.user.services.handmux` (Tailscale-bound `handmux start --port 19999`; PATH node_22 + tmux).
-- Phone: handmux PWA over Tailscale (Add to Home Screen). Desk: `ssh agent@goofeus -t tmux attach -t agents`.
+- Server unit: HM-managed `systemd.user.services.handmux` (foreground supervisor `-f`, Tailscale-bound `handmux start -f --port 19999`; PATH node_22 + tmux + procps).
+- Phone: handmux PWA over **HTTPS** via Tailscale Serve — `https://goofeus.dab-octatonic.ts.net` (443 → 127.0.0.1:19999, `svc:handmux` in `caddy.nix`; PWA-installable cert). Desk: `ssh agent@goofeus -t tmux attach -t agents`.
 - Rebuilds: `agent` runs `nh os switch` with interactive sudo password — **never** passwordless sudo.
 
 ### Secrets
