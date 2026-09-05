@@ -163,7 +163,7 @@ chmod 600 "$HOME/.handmux/config.json"
               Restart = "always";
               RestartSec = 2;
               Environment = "PATH=${lib.makeBinPath [ pkgs.nodejs_22 pkgs.tmux pkgs.procps ]}:/usr/bin:/bin";
-              ExecStart = "${lib.getExe cfg.package} start --port ${toString cfg.port}";
+              ExecStart = "${lib.getExe cfg.package} start -f --port ${toString cfg.port}";
             };
             Install.WantedBy = [ "default.target" ];
           };
