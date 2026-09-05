@@ -17,6 +17,7 @@
         },
         {
           "id": "k2-horizon:3.7b-q4km",
+          "reasoning": true,
           "contextWindow": 65536,
           "maxTokens": 32768,
           "thinkingLevelMap": {
@@ -41,10 +42,22 @@
           "id": "ling-3.0-tiny:q5km",
           "contextWindow": 65536,
           "maxTokens": 32768,
+          "thinkingLevelMap": {
+            "off": null,
+            "minimal": "low",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "high",
+            "max": "high"
+          },
           "compat": {
             "supportsDeveloperRole": false,
             "thinkingFormat": "chat-template",
-            "chatTemplateKwargs": { "enable_thinking": { "$var": "thinking.enabled" } }
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" },
+              "reasoning_effort": { "$var": "thinking.effort" }
+            }
           }
         }
       ]
