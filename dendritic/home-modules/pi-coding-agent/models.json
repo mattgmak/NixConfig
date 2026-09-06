@@ -40,10 +40,10 @@
         },
         {
           "id": "ling-3.0-tiny:q5km",
+          "reasoning": true,
           "contextWindow": 65536,
           "maxTokens": 32768,
           "thinkingLevelMap": {
-            "off": null,
             "minimal": "low",
             "low": "low",
             "medium": "medium",
@@ -55,8 +55,7 @@
             "supportsDeveloperRole": false,
             "thinkingFormat": "chat-template",
             "chatTemplateKwargs": {
-              "enable_thinking": { "$var": "thinking.enabled" },
-              "reasoning_effort": { "$var": "thinking.effort" }
+              "enable_thinking": { "$var": "thinking.enabled" }
             }
           }
         }
