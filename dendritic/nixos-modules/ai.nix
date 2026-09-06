@@ -26,7 +26,7 @@
               -ngl 99
               --fit on
               --fit-target 900
-              --fit-ctx 4096
+              --fit-ctx 131072
               -c 65536
               --parallel 1
               -b 512
@@ -53,9 +53,9 @@
               --port ''${PORT}
               --jinja
               -ngl 99
-              --fit on
+              --fit off
               --fit-target 900
-              --fit-ctx 4096
+              --fit-ctx 65536
               -c 65536
               --parallel 1
               -b 256
@@ -117,7 +117,7 @@
               --no-mmproj
               --fit on
               --fit-target 512
-              --fit-ctx 8192
+              --fit-ctx 16384
               -t 12
               -tb 12
               -c 16384

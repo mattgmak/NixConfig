@@ -41,8 +41,8 @@
         {
           "id": "ling-3.0-tiny:q5km",
           "reasoning": true,
-          "contextWindow": 65536,
-          "maxTokens": 32768,
+          "contextWindow": 131072,
+          "maxTokens": 65536,
           "thinkingLevelMap": {
             "minimal": "low",
             "low": "low",
