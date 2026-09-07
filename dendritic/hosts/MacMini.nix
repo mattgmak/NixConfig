@@ -89,7 +89,11 @@ in
       launchd.daemons.nix-gc = {
         serviceConfig = {
           ProgramArguments = [
-            "${pkgs.nh}/bin/nh" "clean" "all" "--keep" "3"
+            "${pkgs.nh}/bin/nh"
+            "clean"
+            "all"
+            "--keep"
+            "3"
           ];
           StartInterval = 604800; # weekly
           RunAtLoad = false;
@@ -194,7 +198,7 @@ in
       homebrew = {
         enable = true;
         casks = [
-          # "google-chrome"
+          "google-chrome"
           "github-copilot-for-xcode"
           "vial"
           "android-studio"
