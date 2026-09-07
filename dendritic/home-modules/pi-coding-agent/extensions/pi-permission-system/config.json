@@ -31,6 +31,7 @@
       "rm -rf *": "deny",
       "xargs*": "deny",
       "time *": "allow",
+      "timeout *": "allow",
       "lean-ctx allow *": "ask",
       "lean-ctx allow": "ask",
       "lean-ctx config set shell_allowlist*": "deny",
