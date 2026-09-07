@@ -1,13 +1,13 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.4",
-  "defaultProvider": "opencode-go",
-  "defaultModel": "deepseek-v4-flash",
+  "defaultProvider": "clinepass",
+  "defaultModel": "cline-pass/deepseek-v4-flash",
   "defaultThinkingLevel": "off",
   "observational-memory": {
     "model": {
-      "provider": "opencode-go",
-      "id": "mimo-v2.5"
+      "provider": "clinepass",
+      "id": "cline-pass/mimo-v2.5"
     }
   },
   "theme": "stylix",
@@ -32,15 +32,17 @@
     "opencode-go/mimo-v2.5",
     "opencode-go/mimo-v2.5-pro",
     "cursor/grok-4.6:fast",
-    "cursor/grok-4.5:fast",
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
-    "cursor/grok-4.5:slow",
-    "cursor/grok-4.6:slow"
+    "cursor/grok-4.6:slow",
+    "clinepass/cline-pass/deepseek-v4-flash",
+    "clinepass/cline-pass/mimo-v2.5",
+    "clinepass/cline-pass/mimo-v2.5-pro"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
   "modelThinkingLevels": {
+    "clinepass/cline-pass/deepseek-v4-flash": "high",
     "opencode-go/deepseek-v4-flash": "low",
     "llama-swap/k2-horizon:3.7b-q4km": "high",
     "llama-swap/ling-3.0-tiny:q5km": "medium"
