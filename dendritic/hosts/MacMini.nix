@@ -84,6 +84,20 @@ in
         enable = false;
       };
 
+      # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
+      # are inert.  Ditch old profile generations weekly with nh instead.
+      launchd.daemons.nix-gc = {
+        serviceConfig = {
+          ProgramArguments = [
+            "${pkgs.nh}/bin/nh" "clean" "all" "--keep" "3"
+          ];
+          StartInterval = 604800; # weekly
+          RunAtLoad = false;
+          StandardOutPath = "/var/log/nix-gc.stdout";
+          StandardErrorPath = "/var/log/nix-gc.stderr";
+        };
+      };
+
       imports = [
         inputs.home-manager.darwinModules.home-manager
         inputs.nix-homebrew.darwinModules.nix-homebrew

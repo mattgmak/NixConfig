@@ -32,13 +32,22 @@
       };
 
     homeModules.darwin-home =
-      { username, ... }:
+      { lib, username, ... }:
       {
         imports = [ self.homeModules.main ];
         home = {
           inherit username;
           homeDirectory = "/Users/${username}";
         };
+
+        # agenix's age-home.nix sets KeepAlive with SuccessfulExit=false,
+        # but macOS MinimumRuntime (default 10s) overrides it — any exit
+        # before 10s is treated as crash, so the agent respawns forever.
+        # MinimumRuntime takes integer seconds only, can't go below 1
+        # (script runs ~704ms).  Simplest fix: disable KeepAlive entirely.
+        # RunAtLoad=true runs the agent once at login; no KeepAlive means
+        # launchd never respawns.
+        launchd.agents.activate-agenix.config.KeepAlive = lib.mkForce false;
       };
   };
 }
