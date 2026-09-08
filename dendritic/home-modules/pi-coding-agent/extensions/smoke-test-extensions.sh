@@ -2,9 +2,6 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "Testing pi-lens builder parse..."
-node --check vendor/mattgmak/pi-lens/clients/review-graph/builder.ts
-
 echo "Testing pi-permission-system imports SDK getPackageDir..."
 node --input-type=module <<'EOF'
 const fs = await import('node:fs');

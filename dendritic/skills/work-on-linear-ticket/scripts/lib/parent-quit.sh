@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Deferred graceful exit for parent pi after worker handoff.
 # Source from launch-worker.sh — do not run directly.
-# NEVER inline-kill parent during tool call (stale ctx in pi-agent-sesh, pi-lens, OOM).
+# NEVER inline-kill parent during tool call (stale ctx in pi-agent-sesh, OOM).
 
 resolve_parent_tmux_pane() {
   if [ -n "${TMUX_PANE:-}" ]; then

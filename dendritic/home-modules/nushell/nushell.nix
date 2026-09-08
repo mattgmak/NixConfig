@@ -248,10 +248,6 @@
             NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin "/Users/${config.home.username}/NixConfig#darwinConfigurations.MacMini";
             DEVELOPER_DIR = lib.mkIf pkgs.stdenv.isDarwin "/Applications/Xcode.app/Contents/Developer";
           }
-          # pi-lens (packages from pi-coding-agent home module)
-          {
-            PILENS_DATA_DIR = "${config.home.homeDirectory}/.pi-lens/projects";
-          }
           # pi-markdown-preview (packages from pi-coding-agent home module)
           {
             PANDOC_PATH = lib.getExe pkgs.pandoc;

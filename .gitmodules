@@ -22,9 +22,6 @@
 [submodule "MattDevy/pi-extensions"]
 	path = vendor/MattDevy/pi-extensions
 	url = https://github.com/MattDevy/pi-extensions.git
-[submodule "mattgmak/pi-lens"]
-	path = vendor/mattgmak/pi-lens
-	url = https://github.com/mattgmak/pi-lens.git
 [submodule "gotgenes/pi-packages"]
 	path = vendor/gotgenes/pi-packages
 	url = https://github.com/gotgenes/pi-packages.git

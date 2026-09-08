@@ -107,7 +107,7 @@ Upgrade pi or vendored extension submodules.
 | `<extension-name>` | that extension's vendor submodule (match loader dir name or `.gitmodules` path) |
 | `all` or nothing specified | **pi + every extension** under `vendor/` |
 
-Also accept comma-separated lists (e.g. `pi, pi-lens, cursor-provider`).
+Also accept comma-separated lists (e.g. `pi, cursor-provider`).
 
 Themes and skill submodules **out of scope** unless user names them explicitly; mention they can update same way if asked.
 
@@ -226,7 +226,7 @@ pi list
 # spot-check: pi -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts
 ```
 
-**Commit** with a message summarizing what was bumped (e.g. `bump pi-coding-agent and pi-lens`).
+**Commit** with a message summarizing what was bumped (e.g. `bump pi-coding-agent`).
 
 Tell the user to `/reload` or restart pi. Rebuild HM only when pi package or Nix wiring changed.
 

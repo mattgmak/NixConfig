@@ -11,12 +11,12 @@ vendor/<Owner>/<repo>/
 ```
 
 - `<Owner>` — GitHub owner dir, URL casing (`mattgmak`, `MattDevy`, `Gentleman-Programming`)
-- `<repo>` — bare repo name (`pi-lens`, `pi-extensions`, `zen-wireframe-2`)
+- `<repo>` — bare repo name (`lean-ctx`, `pi-extensions`, `zen-wireframe-2`)
 
 Rules:
 
 - **No vendor dirs outside `vendor/`** — extensions, themes, skills, zen, tools all share it. Never `vendor/` under `dendritic/...`.
-- **`.gitmodules` name = `owner/repo`** from git URL, not checkout path (`[submodule "mattgmak/pi-lens"]`).
+- **`.gitmodules` name = `owner/repo`** from git URL, not checkout path (`[submodule "mattgmak/lean-ctx"]`).
 - **Pi extensions**: thin loader dir `dendritic/home-modules/pi-coding-agent/extensions/<name>/` — `package.json` (`pi.extensions: ["./index.ts"]`, optional `pi.skills`) + `index.ts` re-export `../vendor/<Owner>/<repo>/…`. Pi resolves loader imports against live `~/.pi/agent/extensions/<name>/` — depth fixed at 1 up, lands on `extensions/vendor` compat symlink → repo root `vendor/`. Submodule never inside `extensions/`.
 - **Themes**: symlink `…/themes/<name>.json` → `../../../../vendor/<Owner>/<repo>/…`.
 - **Skills**: symlink `dendritic/skills/<name>` → `../../vendor/<owner>/<repo>/…`.
