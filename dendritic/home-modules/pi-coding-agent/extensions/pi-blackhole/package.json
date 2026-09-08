@@ -1,0 +1,10 @@
+{
+  "name": "pi-blackhole",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-blackhole (vendored k0valik/pi-blackhole submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

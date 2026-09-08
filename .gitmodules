@@ -46,9 +46,6 @@
 [submodule "otahontas/pi-coding-agent-catppuccin"]
 	path = vendor/otahontas/pi-coding-agent-catppuccin
 	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git
-[submodule "elpapi42/pi-observational-memory"]
-	path = vendor/elpapi42/pi-observational-memory
-	url = https://github.com/elpapi42/pi-observational-memory.git
 [submodule "mattgmak/lean-ctx"]
 	path = vendor/mattgmak/lean-ctx
 	url = https://github.com/mattgmak/lean-ctx.git
@@ -98,3 +95,6 @@
 [submodule "jellydn/pi-clinepass-provider"]
 	path = vendor/jellydn/pi-clinepass-provider
 	url = https://github.com/jellydn/pi-clinepass-provider.git
+[submodule "k0valik/pi-blackhole"]
+	path = vendor/k0valik/pi-blackhole
+	url = https://github.com/k0valik/pi-blackhole.git

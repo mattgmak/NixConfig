@@ -1,0 +1,1 @@
+export { default } from "../vendor/k0valik/pi-blackhole/index.ts";
