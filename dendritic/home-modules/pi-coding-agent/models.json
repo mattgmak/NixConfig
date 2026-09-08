@@ -16,10 +16,33 @@
           "maxTokens": 2048
         },
         {
-          "id": "k2-horizon:3.7b-q4km",
-          "reasoning": true,
+          "id": "k2-horizon:3.7b-q5km",
           "contextWindow": 65536,
           "maxTokens": 32768,
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": null,
+            "minimal": "low",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "high",
+            "max": "high"
+          },
+          "compat": {
+            "supportsDeveloperRole": false,
+            "thinkingFormat": "chat-template",
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" },
+              "reasoning_effort": { "$var": "thinking.effort" }
+            }
+          }
+        },
+        {
+          "id": "k2-horizon:7b-q4km",
+          "contextWindow": 65536,
+          "maxTokens": 32768,
+          "reasoning": true,
           "thinkingLevelMap": {
             "off": null,
             "minimal": "low",
@@ -42,8 +65,30 @@
           "id": "ling-3.0-tiny:q5km",
           "reasoning": true,
           "contextWindow": 131072,
-          "maxTokens": 65536,
+          "maxTokens": 16384,
           "thinkingLevelMap": {
+            "minimal": "low",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "high",
+            "max": "high"
+          },
+          "compat": {
+            "supportsDeveloperRole": false,
+            "thinkingFormat": "chat-template",
+            "chatTemplateKwargs": {
+              "enable_thinking": { "$var": "thinking.enabled" }
+            }
+          }
+        },
+        {
+          "id": "minicpm5-2:q8",
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": null,
             "minimal": "low",
             "low": "low",
             "medium": "medium",

@@ -12,11 +12,9 @@
         models:  # Ordered from newest to oldest
 
           # Ling-3.0-tiny (7.9B total / 1.3B active MoE, bailingmoe3 arch) — agentic coding.
-          # Same MBZUAI-IFM fork serves it (bailingmoe3 supported). Q5_K_M 5.24 GB fits 8GB with
-          # ~1.5GB headroom (hybrid KDA+MLA KV is tiny: ~0.3GB @64k) → full GPU offload, fast decode.
-          # Q6_K would be ~7.1GB = same spill edge as K2 Q6 (7 tok/s). 128K native ctx.
-          # Independent AA: Intelligence 25, Agentic 16.
-          # Source: https://huggingface.co/inclusionAI/Ling-3.0-tiny-GGUF
+          # Full GPU: Q5_K_M 5.24 GB + KDA+MLA KV ~0.6 GB @128K + compute 0.2 GB = ~6.1 GB
+          #  → fits 8 GB RTX 3070 Ti with ~1.5 GB headroom even after desktop.
+          # Official: temp=1.0, top_p=0.95, top_k=20. Source: inclusionAI/Ling-3.0-tiny-GGUF
           "ling-3.0-tiny:q5km":
             cmd: |
               ${pkgs.llama-cpp}/bin/llama-server
@@ -24,10 +22,8 @@
               --port ''${PORT}
               --jinja
               -ngl 99
-              --fit on
-              --fit-target 900
-              --fit-ctx 131072
-              -c 65536
+              --fit off
+              -c 131072
               --parallel 1
               -b 512
               -ub 256
@@ -37,25 +33,21 @@
               --reasoning on
               --temp 1.0
               --top-p 0.95
+              --top-k 20
 
-          # K2-Horizon-3.7B Q4_K_M (512K native ctx) — agentic coding on RTX 3070 Ti.
-          # Served by MBZUAI-IFM llama.cpp fork (model/K2Horizon @ 35999d1); merge base
-          # = b10450 so the Qwen3.8 DeltaNet fix (ggml-org#27164) stays in effect.
-          # Fit math @64k ctx: KV 2.59 GB (q4_0) + Q4_K_M 2.94 GB + compute ~0.2 GB
-          #  ≈ 5.7 GB vs ~6.1 GB usable (8 GB minus sweep-next-edit persistent 1.6 +
-          #  desktop 0.7). Q5_K_M + compute 0.3 GB = 6.29 GB OOM'd. -b 256 shrinks pp
-          #  buffers; Q4_K_M beats Q4_0 (k-quant). Source: abenzerps/K2-Horizon-3.7B-GGUF
-          # Client: reasoning_effort high, temp 1.0, top_p 0.95; allow ≥32k output tokens.
-          "k2-horizon:3.7b-q4km":
+          # K2-Horizon-3.7B Q5_K_M (512K native ctx) — agentic coding on RTX 3070 Ti.
+          # Q5_K_M = 5 bpw k-quant from NANI-Nithin. Q6_K OOM'd 8GB at 64K.
+          # Full GPU @64K: ~2.4 GB weights + ~2.3 GB KV q4_0 + 0.2 GB compute = ~4.9 GB ✅
+          # Source: https://huggingface.co/NANI-Nithin/K2-Horizon-3.7B-GGUF
+          # Official: reasoning_effort=high, temp=1.0, top_p=0.95, ≥32k output.
+          "k2-horizon:3.7b-q5km":
             cmd: |
               ${pkgs.llama-cpp}/bin/llama-server
-              -hf abenzerps/K2-Horizon-3.7B-GGUF:Q4_K_M
+              -hf NANI-Nithin/K2-Horizon-3.7B-GGUF:K2-Horizon-3.7B-Q5_K_M
               --port ''${PORT}
               --jinja
               -ngl 99
               --fit off
-              --fit-target 900
-              --fit-ctx 65536
               -c 65536
               --parallel 1
               -b 256
@@ -67,18 +59,30 @@
               --temp 1.0
               --top-p 0.95
 
-          # Next-edit autocomplete (~1.5 GB Q8), fits fully on RTX 3070 Ti.
-          # Source: https://huggingface.co/sweepai/sweep-next-edit-1.5B
-          "sweep-next-edit:1.5b-q8":
+          # K2-Horizon-7B Q4_K_M (512K native ctx) — bigger agentic model for RTX 3070 Ti.
+          # Full GPU @64K: Q4_K_M ~4 GB + KV q4_0 ~2.7 GB + compute 0.2 GB = ~6.9 GB ✅
+          # 128K OOMs 8GB (~4 GB weights + ~5.4 GB KV). 64K is safe max with headroom.
+          # Same K2 arch as 3.7B, requires MBZUAI-IFM fork. Q4_K_M recommended general-use quant.
+          # Source: https://huggingface.co/NANI-Nithin/K2-Horizon-7B-GGUF
+          # Official: reasoning_effort=high, temp=1.0, top_p=0.95, ≥32k output.
+          "k2-horizon:7b-q4km":
             cmd: |
               ${pkgs.llama-cpp}/bin/llama-server
-              -hf sweepai/sweep-next-edit-1.5B:Q8_0
+              -hf NANI-Nithin/K2-Horizon-7B-GGUF:K2-Horizon-7B-Q4_K_M
               --port ''${PORT}
-              --ctx-size 8192
-              --parallel 2
-              --batch-size 512
-              --ubatch-size 256
+              --jinja
+              -ngl 99
+              --fit off
+              -c 65536
+              --parallel 1
+              -b 256
+              -ub 128
               --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --reasoning on
+              --temp 1.0
+              --top-p 0.95
 
           # MoE 26B A4B (~3.8B active), UD-Q4_K_XL ~17 GB, max ctx: 262144, 30 layers
           # RTX 3070 Ti (8 GB): mostly CPU offload; mmproj via -hf.
@@ -136,6 +140,31 @@
               --presence-penalty 0.0
               --repeat-penalty 1.0
 
+          # MiniCPM5-2B Q8_0 — 2.5B params, standard LlamaForCausalLM arch.
+          # 128K native ctx. Has enable_thinking in chat template.
+          # Mainline llama.cpp compatible (no fork needed).
+          # Q8_0 ~2.5 GB fits fully on RTX 3070 Ti even at 128K ctx.
+          # Source: https://huggingface.co/openbmb/MiniCPM5-2B-GGUF
+          # Official: temp=1.0, top_p=0.95.
+          "minicpm5-2:q8":
+            cmd: |
+              ${pkgs.llama-cpp}/bin/llama-server
+              -hf openbmb/MiniCPM5-2B-GGUF:MiniCPM5-2B-Q8_0
+              --port ''${PORT}
+              --jinja
+              -ngl 99
+              --fit off
+              -c 131072
+              --parallel 1
+              -b 256
+              -ub 128
+              --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --reasoning on
+              --temp 1.0
+              --top-p 0.95
+
         healthCheckTimeout: 28800  # 8 hours for large model download + loading
 
         # Forward llama-server (child) stdout/stderr into the llama-swap log;
@@ -144,16 +173,6 @@
 
         # TTL keeps models in memory for specified seconds after last use
         ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
-
-        # Groups allow running multiple models simultaneously
-        groups:
-          autocomplete:
-            # Keep next-edit model hot for blink-edit while chat models swap
-            persistent: true
-            swap: false
-            exclusive: false
-            members:
-              - "sweep-next-edit:1.5b-q8"
       '';
 
       systemd.services.llama-swap = {
