@@ -37,7 +37,8 @@
     "cursor/grok-4.6:slow",
     "clinepass/cline-pass/deepseek-v4-flash",
     "clinepass/cline-pass/mimo-v2.5",
-    "clinepass/cline-pass/mimo-v2.5-pro"
+    "clinepass/cline-pass/mimo-v2.5-pro",
+    "openrouter/qwen/qwen3.8-flash"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -46,6 +47,7 @@
     "opencode-go/deepseek-v4-flash": "low",
     "llama-swap/k2-horizon:3.7b-q5km": "high",
     "llama-swap/k2-horizon:7b-q4km": "high",
-    "llama-swap/ling-3.0-tiny:q5km": "medium"
+    "llama-swap/ling-3.0-tiny:q5km": "medium",
+    "openrouter/qwen/qwen3.8-flash": "low"
   }
 }
