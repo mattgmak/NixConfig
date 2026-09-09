@@ -25,7 +25,7 @@
       "lean-ctx config set shell_security*": "deny",
       "lean-ctx security *": "deny",
       "lean-ctx harden undo*": "deny",
-      "sudo *": "ask"
+      "sudo *": "deny"
     },
     "ctx_shell": {
       "rm -rf *": "deny",
@@ -39,7 +39,7 @@
       "lean-ctx config set shell_security*": "deny",
       "lean-ctx security *": "deny",
       "lean-ctx harden undo*": "deny",
-      "sudo *": "ask"
+      "sudo *": "deny"
     },
     "external_directory": "allow"
   }
