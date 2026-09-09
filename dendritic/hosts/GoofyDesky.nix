@@ -335,6 +335,40 @@
         };
         services.blueman.enable = true;
 
+        # WF-1000XM6: keep A2DP transport alive when PC stream goes idle.
+        # Default WirePlumber session suspend (~5s) tears down the LDAC transport;
+        # resume dies with "Failure in Bluetooth audio transport" (sink node stays,
+        # api.bluez5.transport empty, silence). Disable suspend for all bluez nodes
+        # and cards. Node match covers pulse-native (pulse-stream) nodes too.
+        services.pipewire.wireplumber.extraConfig."52-bluez-no-suspend" = {
+          "monitor.bluez.rules" = [
+            {
+              matches = [
+                {
+                  "node.name" = "~bluez_.*";
+                }
+              ];
+              actions = {
+                "update-props" = {
+                  "session.suspend-timeout-seconds" = 0;
+                };
+              };
+            }
+            {
+              matches = [
+                {
+                  "device.name" = "~bluez_card.*";
+                }
+              ];
+              actions = {
+                "update-props" = {
+                  "session.suspend-timeout-seconds" = 0;
+                };
+              };
+            }
+          ];
+        };
+
         systemd.user.services.nvidia-gaming-settings = {
           description = "NVIDIA max-performance PowerMizer";
           after = [
