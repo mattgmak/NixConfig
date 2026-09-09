@@ -1,0 +1,70 @@
+{
+  "compaction": "auto",
+  "compactionEngine": "blackhole",
+  "compactionSummaryMode": "default",
+  "tailBehavior": "minimal",
+  "midRunCompaction": "off",
+  "skipForProviders": [],
+  "compactAfterPreset": "optimized",
+  "compactAfterPresets": {
+    "optimized": [
+      { "window": 32768, "ratio": 0.9 },
+      { "window": 131072, "ratio": 0.8 },
+      { "window": 262144, "ratio": 0.6 },
+      { "window": 1048576, "ratio": 0.2 }
+    ]
+  },
+  "retainedToolOutputMaxTokens": 20000,
+  "observeAfterTokens": 15000,
+  "reflectAfterTokens": 25000,
+  "observationsPoolMaxTokens": 20000,
+  "observationsPoolTargetTokens": 10000,
+  "reflectorInputMaxTokens": 80000,
+  "dropperInputMaxTokens": 80000,
+  "dropperPressureThreshold": 0.7,
+  "dropperPoolFullnessThreshold": 0.1,
+  "observerChunkMaxTokens": 40000,
+  "observerPreambleMaxTokens": 0,
+  "agentMaxTurns": 16,
+  "providerIdleTimeoutMs": 0,
+  "memory": true,
+  "sessionFallback": true,
+  "fullFoldAlways": true,
+  "debug": false,
+  "debugLog": false,
+
+  "model": {
+    "provider": "openrouter",
+    "id": "inclusionai/ling-3.0-flash-fin:free",
+    "thinking": "low",
+    "cooldownHours": 6,
+    "contextWindow": 262144
+  },
+
+  "observerModel": {
+    "provider": "openrouter",
+    "id": "inclusionai/ling-3.0-flash-fin:free",
+    "thinking": "low",
+    "cooldownHours": 6,
+    "contextWindow": 262144
+  },
+  "observerFallbackModels": [],
+
+  "reflectorModel": {
+    "provider": "openrouter",
+    "id": "inclusionai/ling-3.0-flash-fin:free",
+    "thinking": "low",
+    "cooldownHours": 6,
+    "contextWindow": 262144
+  },
+  "reflectorFallbackModels": [],
+
+  "dropperModel": {
+    "provider": "openrouter",
+    "id": "inclusionai/ling-3.0-flash-fin:free",
+    "thinking": "off",
+    "cooldownHours": 6,
+    "contextWindow": 262144
+  },
+  "dropperFallbackModels": []
+}

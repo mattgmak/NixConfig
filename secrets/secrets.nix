@@ -131,6 +131,17 @@ in
       MacMini
     ];
   };
+  "openrouter-api-key.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      AgentAge
+      MacMini
+    ];
+  };
 
   "mercury-ai-token.age" = {
     armor = true;

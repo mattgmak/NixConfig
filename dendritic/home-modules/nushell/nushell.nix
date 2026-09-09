@@ -25,6 +25,16 @@
           ''
         else
           null;
+      openrouterApiKeySecret = ../../../secrets/openrouter-api-key.age;
+      hasOpenrouterApiKeySecret = builtins.pathExists openrouterApiKeySecret;
+      readOpenrouterApiKeyScript =
+        if hasOpenrouterApiKeySecret then
+          pkgs.writeShellScript "read-openrouter-api-key" ''
+            set -euo pipefail
+            cat "${config.age.secrets.openrouter-api-key.path}"
+          ''
+        else
+          null;
       mercuryAiToken = ../../../secrets/mercury-ai-token.age;
       hasMercuryAiTokenSecret = builtins.pathExists mercuryAiToken;
       readMercuryAiTokenScript =
@@ -91,6 +101,7 @@
 
       age.secrets = {
         opencode-api-key.file = lib.mkIf hasOpencodeApiKeySecret opencodeApiKeySecret;
+        openrouter-api-key.file = lib.mkIf hasOpenrouterApiKeySecret openrouterApiKeySecret;
         mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
         context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
         github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
@@ -181,6 +192,14 @@
           ''
           + lib.optionalString hasCursorApiKeySecret ''
 
+            # openrouter-api-key.age: one line, raw OpenRouter API key (no OPENROUTER_API_KEY= prefix)
+            $env.OPENROUTER_API_KEY = (
+              try {
+                (^${readOpenrouterApiKeyScript} | str trim)
+              } catch {
+                ""
+              }
+            )
             # cursor-api-key.age: one line, raw Cursor SDK API key (no CURSOR_API_KEY= prefix)
             $env.CURSOR_API_KEY = (
               try {

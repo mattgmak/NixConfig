@@ -483,6 +483,8 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
       home.file.".config/lean-ctx/config.toml".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
+      home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
 
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;
