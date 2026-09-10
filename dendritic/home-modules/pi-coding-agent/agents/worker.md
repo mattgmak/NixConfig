@@ -3,7 +3,7 @@ name: worker
 description: General-purpose worker — reads, writes, and edits code
 tools: ctx_read, write, edit, ctx_shell, web_search, fetch_content
 subagent_agents: scout, researcher
-model: cursor/composer-2.5:slow
+model: openrouter/deepseek/deepseek-v4-flash-0731
 thinking: off
 system-prompt: append
 auto-exit: true

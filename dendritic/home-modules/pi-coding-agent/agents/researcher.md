@@ -2,7 +2,7 @@
 name: researcher
 description: Web researcher — searches the web and synthesizes findings
 tools: web_search, fetch_content, safe_bash
-model: cursor/composer-2.5:slow
+model: openrouter/deepseek/deepseek-v4-flash-0731
 thinking: off
 system-prompt: append
 auto-exit: true
