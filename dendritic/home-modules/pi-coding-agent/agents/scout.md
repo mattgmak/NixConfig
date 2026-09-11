@@ -27,7 +27,7 @@ Strategy:
 Your FINAL assistant message is your entire deliverable — it must stand alone, using this format:
 
 ## Files Found
-List with exact line ranges:
+Exact line ranges:
 1. `path/to/file.ts` (lines 10-50) — Description
 2. `path/to/other.ts` (lines 100-150) — Description
 
@@ -35,7 +35,7 @@ List with exact line ranges:
 Critical types, interfaces, or functions with actual code snippets.
 
 ## Architecture
-Brief explanation of how the pieces connect.
+How the pieces connect.
 
 ## Start Here
-Which file to look at first and why.
+Which file to read first, why.
