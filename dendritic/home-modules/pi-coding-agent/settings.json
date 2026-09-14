@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "0.85.1",
   "defaultProvider": "clinepass",
   "defaultModel": "cline-pass/deepseek-v4-flash",
   "defaultThinkingLevel": "off",
