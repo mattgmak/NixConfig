@@ -1,15 +1,9 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.84.4",
-  "defaultProvider": "openrouter",
-  "defaultModel": "deepseek/deepseek-v4-flash-0731",
+  "defaultProvider": "clinepass",
+  "defaultModel": "cline-pass/deepseek-v4-flash",
   "defaultThinkingLevel": "off",
-  "observational-memory": {
-    "model": {
-      "provider": "clinepass",
-      "id": "cline-pass/mimo-v2.5"
-    }
-  },
   "theme": "stylix",
   "powerline": {
     "preset": "full",

@@ -2,7 +2,7 @@
 name: scout
 description: Fast codebase recon — explores files, finds patterns, maps architecture
 tools: ctx_read, ctx_grep, ctx_find, ctx_ls
-model: openrouter/deepseek/deepseek-v4-flash-0731
+model: clinepass/cline-pass/deepseek-v4-flash
 thinking: off
 session-mode: lineage-only
 system-prompt: append
