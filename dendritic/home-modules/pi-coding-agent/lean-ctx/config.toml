@@ -50,4 +50,5 @@ shell_allowlist_extra = [
     "agenix",
     "launchctl",
     "command",
+    "agent-sesh",
 ]
