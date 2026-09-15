@@ -297,6 +297,27 @@ Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and 
 
 Run after submodule add/update when an extension has runtime deps.
 
+### Engram ext/bin version sync
+
+`gentle-engram` ext (submodule `vendor/Gentleman-Programming/engram`, `plugin/pi`) + `engram` bin (`dendritic/packages/engram.nix`) stay in sync. Bump both together.
+
+Ext calls HTTP routes on the running `engram serve` bin. Old bin → missing route → ext degrades gracefully (404 → fallback/warning), but features silently die:
+
+| Route | Feature | Server floor |
+|-------|---------|--------------|
+| `/review`, `/review/mark_reviewed` | `mem_review` list/mark_reviewed | v1.20.0+ |
+| `/context/compaction` | session-summary + compaction recovery | 2.0.0-rc era (post-1.20.0) |
+
+Check floor per tag: `git -C vendor/Gentleman-Programming/engram grep -l '<route>' v<tag> -- '*.go'`. Pin bin to latest stable (= 1.20.0 ceiling for stable); rc only if you need compaction recovery.
+
+Bump procedure (`dendritic/packages/engram.nix`):
+
+1. Set `version` = new tag; keep `baseUrl` scheme.
+2. Fetch 4 tarballs `engram_<v>_{linux_amd64,linux_arm64,darwin_arm64,darwin_amd64}.tar.gz` from releases. SRI hash per platform: `curl -fsSLO <url>; nix hash file <tarball>` (`nix-prefetch-url` can be blocked by the lean-ctx shell allowlist).
+3. Verify flat layout (binary `engram` at archive root — `dontUnpack` + `tar -xOf` depends on it) and `engram version` prints the new version (installCheck greps it).
+4. `nix build --no-link .#engram` → installCheck confirms version.
+5. Running server = old bin until `nixos-rebuild switch` / home-manager switch applies the new generation.
+
 ## Apply config changes
 
 Repo paths are linked with `mkOutOfStoreSymlink`, so **content edits are live** at `~/.pi/agent/*` without rebuilding Home Manager.
@@ -386,6 +407,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
 | Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |
+| Bump engram binary (keep in sync with ext) | `dendritic/packages/engram.nix` (see Engram ext/bin version sync) |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent build tweaks) |
 
 ## Goofeus agent workspace (GoofeusAgent)

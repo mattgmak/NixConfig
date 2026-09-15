@@ -12,25 +12,25 @@
         }:
 
         let
-          version = "1.16.1";
+          version = "1.20.0";
           baseUrl = "https://github.com/Gentleman-Programming/engram/releases/download/v${version}";
 
           platformAttrs = {
             "x86_64-linux" = {
               asset = "linux_amd64";
-              hash = "sha256-2VIC8ZJ9FCz+DXZPTEvHqiFx6FuZ+upq7fzJArc9vfc=";
+              hash = "sha256-fcMAMxjjA77iaaR3IUTzzgHI7HAL/VJKrsdncKzTico=";
             };
             "aarch64-linux" = {
               asset = "linux_arm64";
-              hash = "sha256-VqLLPLfgPcf8J+770eKqXvmg2Znha5IOOSv6MQPSeCc=";
+              hash = "sha256-frgVkQp2rmz6ml0BYdNwHik9zKcfd0PP+mLiNuWvWa8=";
             };
             "aarch64-darwin" = {
               asset = "darwin_arm64";
-              hash = "sha256-sMu2xUVGnqYwb5UpLk6KAssaj0/LDcWsmb6TqMW/xsI=";
+              hash = "sha256-I2PVAS8j5Yh4+Gw93MH2PP6dzz7sf0E+cOqvy7nTlMw=";
             };
             "x86_64-darwin" = {
               asset = "darwin_amd64";
-              hash = "sha256-CjJ1A0teQUDjq9XFN4qKer73sLAAfAtcRZnAnz0ZicI=";
+              hash = "sha256-O5AV3Pzdn4I+t60LWQsdvEwlu12B3aP4TmI3CYFa/oA=";
             };
           };
 
