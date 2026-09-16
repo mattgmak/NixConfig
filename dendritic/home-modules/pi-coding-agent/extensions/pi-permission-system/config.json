@@ -42,7 +42,11 @@
       "lean-ctx config set shell_security*": "deny",
       "lean-ctx security *": "deny",
       "lean-ctx harden undo*": "deny",
-      "sudo *": "deny"
+      "sudo *": "deny",
+      "gh pr merge *": "deny",
+      "gh pr close *": "deny",
+      "gh api *pulls*merge*": "deny",
+      "gh api *merges*": "deny"
     },
     "ctx_shell": {
       "rm -rf *": "deny",
@@ -71,7 +75,11 @@
       "lean-ctx config set shell_security*": "deny",
       "lean-ctx security *": "deny",
       "lean-ctx harden undo*": "deny",
-      "sudo *": "deny"
+      "sudo *": "deny",
+      "gh pr merge *": "deny",
+      "gh pr close *": "deny",
+      "gh api *pulls*merge*": "deny",
+      "gh api *merges*": "deny"
     },
     "external_directory": "allow"
   }

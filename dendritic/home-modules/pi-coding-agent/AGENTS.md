@@ -46,6 +46,11 @@
 
 # Git
 
+- NEVER mutate pull requests — no merges, closes, approvals, or admin
+  bypasses (`gh pr merge`, `gh pr close`, `gh pr review --approve`,
+  `gh api .../pulls/.../merge`) unless the user explicitly asked for that
+  specific mutation in the same session. Otherwise stop and ask first.
+
 - NEVER modify previous commits, only when explicitly asked by the user.
 
 - NEVER make commits, unless when explicitly asked by the user.

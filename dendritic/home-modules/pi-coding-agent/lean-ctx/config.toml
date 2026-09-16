@@ -51,4 +51,5 @@ shell_allowlist_extra = [
     "launchctl",
     "command",
     "agent-sesh",
+    "pr",
 ]
