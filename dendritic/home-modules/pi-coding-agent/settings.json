@@ -1,8 +1,8 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.85.1",
-  "defaultProvider": "clinepass",
-  "defaultModel": "cline-pass/deepseek-v4-flash",
+  "defaultProvider": "cursor",
+  "defaultModel": "composer-2.5:slow",
   "defaultThinkingLevel": "off",
   "theme": "stylix",
   "powerline": {
@@ -41,6 +41,7 @@
   "hideThinkingBlock": true,
   "modelThinkingLevels": {
     "clinepass/cline-pass/deepseek-v4-flash": "high",
+    "openrouter/deepseek/deepseek-v4-flash-0731": "high",
     "opencode-go/deepseek-v4-flash": "low",
     "llama-swap/k2-horizon:3.7b-q5km": "high",
     "llama-swap/k2-horizon:7b-q4km": "high",

@@ -3,7 +3,7 @@ name: worker
 description: General-purpose worker — reads, writes, and edits code
 tools: ctx_read, write, edit, ctx_shell, fetch_content
 subagent_agents: scout, researcher
-model: clinepass/cline-pass/deepseek-v4-flash
+model: cursor/composer-2.5:slow
 thinking: off
 system-prompt: append
 auto-exit: true
