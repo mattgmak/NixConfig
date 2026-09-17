@@ -102,6 +102,35 @@ in
         };
       };
 
+      # Engram persistent-memory HTTP server (default port 7437). The
+      # gentle-engram Pi extension talks to this over localhost; without it
+      # mem_* tools fail with "Engram server not running". RunAtLoad starts it
+      # at login, KeepAlive restarts it on crash/exit. DB + logs live in
+      # ~/.engram (created on first serve).
+      launchd.agents.engram = {
+        serviceConfig = {
+          ProgramArguments = [
+            "${self.packages.${system}.engram}/bin/engram"
+            "serve"
+          ];
+          # nix-darwin loads agents into the system domain here; without
+          # UserName the job would run as root. Pin the user explicitly.
+          UserName = username;
+          # launchd daemon/agent context does not set $HOME; engram refuses
+          # to start without it ("determine home directory: $HOME is not
+          # defined"). Pin it so the DB stays at ~/.engram.
+          EnvironmentVariables = {
+            HOME = "/Users/${username}";
+            USER = username;
+          };
+          RunAtLoad = true;
+          KeepAlive = true;
+          WorkingDirectory = "/Users/${username}";
+          StandardOutPath = "/Users/${username}/.engram/serve.stdout.log";
+          StandardErrorPath = "/Users/${username}/.engram/serve.stderr.log";
+        };
+      };
+
       imports = [
         inputs.home-manager.darwinModules.home-manager
         inputs.nix-homebrew.darwinModules.nix-homebrew
