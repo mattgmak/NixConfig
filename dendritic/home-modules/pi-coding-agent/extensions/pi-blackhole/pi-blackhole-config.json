@@ -37,7 +37,7 @@
     "provider": "openrouter",
     "id": "inclusionai/ling-3.0-flash-fin:free",
     "thinking": "low",
-    "cooldownHours": 6,
+    "cooldownHours": 2,
     "contextWindow": 262144
   },
 
@@ -45,26 +45,92 @@
     "provider": "openrouter",
     "id": "inclusionai/ling-3.0-flash-fin:free",
     "thinking": "low",
-    "cooldownHours": 6,
+    "cooldownHours": 2,
     "contextWindow": 262144
   },
-  "observerFallbackModels": [],
+  "observerFallbackModels": [
+    {
+      "provider": "opencode",
+      "id": "ling-3.0-flash-fin-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "provider": "opencode",
+      "id": "big-pickle",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    },
+    {
+      "provider": "opencode",
+      "id": "mimo-v2.5-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    }
+  ],
 
   "reflectorModel": {
     "provider": "openrouter",
     "id": "inclusionai/ling-3.0-flash-fin:free",
     "thinking": "low",
-    "cooldownHours": 6,
+    "cooldownHours": 2,
     "contextWindow": 262144
   },
-  "reflectorFallbackModels": [],
+  "reflectorFallbackModels": [
+    {
+      "provider": "opencode",
+      "id": "ling-3.0-flash-fin-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "provider": "opencode",
+      "id": "big-pickle",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    },
+    {
+      "provider": "opencode",
+      "id": "mimo-v2.5-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    }
+  ],
 
   "dropperModel": {
     "provider": "openrouter",
     "id": "inclusionai/ling-3.0-flash-fin:free",
     "thinking": "off",
-    "cooldownHours": 6,
+    "cooldownHours": 2,
     "contextWindow": 262144
   },
-  "dropperFallbackModels": []
+  "dropperFallbackModels": [
+    {
+      "provider": "opencode",
+      "id": "ling-3.0-flash-fin-free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "provider": "opencode",
+      "id": "big-pickle",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    },
+    {
+      "provider": "opencode",
+      "id": "mimo-v2.5-free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 200000
+    }
+  ]
 }
