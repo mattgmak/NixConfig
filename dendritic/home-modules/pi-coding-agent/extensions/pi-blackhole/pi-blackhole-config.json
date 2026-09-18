@@ -10,7 +10,7 @@
     "optimized": [
       { "window": 32768, "ratio": 0.9 },
       { "window": 131072, "ratio": 0.8 },
-      { "window": 262144, "ratio": 0.6 },
+      { "window": 262144, "ratio": 0.4 },
       { "window": 1048576, "ratio": 0.1 }
     ]
   },
