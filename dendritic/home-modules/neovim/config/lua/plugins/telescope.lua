@@ -83,16 +83,9 @@ return {
       { desc = 'Find files (hidden)' }
     )
     vim.keymap.set('n', '<leader>js', function() builtin.lsp_document_symbols() end, { desc = 'Goto symbol in file' })
-    vim.keymap.set(
-      'n',
-      '<leader>jc',
-      function()
-        builtin.lsp_document_symbols({
-          symbols = { 'method', 'function', 'constructor', 'field', 'class', 'struct', 'interface' },
-        })
-      end,
-      { desc = 'Symbol outline (breadcrumb-ish)' }
-    )
+    vim.keymap.set('n', '<leader>jc', function() require('lib.githunks').pick() end, {
+      desc = 'Git hunks (all files)',
+    })
     vim.keymap.set({ 'n' }, '<leader>jf', function() builtin.current_buffer_fuzzy_find() end, {
       desc = 'Find in active file',
     })
