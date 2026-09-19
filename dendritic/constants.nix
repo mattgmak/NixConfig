@@ -44,6 +44,7 @@ in
     macMiniName = "MacMini";
     desktopName = "GoofyDesky";
     serverName = "Goofeus";
+    ramsayName = "Ramsay";
   };
 
   flake.builderSites = builderSites;

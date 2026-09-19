@@ -260,16 +260,6 @@
           supportedFilesystems = [ "ntfs" ];
         };
 
-        fileSystems."/mnt/windows/c" = {
-          # device = "/dev/nvme1n1p4";
-          device = "/dev/disk/by-uuid/FC880B87880B401E";
-          fsType = "ntfs";
-          options = [
-            "defaults"
-            "nofail"
-          ];
-        };
-
         systemd.services.hyperhdr = {
           enable = true;
           wantedBy = [ "multi-user.target" ];
@@ -402,7 +392,22 @@
         users.users.${username}.openssh.authorizedKeys.keys = [
           self.sshKeys.Droid
         ];
-        services.openssh.enable = true;
+
+        # nixos-anywhere --target-host root@127.0.0.1 (local SSD install). Loopback only.
+        users.users.root.openssh.authorizedKeys.keys = with self.sshKeys; [
+          GoofyDesky
+          GoofyEnvy
+          Droid
+        ];
+
+        services.openssh = {
+          enable = true;
+          settings.PermitRootLogin = "no";
+          extraConfig = ''
+            Match Address 127.0.0.1,::1
+              PermitRootLogin prohibit-password
+          '';
+        };
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         system.stateVersion = "24.11";

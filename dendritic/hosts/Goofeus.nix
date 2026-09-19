@@ -74,85 +74,85 @@
       { lib, pkgs, ... }:
       {
         imports = with self.homeModules; [
-        nixos-home
-        atuin
-        zoxide
-        nushell
-        neovim
-        starship
-        yazi
-        git
-        delta
-        gh
-        direnv
-        devenv
-        lazygit
-        btop
-        bat
-        nix-index-database
-        pi-coding-agent
-        tmux
-        zellij
-        worktrunk
-        handmux
-        bash
-        carapace
-        nixconfig-sync
-      ];
-      programs.handmux = {
-        enable = true;
-        enableServer = true;
-        enableAgentPi = true;
-        name = "Goofeus";
-        tokenFile = "/run/agenix/handmux-token";
+          nixos-home
+          atuin
+          zoxide
+          nushell
+          neovim
+          starship
+          yazi
+          git
+          delta
+          gh
+          direnv
+          devenv
+          lazygit
+          btop
+          bat
+          nix-index-database
+          pi-coding-agent
+          tmux
+          zellij
+          worktrunk
+          handmux
+          bash
+          carapace
+          nixconfig-sync
+        ];
+        programs.handmux = {
+          enable = true;
+          enableServer = true;
+          enableAgentPi = true;
+          name = "Goofeus";
+          tokenFile = "/run/agenix/handmux-token";
+        };
+        tools.nixconfigSync.enable = true;
+
+        # Auto-install pi extension deps when needed (first switch after clone,
+        # or after vendor extension bumps). Non-fatal: failure leaves pi usable,
+        # it only means an extension may need manual pi-npm-i.
+        home.activation.autoPiNpmI = lib.hm.dag.entryAfter [ "writeBoundary" "ensureNixConfig" ] ''
+          stamp="$HOME/.local/state/pi-npm-i.stamp"
+          repo="$HOME/NixConfig"
+          mkdir -p "$HOME/.local/state"
+          if [[ -f "$stamp" ]] && \
+             [[ -z "$(find "$repo/vendor" "$repo/dendritic/home-modules/pi-coding-agent/extensions" \
+                       -name package.json -newer "$stamp" -print -quit 2>/dev/null)" ]]; then
+            exit 0
+          fi
+          echo "pi-npm-i: installing pi extension deps..."
+          if PATH="$HOME/.nix-profile/bin:$PATH" pi-npm-i; then
+            touch "$stamp"
+          else
+            echo "pi-npm-i: failed (non-fatal) — run manually later"
+          fi
+        '';
+
+        # Agent decrypts API secrets with its own age identity (root uses the
+        # ssh host key via nushell's mkIf; agent gets the dedicated key path).
+        age.identityPaths = [ "/run/agenix/agent-age-key" ];
+
+        # Empty `agents` tmux session on boot — pi started manually after attach.
+        systemd.user.services.agents-tmux = {
+          Unit = {
+            Description = "Empty tmux session 'agents' (pi agent workspace)";
+            After = [ "handmux.service" ];
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            # Panes spawned from this session inherit PATH — must include HM profile
+            # bins (starship/zoxide/…) or shells break (see handmux pane shell errors).
+            # Agent user is fixed (age.identityPaths etc. assume it); login PATH is
+            # ~/.nix-profile + /etc/profiles/per-user/agent + system sw.
+            Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+            ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
+        };
       };
-      tools.nixconfigSync.enable = true;
-
-      # Auto-install pi extension deps when needed (first switch after clone,
-      # or after vendor extension bumps). Non-fatal: failure leaves pi usable,
-      # it only means an extension may need manual pi-npm-i.
-      home.activation.autoPiNpmI = lib.hm.dag.entryAfter [ "writeBoundary" "ensureNixConfig" ] ''
-        stamp="$HOME/.local/state/pi-npm-i.stamp"
-        repo="$HOME/NixConfig"
-        mkdir -p "$HOME/.local/state"
-        if [[ -f "$stamp" ]] && \
-           [[ -z "$(find "$repo/vendor" "$repo/dendritic/home-modules/pi-coding-agent/extensions" \
-                     -name package.json -newer "$stamp" -print -quit 2>/dev/null)" ]]; then
-          exit 0
-        fi
-        echo "pi-npm-i: installing pi extension deps..."
-        if PATH="$HOME/.nix-profile/bin:$PATH" pi-npm-i; then
-          touch "$stamp"
-        else
-          echo "pi-npm-i: failed (non-fatal) — run manually later"
-        fi
-      '';
-
-      # Agent decrypts API secrets with its own age identity (root uses the
-      # ssh host key via nushell's mkIf; agent gets the dedicated key path).
-      age.identityPaths = [ "/run/agenix/agent-age-key" ];
-
-      # Empty `agents` tmux session on boot — pi started manually after attach.
-      systemd.user.services.agents-tmux = {
-        Unit = {
-          Description = "Empty tmux session 'agents' (pi agent workspace)";
-          After = [ "handmux.service" ];
-        };
-        Service = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-          # Panes spawned from this session inherit PATH — must include HM profile
-          # bins (starship/zoxide/…) or shells break (see handmux pane shell errors).
-          # Agent user is fixed (age.identityPaths etc. assume it); login PATH is
-          # ~/.nix-profile + /etc/profiles/per-user/agent + system sw.
-          Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
-          ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
-      };
-    };
 
     nixosModules.Goofeus =
       {
