@@ -2330,6 +2330,26 @@
         "type": "github"
       }
     },
+    "orca-slicer-nightly": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789900892,
+        "narHash": "sha256-68TzWCFDqKneUjA2xuycCwBBqAnBQDZHErfU/uIs5ug=",
+        "owner": "skwort",
+        "repo": "orca-slicer-nightly",
+        "rev": "abc782b5585a60bb213952c1e3c74143984fe108",
+        "type": "github"
+      },
+      "original": {
+        "owner": "skwort",
+        "repo": "orca-slicer-nightly",
+        "type": "github"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -2516,6 +2536,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-droid": "nixpkgs-droid",
+        "orca-slicer-nightly": "orca-slicer-nightly",
         "sherlock": "sherlock",
         "stylix": "stylix",
         "tmux-powerkit": "tmux-powerkit",

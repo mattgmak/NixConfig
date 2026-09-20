@@ -142,6 +142,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    orca-slicer-nightly = {
+      url = "github:skwort/orca-slicer-nightly";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     agent-sesh = {
       url = ./vendor/mattgmak/agent-sesh;
       inputs.nixpkgs.follows = "nixpkgs";

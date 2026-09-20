@@ -1,0 +1,13 @@
+--- a/src/libslic3r/CMakeLists.txt
++++ b/src/libslic3r/CMakeLists.txt
+@@ -679,7 +679,9 @@
+         libigl
+         libnest2d
+         miniz
+-        opencv_world
++        opencv_core
++        opencv_imgproc
++        opencv_imgcodecs
+         assimp::assimp
+     PRIVATE
+         ${CMAKE_DL_LIBS}

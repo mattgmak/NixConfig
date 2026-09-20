@@ -1,0 +1,21 @@
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -355,11 +355,13 @@
+         COMMAND ln -sfn "${SLIC3R_RESOURCES_DIR}" "${BIN_RESOURCES_DIR}"
+         COMMENT "Symlinking the resources directory into the build tree"
+         VERBATIM)
+-    add_custom_command(TARGET OrcaSlicer POST_BUILD
+-        COMMAND ${CMAKE_COMMAND} -E rm -rf "${BIN_DIR}/python"
+-        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_PREFIX_PATH}/libpython" "${BIN_DIR}/python"
+-        COMMENT "Copying Python runtime into the build tree"
+-        VERBATIM)
++    if (EXISTS "${CMAKE_PREFIX_PATH}/libpython")
++        add_custom_command(TARGET OrcaSlicer POST_BUILD
++            COMMAND ${CMAKE_COMMAND} -E rm -rf "${BIN_DIR}/python"
++            COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_PREFIX_PATH}/libpython" "${BIN_DIR}/python"
++            COMMENT "Copying Python runtime into the build tree"
++            VERBATIM)
++    endif()
+     # Stage uv next to the binary for the build-tree/.app flows, which never
+     # run install() -- see the layout map above; lookup is bundled_uv_path().
+     if(ORCA_BUNDLED_UV_EXECUTABLE AND EXISTS "${ORCA_BUNDLED_UV_EXECUTABLE}")

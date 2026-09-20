@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1142,6 +1142,11 @@ function(orcaslicer_copy_sos target config postfix output_sos)
+         set(_out_dir "${CMAKE_CURRENT_BINARY_DIR}")
+     endif ()
+ 
++    if (NOT EXISTS "${CMAKE_PREFIX_PATH}/lib/libavcodec.so")
++        set(${output_sos} "" PARENT_SCOPE)
++        return()
++    endif()
++
+     file(COPY ${CMAKE_PREFIX_PATH}/lib/libavcodec.so
+             ${CMAKE_PREFIX_PATH}/lib/libavcodec.so.61
+             ${CMAKE_PREFIX_PATH}/lib/libavcodec.so.61.3.100

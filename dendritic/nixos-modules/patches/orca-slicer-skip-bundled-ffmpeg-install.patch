@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1295,7 +1295,9 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+     ${LIBDIR_BIN}/libswscale.so.8
+     ${LIBDIR_BIN}/libswscale.so.8.1.100
+     )
+-    install(FILES ${LIBRARY_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
++    if (EXISTS "${LIBDIR_BIN}/libavcodec.so.61")
++        install(FILES ${LIBRARY_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
++    endif()
+ endif ()
+ 
+ install(FILES ${CMAKE_SOURCE_DIR}/LICENSE.txt DESTINATION ".")
