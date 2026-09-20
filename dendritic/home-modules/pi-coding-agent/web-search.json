@@ -1,3 +1,25 @@
 {
-    "workflow": "none"
+  "workflow": "none",
+  "autoOpenBrowser": false,
+  "commands": {
+    "curator": { "enabled": false }
+  },
+  "crawl4aiBaseUrl": "http://127.0.0.1:11235",
+  "crawl4aiApiToken": "$CRAWL4AI_API_TOKEN",
+  "fetchRouting": {
+    "allowRemoteHostedProviders": true,
+    "providers": [
+      "http",
+      "crawl4ai",
+      "jina",
+      "tinyfish",
+      "search1api",
+      "querit",
+      "kagi",
+      "ollama",
+      "parallel",
+      "brightdata",
+      "gemini"
+    ]
+  }
 }

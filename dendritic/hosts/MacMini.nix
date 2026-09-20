@@ -70,6 +70,36 @@ in
       common-nixpkgs-config,
       ...
     }:
+    let
+      crawl4aiPort = 11235;
+      crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
+      crawl4aiApiToken =
+        builtins.substring 0 64 (
+          builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
+        );
+      piCrawl4aiServe = pkgs.writeShellApplication {
+        name = "pi-crawl4ai-serve";
+        runtimeInputs = [ pkgs.podman ];
+        text = ''
+          set -euo pipefail
+          port=${toString crawl4aiPort}
+          image=${crawl4aiImage}
+          token=${crawl4aiApiToken}
+          stateDir="$HOME/.local/state"
+          mkdir -p "$stateDir"
+
+          # Homebrew podman owns the macOS VM; nix podman is on PATH via runtimeInputs.
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          podman machine start 2>/dev/null || true
+          podman pull "$image" || true
+          podman rm -f pi-crawl4ai 2>/dev/null || true
+          exec podman run --rm --name pi-crawl4ai --shm-size=1g \
+            -p "127.0.0.1:$port:11235" \
+            -e "CRAWL4AI_API_TOKEN=$token" \
+            "$image"
+        '';
+      };
+    in
     {
       nixpkgs.overlays = common-overlays;
       nixpkgs.config = common-nixpkgs-config;
@@ -128,6 +158,26 @@ in
           WorkingDirectory = "/Users/${username}";
           StandardOutPath = "/Users/${username}/.engram/serve.stdout.log";
           StandardErrorPath = "/Users/${username}/.engram/serve.stderr.log";
+        };
+      };
+
+      # Crawl4AI fetch server for pi-web-access (fetch_content fallback).
+      # Linux pi hosts use systemd.user.services.crawl4ai in pi-coding-agent.nix;
+      # darwin has no user systemd, so mirror engram with a launchd agent.
+      launchd.agents.crawl4ai = {
+        serviceConfig = {
+          ProgramArguments = [ "${piCrawl4aiServe}/bin/pi-crawl4ai-serve" ];
+          UserName = username;
+          EnvironmentVariables = {
+            HOME = "/Users/${username}";
+            USER = username;
+            PATH = "/opt/homebrew/bin:/usr/local/bin:${pkgs.podman}/bin";
+          };
+          RunAtLoad = true;
+          KeepAlive = true;
+          WorkingDirectory = "/Users/${username}";
+          StandardOutPath = "/Users/${username}/.local/state/crawl4ai.stdout.log";
+          StandardErrorPath = "/Users/${username}/.local/state/crawl4ai.stderr.log";
         };
       };
 

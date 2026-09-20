@@ -172,6 +172,13 @@
         text = mkPiPowerlineTheme config.lib.stylix.colors;
       };
 
+      crawl4aiPort = 11235;
+      crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
+      crawl4aiApiToken =
+        builtins.substring 0 64 (
+          builtins.hashString "sha256" "pi-crawl4ai-${config.home.homeDirectory}"
+        );
+
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
         runtimeInputs = with pkgs; [
@@ -443,11 +450,38 @@
           agent-browser
           uv
           bun
+          podman
           piNpmI
           self.packages.${system}.lean-ctx
           self.packages.${system}.engram
         ]
         ++ markdownPreviewDeps;
+
+      systemd.user.services.crawl4ai = {
+        Unit = {
+          Description = "Crawl4AI fetch server for pi-web-access";
+          After = [ "network-online.target" ];
+          Wants = [ "network-online.target" ];
+        };
+        Service = {
+          Type = "simple";
+          Restart = "on-failure";
+          RestartSec = 5;
+          TimeoutStartSec = "10min";
+          # --replace breaks rootless podman pasta port forwarding (host gets RST).
+          ExecStartPre = [
+            "-${lib.getExe pkgs.podman} pull ${crawl4aiImage}"
+            "-${lib.getExe pkgs.podman} rm -f pi-crawl4ai"
+          ];
+          ExecStart =
+            let
+              hostPort = toString crawl4aiPort;
+            in
+            "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
+          ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-crawl4ai";
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
 
       home.activation.linkPiPowerlineTheme = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
@@ -479,7 +513,14 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
       home.file.".pi/agent/agents".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
+      # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
+      # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
+      # paths so repo-managed config wins over stale /curator toggles elsewhere.
       home.file.".pi/web-search.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+      home.file.".pi/agent/web-search.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+      home.file.".config/pi/web-search.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
       home.file.".config/lean-ctx/config.toml".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
@@ -489,6 +530,7 @@
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;
         PI_CURSOR_ASK_QUESTION = "0";
+        CRAWL4AI_API_TOKEN = crawl4aiApiToken;
       };
     };
 }
