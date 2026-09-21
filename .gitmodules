@@ -1,9 +1,6 @@
 [submodule "mattgmak/zen-wireframe-2.0"]
 	path = vendor/mattgmak/zen-wireframe-2
 	url = https://github.com/mattgmak/zen-wireframe-2.0
-[submodule "mattgmak/pi-cursor-provider"]
-	path = vendor/mattgmak/pi-cursor-provider
-	url = https://github.com/mattgmak/pi-cursor-provider.git
 [submodule "carderne/pi-nvim"]
 	path = vendor/carderne/pi-nvim
 	url = https://github.com/carderne/pi-nvim.git
@@ -77,9 +74,6 @@
 [submodule "dabstractor/pi-nvim-bridge"]
 	path = vendor/dabstractor/pi-nvim-bridge
 	url = https://github.com/dabstractor/pi-nvim-bridge.git
-[submodule "vendor/Rahularya01/pi-cursor"]
-	path = vendor/Rahularya01/pi-cursor
-	url = https://github.com/Rahularya01/pi-cursor.git
 [submodule "fitchmultz/pi-cursor-sdk"]
 	path = vendor/fitchmultz/pi-cursor-sdk
 	url = https://github.com/fitchmultz/pi-cursor-sdk.git

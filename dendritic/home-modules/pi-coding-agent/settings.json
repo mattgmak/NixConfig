@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.86.1",
   "defaultProvider": "cursor",
   "defaultModel": "composer-2.5:slow",
   "defaultThinkingLevel": "off",
@@ -29,7 +29,7 @@
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
     "cursor/grok-4.6:slow",
-    "clinepass/cline-pass/deepseek-v4-flash",
+    "clinepass/cline-pass/deepseek-v4.1-flash",
     "clinepass/cline-pass/mimo-v2.5",
     "clinepass/cline-pass/mimo-v2.5-pro",
     "openrouter/qwen/qwen3.8-flash",
@@ -41,7 +41,7 @@
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
   "modelThinkingLevels": {
-    "clinepass/cline-pass/deepseek-v4-flash": "high",
+    "clinepass/cline-pass/deepseek-v4.1-flash": "high",
     "openrouter/deepseek/deepseek-v4-flash-0731": "high",
     "opencode-go/deepseek-v4-flash": "low",
     "llama-swap/k2-horizon:3.7b-q5km": "high",

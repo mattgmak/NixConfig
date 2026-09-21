@@ -47,10 +47,6 @@ Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github
 **Extension submodule** — vendored under `vendor/<owner>/<repo>/`, exposed via loader dir `extensions/<name>/`:
 
 ```
-vendor/Rahularya01/pi-cursor/
-extensions/_stowed/pi-cursor/index.ts   → old loader (not discovered by pi)
-vendor/mattgmak/pi-cursor-provider/   → fork of offbynan/pi-cursor-provider, kept for reference
-extensions/_stowed/cursor-provider/   → its loader (not discovered by pi)
 vendor/fitchmultz/pi-cursor-sdk/
 extensions/pi-cursor-sdk/index.ts     → ../vendor/fitchmultz/pi-cursor-sdk/dist/index.js (built by pi-npm-i)
 extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
@@ -199,8 +195,6 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 
 | Loader / vendor dir | Submodule URL (fork) | Upstream | Upstream branch |
 |---------------------|----------------------|----------|-----------------|
-| `pi-cursor` (`vendor/Rahularya01/pi-cursor`) | *(direct upstream)* | `https://github.com/Rahularya01/pi-cursor.git` | default — loader **stowed** in `extensions/_stowed/` |
-| `cursor-provider` (`vendor/mattgmak/pi-cursor-provider`) | `mattgmak/pi-cursor-provider` | `https://github.com/offbynan/pi-cursor-provider.git` | `main` — loader **stowed** in `extensions/_stowed/` |
 | `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) | *(direct upstream)* | `https://github.com/fitchmultz/pi-cursor-sdk.git` | default — active loader `extensions/pi-cursor-sdk/`; provider `cursor` |
 | `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
 | `pi-interactive-subagents` (`vendor/mattgmak/pi-interactive-subagents`) | `mattgmak/pi-interactive-subagents` | `https://github.com/amosblomqvist/pi-interactive-subagents.git` | `main` |
