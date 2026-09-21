@@ -115,4 +115,4 @@ $env.SHELL = $nu.current-exe
 # source ($nu.default-config-dir | path join 'custom.nu')
 mkdir ~/.cache/starship
 starship init nu | save -f ~/.cache/starship/init.nu
-zoxide init nushell | save -f ~/.zoxide.nu
+# zoxide: guarded init in config.nu via homeModules.zoxide (not here — avoids hook on `nu -c`)
