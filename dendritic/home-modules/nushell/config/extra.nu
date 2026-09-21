@@ -5,7 +5,7 @@ def --env y [...args] {
 	yazi ...$args --cwd-file $tmp
 	let cwd = (open $tmp)
 	if $cwd != "" and $cwd != $env.PWD {
- 		z $cwd
+		z $cwd
 	}
 	rm -fp $tmp
 }
