@@ -9,8 +9,8 @@
   "fetchRouting": {
     "allowRemoteHostedProviders": true,
     "providers": [
-      "http",
       "crawl4ai",
+      "http",
       "jina",
       "tinyfish",
       "search1api",

@@ -79,19 +79,117 @@ in
         );
       piCrawl4aiServe = pkgs.writeShellApplication {
         name = "pi-crawl4ai-serve";
-        runtimeInputs = [ pkgs.podman ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.curl
+          pkgs.podman
+        ];
         text = ''
           set -euo pipefail
           port=${toString crawl4aiPort}
           image=${crawl4aiImage}
           token=${crawl4aiApiToken}
           stateDir="$HOME/.local/state"
+          lockDir="$stateDir/crawl4ai-serve.lock"
           mkdir -p "$stateDir"
 
-          # Homebrew podman owns the macOS VM; nix podman is on PATH via runtimeInputs.
-          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          podman machine start 2>/dev/null || true
-          podman pull "$image" || true
+          # Homebrew podman owns the macOS VM; prepend without clobbering runtimeInputs PATH.
+          export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          crawl4ai_healthy() {
+            curl -sf -o /dev/null "http://127.0.0.1:$port/health" 2>/dev/null
+          }
+
+          clear_stale_lock() {
+            if [ ! -d "$lockDir" ]; then
+              return 0
+            fi
+            if crawl4ai_healthy; then
+              return 0
+            fi
+            if pgrep -f 'pi-crawl4ai-serve' >/dev/null 2>&1; then
+              return 0
+            fi
+            echo "clearing stale crawl4ai lock" >&2
+            rmdir "$lockDir" 2>/dev/null || true
+          }
+
+          clear_stale_lock
+          if ! mkdir "$lockDir" 2>/dev/null; then
+            echo "crawl4ai serve already starting; deferring to launchd retry" >&2
+            exit 1
+          fi
+          trap 'rmdir "$lockDir" 2>/dev/null || true' EXIT
+
+          configure_podman_socket() {
+            socket=$(
+              podman machine inspect podman-machine-default \
+                --format '{{.ConnectionInfo.PodmanSocket.Path}}' 2>/dev/null || true
+            )
+            if [ -n "$socket" ] && [ -S "$socket" ]; then
+              export CONTAINER_HOST="unix://$socket"
+            fi
+          }
+
+          wait_for_podman() {
+            for _ in $(seq 1 120); do
+              podman info >/dev/null 2>&1 && return 0
+              sleep 2
+            done
+            echo "podman API not ready after 240s" >&2
+            return 1
+          }
+
+          reset_podman_machine() {
+            echo "resetting podman machine after storage failure" >&2
+            podman machine stop 2>/dev/null || true
+            podman machine rm -f podman-machine-default 2>/dev/null || true
+            podman machine init --cpus 2 --memory 4096
+            podman machine start
+            configure_podman_socket
+            wait_for_podman
+          }
+
+          ensure_podman() {
+            if [ -z "$(podman machine list -q 2>/dev/null | head -n1)" ]; then
+              podman machine init --cpus 2 --memory 4096
+            fi
+            if ! podman info >/dev/null 2>&1; then
+              if ! podman machine start; then
+                reset_podman_machine
+                return 0
+              fi
+            fi
+            configure_podman_socket
+            wait_for_podman
+          }
+
+          storage_error() {
+            grep -qE 'lower layer|overlay/diff' "$1" 2>/dev/null
+          }
+
+          ensure_podman_storage() {
+            local errfile="$stateDir/crawl4ai.storage-check.stderr"
+            podman pull "$image" || true
+            if podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile"; then
+              return 0
+            fi
+            if storage_error "$errfile"; then
+              reset_podman_machine
+              podman pull "$image" || true
+              podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile" || {
+                cat "$errfile" >&2
+                return 1
+              }
+              return 0
+            fi
+            cat "$errfile" >&2
+            return 1
+          }
+
+          ensure_podman
+          ensure_podman_storage
+
           podman rm -f pi-crawl4ai 2>/dev/null || true
           exec podman run --rm --name pi-crawl4ai --shm-size=1g \
             -p "127.0.0.1:$port:11235" \
@@ -171,10 +269,12 @@ in
           EnvironmentVariables = {
             HOME = "/Users/${username}";
             USER = username;
-            PATH = "/opt/homebrew/bin:/usr/local/bin:${pkgs.podman}/bin";
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${pkgs.podman}/bin:${pkgs.coreutils}/bin";
           };
           RunAtLoad = true;
           KeepAlive = true;
+          # Avoid overlapping podman machine boots when the agent restarts quickly.
+          ThrottleInterval = 30;
           WorkingDirectory = "/Users/${username}";
           StandardOutPath = "/Users/${username}/.local/state/crawl4ai.stdout.log";
           StandardErrorPath = "/Users/${username}/.local/state/crawl4ai.stderr.log";
