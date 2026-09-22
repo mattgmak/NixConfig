@@ -6,6 +6,9 @@
   },
   "crawl4aiBaseUrl": "http://127.0.0.1:11235",
   "crawl4aiApiToken": "$CRAWL4AI_API_TOKEN",
+  "fetch": {
+    "allowedModes": ["readable", "raw"]
+  },
   "fetchRouting": {
     "allowRemoteHostedProviders": true,
     "providers": [
