@@ -1,8 +1,8 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "0.86.1",
-  "defaultProvider": "cursor",
-  "defaultModel": "composer-2.5:slow",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4.1-flash",
   "defaultThinkingLevel": "off",
   "theme": "stylix",
   "powerline": {
@@ -36,7 +36,8 @@
     "opencode-go/glm-5.3-flash",
     "openrouter/z-ai/glm-5.3-flash",
     "openrouter/deepseek/deepseek-v4-flash-0731",
-    "openrouter/deepseek/deepseek-v4.1-flash"
+    "openrouter/deepseek/deepseek-v4.1-flash",
+    "opencode-go/deepseek-v4.1-flash"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -49,6 +50,7 @@
     "llama-swap/ling-3.0-tiny:q5km": "medium",
     "openrouter/qwen/qwen3.8-flash": "low",
     "opencode-go/glm-5.3-flash": "low",
-    "openrouter/z-ai/glm-5.3-flash": "low"
+    "openrouter/z-ai/glm-5.3-flash": "low",
+    "opencode-go/deepseek-v4.1-flash": "medium"
   }
 }

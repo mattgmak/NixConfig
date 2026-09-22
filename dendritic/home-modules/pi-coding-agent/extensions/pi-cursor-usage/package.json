@@ -1,0 +1,10 @@
+{
+  "name": "pi-cursor-usage",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Slash command /cursor-usage — Cursor subscription plan quota and on-demand spend",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
