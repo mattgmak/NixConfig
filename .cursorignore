@@ -1,0 +1,16 @@
+# Large vendored submodules — skip Cursor SDK ripgrep crawls
+vendor/
+
+# Git metadata
+.git/
+
+# Node deps (extensions, pi-cursor-sdk, etc.)
+node_modules/
+
+# Nix build outputs
+result
+result-*
+
+# Local dev shells
+.direnv/
+.devenv/
