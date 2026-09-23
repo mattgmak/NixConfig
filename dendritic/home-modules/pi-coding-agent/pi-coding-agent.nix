@@ -179,6 +179,30 @@
           builtins.hashString "sha256" "pi-crawl4ai-${config.home.homeDirectory}"
         );
 
+      searxngPort = 8888;
+      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc@sha256:f4177a8ee636359b84f4dc49700fdf0176185c34b0f1791d5b312bde0eb7b7a3";
+      searxngSecretKey = builtins.substring 0 64 (
+        builtins.hashString "sha256" "pi-searxng-${config.home.homeDirectory}"
+      );
+      searxngSettingsFile = "${config.home.homeDirectory}/.local/share/pi-searxng/settings.yml";
+      searxngSettingsYaml = ''
+        use_default_settings: true
+        general:
+          debug: false
+          instance_name: pi-searxng
+        server:
+          secret_key: ${searxngSecretKey}
+          limiter: false
+          public_instance: false
+          image_proxy: false
+          method: GET
+        search:
+          formats:
+            - html
+            - json
+          autocomplete: ""
+      '';
+
       piNpmI = pkgs.writeShellApplication {
         name = "pi-npm-i";
         runtimeInputs = with pkgs; [
@@ -483,6 +507,33 @@
         Install.WantedBy = [ "default.target" ];
       };
 
+      # Granian binds :::8080 and ignores server.bind_address; loopback-only via host publish.
+      systemd.user.services.searxng = {
+        Unit = {
+          Description = "SearXNG metasearch server for pi-web-access";
+          After = [ "network-online.target" ];
+          Wants = [ "network-online.target" ];
+        };
+        Service = {
+          Type = "simple";
+          Restart = "on-failure";
+          RestartSec = 5;
+          TimeoutStartSec = "10min";
+          # --replace breaks rootless podman pasta port forwarding (host gets RST).
+          ExecStartPre = [
+            "-${lib.getExe pkgs.podman} pull ${searxngImage}"
+            "-${lib.getExe pkgs.podman} rm -f pi-searxng"
+          ];
+          ExecStart =
+            let
+              hostPort = toString searxngPort;
+            in
+            "${lib.getExe pkgs.podman} run --rm --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
+          ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-searxng";
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+
       home.activation.linkPiPowerlineTheme = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
         ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
@@ -513,6 +564,21 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
       home.file.".pi/agent/agents".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
+      # SearXNG needs settings.yml with json in search.formats (else JSON API 403)
+      # and use_default_settings: true (else KeyError, zero engines). Written via
+      # activation (not home.file): home.file.text is a store symlink; macOS
+      # podman-machine VM shares $HOME but not /nix/store, so bind-mount of the
+      # symlink fails. Content still lives in a store derivation; secret_key is a
+      # deterministic builtins.hashString of a constant plus config.home.homeDirectory, not a credential.
+      home.activation.piSearxngSettings = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+mkdir -p "$HOME/.local/share/pi-searxng"
+rm -f "$HOME/.local/share/pi-searxng/settings.yml"
+cat > "$HOME/.local/share/pi-searxng/settings.yml" <<'HEND'
+${searxngSettingsYaml}
+HEND
+chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
+'';
+
       # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
       # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
       # paths so repo-managed config wins over stale /curator toggles elsewhere.

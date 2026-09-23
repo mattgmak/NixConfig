@@ -77,6 +77,75 @@ in
         builtins.substring 0 64 (
           builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
         );
+      searxngPort = 8888;
+      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc@sha256:f4177a8ee636359b84f4dc49700fdf0176185c34b0f1791d5b312bde0eb7b7a3";
+      podmanBootstrap = ''
+        configure_podman_socket() {
+          socket=$(
+            podman machine inspect podman-machine-default \
+              --format '{{.ConnectionInfo.PodmanSocket.Path}}' 2>/dev/null || true
+          )
+          if [ -n "$socket" ] && [ -S "$socket" ]; then
+            export CONTAINER_HOST="unix://$socket"
+          fi
+        }
+
+        wait_for_podman() {
+          for _ in $(seq 1 120); do
+            podman info >/dev/null 2>&1 && return 0
+            sleep 2
+          done
+          echo "podman API not ready after 240s" >&2
+          return 1
+        }
+
+        reset_podman_machine() {
+          echo "resetting podman machine after storage failure" >&2
+          podman machine stop 2>/dev/null || true
+          podman machine rm -f podman-machine-default 2>/dev/null || true
+          podman machine init --cpus 2 --memory 4096
+          podman machine start
+          configure_podman_socket
+          wait_for_podman
+        }
+
+        ensure_podman() {
+          if [ -z "$(podman machine list -q 2>/dev/null | head -n1)" ]; then
+            podman machine init --cpus 2 --memory 4096
+          fi
+          if ! podman info >/dev/null 2>&1; then
+            if ! podman machine start; then
+              reset_podman_machine
+              return 0
+            fi
+          fi
+          configure_podman_socket
+          wait_for_podman
+        }
+
+        storage_error() {
+          grep -qE 'lower layer|overlay/diff' "$1" 2>/dev/null
+        }
+
+        ensure_podman_storage() {
+          local errfile="$storageCheckErrfile"
+          podman pull "$image" || true
+          if podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile"; then
+            return 0
+          fi
+          if storage_error "$errfile"; then
+            reset_podman_machine
+            podman pull "$image" || true
+            podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile" || {
+              cat "$errfile" >&2
+              return 1
+            }
+            return 0
+          fi
+          cat "$errfile" >&2
+          return 1
+        }
+      '';
       piCrawl4aiServe = pkgs.writeShellApplication {
         name = "pi-crawl4ai-serve";
         runtimeInputs = [
@@ -96,7 +165,7 @@ in
           # Homebrew podman owns the macOS VM; prepend without clobbering runtimeInputs PATH.
           export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
 
-          crawl4ai_healthy() {
+          service_healthy() {
             curl -sf -o /dev/null "http://127.0.0.1:$port/health" 2>/dev/null
           }
 
@@ -104,7 +173,7 @@ in
             if [ ! -d "$lockDir" ]; then
               return 0
             fi
-            if crawl4ai_healthy; then
+            if service_healthy; then
               return 0
             fi
             if pgrep -f 'pi-crawl4ai-serve' >/dev/null 2>&1; then
@@ -121,72 +190,8 @@ in
           fi
           trap 'rmdir "$lockDir" 2>/dev/null || true' EXIT
 
-          configure_podman_socket() {
-            socket=$(
-              podman machine inspect podman-machine-default \
-                --format '{{.ConnectionInfo.PodmanSocket.Path}}' 2>/dev/null || true
-            )
-            if [ -n "$socket" ] && [ -S "$socket" ]; then
-              export CONTAINER_HOST="unix://$socket"
-            fi
-          }
-
-          wait_for_podman() {
-            for _ in $(seq 1 120); do
-              podman info >/dev/null 2>&1 && return 0
-              sleep 2
-            done
-            echo "podman API not ready after 240s" >&2
-            return 1
-          }
-
-          reset_podman_machine() {
-            echo "resetting podman machine after storage failure" >&2
-            podman machine stop 2>/dev/null || true
-            podman machine rm -f podman-machine-default 2>/dev/null || true
-            podman machine init --cpus 2 --memory 4096
-            podman machine start
-            configure_podman_socket
-            wait_for_podman
-          }
-
-          ensure_podman() {
-            if [ -z "$(podman machine list -q 2>/dev/null | head -n1)" ]; then
-              podman machine init --cpus 2 --memory 4096
-            fi
-            if ! podman info >/dev/null 2>&1; then
-              if ! podman machine start; then
-                reset_podman_machine
-                return 0
-              fi
-            fi
-            configure_podman_socket
-            wait_for_podman
-          }
-
-          storage_error() {
-            grep -qE 'lower layer|overlay/diff' "$1" 2>/dev/null
-          }
-
-          ensure_podman_storage() {
-            local errfile="$stateDir/crawl4ai.storage-check.stderr"
-            podman pull "$image" || true
-            if podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile"; then
-              return 0
-            fi
-            if storage_error "$errfile"; then
-              reset_podman_machine
-              podman pull "$image" || true
-              podman run --rm --entrypoint "" "$image" /bin/sh -c "exit 0" 2>"$errfile" || {
-                cat "$errfile" >&2
-                return 1
-              }
-              return 0
-            fi
-            cat "$errfile" >&2
-            return 1
-          }
-
+          storageCheckErrfile="$stateDir/crawl4ai.storage-check.stderr"
+          ${podmanBootstrap}
           ensure_podman
           ensure_podman_storage
 
@@ -194,6 +199,72 @@ in
           exec podman run --rm --name pi-crawl4ai --shm-size=1g \
             -p "127.0.0.1:$port:11235" \
             -e "CRAWL4AI_API_TOKEN=$token" \
+            "$image"
+        '';
+      };
+      piSearxngServe = pkgs.writeShellApplication {
+        name = "pi-searxng-serve";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.curl
+          pkgs.podman
+        ];
+        text = ''
+          set -euo pipefail
+          port=${toString searxngPort}
+          image=${searxngImage}
+          stateDir="$HOME/.local/state"
+          lockDir="$stateDir/searxng-serve.lock"
+          settingsFile="$HOME/.local/share/pi-searxng/settings.yml"
+          mkdir -p "$stateDir"
+
+          # Homebrew podman owns the macOS VM; prepend without clobbering runtimeInputs PATH.
+          export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+          if [ -L "$settingsFile" ]; then
+            echo "$settingsFile must be a regular file, not a symlink: podman-machine VM cannot resolve /nix/store symlinks" >&2
+            exit 1
+          fi
+
+          if [ ! -f "$settingsFile" ]; then
+            echo "missing $settingsFile; must be written by the home-manager pi-coding-agent activation" >&2
+            exit 1
+          fi
+
+          service_healthy() {
+            curl -sf -o /dev/null "http://127.0.0.1:$port/healthz"
+          }
+
+          clear_stale_lock() {
+            if [ ! -d "$lockDir" ]; then
+              return 0
+            fi
+            if service_healthy; then
+              return 0
+            fi
+            if pgrep -f 'pi-searxng-serve' >/dev/null 2>&1; then
+              return 0
+            fi
+            echo "clearing stale searxng lock" >&2
+            rmdir "$lockDir" 2>/dev/null || true
+          }
+
+          clear_stale_lock
+          if ! mkdir "$lockDir" 2>/dev/null; then
+            echo "searxng serve already starting; deferring to launchd retry" >&2
+            exit 1
+          fi
+          trap 'rmdir "$lockDir" 2>/dev/null || true' EXIT
+
+          storageCheckErrfile="$stateDir/searxng.storage-check.stderr"
+          ${podmanBootstrap}
+          ensure_podman
+          ensure_podman_storage
+
+          podman rm -f pi-searxng 2>/dev/null || true
+          exec podman run --rm --name pi-searxng \
+            -p "127.0.0.1:$port:8080" \
+            -v "$HOME/.local/share/pi-searxng/settings.yml:/etc/searxng/settings.yml:ro" \
             "$image"
         '';
       };
@@ -278,6 +349,28 @@ in
           WorkingDirectory = "/Users/${username}";
           StandardOutPath = "/Users/${username}/.local/state/crawl4ai.stdout.log";
           StandardErrorPath = "/Users/${username}/.local/state/crawl4ai.stderr.log";
+        };
+      };
+
+      # SearXNG meta-search for pi web-search (http://127.0.0.1:8888).
+      # Linux pi hosts use systemd.user.services.searxng in pi-coding-agent.nix;
+      # darwin has no user systemd, so mirror engram with a launchd agent.
+      launchd.agents.searxng = {
+        serviceConfig = {
+          ProgramArguments = [ "${piSearxngServe}/bin/pi-searxng-serve" ];
+          UserName = username;
+          EnvironmentVariables = {
+            HOME = "/Users/${username}";
+            USER = username;
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${pkgs.podman}/bin:${pkgs.coreutils}/bin";
+          };
+          RunAtLoad = true;
+          KeepAlive = true;
+          # Avoid overlapping podman machine boots when the agent restarts quickly.
+          ThrottleInterval = 30;
+          WorkingDirectory = "/Users/${username}";
+          StandardOutPath = "/Users/${username}/.local/state/searxng.stdout.log";
+          StandardErrorPath = "/Users/${username}/.local/state/searxng.stderr.log";
         };
       };
 

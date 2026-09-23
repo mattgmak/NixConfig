@@ -6,6 +6,7 @@
   },
   "crawl4aiBaseUrl": "http://127.0.0.1:11235",
   "crawl4aiApiToken": "$CRAWL4AI_API_TOKEN",
+  "searxngBaseUrl": "http://127.0.0.1:8888",
   "fetch": {
     "allowedModes": ["readable", "raw"]
   },
@@ -24,5 +25,8 @@
       "brightdata",
       "gemini"
     ]
+  },
+  "ssrf": {
+    "allowRanges": ["127.0.0.1/32"]
   }
 }
