@@ -21,6 +21,7 @@ Rules:
 - **Themes**: symlink `…/themes/<name>.json` → `../../../../vendor/<Owner>/<repo>/…`.
 - **Skills**: symlink `dendritic/skills/<name>` → `../../vendor/<owner>/<repo>/…`.
 - `pi-npm-i` installs vendor extension deps; skips non-extension repos (themes/skills/zen/tools) + special-cases `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk` (`npm ci --ignore-scripts` + `build.mjs` → `dist/`).
+- **System switch/rebuild**: always defer to user to manually do switch/rebuild via `nh` for the current machine.
 
 New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.gitmodules` name → `owner/repo` if git used path. Full workflow + fork handling: `dendritic/skills/pi-setup/REFERENCE.md`.
 
