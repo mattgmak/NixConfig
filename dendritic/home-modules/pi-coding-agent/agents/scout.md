@@ -2,8 +2,8 @@
 name: scout
 description: Fast codebase recon — explores files, finds patterns, maps architecture
 tools: ctx_read, ctx_grep, ctx_find, ctx_ls
-model: cursor/composer-2.5:slow
-thinking: off
+model: opencode-go/space-bunny-free
+thinking: medium
 session-mode: lineage-only
 system-prompt: append
 auto-exit: true

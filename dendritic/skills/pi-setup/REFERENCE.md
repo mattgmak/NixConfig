@@ -374,7 +374,9 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | `pi-caveman` | caveman mode in subagents |
 | `pi-codegraph` | codegraph tools |
 
-**Conditional:** `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
+**Conditional:**
+- `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
+- `pi-opencode-provider` loader for `opencode/*` and `opencode-go/*` models.
 
 **Denied (implicit):** engram, observational-memory, agent-sesh, mcp-nixos, pi-nvim*, … — not in base list; `--no-extensions` blocks discovery.
 

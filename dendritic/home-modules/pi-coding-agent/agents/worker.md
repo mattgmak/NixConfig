@@ -3,8 +3,8 @@ name: worker
 description: General-purpose worker — reads, writes, and edits code
 tools: ctx_read, write, edit, ctx_shell, fetch_content
 subagent_agents: scout, researcher
-model: cursor/composer-2.5:slow
-thinking: off
+model: opencode-go/space-bunny-free
+thinking: medium
 system-prompt: append
 auto-exit: true
 ---
