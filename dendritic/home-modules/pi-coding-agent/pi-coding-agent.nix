@@ -180,7 +180,10 @@
         );
 
       searxngPort = 8888;
-      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc@sha256:f4177a8ee636359b84f4dc49700fdf0176185c34b0f1791d5b312bde0eb7b7a3";
+      # Pin the multi-arch OCI *index* digest, not a platform sub-manifest: podman
+      # then selects the native image. Pinning the amd64 sub-manifest digest made
+      # arm64 hosts run the image under qemu, which segfaults.
+      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc@sha256:f6f67c89efdac7b1bd4805703764ecaa9d0777b86a101b86cae4f1563de4d627";
       searxngSecretKey = builtins.substring 0 64 (
         builtins.hashString "sha256" "pi-searxng-${config.home.homeDirectory}"
       );
