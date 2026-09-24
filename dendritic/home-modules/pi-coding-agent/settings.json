@@ -37,7 +37,8 @@
     "openrouter/z-ai/glm-5.3-flash",
     "openrouter/deepseek/deepseek-v4-flash-0731",
     "openrouter/deepseek/deepseek-v4.1-flash",
-    "opencode-go/deepseek-v4.1-flash"
+    "opencode-go/deepseek-v4.1-flash",
+    "opencode-go/space-bunny-free"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -51,6 +52,7 @@
     "openrouter/qwen/qwen3.8-flash": "low",
     "opencode-go/glm-5.3-flash": "low",
     "openrouter/z-ai/glm-5.3-flash": "low",
-    "opencode-go/deepseek-v4.1-flash": "medium"
+    "opencode-go/deepseek-v4.1-flash": "medium",
+    "opencode-go/space-bunny-free": "medium"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "name": "pi-opencode-go-usage",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Slash command /opencode-go-usage — OpenCode Go subscription usage windows",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
