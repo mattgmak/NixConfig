@@ -145,16 +145,27 @@
         FTLCONF_dns_upstreams = "127.0.0.1#${toString unboundPort}";
         # LOCAL mode ignores tailnet clients; ALL required for TS DNS override.
         FTLCONF_dns_listeningMode = "ALL";
-        FTLCONF_dns_queryLogging = "false";
+        # Full query history locally: privacylevel 3 + queryLogging false left the
+        # pihole-FTL.db `queries` table empty, so drops/SERVFAIL windows could not be
+        # reconstructed after the fact.
+        FTLCONF_dns_queryLogging = "true";
         FTLCONF_dns_rateLimit_count = "10000";
         FTLCONF_dns_rateLimit_interval = "60";
-        FTLCONF_misc_privacylevel = "3";
+        FTLCONF_misc_privacylevel = "0";
+        # dnsmasq's forward table (--dns-forward-max) defaults to 150 slots; when full,
+        # src/forward.c query_full() drops the query with no reply at all. FTL logged
+        # "Maximum number of concurrent DNS queries reached (max: 150)" on 11 dates,
+        # triggered by ~300 ms average upstream latency. Array settings are
+        # ;/newline-delimited in FTL env vars.
+        FTLCONF_misc_dnsmasq_lines = "dns-forward-max=1000";
       };
 
       extraOptions = [
         "--cap-add=NET_ADMIN"
-        "--cpus=0.5"
-        "--memory=256m"
+        # 1000 forward slots + full query logging (FTL keeps an in-memory copy of the
+        # query database) need more headroom than the previous 0.5 cpu / 256 MB.
+        "--cpus=1"
+        "--memory=512m"
         "--network=host"
         # Pi-hole image healthcheck runs dig @127.0.0.1 pi.hole; fails during startup and
         # trips nixos-rebuild activation if conmon blocks on the first healthcheck oneshot.
