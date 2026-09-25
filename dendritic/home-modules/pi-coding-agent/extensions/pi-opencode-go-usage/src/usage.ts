@@ -156,6 +156,19 @@ function formatPercent(percent: number): string {
 	return Number.isInteger(percent) ? `${percent}%` : `${percent.toFixed(1)}%`;
 }
 
+function renderProgressBar(percent: number, width: number): string {
+	const clamped = Math.max(0, Math.min(100, percent));
+	const filled = clamped > 0 ? Math.max(1, Math.round((clamped / 100) * width)) : 0;
+	return "█".repeat(filled) + "░".repeat(width - filled);
+}
+
+function progressBarWidth(terminalWidth: number): number {
+	if (terminalWidth < 47) return 4;
+	if (terminalWidth < 60) return 6;
+	if (terminalWidth < 74) return 8;
+	return 20;
+}
+
 function formatResetTime(resetsAt: string | undefined, now: number): string {
 	if (!resetsAt) return "Resets unavailable";
 
@@ -182,19 +195,33 @@ function formatResetTime(resetsAt: string | undefined, now: number): string {
 	return "Resets in a few seconds";
 }
 
-function formatWindow(label: string, window: OpenCodeGoUsageWindow, now: number): string {
+function formatWindow(
+	label: string,
+	window: OpenCodeGoUsageWindow,
+	now: number,
+	barWidth: number,
+	terminalWidth: number,
+): string {
 	const percent = formatPercent(window.percent).padStart(4);
+	const bar = renderProgressBar(window.percent, barWidth);
 	const reset = formatResetTime(window.resetsAt, now);
-	return `  ${label.padEnd(14)}${percent}${" ".repeat(12)}${reset}`;
+	if (terminalWidth < 45) return `  ${label} ${percent} ${bar}\n  ${reset}`;
+	return `  ${label.padEnd(14)}${percent} ${bar} ${reset}`;
 }
 
-export function formatOpenCodeGoUsage(usage: OpenCodeGoUsage, now = Date.now()): string {
+export function formatOpenCodeGoUsage(
+	usage: OpenCodeGoUsage,
+	now = Date.now(),
+	terminalWidth = process.stdout.columns || 80,
+): string {
+	const width = Number.isFinite(terminalWidth) && terminalWidth > 0 ? terminalWidth : 80;
+	const barWidth = progressBarWidth(width);
 	return [
 		"Go-Subscription",
 		"Low cost coding models for everyone • Learn more",
 		"",
-		formatWindow("Rolling usage", usage.rolling, now),
-		formatWindow("Weekly usage", usage.weekly, now),
-		formatWindow("Monthly usage", usage.monthly, now),
+		formatWindow("Rolling usage", usage.rolling, now, barWidth, width),
+		formatWindow("Weekly usage", usage.weekly, now, barWidth, width),
+		formatWindow("Monthly usage", usage.monthly, now, barWidth, width),
 	].join("\n");
 }
