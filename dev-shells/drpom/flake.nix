@@ -63,10 +63,10 @@
           # Argent: upstream git omits Simulator binaries (npm-only); the workspace lockfile is
           # missing resolved URLs (~npm/cli#6301), so fetchNpmDeps cannot satisfy npm ci reliably.
           # Package the registry release (matches https://github.com/software-mansion/argent releases).
-          argentVersion = "0.6.0";
+          argentVersion = "0.25.2";
           argentNpmRelease = pkgs.fetchurl {
             url = "https://registry.npmjs.org/@swmansion/argent/-/argent-${argentVersion}.tgz";
-            hash = "sha256-2bUPzWbTJyxZrf91WV1f8bAVzt/IfGherSOHRv3ySWA=";
+            hash = "sha256-V0d9DBz5qI7d69SueP55bxL2SutOcFoUd0VrZUkyvt4=";
           };
           argent = pkgs.stdenvNoCC.mkDerivation {
             pname = "argent";
@@ -89,8 +89,9 @@
               makeWrapper "${pkgs.nodejs_22}/bin/node" "$out/bin/argent" \
                 --add-flags "$out/libexec/argent/dist/cli.js"
 
-              ln -sf "$out/libexec/argent/bin/simulator-server" "$out/bin/argent-simulator-server"
-              ln -sf "$out/libexec/argent/bin/ax-service" "$out/bin/ax-service"
+              # Native helpers are per-platform subdirs (bin/<platformKey>/…); darwin-only build.
+              ln -sf "$out/libexec/argent/bin/darwin/simulator-server" "$out/bin/argent-simulator-server"
+              ln -sf "$out/libexec/argent/bin/darwin/ax-service" "$out/bin/ax-service"
             '';
             meta = {
               description = "Agentic toolkit for iOS Simulator (MCP)";
