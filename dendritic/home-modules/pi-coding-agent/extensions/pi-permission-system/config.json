@@ -1,7 +1,7 @@
 {
   "debugLog": false,
   "permissionReviewLog": true,
-  "yoloMode": false,
+  "yoloMode": true,
   "shellTools": {
     "ctx_shell": {
       "commandArgument": "command"
@@ -11,11 +11,13 @@
     "*": "allow",
     "path": {
       "*": "allow",
+      "~/.config/lean-ctx/config.toml": "deny",
       "*.env": "deny",
       "*.env.*": "deny",
       "*.env.example": "allow"
     },
     "bash": {
+      "*": "allow",
       "rm -rf *": "deny",
       "xargs*": "deny",
       "env *": "deny",
@@ -35,8 +37,8 @@
       "find * -ok*": "deny",
       "fd * -x*": "deny",
       "fd * --exec*": "deny",
-      "lean-ctx allow *": "ask",
-      "lean-ctx allow": "ask",
+      "lean-ctx allow *": "deny",
+      "lean-ctx allow": "deny",
       "lean-ctx config set shell_allowlist*": "deny",
       "lean-ctx config set shell_allowlist_extra*": "deny",
       "lean-ctx config set shell_security*": "deny",
@@ -49,6 +51,7 @@
       "gh api *merges*": "deny"
     },
     "ctx_shell": {
+      "*": "allow",
       "rm -rf *": "deny",
       "xargs*": "deny",
       "env *": "deny",
@@ -68,8 +71,8 @@
       "find * -ok*": "deny",
       "fd * -x*": "deny",
       "fd * --exec*": "deny",
-      "lean-ctx allow *": "ask",
-      "lean-ctx allow": "ask",
+      "lean-ctx allow *": "deny",
+      "lean-ctx allow": "deny",
       "lean-ctx config set shell_allowlist*": "deny",
       "lean-ctx config set shell_allowlist_extra*": "deny",
       "lean-ctx config set shell_security*": "deny",
