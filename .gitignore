@@ -3,3 +3,6 @@ result
 # pi-npm-i runtime artifacts (recreated on each run; never commit)
 /vendor/.engram-deps/
 /vendor/node_modules
+
+# lean-ctx MCP schema cache (runtime artifact beside extension config; recreated)
+mcp-schema-cache.json
