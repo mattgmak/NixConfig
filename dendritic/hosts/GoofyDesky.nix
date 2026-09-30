@@ -377,6 +377,17 @@
           };
         };
 
+        systemd.oomd = {
+          enable = true;
+          enableUserSlices = true;
+
+          settings.OOM = {
+            SwapUsedLimit = "75%";
+          };
+        };
+
+        systemd.slices.user.sliceConfig.ManagedOOMSwap = "kill";
+
         swapDevices = [
           {
             device = "/swapfile";
