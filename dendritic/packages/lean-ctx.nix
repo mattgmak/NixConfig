@@ -67,11 +67,21 @@
               # Release archives contain one root-level executable.
               dontUnpack = true;
 
-              nativeBuildInputs = [
-                gnutar
-                makeWrapper
-              ]
-              ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+              # autoPatchelfHook builds its soname search cache (--libs) from
+              # the `$1/lib` of every input reported to the *host* env hooks
+              # (envHostHostHook/envHostTargetHook), i.e. buildInputs /
+              # propagatedBuildInputs. nativeBuildInputs feed envBuild*Hook and
+              # are ignored, so gcc-lib has to be a host input as well —
+              # otherwise libgcc_s.so.1 is reported unsatisfiable even though
+              # runtimeDependencies already puts it in the RPATH.
+              nativeBuildInputs =
+                [
+                  gnutar
+                  makeWrapper
+                ]
+                ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+
+              buildInputs = runtimeDependencies;
 
               inherit runtimeDependencies;
 
