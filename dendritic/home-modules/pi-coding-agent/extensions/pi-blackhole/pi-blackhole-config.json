@@ -43,7 +43,7 @@
   },
 
   "observerModel": {
-    "_comment": "Observer primary: Nemotron 3 Super 120B free. Fastest verified free endpoint (127-146ms), 262k window, valid structured tool call.",
+    "_comment": "Observer primary: Nemotron 3 Super 120B free. Fastest verified free endpoint (138-202ms, 3/3 valid structured tool calls), 262k window.",
     "provider": "openrouter",
     "id": "nvidia/nemotron-3-super-120b-a12b:free",
     "thinking": "low",
@@ -52,15 +52,23 @@
   },
   "observerFallbackModels": [
     {
-      "_comment": "Fallback 1: Nex N2.5 Mini free (401ms, 262k).",
+      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Newest 1M-window endpoint, 273-523ms, 5/6 tool calls (one plain-text miss).",
       "provider": "openrouter",
-      "id": "nex-agi/nex-n2.5-mini:free",
+      "id": "nvidia/nemotron-3.5-lightning:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 2: Qwen3.8 27B free. Most reliable of the new batch (9/9 tool calls), 288-830ms, 262k.",
+      "provider": "openrouter",
+      "id": "qwen/qwen3.8-27b:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 2: Dots3 Note Preview free (1.0-1.3s, 512k window).",
+      "_comment": "Fallback 3: Dots3 Note Preview free (661-840ms, 3/3 tool calls, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -68,17 +76,17 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 3: Nemotron 3 Nano Omni 30B free (393ms, 256k).",
+      "_comment": "Fallback 4: Apodex 1.1 Mini free. Newest free release (2026-10-01), 9/9 tool calls, 693-848ms typical but spiky (3.8s observed), 262k.",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "id": "apodex/apodex-1.1-mini:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 256000
+      "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4 (last resort): Ling 3.0 Flash Fin free. Finance-domain tune, worst fit for dev content, but historically the most reliably available free endpoint.",
+      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free. Replaces the retired ling-3.0-flash-fin endpoint; 765-783ms, 3/3 tool calls, 262k.",
       "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-fin:free",
+      "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
@@ -86,7 +94,7 @@
   ],
 
   "reflectorModel": {
-    "_comment": "Reflector primary: Nemotron 3 Ultra 550B free. Strongest reasoning among verified free endpoints, 1M window (covers reflectorInputMaxTokens 80k for large pools).",
+    "_comment": "Reflector primary: Nemotron 3 Ultra 550B free. Strongest reasoning among verified free endpoints, 1M window (covers reflectorInputMaxTokens 80k for large pools), 337-358ms, 3/3 tool calls.",
     "provider": "openrouter",
     "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
     "thinking": "low",
@@ -95,15 +103,15 @@
   },
   "reflectorFallbackModels": [
     {
-      "_comment": "Fallback 1: Nex N2.5 Pro free (agentic coding, 441ms-3.8s, 262k).",
+      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Only other verified 1M-window free endpoint, 273-523ms, 5/6 tool calls.",
       "provider": "openrouter",
-      "id": "nex-agi/nex-n2.5-pro:free",
+      "id": "nvidia/nemotron-3.5-lightning:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Dots3 Note Preview free (512k).",
+      "_comment": "Fallback 2: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -111,17 +119,25 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 3: Nemotron 3 Nano Omni 30B free (256k).",
+      "_comment": "Fallback 3: Qwen3.8 27B free (288-453ms, 6/6 tool calls, 262k).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "id": "qwen/qwen3.8-27b:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 256000
+      "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4 (last resort): Ling 3.0 Flash Fin free.",
+      "_comment": "Fallback 4: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
       "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-fin:free",
+      "id": "apodex/apodex-1.1-mini:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
+      "provider": "openrouter",
+      "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
@@ -129,7 +145,7 @@
   ],
 
   "dropperModel": {
-    "_comment": "Dropper primary: North Mini Code free (agentic coding judgement, 387-984ms, 256k). Thinking off - retention decisions are cheap.",
+    "_comment": "Dropper primary: North Mini Code free (agentic coding judgement, 332-526ms, 3/3 tool calls, 256k). Thinking off - retention decisions are cheap.",
     "provider": "openrouter",
     "id": "cohere/north-mini-code:free",
     "thinking": "off",
@@ -138,23 +154,23 @@
   },
   "dropperFallbackModels": [
     {
-      "_comment": "Fallback 1: Nemotron 3 Nano Omni 30B free (393ms).",
+      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Replaces nemotron-3-nano-omni-30b, which now returns an empty completion half the time (3/6 tool calls). 1M window, 273-523ms.",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "id": "nvidia/nemotron-3.5-lightning:free",
       "thinking": "off",
       "cooldownHours": 2,
-      "contextWindow": 256000
+      "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Nex N2.5 Mini free (401ms).",
+      "_comment": "Fallback 2: Qwen3.8 27B free (288-453ms, 6/6 tool calls, 262k).",
       "provider": "openrouter",
-      "id": "nex-agi/nex-n2.5-mini:free",
+      "id": "qwen/qwen3.8-27b:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: Dots3 Note Preview free (512k).",
+      "_comment": "Fallback 3: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "off",
@@ -162,9 +178,17 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 4 (last resort): Ling 3.0 Flash Fin free.",
+      "_comment": "Fallback 4: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
       "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-fin:free",
+      "id": "apodex/apodex-1.1-mini:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
+      "provider": "openrouter",
+      "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
