@@ -184,6 +184,62 @@
             };
           };
 
+          # pnpm 10.34.6 is the registry latest-10 but never landed in nixpkgs: nixpkgs goes
+          # 10.33.4 -> 11.1.1, so neither pkgs.pnpm nor multiverse's mv.version can reach it
+          # (multiverse only indexes versions nixpkgs actually shipped). Build the registry
+          # tarball instead, same shape as nixpkgs' pkgs/development/tools/pnpm/generic.nix:
+          # the tarball ships prebuilt bundles (dist/pnpm.cjs, bundled node_modules), so
+          # there is nothing to build and no lockfile to resolve.
+          pnpmVersion = "10.34.6";
+          pnpmPinned = pkgs.stdenvNoCC.mkDerivation {
+            pname = "pnpm";
+            version = pnpmVersion;
+            src = pkgs.fetchurl {
+              url = "https://registry.npmjs.org/pnpm/-/pnpm-${pnpmVersion}.tgz";
+              hash = "sha256-RNfbkPy7IxW1gfhZiakTRmdlQh/GVsKOgPrBt6tb5FY=";
+            };
+            strictDeps = true;
+            dontConfigure = true;
+            dontBuild = true;
+
+            nativeBuildInputs = [
+              pkgs.bashNonInteractive
+              pkgs.makeWrapper
+              pkgs.nodejs_22
+            ];
+
+            # Prebuilt .node blobs that only enable the reflink fast path; dropping them
+            # keeps the closure binaryNativeCode-free, as nixpkgs does.
+            postUnpack = ''
+              rm -r package/dist/reflink.*node
+            '';
+
+            installPhase = ''
+              runHook preInstall
+
+              install -d $out/{bin,libexec}
+              cp -R . $out/libexec/pnpm
+              makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/pnpm \
+                --add-flags "$out/libexec/pnpm/bin/pnpm.cjs"
+              makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/pnpx \
+                --add-flags "$out/libexec/pnpm/bin/pnpx.cjs"
+
+              runHook postInstall
+            '';
+
+            passthru = {
+              inherit (pkgs.nodejs_22) nodejs;
+            };
+
+            meta = {
+              description = "Fast, disk space efficient package manager for JavaScript";
+              homepage = "https://pnpm.io/";
+              license = pkgs.lib.licenses.mit;
+              platforms = pkgs.lib.platforms.unix;
+              mainProgram = "pnpm";
+            };
+          };
+
           droastVersion = "1.4.11";
           droast = pkgs.rustPlatform.buildRustPackage {
             pname = "dockerfile-roast";
@@ -215,7 +271,7 @@
                 [
                   nodejs_22
                   deno
-                  pnpm
+                  pnpmPinned
                   jdk17
                   kotlin
                   kotlin-language-server
