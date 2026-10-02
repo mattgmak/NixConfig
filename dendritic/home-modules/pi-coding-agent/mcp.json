@@ -2,7 +2,7 @@
   "mcpServers": {
     "context7": {
       "url": "https://mcp.context7.com/mcp",
-      "directTools": true,
+      "exposure": "direct",
       "headers": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
       }
@@ -10,32 +10,32 @@
     "Linear": {
       "url": "https://mcp.linear.app/mcp",
       "headers": {},
-      "directTools": [
-        "get_issue",
-        "list_issues"
-      ]
+      "toolExposure": {
+        "get_issue": "direct",
+        "list_issues": "direct"
+      }
     },
     "github-readonly": {
       "url": "https://api.githubcopilot.com/mcp/readonly",
-      "auth": "bearer",
-      "bearerToken": "${GITHUB_MCP_TOKEN}",
-      "directTools": [
-        "pull_request_read",
-        "get_file_contents",
-        "search_code",
-        "search_issues",
-        "search_pull_requests",
-        "issue_read",
-        "list_commits",
-        "get_commit",
-        "list_branches",
-        "list_pull_requests",
-        "search_repositories"
-      ]
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_MCP_TOKEN}"
+      },
+      "toolExposure": {
+        "pull_request_read": "direct",
+        "get_file_contents": "direct",
+        "search_code": "direct",
+        "search_issues": "direct",
+        "search_pull_requests": "direct",
+        "issue_read": "direct",
+        "list_commits": "direct",
+        "get_commit": "direct",
+        "list_branches": "direct",
+        "list_pull_requests": "direct",
+        "search_repositories": "direct"
+      }
     },
     "figma": {
-      "url": "http://127.0.0.1:3845/mcp",
-      "auth": false
+      "url": "http://127.0.0.1:3845/mcp"
     },
     "argent": {
       "command": "argent",

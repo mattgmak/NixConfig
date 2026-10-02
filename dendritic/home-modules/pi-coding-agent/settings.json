@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "0.86.1",
+  "lastChangelogVersion": "1.0.0",
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4.1-flash",
   "defaultThinkingLevel": "off",
@@ -10,6 +10,9 @@
     "fixedEditor": false,
     "welcome": false
   },
+  "extensions": [
+    "-builtin:mcp"
+  ],
   "enabledModels": [
     "opencode/big-pickle",
     "opencode/deepseek-v4-flash-free",
