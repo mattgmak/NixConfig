@@ -52,4 +52,5 @@ shell_allowlist_extra = [
     "command",
     "agent-sesh",
     "pr",
+    "biome",
 ]
