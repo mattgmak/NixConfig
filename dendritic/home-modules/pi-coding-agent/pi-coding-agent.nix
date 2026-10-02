@@ -58,7 +58,8 @@
           );
 
           theme = {
-            "$schema" = "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json";
+            "$schema" =
+              "https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json";
             name = "stylix";
             inherit vars;
             colors = {
@@ -174,10 +175,9 @@
 
       crawl4aiPort = 11235;
       crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
-      crawl4aiApiToken =
-        builtins.substring 0 64 (
-          builtins.hashString "sha256" "pi-crawl4ai-${config.home.homeDirectory}"
-        );
+      crawl4aiApiToken = builtins.substring 0 64 (
+        builtins.hashString "sha256" "pi-crawl4ai-${config.home.homeDirectory}"
+      );
 
       searxngPort = 8888;
       # Pin the multi-arch OCI *index* digest, not a platform sub-manifest: podman
@@ -537,13 +537,15 @@
         Install.WantedBy = [ "default.target" ];
       };
 
-      home.activation.linkPiPowerlineTheme = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
-        ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
-        if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
-          ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
-        fi
-      '';
+      home.activation.linkPiPowerlineTheme =
+        inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+          ''
+            mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
+            ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
+            if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
+              ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
+            fi
+          '';
 
       home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
         map (name: {
@@ -565,8 +567,7 @@
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
       home.file.".pi/agent/keybindings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
-      home.file.".pi/agent/agents".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
+      home.file.".pi/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
       # SearXNG needs settings.yml with json in search.formats (else JSON API 403)
       # and use_default_settings: true (else KeyError, zero engines). Written via
       # activation (not home.file): home.file.text is a store symlink; macOS
@@ -574,13 +575,13 @@
       # symlink fails. Content still lives in a store derivation; secret_key is a
       # deterministic builtins.hashString of a constant plus config.home.homeDirectory, not a credential.
       home.activation.piSearxngSettings = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-mkdir -p "$HOME/.local/share/pi-searxng"
-rm -f "$HOME/.local/share/pi-searxng/settings.yml"
-cat > "$HOME/.local/share/pi-searxng/settings.yml" <<'HEND'
-${searxngSettingsYaml}
-HEND
-chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
-'';
+        mkdir -p "$HOME/.local/share/pi-searxng"
+        rm -f "$HOME/.local/share/pi-searxng/settings.yml"
+        cat > "$HOME/.local/share/pi-searxng/settings.yml" <<'HEND'
+        ${searxngSettingsYaml}
+        HEND
+        chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
+      '';
 
       # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
       # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
@@ -595,6 +596,8 @@ chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
       home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
         config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
+      home.file.".config/rpiv-todo/config.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/rpiv-todo/config.json";
 
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;
