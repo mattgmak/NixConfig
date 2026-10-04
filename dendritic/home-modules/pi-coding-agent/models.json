@@ -9,6 +9,11 @@
         "supportsReasoningEffort": false
       },
       "models": [
+        {
+          "id": "lfm2.5:8b-a1b-udq4kxl",
+          "contextWindow": 131072,
+          "maxTokens": 16384
+        },
         { "id": "gemma-4:26b-a4b-q4" },
         {
           "id": "qwen3.8:27b-iq2xxs",

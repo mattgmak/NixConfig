@@ -11,6 +11,32 @@
 
         models:  # Ordered from newest to oldest
 
+          # LFM2.5-8B-A1B (8.3B total / 1.5B active MoE, lfm2moe hybrid) — agentic.
+          # unsloth UD-Q4_K_XL = 4.98 GiB. Upstream llama.cpp arch support
+          # (LLM_ARCH_LFM2MOE, ggml-org#16464) — no fork needed.
+          # Full GPU ~5.4 GB @128K (hybrid: only 6 full-attention layers, cheap KV).
+          # Official sampling: temp=0.2, top_k=80, repeat_penalty=1.05.
+          "lfm2.5:8b-a1b-udq4kxl":
+            cmd: |
+              ${pkgs.llama-cpp}/bin/llama-server
+              -hf unsloth/LFM2.5-8B-A1B-GGUF:UD-Q4_K_XL
+              --port ''${PORT}
+              --jinja
+              --no-mmproj
+              -ngl 99
+              --fit off
+              -c 131072
+              --parallel 1
+              -b 512
+              -ub 256
+              --flash-attn on
+              -ctk q4_0
+              -ctv q4_0
+              --temp 0.2
+              --top-p 0.95
+              --top-k 80
+              --repeat-penalty 1.05
+
           # Ling-3.0-tiny (7.9B total / 1.3B active MoE, bailingmoe3 arch) — agentic coding.
           # Full GPU: Q5_K_M 5.24 GB + KDA+MLA KV ~0.6 GB @128K + compute 0.2 GB = ~6.1 GB
           #  → fits 8 GB RTX 3070 Ti with ~1.5 GB headroom even after desktop.
