@@ -13,6 +13,7 @@
               fetchurl,
               makeWrapper,
               nodejs_22,
+              patchelf,
               libgcc,
             }:
             let
@@ -54,7 +55,7 @@
                   nodejs_22
                   makeWrapper
                 ]
-                ++ lib.optionals stdenv.hostPlatform.isLinux [ lib.patchelf ];
+                ++ lib.optionals stdenv.hostPlatform.isLinux [ patchelf ];
 
               dontConfigure = true;
               dontBuild = true;
