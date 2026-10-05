@@ -3,7 +3,10 @@
 
   "app.tree.foldOrUp": "ctrl+shift+left",
   "app.tree.unfoldOrDown": "ctrl+shift+right",
-  "app.message.dequeue": "ctrl+shift+up",
+  "app.message.dequeue": "ctrl+,",
   "app.models.reorderUp": "ctrl+shift+alt+up",
-  "app.models.reorderDown": "ctrl+shift+alt+down"
+  "app.models.reorderDown": "ctrl+shift+alt+down",
+
+  "tui.altScreen.halfPageUp": "ctrl+u",
+  "tui.altScreen.halfPageDown": "ctrl+d"
 }
