@@ -1,0 +1,37 @@
+# .envrc template for a dev shell that lives in this dendritic flake.
+#
+# Copy to your project root as .envrc, then replace the two placeholders:
+#   __FLAKE_REF__   flake URI + shell attr, e.g. ~/NixConfig#drpom
+#   __SHELL_NAME__  the devShells attr name (see table below)
+#
+# Requires nix-direnv on PATH:
+#   nix profile install nix-direnv
+# or enable programs.direnv.nixDirEnv in your Nix config.
+#
+# Shells available (declared in dendritic/dev-shells/*.nix):
+#   android  x86_64-linux                  android-tools, payload-dumper-go
+#   drpom    x86_64-linux, aarch64-darwin node/pnpm/eas/deno/kotlin/railway/psql
+#   yt-dlp   x86_64-linux, aarch64-darwin mutagen, drives the yt-dlp sync
+#
+# aarch64-linux (nix-on-droid) has none of these. Asking for a shell your system
+# does not define fails with:
+#   error: flake '...' does not provide attribute 'devShells.<system>.<shell>.name'
+# There is no devShells.default anywhere, so `#<attr>` is mandatory; omit it and
+# nix looks for 'devShells.<system>.default' and fails the same way.
+#
+# `-v --log-format internal-json` pipes nix's log into nom. Drop both flags for a
+# plain shell.
+#
+# CACHE WARNING: nix-direnv 3.1.2 watches only flake.nix, flake.lock and
+# devshell.toml. Editing dendritic/dev-shells/<shell>.nix does NOT invalidate the
+# direnv cache, so you get a stale shell with no warning. Run `direnv reload`
+# by hand after changing any module under dendritic/.
+
+use flake __FLAKE_REF__ -v --log-format internal-json 2> >(nom --json)
+
+# Project-specific exports go below. The shell's own shellHook has already run by
+# the time this line is reached, and `unset LD` below drops the nix-provided LD so
+# macOS system binaries resolve normally.
+#
+# export PROJECT_VAR=...
+# unset LD
