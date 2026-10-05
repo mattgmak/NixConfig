@@ -31,3 +31,7 @@ New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.git
 - **Never** pass `git commit --trailer` or append attribution trailers for Cursor, agents, or tooling — not default, not "helpful"
 - Use plain `git commit -m "$(cat <<'EOF' … EOF)"` — subject line only inside the heredoc
 - Imperative mood, capitalize first word (e.g. `Generate pi themes from Stylix palette.`)
+
+## Comments
+
+- Fewest possible. Non-obvious *why* only — never *what*, no commented-out code, section banners, or change notes.

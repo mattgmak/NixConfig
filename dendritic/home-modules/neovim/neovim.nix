@@ -15,7 +15,9 @@
       lockFile = "${neovimRoot}/config/lazy-lock.json";
       restoreStamp = "${config.home.homeDirectory}/.local/state/nvim/lazy-restore.lock.sha256";
       nvim = config.programs.neovim.package;
-      c = config.lib.stylix.colors.withHashtag;
+      # Stylix is absent on the minimal installer ISO; the lua side falls back.
+      hasStylix = config.lib ? stylix;
+      c = if hasStylix then config.lib.stylix.colors.withHashtag else { };
       restorePath = lib.makeBinPath (
         with pkgs;
         [
@@ -27,8 +29,6 @@
       );
     in
     {
-      stylix.targets.neovim.enable = true;
-
       home.file = {
         ".config/nvim/after".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/after";
         ".config/nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua";
@@ -40,29 +40,32 @@
         withPython3 = true;
         withNodeJs = true;
         withRuby = true;
-        initLua = ''
-          vim.g.stylix_palette = {
-            base00 = "${c.base00}",
-            base01 = "${c.base01}",
-            base02 = "${c.base02}",
-            base03 = "${c.base03}",
-            base04 = "${c.base04}",
-            base05 = "${c.base05}",
-            base06 = "${c.base06}",
-            base07 = "${c.base07}",
-            base08 = "${c.base08}",
-            base09 = "${c.base09}",
-            base0A = "${c.base0A}",
-            base0B = "${c.base0B}",
-            base0C = "${c.base0C}",
-            base0D = "${c.base0D}",
-            base0E = "${c.base0E}",
-            base0F = "${c.base0F}",
-          }
-          ${pkgs.lib.optionalString (hostname == "Goofeus") "vim.g.disable_ui2 = true"}
-          require('lazy_setup')
-          require('config')
-        '';
+        initLua =
+          lib.optionalString hasStylix ''
+            vim.g.stylix_palette = {
+              base00 = "${c.base00}",
+              base01 = "${c.base01}",
+              base02 = "${c.base02}",
+              base03 = "${c.base03}",
+              base04 = "${c.base04}",
+              base05 = "${c.base05}",
+              base06 = "${c.base06}",
+              base07 = "${c.base07}",
+              base08 = "${c.base08}",
+              base09 = "${c.base09}",
+              base0A = "${c.base0A}",
+              base0B = "${c.base0B}",
+              base0C = "${c.base0C}",
+              base0D = "${c.base0D}",
+              base0E = "${c.base0E}",
+              base0F = "${c.base0F}",
+            }
+          ''
+          + ''
+            ${pkgs.lib.optionalString (hostname == "Goofeus") "vim.g.disable_ui2 = true"}
+            require('lazy_setup')
+            require('config')
+          '';
         extraLuaPackages = ps: [ ps.magick ];
         extraPackages = with pkgs; [
           lua-language-server

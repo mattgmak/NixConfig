@@ -3,8 +3,6 @@
   flake.homeModules.yazi =
     { pkgs, ... }:
     {
-      stylix.targets.yazi.enable = true;
-
       programs.yazi = {
         enable = true;
         package = inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
