@@ -37,6 +37,7 @@
           command = "${lib.getExe pkgs.nushell} -e ${lib.escapeShellArg "^tmux attach-session; if ($env.LAST_EXIT_CODE != 0) { ^tmux new-session }"}";
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
+          cursor-style-blink = false;
           window-decoration = "none";
           window-padding-x = 4;
           window-padding-y = 4;
@@ -44,6 +45,7 @@
           window-padding-color = "extend";
           keybind = [
             "ctrl+enter=unbind"
+            "ctrl+,=unbind"
             "global:super+t=toggle_quick_terminal"
             # "super+alt+shift+j=write_screen_file:open"
             # "super+alt+shift+w=close_all_windows"
