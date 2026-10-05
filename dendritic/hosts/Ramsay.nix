@@ -66,6 +66,7 @@ in
         atuin
         zoxide
         nushell
+        zsh
         neovim
         starship
         yazi
@@ -122,8 +123,10 @@ in
         };
         environment.shells = with pkgs; [
           nushell
+          zsh
           bash
         ];
+        programs.zsh.enable = true;
 
         time.timeZone = "Asia/Hong_Kong";
         i18n.defaultLocale = "en_HK.UTF-8";
@@ -150,7 +153,7 @@ in
         ];
 
         users.users.${username} = {
-          shell = pkgs.nushell;
+          shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             GoofyDesky
             GoofyEnvy

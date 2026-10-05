@@ -34,6 +34,7 @@ in
       zoxide
       zen-browser
       nushell
+      zsh
       wezterm
       neovim
       starship
@@ -414,7 +415,7 @@ in
         EDITOR = "nvim";
         VISUAL = "nvim";
         DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
-        SHELL = "${pkgs.nushell}/bin/nu";
+        SHELL = "${pkgs.zsh}/bin/zsh";
       };
 
       environment.systemPackages =

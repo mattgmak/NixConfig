@@ -54,6 +54,7 @@
         atuin
         zoxide
         nushell
+        zsh
         neovim
         starship
         yazi
@@ -78,6 +79,7 @@
           atuin
           zoxide
           nushell
+          zsh
           neovim
           starship
           yazi
@@ -236,8 +238,10 @@
           };
         environment.shells = with pkgs; [
           nushell
+          zsh
           bash
         ];
+        programs.zsh.enable = true;
 
         # Set your time zone.
         time.timeZone = "Asia/Hong_Kong";
@@ -269,7 +273,7 @@
 
         # Define a user account. Don't forget to set a password with ‘passwd’.
         users.users.${username} = {
-          shell = pkgs.nushell;
+          shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             GoofyDesky
             GoofyEnvy

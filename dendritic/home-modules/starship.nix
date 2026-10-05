@@ -1,8 +1,26 @@
 {
-  flake.homeModules.starship = {
-    programs.starship = {
-      enable = true;
-      enableNushellIntegration = true;
+  flake.homeModules.starship =
+    { config, lib, pkgs, ... }:
+    let
+      # JSON \u takes exactly 4 hex digits, so BMP private-use glyphs only.
+      nerdGlyph = code: builtins.fromJSON ''"\u${code}"'';
+      checkGlyph = nerdGlyph "f00c"; # nf-fa-check
+      crossGlyph = nerdGlyph "f00d"; # nf-fa-times
+      insertGlyph = nerdGlyph "f040"; # nf-fa-pencil
+      normalGlyph = nerdGlyph "e7c5"; # nf-dev-vim
+      chevronGlyph = builtins.fromJSON ''"\udb80\udd42"''; # nf-md-chevron_right U+F0142
+
+      stylixColors = (config.lib.stylix or { }).colors or { };
+      c = stylixColors.withHashtag or { };
+      hex = name: c.${name} or "#000000";
+
+      # nu draws its own vi indicator, so it loads a copy without `character`.
+      nuConfigPath = "${config.xdg.configHome}/starship-nu.toml";
+    in
+    {
+      programs.starship = {
+        enable = true;
+        enableNushellIntegration = true;
       # Jetpack preset
       # settings = {
       #   add_newline = true;
@@ -295,11 +313,28 @@
       # Nerd Font symbols preset
       settings = {
         format = ''
-          $username$hostname$localip$shlvl$singularity$kubernetes$directory$vcsh$fossil_branch$fossil_metrics$git_branch$git_commit$git_state$git_metrics$git_status$hg_branch$pijul_channel$docker_context$package$c$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$gleam$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$quarto$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$typst$vlang$vagrant$zig$buf$nix_shell$conda$meson$spack$memory_usage$aws$gcloud$openstack$azure$nats$direnv$env_var$mise$crystal$custom$sudo$cmd_duration$character$jobs$battery$time$status$os$container$netns$shell$line_break
+          $username$hostname$localip$shlvl$singularity$kubernetes$directory$vcsh$fossil_branch$fossil_metrics$git_branch$git_commit$git_state$git_metrics$git_status$hg_branch$pijul_channel$docker_context$package$c$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$gleam$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$quarto$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$typst$vlang$vagrant$zig$buf$nix_shell$conda$meson$spack$memory_usage$aws$gcloud$openstack$azure$nats$direnv$env_var$mise$crystal$custom$sudo$time$cmd_duration$jobs$battery$os$container$netns$shell$status$line_break$character
         '';
+        status = {
+          disabled = false;
+          format = "$symbol";
+          symbol = "[${crossGlyph}](bold ${hex "base08"}) "; # nf-fa-times: non-zero exit
+          success_symbol = "[${checkGlyph}](bold ${hex "base0B"}) "; # nf-fa-check
+          pipestatus = false;
+        };
+
+        # No vimcmd_visual/replace: starship 1.26 maps keymap->mode only for (zsh, vicmd).
         character = {
-          success_symbol = "[](bold green) $line_break";
-          error_symbol = "[](bold red) $line_break";
+          format = "$symbol ";
+          success_symbol = "[${insertGlyph} ${chevronGlyph}](bold ${hex "base0E"})"; # nf-fa-pencil
+          error_symbol = "[${insertGlyph} ${chevronGlyph}](bold ${hex "base0E"})"; # failures show in $status
+          vimcmd_symbol = "[${normalGlyph} ${chevronGlyph}](bold ${hex "base0D"})"; # nf-dev-vim
+        };
+
+        # starship has no command-*start* time: $time is prompt-render time.
+        time = {
+          disabled = false;
+          time_format = "%R"; # HH:mm
         };
 
         aws = {
@@ -545,6 +580,21 @@
       };
 
     };
+
+    xdg.configFile."starship-nu.toml".source =
+      (pkgs.formats.toml { }).generate "starship-nu.toml" (
+        config.programs.starship.settings
+        // {
+          character = config.programs.starship.settings.character // {
+            disabled = true;
+          };
+        }
+      );
+
+    # config.nu load-envs home.sessionVariables after env.nu (starship's module
+    # puts the shared STARSHIP_CONFIG there), so force the nu path.
+    programs.nushell.environmentVariables.STARSHIP_CONFIG = lib.mkForce nuConfigPath;
+
     # home.file = { ".config/starship.toml".source = ./starship.toml; };
   };
 }

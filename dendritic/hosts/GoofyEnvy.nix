@@ -39,6 +39,7 @@
         zoxide
         zen-browser
         nushell
+        zsh
         wezterm
         neovim
         starship

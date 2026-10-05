@@ -48,6 +48,7 @@
         zen-browser
         cs2
         nushell
+        zsh
         wezterm
         neovim
         starship

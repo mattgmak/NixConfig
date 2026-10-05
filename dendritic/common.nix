@@ -95,8 +95,10 @@
       };
       environment.shells = with pkgs; [
         nushell
+        zsh
         bash
       ];
+      programs.zsh.enable = true;
 
       systemd.services.fprintd = {
         wantedBy = [ "multi-user.target" ];
@@ -217,7 +219,7 @@
           "docker"
           "podman"
         ];
-        shell = pkgs.nushell;
+        shell = pkgs.zsh;
       };
 
       security.sudo.enable = true;
