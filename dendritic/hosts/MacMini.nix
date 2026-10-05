@@ -456,6 +456,9 @@ in
           shfmt
           shellcheck
           uv
+          # Argent MCP server: pi's mcp.json spawns bare "argent", so it must be on the
+          # global PATH, not just a devshell. Deduplicated from dev-shells/drpom.
+          self.packages.${pkgs.stdenv.hostPlatform.system}.argent
         ]
         ++ (with pkgs.darwin; [
           file_cmds

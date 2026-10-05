@@ -245,6 +245,9 @@
           android-tools
           kdePackages.wacomtablet
           packages.osu-lazer-bin
+          # Argent MCP server: pi's mcp.json spawns bare "argent", so it must be on the
+          # global PATH, not just a devshell. Deduplicated from dev-shells/drpom.
+          self.packages.${pkgs.stdenv.hostPlatform.system}.argent
         ];
 
         boot = {
