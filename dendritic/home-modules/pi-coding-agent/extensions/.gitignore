@@ -5,5 +5,7 @@ node_modules
 package-lock.json
 dist/
 *.tsbuildinfo
+# pi-npm-i: self-contained bundle for compiled bun hosts (pi-bolt)
+pi-cursor-sdk/pi-bolt-bundle.js
 # HM/pi-npm-i Stylix symlink — recreated on activation
 pi-powerline-footer/theme.json

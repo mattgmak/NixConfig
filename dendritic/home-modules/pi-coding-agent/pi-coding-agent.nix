@@ -212,6 +212,7 @@
           git
           nodejs_22
           pnpm
+          bun
         ];
         text = ''
           set -euo pipefail
@@ -341,6 +342,18 @@
               echo "pi-npm-i: pi-cursor-sdk dist/index.js missing after build" >&2
               exit 1
             fi
+            # pi-bolt is a compiled bun binary; its extension loader resolves extension
+            # deps itself and fails on this package's bare node_modules deps
+            # (@cursor/sdk, @bufbuild/protobuf) at runtime. Inline them for that host;
+            # node hosts keep using dist/.
+            (cd "$dir" && bun build dist/index.js \
+              --target=bun --format=esm \
+              --outfile="$EXTENSIONS/pi-cursor-sdk/pi-bolt-bundle.js" \
+              --external '@earendil-works/*' \
+              --external '@mariozechner/*' \
+              --external 'typebox*' \
+              --external '@sinclair/typebox*' \
+              --external '*.node')
             restore_vendor_tracked_changes "$dir" "pi-cursor-sdk"
           }
 
