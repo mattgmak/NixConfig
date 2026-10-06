@@ -98,6 +98,9 @@
         zsh
         bash
       ];
+      # nixpkgs defaults this to `ls -alh` in /etc/zshrc, and an alias
+      # shadows the lazygit shell function of the same name.
+      environment.shellAliases.l = null;
       programs.zsh.enable = true;
 
       systemd.services.fprintd = {
