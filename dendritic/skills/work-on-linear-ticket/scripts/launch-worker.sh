@@ -29,9 +29,10 @@ if [ -z "$session" ]; then
   session=$(printf '%s%s' "$repo_parts" "$rel" | tr '.:' '__' | tr ' ' '_')
 fi
 
-# pi runs under node; idle pane shows shell
+# pi's foreground process name differs by runtime: node (node pi), bun (bun-compiled pi),
+# pi (self-contained native binary, e.g. pi-bolt on linux), pi-bin (pi-bolt's launcher child on darwin)
 pi_running() {
-  tmux list-panes -t "$session" -F '#{pane_current_command}' 2>/dev/null | grep -q '^node$'
+  tmux list-panes -t "$session" -F '#{pane_current_command}' 2>/dev/null | grep -qE '^(node|bun|pi|pi-bin)$'
 }
 
 # 3) Create session if missing
