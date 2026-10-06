@@ -66,6 +66,11 @@
         })
         inputs.nix4vscode.overlays.default
         inputs.coding-agents.overlays.default
+        # Last so it wins over coding-agents' own pi-coding-agent tweaks: swap the node
+        # build for the native Pi-Bolt binary, which ships bin/pi for exactly this.
+        (_final: _super: {
+          pi-coding-agent = self.packages.${system}.pi-bolt;
+        })
       ];
 
       common-nixpkgs-config = {

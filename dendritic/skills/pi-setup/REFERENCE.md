@@ -40,9 +40,11 @@ Deployed at runtime:
 
 User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 
-Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). The `pi-coding-agent` package may be overridden in `dendritic/overlays.nix` (npm deps hash).
+Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
 
 ### Examples (not exhaustive)
+
+**pi-bolt (compiled bun host) can't resolve extension deps at runtime.** Its extension loader runs jiti in embedded mode (`isBunBinary` → `{ virtualModules, tryNative: false }`), which fails on bare specifiers reached *inside* a package's own dependency tree (`Cannot find package 'X'`), while plain node/bun resolve the same tree fine. Workaround pattern: `pi-npm-i` bundles the extension for that host and the loader picks the bundle when `process.versions.bun` is set — see `install_pi_cursor_sdk` (`bun build … --external '@earendil-works/*' --external 'typebox*' --external '*.node'`) and `extensions/pi-cursor-sdk/index.ts`. Put generated bundles in the loader dir (**not** the submodule): `discard_vendor_changes` runs `git clean -fd` in every vendor submodule at the end of `pi-npm-i`.
 
 **Extension submodule** — vendored under `vendor/<owner>/<repo>/`, exposed via loader dir `extensions/<name>/`:
 
@@ -402,9 +404,10 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Subagent agent profiles | `dendritic/home-modules/pi-coding-agent/agents/*.md` |
 | Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
-| Bump pi package | `flake.nix` / `flake.lock` (`coding-agents` input) + `dendritic/overlays.nix` |
+| Bump pi package | `dendritic/packages/pi-bolt.nix` (version + both platform hashes) |
 | Bump engram binary (keep in sync with ext) | `dendritic/packages/engram.nix` (see Engram ext/bin version sync) |
-| pi package overlay | `dendritic/overlays.nix` (pi-coding-agent build tweaks) |
+| pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap) |
+| Extension bundle for compiled bun hosts | `pi-npm-i` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
 
 ## Goofeus agent workspace (GoofeusAgent)
 

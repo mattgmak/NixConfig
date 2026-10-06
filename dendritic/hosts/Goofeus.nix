@@ -314,6 +314,11 @@
         virtualisation.docker.enable = true;
         virtualisation.podman.enable = true;
 
+        # This host skips nixosModules.common, so nix-ld is not inherited from it.
+        # Needed because pi is the native Pi-Bolt ELF, which hardcodes the generic
+        # /lib64/ld-linux-x86-64.so.2 interpreter that NixOS only provides as a stub.
+        programs.nix-ld.enable = true;
+
         services.transmissionGluetun = {
           enable = true;
           serverRegions = "Netherlands";
