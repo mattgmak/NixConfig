@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "1.0.0",
+  "lastChangelogVersion": "1.0.3",
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4.1-flash",
   "defaultThinkingLevel": "off",
@@ -41,7 +41,8 @@
     "openrouter/deepseek/deepseek-v4-flash-0731",
     "openrouter/deepseek/deepseek-v4.1-flash",
     "opencode-go/deepseek-v4.1-flash",
-    "opencode-go/space-bunny-free"
+    "opencode-go/space-bunny-free",
+    "azure-openai-responses/gpt-6-luna"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -56,6 +57,7 @@
     "opencode-go/glm-5.3-flash": "low",
     "openrouter/z-ai/glm-5.3-flash": "low",
     "opencode-go/deepseek-v4.1-flash": "medium",
-    "opencode-go/space-bunny-free": "medium"
+    "opencode-go/space-bunny-free": "medium",
+    "azure-openai-responses/gpt-6-luna": "low"
   }
 }
