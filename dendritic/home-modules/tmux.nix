@@ -192,6 +192,7 @@
           set -g allow-passthrough on
           set -g visual-activity off
           set -g focus-events on
+          set -g default-shell ${lib.getExe pkgs.zsh}
           set -ga update-environment TERM
           set -ga update-environment TERM_PROGRAM
           bind r run-shell 'rm -rf ${config.home.homeDirectory}/.cache/tmux-powerkit/data/* 2>/dev/null; true' \; source-file ~/.config/tmux/tmux.conf \; refresh-client -S \; display-message "Config reloaded (powerkit cache cleared)..."

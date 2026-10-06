@@ -32,9 +32,8 @@
             "Noto Color Emoji"
           ];
           quick-terminal-position = "center";
-          # command = lib.getExe pkgs.nushell;
-          # Bare `tmux` is new-session; attach to MRU (no -t) or start if no server. Stay in nu after tmux exits.
-          command = "${lib.getExe pkgs.nushell} -e ${lib.escapeShellArg "^tmux attach-session; if ($env.LAST_EXIT_CODE != 0) { ^tmux new-session }"}";
+          # Attach to the MRU tmux session (bare `tmux` would start a new one); stay in zsh after it exits.
+          command = "${lib.getExe pkgs.zsh} -l -c ${lib.escapeShellArg "tmux attach-session || tmux new-session; exec zsh -l"}";
           custom-shader = "shaders/cursor-smear.glsl";
           cursor-style = "block";
           cursor-style-blink = false;
