@@ -614,6 +614,7 @@
 
       home.sessionVariables = {
         LEAN_CTX_BIN = lib.getExe leanCtx;
+        LEAN_CTX_SHELL = lib.getExe pkgs.bash;
         PI_CURSOR_ASK_QUESTION = "0";
         CRAWL4AI_API_TOKEN = crawl4aiApiToken;
       };
