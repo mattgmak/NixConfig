@@ -24,7 +24,7 @@ Stack: **pi** + **pi-interactive-subagents** (tmux) + **handmux** (phone PWA) �
 |-------|----------|
 | Compute | **Goofeus primary** — agent runs on Goofeus; phone connects there |
 | Linux user | **`agent`** HM user + **root** stays admin/remote-builder |
-| Root `NixConfig` | **Deprecated for builds** — agent owns `~/NixConfig`; root may build from `/home/agent/NixConfig` |
+| Root `NixConfig` | **Deploy-time pin** — `scripts/deploy-goofeus.sh` symlinks it to the deployed flake source store path (gcroot); agent owns its own `~/NixConfig` workspace |
 | Phone frontend | **handmux + tmux** — **locked** (muxr / Herdr mobile relay rejected) |
 | Multiplexer | **tmux** — **locked** — required by `pi-interactive-subagents` |
 | handmux network | **Tailscale only** — no public tunnel; bind tailnet IP |
@@ -202,10 +202,20 @@ HM `home.activation` on agent user:
 - **`main` = flake SSOT** for `nixos-rebuild` / `nh os switch`; agent coding work in **worktrees** (`worktrunk`) so auto-pull on main is safe.
 - agenix deploy key or gh credential for private repo.
 
-### 3. Root builder path
+### 3. Root NixConfig dir — **locked**
 
-- Point `NH_OS_FLAKE` / remote builder at `/home/agent/NixConfig`.
-- Deprecate `/root/NixConfig` clone over time.
+`/root/NixConfig` is not a checkout. `scripts/deploy-goofeus.sh` points it at the flake
+source store path of the revision being deployed (`nix flake metadata` → `nix copy` →
+`ln -sfn`) and pins that source with a gcroot, so the directory is exactly what gets
+built, survives `nix-collect-garbage`, and needs no git, branch or pull.
+
+- `scripts/deploy-goofeus.sh` syncs, writes the boot entry and activates.
+- `--dir-only` syncs without activating, `--dry` prints what `nh` would do, `--no-boot`
+  activates without touching the boot entry.
+- The directory is read-only by design. `~/.config/nvim/lazy-lock.json` is symlinked
+  into it, so `:Lazy update` cannot write there.
+- Nix's flake source holds tracked paths only: `git add` a new file or it is silently
+  absent from the deployed tree (the script warns about untracked files).
 
 ### 4. handmux module — **locked**
 
@@ -224,7 +234,7 @@ HM `home.activation` on agent user:
 
 - agent may run `nixos-rebuild` / `nh os switch` from `~/NixConfig` **main**.
 - **Requires interactive sudo password** — no passwordless sudo for agent, ever.
-- Rebuild from phone: handmux shell → `cd ~/NixConfig && sudo nh os switch` (user types pw).
+- Rebuild from phone: handmux shell → `cd ~/NixConfig && sudo nh -R os switch` (user types pw; `nh` refuses to run as root without `-R`).
 
 ### 7. Secrets (agenix)
 
