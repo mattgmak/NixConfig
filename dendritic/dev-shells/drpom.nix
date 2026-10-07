@@ -51,13 +51,13 @@
         ANDROID_NDK_ROOT = "${ANDROID_HOME}/ndk-bundle";
 
         # Registry release from https://www.npmjs.com/package/eas-cli (npm tarball has no lockfile).
-        easCliVersion = "19.1.0";
+        easCliVersion = "24.11.0";
         easCli = pkgs.buildNpmPackage {
           pname = "eas-cli";
           version = easCliVersion;
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/eas-cli/-/eas-cli-${easCliVersion}.tgz";
-            hash = "sha256-Wh2gE/Ey0uJkHS4iug6rK0HhVSwuFyTO9jwOJYWAZnc=";
+            hash = "sha256-JUmBP2ruO2XTUtdjrHYj5MhIDeSSs42LXgaObm4XM/g=";
           };
           sourceRoot = "package";
 
@@ -65,7 +65,7 @@
             cp ${./eas-cli-package-lock.json} package-lock.json
           '';
 
-          npmDepsHash = "sha256-sbgt2quVZrYOrpHmZheJZYmp3iwQw+iSUgWo3NQb4/Q=";
+          npmDepsHash = "sha256-fl2wPhCwevLmuNenCPXTbCNF1vNV3Zs9PB2I1qJxsHI=";
 
           nodejs = pkgs.nodejs_22;
 
