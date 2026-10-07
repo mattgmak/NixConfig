@@ -60,15 +60,23 @@
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Qwen3.8 27B free. Most reliable of the new batch (9/9 tool calls), 288-830ms, 262k.",
+      "_comment": "Fallback 2: Ling 3.1 Flash free. Newest free endpoint (2026-10-02), hybrid reasoning MoE (25B active/560B), 262k.",
       "provider": "openrouter",
-      "id": "qwen/qwen3.8-27b:free",
+      "id": "inclusionai/ling-3.1-flash",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: Dots3 Note Preview free (661-840ms, 3/3 tool calls, 512k window).",
+      "_comment": "Fallback 3: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
+      "provider": "opencode-go",
+      "id": "longcat-2.5-preview-free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 4: Dots3 Note Preview free (661-840ms, 3/3 tool calls, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -76,7 +84,7 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 4: Apodex 1.1 Mini free. Newest free release (2026-10-01), 9/9 tool calls, 693-848ms typical but spiky (3.8s observed), 262k.",
+      "_comment": "Fallback 5: Apodex 1.1 Mini free. Newest free release (2026-10-01), 9/9 tool calls, 693-848ms typical but spiky (3.8s observed), 262k.",
       "provider": "openrouter",
       "id": "apodex/apodex-1.1-mini:free",
       "thinking": "low",
@@ -84,7 +92,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free. Replaces the retired ling-3.0-flash-fin endpoint; 765-783ms, 3/3 tool calls, 262k.",
+      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free. Replaces the retired ling-3.0-flash-fin endpoint; 765-783ms, 3/3 tool calls, 262k.",
       "provider": "openrouter",
       "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "low",
@@ -119,15 +127,23 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 3: Qwen3.8 27B free (288-453ms, 6/6 tool calls, 262k).",
+      "_comment": "Fallback 3: Ling 3.1 Flash free (newest free endpoint, hybrid reasoning MoE, 262k).",
       "provider": "openrouter",
-      "id": "qwen/qwen3.8-27b:free",
+      "id": "inclusionai/ling-3.1-flash",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
+      "_comment": "Fallback 4: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
+      "provider": "opencode-go",
+      "id": "longcat-2.5-preview-free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 5: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
       "provider": "openrouter",
       "id": "apodex/apodex-1.1-mini:free",
       "thinking": "low",
@@ -135,7 +151,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
+      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
       "provider": "openrouter",
       "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "low",
@@ -162,15 +178,23 @@
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Qwen3.8 27B free (288-453ms, 6/6 tool calls, 262k).",
+      "_comment": "Fallback 2: Ling 3.1 Flash free (newest free endpoint, hybrid reasoning MoE, 262k).",
       "provider": "openrouter",
-      "id": "qwen/qwen3.8-27b:free",
+      "id": "inclusionai/ling-3.1-flash",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
+      "_comment": "Fallback 3: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
+      "provider": "opencode-go",
+      "id": "longcat-2.5-preview-free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 4: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "off",
@@ -178,7 +202,7 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 4: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
+      "_comment": "Fallback 5: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
       "provider": "openrouter",
       "id": "apodex/apodex-1.1-mini:free",
       "thinking": "off",
@@ -186,7 +210,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 5 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
+      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
       "provider": "openrouter",
       "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "off",
