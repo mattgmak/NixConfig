@@ -3,8 +3,8 @@ name: argent-worker
 description: Worker plus argent — reads, writes and edits code, and drives iOS sim / Android emulator / chromium through the argent MCP
 tools: ctx_read, write, edit, ctx_shell, fetch_content, mcp, mcp__argent
 subagent_agents: scout, researcher
-model: cursor/composer-2.5:slow
-thinking: off
+model: opencode-go/longcat-2.5-preview-free
+thinking: medium
 system-prompt: append
 auto-exit: true
 ---
