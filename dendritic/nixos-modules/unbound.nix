@@ -74,6 +74,13 @@
           incoming-num-tcp = 128;
           outgoing-num-tcp = 64;
 
+          # tcp-idle-timeout covers server-side (dnsmasq -> unbound) connections and
+          # defaults to 30s, so FTL reopens TCP constantly; 5 min cuts that local churn.
+          tcp-idle-timeout = 300000;
+          # Documented for authority servers; measured inert for forwarders, where
+          # unbound closes DoT sockets itself after <20s, so 600s never binds.
+          tcp-reuse-timeout = 600000;
+
           harden-glue = true;
           harden-dnssec-stripped = true;
           use-caps-for-id = false;
