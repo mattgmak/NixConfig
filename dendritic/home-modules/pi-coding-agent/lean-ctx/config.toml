@@ -55,4 +55,6 @@ shell_allowlist_extra = [
     "biome",
     "convex",
     "pi-bolt",
+    "avdmanager",
+    "emulator",
 ]
