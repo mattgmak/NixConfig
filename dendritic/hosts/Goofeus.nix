@@ -285,7 +285,7 @@
         users.users.agent = {
           isNormalUser = true;
           extraGroups = [ "networkmanager" ];
-          shell = pkgs.nushell;
+          shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             GoofyDesky
             GoofyEnvy
