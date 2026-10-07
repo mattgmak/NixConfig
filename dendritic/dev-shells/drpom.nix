@@ -31,6 +31,7 @@
             "x86_64"
             "arm64-v8a"
           ];
+          buildToolsVersions = [ "36.0.0" ];
           includeNDK = true;
           ndkVersions = [
             "27.0.12077973"
