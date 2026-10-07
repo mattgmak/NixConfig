@@ -60,10 +60,6 @@
         allowedTCPPorts = [
           80
           443
-          3000
-          8081
-          8082
-          3210
         ];
         allowedUDPPorts = [
           80
@@ -75,6 +71,19 @@
           {
             from = 1714;
             to = 1764;
+          }
+          # Dev work
+          {
+            from = 3000;
+            to = 3003;
+          }
+          {
+            from = 8081;
+            to = 8084;
+          }
+          {
+            from = 3210;
+            to = 3213;
           }
         ];
         allowedUDPPortRanges = [
