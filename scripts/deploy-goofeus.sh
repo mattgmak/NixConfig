@@ -19,6 +19,7 @@ HOST=${HOST:-root@goofeus}
 ATTR=${ATTR:-Goofeus}
 DEST=${DEST:-/root/NixConfig}
 GCROOT=${GCROOT:-/nix/var/nix/gcroots/deployed-nixconfig}
+REPO_URL=${REPO_URL:-https://github.com/mattgmak/NixConfig}
 
 dry=0
 dir_only=0
@@ -55,13 +56,14 @@ fi
 if [ "$dry" = 0 ]; then
   nix copy --to "ssh://$HOST" "$src"
 
-  ssh "$HOST" "bash -s -- '$src' '$DEST' '$GCROOT' '$rev' '$dirty'" <<'REMOTE'
+  ssh "$HOST" "bash -s -- '$src' '$DEST' '$GCROOT' '$rev' '$dirty' '$REPO_URL'" <<'REMOTE'
 set -euo pipefail
 src=$1
 dest=$2
 gcroot=$3
 rev=$4
 dirty=$5
+repoUrl=$6
 
 # A real directory here is a leftover checkout: move it aside, never delete it.
 if [ -e "$dest" ] && [ ! -L "$dest" ]; then
@@ -74,6 +76,18 @@ ln -sfn "$src" "$dest"
 ln -sfn "$src" "$gcroot"
 printf 'rev=%s\ndirty=%s\nsrc=%s\nsynced_at=%s\n' \
   "$rev" "$dirty" "$src" "$(date -Is)" >"$dest.rev"
+
+# Also sync agent's ~/NixConfig to the deployed revision.
+agentRepo="/home/agent/NixConfig"
+if [ ! -d "$agentRepo/.git" ]; then
+  echo "deploy-goofeus: cloning $repoUrl → $agentRepo"
+  sudo -u agent git clone --recurse-submodules -b main "$repoUrl" "$agentRepo"
+else
+  echo "deploy-goofeus: fast-forwarding agent repo"
+  sudo -u agent git -C "$agentRepo" fetch origin main
+  sudo -u agent git -C "$agentRepo" merge --ff-only origin/main || true
+  sudo -u agent git -C "$agentRepo" submodule update --init --recursive || true
+fi
 REMOTE
 
   remote_path=$(ssh "$HOST" "nix flake metadata --json '$DEST' | jq -r .path")

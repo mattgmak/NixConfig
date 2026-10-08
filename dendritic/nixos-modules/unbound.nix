@@ -1,4 +1,4 @@
-# Recursive DNS upstream for Pi-hole: Mullvad DNS-over-TLS.
+# Recursive DNS upstream for Pi-hole: Cloudflare DNS-over-TLS.
 # Port 5335 — Pi-hole forwards to 127.0.0.1:5335 (not exposed on LAN firewall).
 {
   flake.nixosModules.unbound =
@@ -9,18 +9,19 @@
     }:
   let
     unboundPort = 5335;
-    # Mullvad anycast DoT endpoints: 194.242.2.2 = no filtering, 194.242.2.9 = all
-    # Mullvad blocklists (redundant with Pi-hole gravity, harmless).
-    # Anycast means every address is announced from many Mullvad sites: when one node
-    # is down or retired the route is withdrawn and traffic shifts to the next-closest
-    # instance, instead of the pinned unicast node IPs (sg-sin-dns-101, de-fra-dns-001)
-    # answering with TCP RST until someone updates the config.
-    # Verified 2026-09-25 with full TLS verification against both endpoints:
-    #   dig +tls +tls-ca +tls-hostname=dns.mullvad.net @194.242.2.2 example.com
-    #   dig +tls +tls-ca +tls-hostname=all.dns.mullvad.net @194.242.2.9 example.com
-    mullvadForwarders = [
-      "194.242.2.2@853#dns.mullvad.net"
-      "194.242.2.9@853#all.dns.mullvad.net"
+    # Cloudflare anycast DoT, unfiltered: Pi-hole gravity is the only filtering layer.
+    # Mullvad dropped 2026-10-08. Its nearest POP is Singapore, so from Goofeus every
+    # cold lookup paid 39-49ms RTT, ~25% of TLS handshakes stalled at 380-420ms on that
+    # lossy route, and unbound logged 162 ECONNREFUSED bursts on :853 in 10s. Cloudflare
+    # answers from a Hong Kong POP: 2.1-2.5ms RTT, 5ms handshake+query, no stalls in 12
+    # samples. Two addresses of one operator on purpose: mixing operators or filtering
+    # profiles made the same name resolve differently query to query.
+    # Verified 2026-10-08 with full TLS verification against both endpoints:
+    #   dig +tls +tls-ca +tls-hostname=cloudflare-dns.com @1.1.1.1 example.com
+    #   dig +tls +tls-ca +tls-hostname=cloudflare-dns.com @1.0.0.1 example.com
+    dotForwarders = [
+      "1.1.1.1@853#cloudflare-dns.com"
+      "1.0.0.1@853#cloudflare-dns.com"
     ];
   in
   {
@@ -65,7 +66,7 @@
           num-queries-per-thread = 2048;
 
           # DoT upstream means every forward is a TCP connection: outgoing-num-tcp caps
-          # concurrent connections to the Mullvad endpoints (default 10/thread), and
+          # concurrent connections to the DoT endpoints (default 10/thread), and
           # incoming-num-tcp caps connections from Pi-hole's dnsmasq (also 10/thread) —
           # dnsmasq uses TCP to Unbound whenever a client asks over TCP or a reply was
           # truncated. FTL's worst cluster was 15 "TCP connection failed while receiving
@@ -116,7 +117,7 @@
         forward-zone = [
           {
             name = ".";
-            forward-addr = mullvadForwarders;
+            forward-addr = dotForwarders;
             forward-tls-upstream = true;
           }
         ];
