@@ -15,19 +15,13 @@
   ],
   "enabledModels": [
     "opencode/big-pickle",
-    "opencode/deepseek-v4-flash-free",
-    "opencode/mimo-v2.5-free",
     "opencode/nemotron-3-ultra-free",
     "opencode-go/glm-5.2",
     "opencode-go/hy3",
     "opencode-go/kimi-k3",
-    "opencode-go/qwen3.8-max",
     "opencode-go/gpt-5.6-luna",
     "opencode-go/deepseek-v4-flash",
     "opencode-go/deepseek-v4-pro",
-    "opencode-go/qwen3.7-plus",
-    "opencode-go/mimo-v2.5",
-    "opencode-go/mimo-v2.5-pro",
     "cursor/grok-4.6:fast",
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
@@ -42,7 +36,9 @@
     "openrouter/deepseek/deepseek-v4.1-flash",
     "opencode-go/deepseek-v4.1-flash",
     "opencode-go/longcat-2.5-preview-free",
-    "azure-openai-responses/gpt-6-luna"
+    "opencode-go/qwen3.8-flash",
+    "opencode-go/mimo-v2.6-flash",
+    "azure/gpt-6-luna"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -58,6 +54,6 @@
     "openrouter/z-ai/glm-5.3-flash": "low",
     "opencode-go/deepseek-v4.1-flash": "medium",
     "opencode-go/longcat-2.5-preview-free": "medium",
-    "azure-openai-responses/gpt-6-luna": "low"
+    "azure/gpt-6-luna": "low"
   }
 }
