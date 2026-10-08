@@ -95,6 +95,32 @@
           ''
         else
           null;
+      # agenix symlinks the generation only after decrypting every secret, so
+      # the first present secret doubles as the readiness probe.
+      waitAgenixScript =
+        let
+          present = lib.filter (
+            name: builtins.pathExists ../../../secrets/${name}.age
+          ) [
+            "opencode-api-key"
+            "openrouter-api-key"
+            "mercury-ai-token"
+            "context7-api-key"
+            "github-mcp-token"
+            "cursor-api-key"
+            "cline-api-key"
+            "cursor-usage-session-token"
+          ];
+        in
+        if present == [ ] then
+          null
+        else
+          pkgs.writeShellScript "wait-for-agenix" ''
+            for _ in {1..200}; do
+              if [ -r "${config.age.secrets.${builtins.head present}.path}" ]; then exit 0; fi
+              sleep 0.05
+            done
+          '';
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -149,6 +175,12 @@
               $ssh_agent_env | save --force $ssh_agent_file
             }
           '')
+          + lib.optionalString (waitAgenixScript != null) ''
+
+            # A shell started before the mount cached empty values for the whole
+            # session; wait for agenix instead of reading too early.
+            try { ^${waitAgenixScript} } catch { }
+          ''
           + lib.optionalString hasOpencodeApiKeySecret ''
 
             # opencode-api-key.age: one line, raw API key (no OPENCODE_API_KEY= prefix)

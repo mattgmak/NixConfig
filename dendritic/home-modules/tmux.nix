@@ -195,6 +195,11 @@
           set -g default-shell ${lib.getExe pkgs.zsh}
           set -ga update-environment TERM
           set -ga update-environment TERM_PROGRAM
+          # A server started before agenix mounted carries empty secret vars plus
+          # HM's exported once-guard; drop the guard so panes re-read them.
+          # run-shell blocks the config queue, so this lands before the first
+          # window exists; the guard is usually absent, hence the redirect.
+          run-shell '${lib.getExe config.programs.tmux.package} setenv -gu __HM_ZSH_SESS_VARS_SOURCED 2>/dev/null'
           bind r run-shell 'rm -rf ${config.home.homeDirectory}/.cache/tmux-powerkit/data/* 2>/dev/null; true' \; source-file ~/.config/tmux/tmux.conf \; refresh-client -S \; display-message "Config reloaded (powerkit cache cleared)..."
           bind-key -T copy-mode-vi v send-keys -X begin-selection
           bind-key -T copy-mode-vi C-v send-keys -X rectangle-on \; send -X begin-selection

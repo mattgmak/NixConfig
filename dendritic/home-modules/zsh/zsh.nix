@@ -21,6 +21,8 @@
       };
       secretFile = name: ../../../secrets/${name}.age;
       availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
+      secretNames = builtins.attrValues availableSecrets;
+      secretPathOf = name: config.age.secrets.${name}.path;
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -63,14 +65,31 @@
           s = "sesh connect $(sesh list --icons | fzf --ansi)";
         };
 
-        # Per-shell-start expansion, like nu's `$env.X = (cat …)`. Not
-        # home.sessionVariables: the nu module would clobber nu's real values
-        # with the literal "$(cat …)".
-        sessionVariables =
-          lib.mapAttrs (_: name: ''$(cat ${config.age.secrets.${name}.path})'') availableSecrets
-          // {
-            EDITOR = "nvim";
-          };
+        sessionVariables = {
+          EDITOR = "nvim";
+        };
+
+        # Secrets are read per shell start, not through sessionVariables: HM
+        # wraps those exports in an exported __HM_ZSH_SESS_VARS_SOURCED
+        # once-guard, so a shell that started before agenix finished mounting
+        # exported empty values and every descendant (tmux server, panes, nu)
+        # inherited them for good. .zshenv is unguarded and runs for every zsh.
+        # The poll covers the async launchd mount: agenix only flips the
+        # generation symlink after decrypting every secret.
+        envExtra =
+          lib.optionalString (secretNames != [ ]) ''
+            __agenix_first="${secretPathOf (builtins.head secretNames)}"
+            for __i in {1..200}; do
+              if [[ -r "$__agenix_first" ]]; then break; fi
+              sleep 0.05
+            done
+            unset __agenix_first __i
+          ''
+          + lib.concatStringsSep "\n" (
+            lib.mapAttrsToList (
+              env: name: ''export ${env}="$(cat "${secretPathOf name}" 2>/dev/null)"''
+            ) availableSecrets
+          );
 
         # Priorities: 570 compinit · 851 zoxide · 910 fzf · 1200 syntax
         # highlighting; integrations with no order set (atuin, carapace, direnv,
