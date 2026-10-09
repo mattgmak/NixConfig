@@ -1,68 +1,41 @@
 # General
 
-- CRITICAL: Always verify symbols, function names, config options, module
-  paths, variable names, CLI flags, and API fields against actual source code
-  or documentation before using them. NEVER guess symbols which you have not
-  seen or read before.
-
-- When I ask a question, don't start coding, don't write files, just answer the question.
-  You can use tools and write scripts, but only if you need additional information to answer.
+- CRITICAL: Verify symbols, fn names, config options, module paths, CLI flags, API
+  fields against actual source/docs before use. NEVER guess unseen symbols.
+- Question → answer only. No coding, no files. Tools/scripts OK if needed for answer.
 
 # Running commands
 
-- When grepping via the shell tool, always use `rg` over `grep` as it is faster.
+- Shell grep always `rg` over `grep`. Faster.
+- NEVER `find` on `/`, `/nix`, `~` — never completes, may crash terminal.
+- NEVER prefix commands with `sleep`. Expect long → polling script.
+- No lint/format/type checks — Pi runs them, reports all errors on finish. Tests/other checks OK.
 
-- NEVER run find on big directories like `/` or `/nix` or `~`!
-  It would never complete and might even crash the terminal you are running in.
+# Large output
 
-- When running commands, NEVER prefix it with a sleep. If you expect something
-  to take long, write a script which polls the result.
+- Default: ctx_shell compression + auto-tee handles it — don't pre-redirect.
+- Known-huge output you'll grep repeatedly or need later (builds, test runs,
+  CI dumps) → redirect once: `cmd > $TMPDIR/agent-tmp/<project>/x.log 2>&1`,
+  check exit code, then `rg` / bounded `ctx_read` on the file.
 
-- Don't run linting, formatting or type and syntax checking, they will run
-  automatically by Pi and you will be notified every error when you finish.
-  Run tests and other types of checks/experiments to verify your work.
+# Codemode
+
+- Batch independent tool calls → codemode (Promise.allSettled/chain), not many separate calls.
+- Large output → filter in codemode before returning.
 
 # Temporary files
 
-- When you want to write one-off scripts, data or temporary files for
-  experiments, exploration, testing, answering questions, triggering runs or
-  whatever, you can use `$TMPDIR/agent-tmp/<project_name>` directory to write and
-  run them.
+- One-off scripts/data → `$TMPDIR/agent-tmp/<project_name>`. No inline scripts — write reusable file, run after.
+- NEVER delete from `$TMPDIR/agent-tmp/`
 
-- Never delete anything from `$TMPDIR/agent-tmp/`
+# File ops + paths
 
-- Don't write one-off scripts inline, write reusable scripts in files instead
-  and run them afterwards.
-
-# File operations and paths
-
-- When you want to write the exact same file to a different place with the exact same content,
-  use the `mv` command instead of the Write tool. This makes the move faster and more precise.
-
-- If you got a Windows Path like `C:\Users\walkman\Downloads\picture.png`, you are running in WSL2,
-  translate this to the WSL path: `/mnt/c/Users/walkman/Downloads/picture.png`.
-
-- When you want to revert file changes you made, use git operations instead of editing the file again.
+- Same content, different path → `mv`, not Write tool.
+- Revert own file changes → git, not re-edit.
 
 # Git
 
-- NEVER mutate pull requests — no merges, closes, approvals, or admin
-  bypasses (`gh pr merge`, `gh pr close`, `gh pr review --approve`,
-  `gh api .../pulls/.../merge`) unless the user explicitly asked for that
-  specific mutation in the same session. Otherwise stop and ask first.
-
-- NEVER modify previous commits, only when explicitly asked by the user.
-
-- NEVER make commits, unless when explicitly asked by the user.
-
-- When making commits, default to only writing commit subject with empty message.
-  Always follow project commit convention.
-
-- If the user explicitly specifies to make commits with message, explain in details 
-  **WHY** you did what you did. What was the problem you solved, 
-  why a specific design decision was made. Everything
-  that you know but cannot seen in the code. Make sure the most important
-  details are explained in the commit message.
-
-- No need to write in the commit message what tests were you running or the thing
-  "works", that should be the default.
+- NEVER mutate PRs — merges, closes, approvals, admin bypass (`gh pr merge`, `gh pr close`, `gh pr review --approve`, `gh api .../pulls/.../merge`) unless explicit same-session request. Stop + ask first.
+- NEVER modify previous commits or make commits unless explicitly asked.
+- Commits: subject only, empty body. Follow project convention.
+- Explicit message → explain WHY: problem solved, design decision, context not visible in code. No test lists, no "works" claims — presupposed.
