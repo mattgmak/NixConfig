@@ -65,19 +65,10 @@
           installPhase = ''
             runHook preInstall
 
-            # The whole directory must stay together: `pi-launcher` is a thin launcher that
-            # execs the `pi` beside its own realpath, and the runtime reads package.json,
+            # The whole directory must stay together: the runtime reads package.json,
             # theme/ and export-html/ next to the executable.
             mkdir -p $out/libexec
             cp -R . $out/libexec/pi
-
-            # The 36K `pi` is a thin launcher that execs the real app beside itself as
-            # `%s/pi-bin`. tmux names panes/windows after the resolved executable basename,
-            # not argv0, so swap the names: real app -> `pi`, launcher -> `pi-launcher`, with a
-            # `pi-bin` symlink so the launcher still finds it.
-            mv $out/libexec/pi/pi $out/libexec/pi/pi-launcher
-            mv $out/libexec/pi/pi-bin $out/libexec/pi/pi
-            ln -s pi $out/libexec/pi/pi-bin
 
             # Never copy `pi` alone into bin/. PIBOLT_NPM marks it as package-managed so
             # `pi-bolt update` refuses to curl-install into ~/.pi-bolt.
@@ -86,7 +77,7 @@
             # value silently redirects asset lookup (`--export` ENOENT, wrong --version).
             # --argv0 pi: macOS ps comm is argv[0], so the default full store path would
             # become the process name.
-            makeWrapper $out/libexec/pi/pi-launcher $out/bin/pi \
+            makeWrapper $out/libexec/pi/pi $out/bin/pi \
               --argv0 pi \
               --set PIBOLT_NPM 1 \
               --set PI_TELEMETRY 0 \
