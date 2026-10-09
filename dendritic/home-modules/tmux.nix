@@ -196,7 +196,8 @@
           set -ga update-environment TERM
           set -ga update-environment TERM_PROGRAM
           # The agents session is started by systemd, so the server outlives any
-          # client env; pull pi's capability overrides across on attach.
+          # client env; pull capability vars across on attach.
+          set -ga update-environment COLORTERM
           set -ga update-environment PI_TRUE_COLOR
           set -ga update-environment POWERLINE_NERD_FONTS
           # A server started before agenix mounted carries empty secret vars plus

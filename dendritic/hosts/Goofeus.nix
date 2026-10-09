@@ -315,7 +315,19 @@
         users.groups.agent = { };
 
         # Enable the OpenSSH daemon.
-        services.openssh.enable = true;
+        services.openssh = {
+          enable = true;
+          # sshd copies no variables by default (TERM always arrives), so COLORTERM
+          # never reaches remote TUIs — nvim gates truecolor on it, tcell too.
+          settings.AcceptEnv = [
+            "COLORTERM"
+            "TERM_PROGRAM"
+          ];
+        };
+
+        # Client TERMs (xterm-ghostty, xterm-kitty, wezterm, …) have no terminfo
+        # entry in the system profile, so TUIs fail or degrade on them.
+        environment.enableAllTerminfo = true;
 
         home-manager.users.${username} = self.homeConfigurations.Goofeus;
         home-manager.users.agent = self.homeConfigurations.GoofeusAgent;

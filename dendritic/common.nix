@@ -312,6 +312,10 @@
         # libraries = with pkgs; [ ];
       };
 
+      # sshd only forwards the variables its AcceptEnv lists; without these the
+      # remote side loses COLORTERM and TUIs drop to 256 colors.
+      programs.ssh.extraConfig = "SendEnv COLORTERM TERM_PROGRAM";
+
       virtualisation.podman = {
         enable = true;
         dockerCompat = true;
