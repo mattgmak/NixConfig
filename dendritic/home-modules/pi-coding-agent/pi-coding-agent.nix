@@ -616,6 +616,11 @@
         LEAN_CTX_BIN = lib.getExe leanCtx;
         LEAN_CTX_SHELL = lib.getExe pkgs.bash;
         PI_CURSOR_ASK_QUESTION = "0";
+        # ssh forwards TERM but never COLORTERM or TERM_PROGRAM, so pi's truecolor
+        # hint (COLORTERM=truecolor|24bit, TERM=*-direct) and the powerline
+        # extension's Nerd Font heuristic both fail and fall back remotely.
+        PI_TRUE_COLOR = "1";
+        POWERLINE_NERD_FONTS = "1";
         CRAWL4AI_API_TOKEN = crawl4aiApiToken;
       };
     };

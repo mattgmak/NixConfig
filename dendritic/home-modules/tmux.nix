@@ -195,6 +195,10 @@
           set -g default-shell ${lib.getExe pkgs.zsh}
           set -ga update-environment TERM
           set -ga update-environment TERM_PROGRAM
+          # The agents session is started by systemd, so the server outlives any
+          # client env; pull pi's capability overrides across on attach.
+          set -ga update-environment PI_TRUE_COLOR
+          set -ga update-environment POWERLINE_NERD_FONTS
           # A server started before agenix mounted carries empty secret vars plus
           # HM's exported once-guard; drop the guard so panes re-read them.
           # run-shell blocks the config queue, so this lands before the first
