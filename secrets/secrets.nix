@@ -215,6 +215,18 @@ in
     ];
   };
 
+  "deepseek-api-key.age" = {
+    armor = true;
+    publicKeys = [
+      Droid
+      GoofyDesky
+      GoofyEnvy
+      Goofeus
+      AgentAge
+      MacMini
+    ];
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [

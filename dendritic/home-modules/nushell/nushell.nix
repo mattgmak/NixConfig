@@ -10,109 +10,37 @@
       ...
     }:
     let
-      opencodeApiKeySecret = ../../../secrets/opencode-api-key.age;
-      hasOpencodeApiKeySecret = builtins.pathExists opencodeApiKeySecret;
-      readOpencodeApiKeyScript =
-        if hasOpencodeApiKeySecret then
-          pkgs.writeShellScript "read-opencode-api-key" ''
-            set -euo pipefail
-            cat "${config.age.secrets.opencode-api-key.path}"
-          ''
-        else
-          null;
-      openrouterApiKeySecret = ../../../secrets/openrouter-api-key.age;
-      hasOpenrouterApiKeySecret = builtins.pathExists openrouterApiKeySecret;
-      readOpenrouterApiKeyScript =
-        if hasOpenrouterApiKeySecret then
-          pkgs.writeShellScript "read-openrouter-api-key" ''
-            set -euo pipefail
-            cat "${config.age.secrets.openrouter-api-key.path}"
-          ''
-        else
-          null;
-      mercuryAiToken = ../../../secrets/mercury-ai-token.age;
-      hasMercuryAiTokenSecret = builtins.pathExists mercuryAiToken;
-      readMercuryAiTokenScript =
-        if hasMercuryAiTokenSecret then
-          pkgs.writeShellScript "read-mercury-ai-token" ''
-            set -euo pipefail
-            cat "${config.age.secrets.mercury-ai-token.path}"
-          ''
-        else
-          null;
-      context7ApiKeySecret = ../../../secrets/context7-api-key.age;
-      hasContext7ApiKeySecret = builtins.pathExists context7ApiKeySecret;
-      readContext7ApiKeyScript =
-        if hasContext7ApiKeySecret then
-          pkgs.writeShellScript "read-context7-api-key" ''
-            set -euo pipefail
-            cat "${config.age.secrets.context7-api-key.path}"
-          ''
-        else
-          null;
-      githubMcpTokenSecret = ../../../secrets/github-mcp-token.age;
-      hasGithubMcpTokenSecret = builtins.pathExists githubMcpTokenSecret;
-      readGithubMcpTokenScript =
-        if hasGithubMcpTokenSecret then
-          pkgs.writeShellScript "read-github-mcp-token" ''
-            set -euo pipefail
-            cat "${config.age.secrets.github-mcp-token.path}"
-          ''
-        else
-          null;
-      cursorApiKeySecret = ../../../secrets/cursor-api-key.age;
-      hasCursorApiKeySecret = builtins.pathExists cursorApiKeySecret;
-      readCursorApiKeyScript =
-        if hasCursorApiKeySecret then
-          pkgs.writeShellScript "read-cursor-api-key" ''
-            set -euo pipefail
-            cat "${config.age.secrets.cursor-api-key.path}"
-          ''
-        else
-          null;
-      clineApiKeySecret = ../../../secrets/cline-api-key.age;
-      hasClineApiKeySecret = builtins.pathExists clineApiKeySecret;
-      readClineApiKeyScript =
-        if hasClineApiKeySecret then
-          pkgs.writeShellScript "read-cline-api-key" ''
-            set -euo pipefail
-            cat "${config.age.secrets.cline-api-key.path}"
-          ''
-        else
-          null;
-      cursorUsageSessionTokenSecret = ../../../secrets/cursor-usage-session-token.age;
-      hasCursorUsageSessionTokenSecret = builtins.pathExists cursorUsageSessionTokenSecret;
-      readCursorUsageSessionTokenScript =
-        if hasCursorUsageSessionTokenSecret then
-          pkgs.writeShellScript "read-cursor-usage-session-token" ''
-            set -euo pipefail
-            cat "${config.age.secrets.cursor-usage-session-token.path}"
-          ''
-        else
-          null;
+      # Explicit list: config.age.secrets also holds non-env secrets.
+      envSecrets = {
+        OPENCODE_API_KEY = "opencode-api-key";
+        MERCURY_AI_TOKEN = "mercury-ai-token";
+        CONTEXT7_API_KEY = "context7-api-key";
+        GITHUB_MCP_TOKEN = "github-mcp-token";
+        OPENROUTER_API_KEY = "openrouter-api-key";
+        CURSOR_API_KEY = "cursor-api-key";
+        CLINE_API_KEY = "cline-api-key";
+        CURSOR_USAGE_SESSION_TOKEN = "cursor-usage-session-token";
+        DEEPSEEK_API_KEY = "deepseek-api-key";
+      };
+      secretFile = name: ../../../secrets/${name}.age;
+      availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
+      secretNames = builtins.attrValues availableSecrets;
+      secretPathOf = name: config.age.secrets.${name}.path;
+      # Every secret file holds one line, the raw value (no `ENV=` prefix). Bash
+      # expands agenix paths (e.g. $(getconf DARWIN_USER_TEMP_DIR)/agenix/… and ''${XDG_RUNTIME_DIR}/agenix/…) like HM activation.
+      readSecret = name: pkgs.writeShellScript "read-${name}" ''
+        set -euo pipefail
+        cat "${secretPathOf name}"
+      '';
       # agenix symlinks the generation only after decrypting every secret, so
       # the first present secret doubles as the readiness probe.
       waitAgenixScript =
-        let
-          present = lib.filter (
-            name: builtins.pathExists ../../../secrets/${name}.age
-          ) [
-            "opencode-api-key"
-            "openrouter-api-key"
-            "mercury-ai-token"
-            "context7-api-key"
-            "github-mcp-token"
-            "cursor-api-key"
-            "cline-api-key"
-            "cursor-usage-session-token"
-          ];
-        in
-        if present == [ ] then
+        if secretNames == [ ] then
           null
         else
           pkgs.writeShellScript "wait-for-agenix" ''
             for _ in {1..200}; do
-              if [ -r "${config.age.secrets.${builtins.head present}.path}" ]; then exit 0; fi
+              if [ -r "${secretPathOf (builtins.head secretNames)}" ]; then exit 0; fi
               sleep 0.05
             done
           '';
@@ -120,16 +48,10 @@
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
 
-      age.secrets = {
-        opencode-api-key.file = lib.mkIf hasOpencodeApiKeySecret opencodeApiKeySecret;
-        openrouter-api-key.file = lib.mkIf hasOpenrouterApiKeySecret openrouterApiKeySecret;
-        mercury-ai-token.file = lib.mkIf hasMercuryAiTokenSecret mercuryAiToken;
-        context7-api-key.file = lib.mkIf hasContext7ApiKeySecret context7ApiKeySecret;
-        github-mcp-token.file = lib.mkIf hasGithubMcpTokenSecret githubMcpTokenSecret;
-        cursor-api-key.file = lib.mkIf hasCursorApiKeySecret cursorApiKeySecret;
-        cline-api-key.file = lib.mkIf hasClineApiKeySecret clineApiKeySecret;
-        cursor-usage-session-token.file = lib.mkIf hasCursorUsageSessionTokenSecret cursorUsageSessionTokenSecret;
-      };
+      # Also declared in zsh/zsh.nix (identical values merge).
+      age.secrets = lib.genAttrs secretNames (name: {
+        file = secretFile name;
+      });
 
       # Servers (root user): decrypt headless with the passphrase-less SSH host
       # key; desktop users keep the default ~/.ssh identities.
@@ -176,88 +98,19 @@
             # session; wait for agenix instead of reading too early.
             try { ^${waitAgenixScript} } catch { }
           ''
-          + lib.optionalString hasOpencodeApiKeySecret ''
+          + lib.concatStringsSep "" (
+            lib.mapAttrsToList (env: name: ''
 
-            # opencode-api-key.age: one line, raw API key (no OPENCODE_API_KEY= prefix)
-            # Bash expands agenix paths (e.g. $(getconf DARWIN_USER_TEMP_DIR)/agenix/… and ''${XDG_RUNTIME_DIR}/agenix/…) like HM activation.
-            $env.OPENCODE_API_KEY = (
-              try {
-                (^${readOpencodeApiKeyScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-            $env.MERCURY_AI_TOKEN = (
-              try {
-                (^${readMercuryAiTokenScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
-          + lib.optionalString hasContext7ApiKeySecret ''
-
-            # context7-api-key.age: one line, raw API key (no CONTEXT7_API_KEY= prefix)
-            $env.CONTEXT7_API_KEY = (
-              try {
-                (^${readContext7ApiKeyScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
-          + lib.optionalString hasGithubMcpTokenSecret ''
-
-            # github-mcp-token.age: one line, raw GitHub PAT (no GITHUB_MCP_TOKEN= prefix)
-            $env.GITHUB_MCP_TOKEN = (
-              try {
-                (^${readGithubMcpTokenScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
-          + lib.optionalString hasCursorApiKeySecret ''
-
-            # openrouter-api-key.age: one line, raw OpenRouter API key (no OPENROUTER_API_KEY= prefix)
-            $env.OPENROUTER_API_KEY = (
-              try {
-                (^${readOpenrouterApiKeyScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-            # cursor-api-key.age: one line, raw Cursor SDK API key (no CURSOR_API_KEY= prefix)
-            $env.CURSOR_API_KEY = (
-              try {
-                (^${readCursorApiKeyScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
-          + lib.optionalString hasClineApiKeySecret ''
-
-            # cline-api-key.age: one line, raw ClinePass API key (no CLINE_API_KEY= prefix)
-            $env.CLINE_API_KEY = (
-              try {
-                (^${readClineApiKeyScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
-          + lib.optionalString hasCursorUsageSessionTokenSecret ''
-
-            # cursor-usage-session-token.age: one line, raw WorkosCursorSessionToken cookie (no prefix)
-            $env.CURSOR_USAGE_SESSION_TOKEN = (
-              try {
-                (^${readCursorUsageSessionTokenScript} | str trim)
-              } catch {
-                ""
-              }
-            )
-          ''
+              # ${name}.age: one line, raw value (no ${env}= prefix)
+              $env.${env} = (
+                try {
+                  (^${readSecret name} | str trim)
+                } catch {
+                  ""
+                }
+              )
+            '') availableSecrets
+          )
           + ''
 
             # Nushell has no per-command history ignore (0.112 only ships

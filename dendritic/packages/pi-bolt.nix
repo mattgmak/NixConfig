@@ -2,7 +2,7 @@
   perSystem =
     { pkgs, ... }:
     let
-      piBolt = pkgs.callPackage (
+      piPkg = pkgs.callPackage (
         {
           lib,
           stdenv,
@@ -34,7 +34,7 @@
           asset = "pi-bolt-${attrs.variant}";
         in
         stdenv.mkDerivation {
-          pname = "pi-bolt";
+          pname = "pi";
           inherit version;
 
           src = fetchurl {
@@ -65,25 +65,32 @@
           installPhase = ''
             runHook preInstall
 
-            # The whole directory must stay together: `pi` is a launcher that spawns the
-            # `pi-bin` beside its own realpath, and the runtime reads package.json,
+            # The whole directory must stay together: `pi-launcher` is a thin launcher that
+            # execs the `pi` beside its own realpath, and the runtime reads package.json,
             # theme/ and export-html/ next to the executable.
             mkdir -p $out/libexec
-            cp -R . $out/libexec/pi-bolt
+            cp -R . $out/libexec/pi
+
+            # The 36K `pi` is a thin launcher that execs the real app beside itself as
+            # `%s/pi-bin`. tmux names panes/windows after the resolved executable basename,
+            # not argv0, so swap the names: real app -> `pi`, launcher -> `pi-launcher`, with a
+            # `pi-bin` symlink so the launcher still finds it.
+            mv $out/libexec/pi/pi $out/libexec/pi/pi-launcher
+            mv $out/libexec/pi/pi-bin $out/libexec/pi/pi
+            ln -s pi $out/libexec/pi/pi-bin
 
             # Never copy `pi` alone into bin/. PIBOLT_NPM marks it as package-managed so
             # `pi-bolt update` refuses to curl-install into ~/.pi-bolt.
             # PI_PACKAGE_DIR must be pinned to our own layout: it is inherited from any
             # parent pi process (and wins over the binary's own dirname), and a foreign
             # value silently redirects asset lookup (`--export` ENOENT, wrong --version).
-            # `pi` is the in-place swap name (installed via the pi-coding-agent overlay),
-            # `pi-bolt` keeps the package usable side by side.
-            for bin in pi pi-bolt; do
-              makeWrapper $out/libexec/pi-bolt/pi $out/bin/$bin \
-                --set PIBOLT_NPM 1 \
-                --set PI_TELEMETRY 0 \
-                --set PI_PACKAGE_DIR $out/libexec/pi-bolt
-            done
+            # --argv0 pi: macOS ps comm is argv[0], so the default full store path would
+            # become the process name.
+            makeWrapper $out/libexec/pi/pi-launcher $out/bin/pi \
+              --argv0 pi \
+              --set PIBOLT_NPM 1 \
+              --set PI_TELEMETRY 0 \
+              --set PI_PACKAGE_DIR $out/libexec/pi
 
             runHook postInstall
           '';
@@ -100,6 +107,6 @@
       ) { };
     in
     {
-      packages.pi-bolt = piBolt;
+      packages.pi = piPkg;
     };
 }

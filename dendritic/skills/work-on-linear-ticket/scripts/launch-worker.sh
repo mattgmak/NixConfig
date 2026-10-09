@@ -30,9 +30,9 @@ if [ -z "$session" ]; then
 fi
 
 # pi's foreground process name differs by runtime: node (node pi), bun (bun-compiled pi),
-# pi (self-contained native binary, e.g. pi-bolt on linux), pi-bin (pi-bolt's launcher child on darwin)
+# pi (self-contained native binary)
 pi_running() {
-  tmux list-panes -t "$session" -F '#{pane_current_command}' 2>/dev/null | grep -qE '^(node|bun|pi|pi-bin)$'
+  tmux list-panes -t "$session" -F '#{pane_current_command}' 2>/dev/null | grep -qE '^(node|bun|pi)$'
 }
 
 # 3) Create session if missing

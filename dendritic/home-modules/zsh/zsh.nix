@@ -18,6 +18,7 @@
         CURSOR_API_KEY = "cursor-api-key";
         CLINE_API_KEY = "cline-api-key";
         CURSOR_USAGE_SESSION_TOKEN = "cursor-usage-session-token";
+        DEEPSEEK_API_KEY = "deepseek-api-key";
       };
       secretFile = name: ../../../secrets/${name}.age;
       availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
