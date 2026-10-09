@@ -1,0 +1,7 @@
+{
+  "name": "tool-allowlist",
+  "private": true,
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
