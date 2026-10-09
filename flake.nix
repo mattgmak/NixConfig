@@ -188,5 +188,14 @@
         pkgs = flake.legacyPackages.aarch64-linux.mv.unstable;
         modules = [ flake.nixOnDroidConfiguration ];
       };
+
+      # x86_64 AVD. On-device (upstream release-24.05 README):
+      # Use `nix-on-droid switch --flake path/to/flake#device` to build and activate your configuration (`path/to/flake#device`
+      # will expand to `.#nixOnDroidConfigurations.device`). If you run `nix-on-droid switch --flake path/to/flake`, the
+      # `default` configuration will be used.
+      nixOnDroidConfigurations.x86-avd = nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = flake.legacyPackages.x86_64-linux.mv.unstable;
+        modules = [ flake.nixOnDroidConfiguration ];
+      };
     };
 }
