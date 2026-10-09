@@ -86,8 +86,8 @@
 
     yazi.url = "github:sxyazi/yazi/v26.5.6";
 
-    # Stable nixpkgs for nix-on-droid infra/proot only; droid apps use mv.unstable via pkgs below.
-    nixpkgs-droid.url = "github:nixos/nixpkgs/nixos-25.11";
+    # Stable nixpkgs for nix-on-droid modules; droid apps use mv.unstable via pkgs below.
+    nixpkgs-droid.url = "github:nixos/nixpkgs/nixos-24.05";
 
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/release-24.05";
