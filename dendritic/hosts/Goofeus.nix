@@ -252,6 +252,23 @@
         security.sudo = {
           enable = true;
           wheelNeedsPassword = false;
+
+          # agent cannot join wheel: wheel is passwordless above, which the agent
+          # workspace spec forbids. A PASSWD rule grants the same interactive-prompt
+          # behaviour without inheriting that. Needed because nh elevates per command
+          # (profile set, switch-to-configuration, bootloader), so allowing "nh" alone
+          # would not cover the elevated steps.
+          extraRules = [
+            {
+              users = [ "agent" ];
+              commands = [
+                {
+                  command = "ALL";
+                  options = [ "PASSWD" ];
+                }
+              ];
+            }
+          ];
         };
 
         environment.systemPackages = with pkgs; [
