@@ -2,18 +2,34 @@
 {
   imports = [ inputs.home-manager.flakeModules.home-manager ];
   flake = {
-    homeModules.main = {
-      home.stateVersion = "26.05"; # Please read the comment before changing.
-      programs.home-manager.enable = true;
+    homeModules.main =
+      {
+        config,
+        pkgs,
+        lib,
+        ...
+      }:
+      {
+        home.stateVersion = "26.05"; # Please read the comment before changing.
+        programs.home-manager.enable = true;
 
-      # Skip installing the HM reference manpage. Its drv embeds
-      # `${hmOptionsDocs.optionsJSON}/share/doc/nixos/options.json`
-      # (nixosOptionsDoc = runCommand "options.json" with
-      # unsafeDiscardStringContext'd module paths), so merely forcing its
-      # outPath during the per-user profile buildEnv eval emits the
-      # "references the store path ... without a proper context" warning.
-      # manual.manpages.enable = false;
-    };
+        # nh reads these from the environment; session vars so zsh (nh darwin
+        # switch / nh os switch) sees them too, not just nu.
+        home.sessionVariables = {
+          NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${config.home.homeDirectory}/NixConfig";
+          NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin (
+            "${config.home.homeDirectory}/NixConfig#darwinConfigurations.MacMini"
+          );
+        };
+
+        # Skip installing the HM reference manpage. Its drv embeds
+        # `${hmOptionsDocs.optionsJSON}/share/doc/nixos/options.json`
+        # (nixosOptionsDoc = runCommand "options.json" with
+        # unsafeDiscardStringContext'd module paths), so merely forcing its
+        # outPath during the per-user profile buildEnv eval emits the
+        # "references the store path ... without a proper context" warning.
+        # manual.manpages.enable = false;
+      };
 
     homeModules.nixos-home =
       {
