@@ -92,6 +92,16 @@
             ) availableSecrets
           );
 
+        # Nix-on-Droid starts the app's login zsh non-interactive (tty race at
+        # exec in login-inner); .zshrc is never sourced and no prompt renders.
+        # Marker is only present on nix-on-droid, so other hosts skip this.
+        profileExtra = ''
+          if [[ -t 0 && ! -o interactive && -e "$HOME/.nix-profile/etc/profile.d/nix-on-droid-session-init.sh" && -z "$_NOD_REEXEC" ]]; then
+            export _NOD_REEXEC=1
+            exec zsh -l -i
+          fi
+        '';
+
         # Priorities: 570 compinit · 851 zoxide · 910 fzf · 1200 syntax
         # highlighting; integrations with no order set (atuin, carapace, direnv,
         # lazygit, yazi, starship, …) all share 1000.
