@@ -1,5 +1,7 @@
 { self, inputs, ... }:
 {
+  # Apps: mv.unstable (aarch64-linux). Proot/bootstrap: nix-on-droid release-24.05 + nixpkgs 24.05 (flake nixpkgs-droid).
+  # activationPackage eval: --impure (upstream #545 hardcoded proot store paths). Host may need that proot path in store.
   flake.nixOnDroidConfiguration =
     {
       config,
@@ -85,6 +87,10 @@
           enable = true;
           enableDefaultConfig = false;
         };
+        # Root-owned store dirs in fpath fail compaudit under the non-root
+        # Termux/proot uid and the [y/n] check aborts completions on every
+        # new shell; -u skips the audit (nix store is still read-only).
+        programs.zsh.completionInit = "autoload -U compinit && compinit -u";
         home = {
           stateVersion = "24.05";
         };
@@ -116,10 +122,13 @@
       nix = {
         substituters = [
           "https://cache.nixos.org"
+          "https://nix-on-droid.cachix.org"
           "https://nix-community.cachix.org"
           "https://yazi.cachix.org"
         ];
         trustedPublicKeys = [
+          "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+          "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
           "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
         ]
