@@ -1,7 +1,8 @@
 {
   description = "NixOS config flake";
   inputs = {
-    self.submodules = true;
+    # Device nix 2.18 lacks `submodules` input attr; omit for on-device bootstrap (github: tarball has no submodule checkout).
+    # self.submodules = true;
     import-tree.url = "github:vic/import-tree";
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs = {
@@ -101,12 +102,12 @@
     };
 
     whisper-dictation = {
-      url = ./vendor/mattgmak/whisper-dictation;
+      url = "github:mattgmak/whisper-dictation/981a1e2fe93abc2b71d200f567e4c313ca383d09";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     woomer = {
-      url = ./vendor/mattgmak/woomer;
+      url = "github:mattgmak/woomer/172b4e3610d5f9a5145019da5685ed2a06f0af85";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -148,7 +149,7 @@
     };
 
     agent-sesh = {
-      url = ./vendor/mattgmak/agent-sesh;
+      url = "github:mattgmak/agent-sesh/34aa6d05f1a981f1d5726c1aa5e8924d0aef8197";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
