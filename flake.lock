@@ -32,14 +32,19 @@
         ]
       },
       "locked": {
-        "path": "vendor/mattgmak/agent-sesh",
-        "type": "path"
+        "lastModified": 1790238299,
+        "narHash": "sha256-Rnkmq2VIugQyGphuN8hgR/Y6DIYa3Q6nbHmDS+4AxFE=",
+        "owner": "mattgmak",
+        "repo": "agent-sesh",
+        "rev": "34aa6d05f1a981f1d5726c1aa5e8924d0aef8197",
+        "type": "github"
       },
       "original": {
-        "path": "vendor/mattgmak/agent-sesh",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "mattgmak",
+        "repo": "agent-sesh",
+        "rev": "34aa6d05f1a981f1d5726c1aa5e8924d0aef8197",
+        "type": "github"
+      }
     },
     "aquamarine": {
       "inputs": {
@@ -3090,14 +3095,19 @@
         ]
       },
       "locked": {
-        "path": "vendor/mattgmak/whisper-dictation",
-        "type": "path"
+        "lastModified": 1786769916,
+        "narHash": "sha256-UAVuAsjVKRRnDkqjEEVf2aTdEQ3diw/GhqZXEj1jbu0=",
+        "owner": "mattgmak",
+        "repo": "whisper-dictation",
+        "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
+        "type": "github"
       },
       "original": {
-        "path": "vendor/mattgmak/whisper-dictation",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "mattgmak",
+        "repo": "whisper-dictation",
+        "rev": "981a1e2fe93abc2b71d200f567e4c313ca383d09",
+        "type": "github"
+      }
     },
     "wiremix": {
       "inputs": {
@@ -3129,14 +3139,19 @@
         "systems": "systems_10"
       },
       "locked": {
-        "path": "vendor/mattgmak/woomer",
-        "type": "path"
+        "lastModified": 1786465014,
+        "narHash": "sha256-UPzQJryidznrYGO+dmDtJ4RN7ZuefviVLdsmqmxuj1s=",
+        "owner": "mattgmak",
+        "repo": "woomer",
+        "rev": "172b4e3610d5f9a5145019da5685ed2a06f0af85",
+        "type": "github"
       },
       "original": {
-        "path": "vendor/mattgmak/woomer",
-        "type": "path"
-      },
-      "parent": []
+        "owner": "mattgmak",
+        "repo": "woomer",
+        "rev": "172b4e3610d5f9a5145019da5685ed2a06f0af85",
+        "type": "github"
+      }
     },
     "worktrunk": {
       "inputs": {
