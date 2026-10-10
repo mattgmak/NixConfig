@@ -87,6 +87,10 @@
           enable = true;
           enableDefaultConfig = false;
         };
+        # Root-owned store dirs in fpath fail compaudit under the non-root
+        # Termux/proot uid and the [y/n] check aborts completions on every
+        # new shell; -u skips the audit (nix store is still read-only).
+        programs.zsh.completionInit = "autoload -U compinit && compinit -u";
         home = {
           stateVersion = "24.05";
         };
