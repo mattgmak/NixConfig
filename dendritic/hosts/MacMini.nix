@@ -74,10 +74,9 @@ in
     let
       crawl4aiPort = 11235;
       crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
-      crawl4aiApiToken =
-        builtins.substring 0 64 (
-          builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
-        );
+      crawl4aiApiToken = builtins.substring 0 64 (
+        builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
+      );
       searxngPort = 8888;
       # Pin the multi-arch OCI *index* digest, not a platform sub-manifest: podman
       # then selects the native image. Pinning the amd64 sub-manifest digest made
@@ -487,6 +486,7 @@ in
           # "chromium"
           "ghostty"
           "figma"
+          "vorssaint"
         ];
         brews = [
           "xcode-build-server"

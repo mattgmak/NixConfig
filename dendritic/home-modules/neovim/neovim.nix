@@ -89,19 +89,15 @@
       ];
 
       home.activation.restoreLazyPlugins = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        if [ ! -f ${lib.escapeShellArg lockFile} ]; then
-          exit 0
+        if [ -f ${lib.escapeShellArg lockFile} ]; then
+          mkdir -p "$(dirname ${lib.escapeShellArg restoreStamp})"
+          lock_hash=$(${pkgs.coreutils}/bin/sha256sum ${lib.escapeShellArg lockFile} | ${pkgs.coreutils}/bin/cut -d' ' -f1)
+          if [ ! -f ${lib.escapeShellArg restoreStamp} ] || [ "$(cat ${lib.escapeShellArg restoreStamp})" != "$lock_hash" ]; then
+            export PATH="${restorePath}:$PATH"
+            ${nvim}/bin/nvim --headless "+Lazy! restore" +qa
+            printf '%s' "$lock_hash" > ${lib.escapeShellArg restoreStamp}
+          fi
         fi
-
-        mkdir -p "$(dirname ${lib.escapeShellArg restoreStamp})"
-        lock_hash=$(${pkgs.coreutils}/bin/sha256sum ${lib.escapeShellArg lockFile} | ${pkgs.coreutils}/bin/cut -d' ' -f1)
-        if [ -f ${lib.escapeShellArg restoreStamp} ] && [ "$(cat ${lib.escapeShellArg restoreStamp})" = "$lock_hash" ]; then
-          exit 0
-        fi
-
-        export PATH="${restorePath}:$PATH"
-        ${nvim}/bin/nvim --headless "+Lazy! restore" +qa
-        printf '%s' "$lock_hash" > ${lib.escapeShellArg restoreStamp}
       '';
     };
 }
