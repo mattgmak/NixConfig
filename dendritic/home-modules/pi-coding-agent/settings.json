@@ -1,8 +1,8 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "1.1.0",
-  "defaultProvider": "deepseek",
-  "defaultModel": "deepseek-flash",
+  "defaultProvider": "commandcode",
+  "defaultModel": "z-ai/glm-5.3-flash",
   "defaultThinkingLevel": "off",
   "theme": "stylix",
   "powerline": {
@@ -51,6 +51,12 @@
     "opencode-go/longcat-2.5-preview-free": "medium",
     "azure/gpt-6-luna": "low",
     "opencode-go/step-5-preview-free": "low",
-    "deepseek/deepseek-flash": "high"
+    "deepseek/deepseek-flash": "high",
+    "commandcode/z-ai/glm-5.3-flash": "low",
+    "commandcode/deepseek/deepseek-v4.1-flash": "high",
+    "commandcode/xiaomi/mimo-v2.6-pro": "low",
+    "commandcode/xiaomi/mimo-v2.6-flash": "low",
+    "commandcode/stealth/glyph-cluster:free": "medium",
+    "commandcode/inclusionai/ling-3.1-flash:free": "medium"
   }
 }
