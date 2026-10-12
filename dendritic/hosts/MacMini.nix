@@ -30,6 +30,7 @@ in
   flake.homeConfigurations.MacMini = {
     imports = with self.homeModules; [
       darwin-home
+      mac-mini-home
       atuin
       zoxide
       zen-browser
