@@ -89,3 +89,6 @@
 [submodule "k0valik/pi-blackhole"]
 	path = vendor/k0valik/pi-blackhole
 	url = https://github.com/k0valik/pi-blackhole.git
+[submodule "patlux/pi-commandcode-provider"]
+	path = vendor/patlux/pi-commandcode-provider
+	url = https://github.com/patlux/pi-commandcode-provider.git

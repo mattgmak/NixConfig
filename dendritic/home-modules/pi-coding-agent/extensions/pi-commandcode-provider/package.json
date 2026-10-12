@@ -1,0 +1,10 @@
+{
+  "name": "pi-commandcode-provider",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-commandcode-provider (vendored patlux/pi-commandcode-provider submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
