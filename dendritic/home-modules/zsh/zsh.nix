@@ -42,6 +42,16 @@
         enable = true;
         dotDir = "${config.xdg.configHome}/zsh";
         enableCompletion = true; # carapace and fzf-tab need compinit
+        completionInit = ''
+          autoload -Uz compinit
+          _zdump="$ZDOTDIR/.zcompdump-$(printf %s $fpath | shasum | cut -d' ' -f1)"
+          if [[ -f $_zdump ]]; then
+            compinit -C -d $_zdump
+          else
+            compinit -d $_zdump
+          fi
+          unset _zdump
+        '';
         defaultKeymap = "viins"; # nu: edit_mode = vi
         autocd = true;
         autosuggestion.enable = true;
@@ -79,12 +89,14 @@
         # generation symlink after decrypting every secret.
         envExtra =
           lib.optionalString (secretNames != [ ]) ''
-            __agenix_first="${secretPathOf (builtins.head secretNames)}"
-            for __i in {1..200}; do
-              if [[ -r "$__agenix_first" ]]; then break; fi
-              sleep 0.05
-            done
-            unset __agenix_first __i
+            if [[ -o interactive ]]; then
+              __agenix_first="${secretPathOf (builtins.head secretNames)}"
+              for __i in {1..300}; do
+                if [[ -r "$__agenix_first" ]]; then break; fi
+                sleep 0.01
+              done
+              unset __agenix_first __i
+            fi
           ''
           + lib.concatStringsSep "\n" (
             lib.mapAttrsToList (
