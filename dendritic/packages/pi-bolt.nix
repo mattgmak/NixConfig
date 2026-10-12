@@ -12,18 +12,18 @@
           makeWrapper,
         }:
         let
-          version = "0.7.2";
+          version = "0.8.4";
 
           # Asset names are stable across releases (scripts/package-release.sh).
           # linux-x64 = AVX2 build; -baseline (SSE4.2) and -jit variants exist too.
           platformAttrs = {
             "aarch64-darwin" = {
               variant = "darwin-arm64";
-              hash = "sha256-l1CvMpEFKGDOrF84+Y3LI3oAjqNBU0rVzhQcqADOSAY=";
+              hash = "sha256-Ft0yuY+fUQIquSsuf5wAS1KpC5xSHYUCKxdT/75Z8TE=";
             };
             "x86_64-linux" = {
               variant = "linux-x64";
-              hash = "sha256-9ZwQBt9JWR9iUFznj8Jq3jMQEByKBxTbZYw+7PBOy5I=";
+              hash = "sha256-8EPQwNJElsxEQJQFiZt++UsUZrcJiCKGCjpO4eNnm8A=";
             };
           };
 
@@ -70,13 +70,27 @@
             mkdir -p $out/libexec
             cp -R . $out/libexec/pi
 
+            # The darwin build splits the app: a 36K `pi` launcher execs the real `pi-bin`
+            # beside it, so the running app is named `pi-bin` (tmux pane_current_command,
+            # Activity Monitor, any exec-path reader). Swap them: real app becomes `pi`,
+            # launcher stays usable as `pi-launcher`, `pi-bin` becomes a symlink so the
+            # launcher's `%s/pi-bin` lookup keeps resolving. linux-x64 ships one
+            # self-contained `pi`, so the swap is darwin-only.
+            if [ -e $out/libexec/pi/pi-bin ]; then
+              mv $out/libexec/pi/pi $out/libexec/pi/pi-launcher
+              mv $out/libexec/pi/pi-bin $out/libexec/pi/pi
+              ln -s pi $out/libexec/pi/pi-bin
+            fi
+
             # Never copy `pi` alone into bin/. PIBOLT_NPM marks it as package-managed so
             # `pi-bolt update` refuses to curl-install into ~/.pi-bolt.
             # PI_PACKAGE_DIR must be pinned to our own layout: it is inherited from any
             # parent pi process (and wins over the binary's own dirname), and a foreign
             # value silently redirects asset lookup (`--export` ENOENT, wrong --version).
-            # --argv0 pi: macOS ps comm is argv[0], so the default full store path would
-            # become the process name.
+            # Exec the app directly instead of the launcher: one less exec hop, and the
+            # launcher's own name would leak back into exec-path process listings.
+            # --argv0 pi: macOS comm is argv[0] truncated to 16 bytes, so the default
+            # full store path would become the process name.
             makeWrapper $out/libexec/pi/pi $out/bin/pi \
               --argv0 pi \
               --set PIBOLT_NPM 1 \
