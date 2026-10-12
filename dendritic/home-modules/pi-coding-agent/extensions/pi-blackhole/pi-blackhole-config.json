@@ -90,14 +90,6 @@
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
-    },
-    {
-      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free. Replaces the retired ling-3.0-flash-fin endpoint; 765-783ms, 3/3 tool calls, 262k.",
-      "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-sante:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 262144
     }
   ],
 
@@ -149,14 +141,6 @@
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
-    },
-    {
-      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
-      "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-sante:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 262144
     }
   ],
 
@@ -205,14 +189,6 @@
       "_comment": "Fallback 5: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
       "provider": "openrouter",
       "id": "apodex/apodex-1.1-mini:free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 262144
-    },
-    {
-      "_comment": "Fallback 6 (last resort): Ling 3.0 Flash Sante free (replaces retired ling-3.0-flash-fin).",
-      "provider": "openrouter",
-      "id": "inclusionai/ling-3.0-flash-sante:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
