@@ -60,6 +60,7 @@
         allowedTCPPorts = [
           80
           443
+          8181
         ];
         allowedUDPPorts = [
           80
