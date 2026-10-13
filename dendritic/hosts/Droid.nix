@@ -83,6 +83,12 @@
         stylix.targets.kde.enable = lib.mkForce false;
         # HM defaults dconf on for Linux; dbus is not available in this environment.
         dconf.enable = false;
+        # agenix's HM module only decrypts from a systemd user service, which does
+        # not exist on Android, and it keeps secrets in XDG_RUNTIME_DIR, which
+        # Android leaves unset (all reads would hit /agenix). Keep them under
+        # $HOME instead; the activation step lives in zsh.nix.
+        age.secretsDir = lib.mkForce "\${HOME}/.local/state/agenix";
+        age.secretsMountPoint = lib.mkForce "\${HOME}/.local/state/agenix.d";
         programs.ssh = {
           enable = true;
           enableDefaultConfig = false;
@@ -135,7 +141,8 @@
         ++ self.builderPublicKeys;
       };
 
-      # terminal.font is set by stylix/droid/fonts.nix from stylix.fonts.monospace (see stylixCommon).
+      # ${pkgs.nerd-fonts.iosevka-term} available at eval time via mv overlay; types.path, activated as ~/.termux/font.ttf.
+      terminal.font = lib.mkForce "${pkgs.nerd-fonts.iosevka-term}/share/fonts/truetype/NerdFonts/IosevkaTerm/IosevkaTermNerdFont-Regular.ttf";
       # Set your time zone
       time.timeZone = "Asia/Hong_Kong";
     };

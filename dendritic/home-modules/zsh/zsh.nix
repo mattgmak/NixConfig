@@ -45,7 +45,7 @@
         enableCompletion = true; # carapace and fzf-tab need compinit
         completionInit = ''
           autoload -Uz compinit
-          _zdump="$ZDOTDIR/.zcompdump-$(printf %s $fpath | shasum | cut -d' ' -f1)"
+          _zdump="$ZDOTDIR/.zcompdump-$(printf %s $fpath | md5sum | cut -d' ' -f1)"
           if [[ -f $_zdump ]]; then
             compinit -C -d $_zdump
           else
@@ -139,6 +139,22 @@
           (lib.mkOrder 1050 (builtins.readFile ./config/init.zsh))
         ];
       };
+
+      # agenix only decrypts from a systemd user service, which nix-on-droid has
+      # no way to run (Android, no systemd); decrypt at activation instead. The
+      # identity is the device's own ~/.ssh/id_ed25519 — the Droid recipient.
+      home.activation.agenixMount = lib.mkIf (config.home.username == "nix-on-droid") (
+        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run mkdir -m 700 -p ${config.age.secretsDir}
+          ${lib.concatStringsSep "\n" (
+            lib.mapAttrsToList (_: secret: ''
+              run ${pkgs.age}/bin/age --decrypt --identity "$HOME/.ssh/id_ed25519" -o "${secret.path}.tmp" ${secret.file}
+              run chmod ${secret.mode} "${secret.path}.tmp"
+              run mv -f "${secret.path}.tmp" "${secret.path}"
+            '') config.age.secrets
+          )}
+        ''
+      );
 
       programs.atuin.flags = [ "--disable-ctrl-r" ];
 
