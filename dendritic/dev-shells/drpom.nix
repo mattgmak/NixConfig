@@ -6,14 +6,20 @@
     { system, ... }:
     # Plain Nix `if`, not lib.mkIf: flake-parts does not unwrap mkIf, and a bare
     # mkIf at the perSystem root would register `_type`/`_then` as option names.
-    if !(builtins.elem system [ "x86_64-linux" "aarch64-darwin" ]) then
+    if
+      !(builtins.elem system [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ])
+    then
       { }
     else
       let
         # perSystem's `pkgs` is plain nixpkgs.legacyPackages; it carries none of this
         # config. Import nixpkgs directly so unfree packages resolve and the Android
         # SDK licence is pre-accepted (androidenv refuses to compose otherwise).
-        pkgsFor = pkgs:
+        pkgsFor =
+          pkgs:
           import pkgs {
             inherit system;
             config.allowUnfree = true;
@@ -171,76 +177,75 @@
         # GRADLE_OPTS = "-Dorg.gradle.project.android.aapt2FromMavenOverride=${ANDROID_HOME}/build-tools/${buildToolsVersion}/aapt2";
       in
       {
-        devShells.drpom =
-          pkgs.mkShell {
-            packages =
-              with pkgs;
-              [
-                nodejs_22
-                deno
-                pnpmPinned
-                jdk17
-                kotlin
-                kotlin-language-server
-                # Formerly a separate `biome-pin` input; the pin was just an older
-                # nixos-unstable, so track the flake's own nixpkgs instead.
-                biome
-                jq
-                rclone
-                postgresql
-                tailwindcss-language-server
-                easCli
-                droast
-                yaml-language-server
-                act
-                railway
-              ]
-              ++ (if pkgs.stdenv.isDarwin then [ ] else [ ])
-              ++ (
-                if pkgs.stdenv.isLinux then
-                  [
-                    androidenv.androidPkgs.platform-tools
-                    androidStudio
-                    androidComp.androidsdk
-                    chromium
-                    glib
-                    libsecret
-                  ]
-                else
-                  [ ]
-              );
-            NODE_OPTIONS = "--experimental-vm-modules";
-            shellHook = ''
-              export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
-              ${
-                if pkgs.stdenv.isDarwin then
-                  ''
-                    export ANDROID_HOME=/Volumes/Kingston480GB/Android/sdk
-                    export BUN_INSTALL="$HOME/.bun"
-                    export PATH="$BUN_INSTALL/bin:$PATH"
-                    unset CC CXX LD
-                    # stdenv-darwin overrides DEVELOPER_DIR/SDKROOT with the Nix apple-sdk;
-                    # EAS local iOS builds need the real Xcode.app toolchain (xcodebuild).
-                    export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
-                    unset SDKROOT
-                    export PATH="/usr/bin:/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH"
-                  ''
-                else
-                  # ''
-                  #   export ANDROID_HOME=~/Android
-                  # ''
-                  ''
-                    export ANDROID_HOME=${ANDROID_HOME}
-                    export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
-                    export LD_LIBRARY_PATH="${
-                      pkgs.lib.makeLibraryPath [
-                        pkgs.libsecret
-                        pkgs.glib
-                      ]
-                    }:$LD_LIBRARY_PATH"
-                  ''
-              }
-            '';
-          };
+        devShells.drpom = pkgs.mkShell {
+          packages =
+            with pkgs;
+            [
+              nodejs_24
+              deno
+              pnpmPinned
+              jdk17
+              kotlin
+              kotlin-language-server
+              # Formerly a separate `biome-pin` input; the pin was just an older
+              # nixos-unstable, so track the flake's own nixpkgs instead.
+              biome
+              jq
+              rclone
+              postgresql
+              tailwindcss-language-server
+              easCli
+              droast
+              yaml-language-server
+              act
+              railway
+            ]
+            ++ (if pkgs.stdenv.isDarwin then [ ] else [ ])
+            ++ (
+              if pkgs.stdenv.isLinux then
+                [
+                  androidenv.androidPkgs.platform-tools
+                  androidStudio
+                  androidComp.androidsdk
+                  chromium
+                  glib
+                  libsecret
+                ]
+              else
+                [ ]
+            );
+          # NODE_OPTIONS = "--experimental-vm-modules";
+          shellHook = ''
+            export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
+            ${
+              if pkgs.stdenv.isDarwin then
+                ''
+                  export ANDROID_HOME=/Volumes/Kingston480GB/Android/sdk
+                  export BUN_INSTALL="$HOME/.bun"
+                  export PATH="$BUN_INSTALL/bin:$PATH"
+                  unset CC CXX LD
+                  # stdenv-darwin overrides DEVELOPER_DIR/SDKROOT with the Nix apple-sdk;
+                  # EAS local iOS builds need the real Xcode.app toolchain (xcodebuild).
+                  export DEVELOPER_DIR="/Applications/Xcode.app/Contents/Developer"
+                  unset SDKROOT
+                  export PATH="/usr/bin:/bin:/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin:$PATH"
+                ''
+              else
+                # ''
+                #   export ANDROID_HOME=~/Android
+                # ''
+                ''
+                  export ANDROID_HOME=${ANDROID_HOME}
+                  export ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT}
+                  export LD_LIBRARY_PATH="${
+                    pkgs.lib.makeLibraryPath [
+                      pkgs.libsecret
+                      pkgs.glib
+                    ]
+                  }:$LD_LIBRARY_PATH"
+                ''
+            }
+          '';
+        };
       };
 }
