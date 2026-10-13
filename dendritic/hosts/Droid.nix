@@ -93,6 +93,11 @@
           enable = true;
           enableDefaultConfig = false;
         };
+        # Termux extra-keys row: default layout plus DRAWER at the end of row 2.
+        # nix-on-droid has no option for termux.properties, so manage it via home.file.
+        home.file.".termux/termux.properties".text = lib.generators.toKeyValue { } {
+          extra-keys = "[['ESC','/','-','HOME','UP','END','PGUP'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','DRAWER']]";
+        };
         # Root-owned store dirs in fpath fail compaudit under the non-root
         # Termux/proot uid and the [y/n] check aborts completions on every
         # new shell; -u skips the audit (nix store is still read-only).
