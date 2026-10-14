@@ -109,6 +109,15 @@ let
       size = vec2 1200 800;
     })
     (mkRule {
+      name = "android-emulator-float";
+      match = {
+        class = "(Emulator)";
+      };
+      float = true;
+      center = true;
+      pin = true;
+    })
+    (mkRule {
       name = "focus-cursor-zen";
       match = {
         class = "([Cc]ursor|zen.*)";
@@ -187,6 +196,13 @@ let
       center = true;
       stay_focused = true;
       pin = true;
+    })
+    (mkRule {
+      name = "android-emulator-ws6";
+      match = {
+        class = "(Emulator)";
+      };
+      workspace = lib.head secondaryWorkspaces;
     })
     (mkRule {
       name = "vesktop-secondary";

@@ -7,10 +7,10 @@
       ...
     }:
     let
-      acceptShiftShortcuts = lib.listToAttrs (
+      digitShortcuts = lib.listToAttrs (
         map (n: {
           name = "ctrl-shift-${toString n}";
-          value = "accept-${toString n}";
+          value = "return-selection-${toString n}";
         }) (lib.range 1 9)
       );
     in
@@ -33,12 +33,21 @@
             # `# <uuid>` marker line (see `atuin init nu`) — skip those too
             "(?m)^# [0-9a-f-]{36}$"
           ];
+          # zsh's default keymap is viins, so atuin's viins widgets start the TUI
+          # with --keymap-mode=vim-insert; overrides for emacs/vim-normal alone
+          # never apply there.
+          # return-selection-N (not accept-N) puts the entry on the command line
+          # for editing instead of executing it.
           keymap = {
-            emacs = acceptShiftShortcuts // {
+            emacs = digitShortcuts // {
               "ctrl-d" = "delete";
               "ctrl-y" = "copy";
             };
-            vim-normal = acceptShiftShortcuts // {
+            vim-normal = digitShortcuts // {
+              "ctrl-d" = "delete";
+              "ctrl-y" = "copy";
+            };
+            vim-insert = digitShortcuts // {
               "ctrl-d" = "delete";
               "ctrl-y" = "copy";
             };
