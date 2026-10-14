@@ -34,7 +34,8 @@
     "commandcode/xiaomi/mimo-v2.6-flash",
     "commandcode/stealth/glyph-cluster:free",
     "commandcode/inclusionai/ling-3.1-flash:free",
-    "commandcode/poolside/laguna-s-2.1-free"
+    "commandcode/poolside/laguna-s-2.1-free",
+    "opencode-go/cat-jam-free"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
