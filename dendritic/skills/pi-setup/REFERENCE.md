@@ -42,9 +42,7 @@ User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 
 Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
 
-### Examples (not exhaustive)
-
-**pi-bolt (compiled bun host) can't resolve extension deps at runtime.** Its extension loader runs jiti in embedded mode (`isBunBinary` → `{ virtualModules, tryNative: false }`), which fails on bare specifiers reached *inside* a package's own dependency tree (`Cannot find package 'X'`), while plain node/bun resolve the same tree fine. Workaround pattern: `pi-npm-i` bundles the extension for that host and the loader picks the bundle when `process.versions.bun` is set — see `install_pi_cursor_sdk` (`bun build … --external '@earendil-works/*' --external 'typebox*' --external '*.node'`) and `extensions/pi-cursor-sdk/index.ts`. Put generated bundles in the loader dir (**not** the submodule): `discard_vendor_changes` runs `git clean -fd` in every vendor submodule at the end of `pi-npm-i`.
+### Loader, theme, and skill examples
 
 **Extension submodule** — vendored under `vendor/<owner>/<repo>/`, exposed via loader dir `extensions/<name>/`:
 
@@ -185,13 +183,11 @@ For a full upstream fetch across all vendor submodules:
 
 Do **not** re-add `post-checkout`/`post-merge` hooks that run `git submodule foreach fetch`.
 
-### Fork workflow
-
-When upstream needs local patches: fork upstream, point submodule at your fork, push fixes there, bump submodule SHA in NixConfig when ready.
-
 ### Fork vendored extensions
 
-Extension submodules whose `.gitmodules` URL is **your fork** must be checked against **upstream**, not just `origin`. During `pi-setup update`, always fetch upstream and compare before proposing a bump.
+Upstream needs local patches → fork upstream, point the submodule at your fork, push fixes there, bump the submodule SHA in NixConfig when ready.
+
+Extension submodules whose `.gitmodules` URL is **your fork** must be checked against **upstream**, not just `origin`. During `pi-setup update`, fetch upstream and compare **every fork in scope** before proposing a bump.
 
 #### Registry (extension forks)
 
@@ -208,7 +204,7 @@ Add new rows here when vendoring through a fork.
 
 ```bash
 # From NixConfig root — extension vendor paths whose URL is your GitHub user
-grep -E 'url = https://github.com/(mattgmak|MattDevy)/' .gitmodules
+rg 'url = https://github.com/(mattgmak|MattDevy)/' .gitmodules
 ```
 
 #### Upstream comparison (per fork)
@@ -252,10 +248,12 @@ git -C "$VENDOR" log --oneline upstream/$UPSTREAM_BRANCH..HEAD | head -10
 
 #### Reconcile before bump (when upstream is ahead or diverged)
 
+Merge, **not** rebase — the submodule pointer records a SHA, and rebasing rewrites the fork-only patch trail. Same commands as SKILL.md `update` step 2:
+
 ```bash
 cd vendor/<owner>/<name>
 git checkout main   # or master for pi-lens
-git merge upstream/<branch>   # or rebase if you prefer linear history
+git merge upstream/<branch>
 # resolve conflicts; preserve fork-only fixes
 npm install --omit=dev   # if package.json changed
 git push origin HEAD
@@ -290,6 +288,8 @@ Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and 
 `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-npm-i` fails if missing.
 
 `pi-agent-browser-native` (`vendor/fitchmultz/pi-agent-browser-native`) uses the same build pattern. Loader needs `dist/extensions/agent-browser/index.js`.
+
+**pi-bolt (compiled bun host) can't resolve extension deps at runtime.** Its extension loader runs jiti in embedded mode (`isBunBinary` → `{ virtualModules, tryNative: false }`), which fails on bare specifiers reached *inside* a package's own dependency tree (`Cannot find package 'X'`), while plain node/bun resolve the same tree fine. Workaround pattern: `pi-npm-i` bundles the extension for that host and the loader picks the bundle when `process.versions.bun` is set — see `install_pi_cursor_sdk` (`bun build … --external '@earendil-works/*' --external 'typebox*' --external '*.node'`) and `extensions/pi-cursor-sdk/index.ts`. Put generated bundles in the loader dir (**not** the submodule): `discard_vendor_changes` runs `git clean -fd` in every vendor submodule at the end of `pi-npm-i`.
 
 Run after submodule add/update when an extension has runtime deps.
 
@@ -334,6 +334,8 @@ home-manager switch --flake .#<host>
 
 ## Do NOT
 
+Positive defaults: submodule under `vendor/<owner>/<repo>` + HM symlink = source of truth; edit in-repo (never under `~/.pi/agent/`); run `pi-npm-i` after every submodule add/update with runtime deps; rebuild HM when Nix wiring changes.
+
 - Put extensions in `dendritic/skills/` or skills in `extensions/`
 - Use `pi install` for extensions we already vendor — submodule + HM symlink is source of truth
 - Commit `node_modules/` in NixConfig-owned extensions unless intentional
@@ -348,15 +350,16 @@ home-manager switch --flake .#<host>
 ```bash
 ls -la ~/.pi/agent/extensions ~/.pi/agent/skills
 readlink ~/.pi/agent/extensions
-pi list
 pi --verbose
-pi -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts
+pi -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts   # interactive, extension loaded
+pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts list   # load check, non-interactive
 ```
 
 Common failures:
 
 - Empty submodule dir → `git submodule update --init --recursive`
 - Extension load error → missing `npm install`, bad `pi.extensions` path, or stale `@mariozechner/*` peer dep
+- Load unconfirmable: `pi -e <path> --help` never loads extensions, exit 0 does not prove a load, and `pi list` prints “No packages installed” under HM symlinks. Confirm with `pi -ne -e <loader>/index.ts list`
 - Changes not visible → `/reload` or restart pi; rebuild HM only if Nix wiring changed
 - Pi package build fails after flake update → update `npmDepsHash` in `dendritic/overlays.nix`
 
