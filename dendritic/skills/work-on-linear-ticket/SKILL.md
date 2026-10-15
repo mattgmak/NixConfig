@@ -6,24 +6,27 @@ argument-hint: "<branch-name> [implementation notes] e.g. mattmak/prd-239-dashbo
 
 # Work on Linear Ticket
 
-Worktree + detached Pi worker for Linear branch. Parent pi quits after handoff — deferred `/quit`, never inline kill.
+Worktree + detached Pi worker for Linear branch. Deferred parent `/quit` — never inline kill.
 
 ## Skill root + scripts
 
-Skill root = parent dir of this `SKILL.md`. Scripts committed under `scripts/` — **do not** write temp copies.
+Skill root = parent dir of this `SKILL.md`. Scripts committed under `scripts/` — **do not** write temp copies. Launcher + worktree parser + parent-quit live in **spawn-pi** skill.
 
 | Script | Purpose |
 |--------|---------|
 | `scripts/parse-issue-id.sh` | Branch slug → `PRD-239` |
-| `scripts/parse-worktree-path.sh` | `wt switch` output → absolute worktree path |
-| `scripts/launch-worker.sh` | Detached tmux + pi + handoff report + deferred parent quit |
-| `scripts/lib/parent-quit.sh` | Sourced by launcher — not invoked alone |
+| `$SPAWN_SKILL_ROOT/scripts/launch-worker.sh` | Detached tmux + pi + handoff report + deferred parent quit |
+| `$SPAWN_SKILL_ROOT/scripts/parse-worktree-path.sh` | `wt switch` output → absolute worktree path |
+| `$SPAWN_SKILL_ROOT/scripts/lib/parent-quit.sh` | Sourced by launcher — not invoked alone |
 
-Resolve skill root at runtime (pick one that exists):
+Resolve roots at runtime (pick one that exists):
 
 ```bash
 SKILL_ROOT="${PI_SKILL_ROOT:-$HOME/.pi/agent/skills/work-on-linear-ticket}"
-# NixConfig dev: SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/work-on-linear-ticket"
+SPAWN_SKILL_ROOT="${PI_SKILL_ROOT:-$HOME/.pi/agent/skills/spawn-pi}"
+# NixConfig dev:
+# SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/work-on-linear-ticket"
+# SPAWN_SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/spawn-pi"
 ```
 
 ## Invocation
@@ -75,8 +78,8 @@ Branch exists → `wt switch <branch_name>`.
 Capture stdout+stderr. Parse path:
 
 ```bash
-bash "$SKILL_ROOT/scripts/parse-worktree-path.sh" <<<"$wt_output"
-# or: wt switch ... 2>&1 | bash "$SKILL_ROOT/scripts/parse-worktree-path.sh"
+bash "$SPAWN_SKILL_ROOT/scripts/parse-worktree-path.sh" <<<"$wt_output"
+# or: wt switch ... 2>&1 | bash "$SPAWN_SKILL_ROOT/scripts/parse-worktree-path.sh"
 ```
 
 `test -d <path>` before continue.
@@ -102,7 +105,7 @@ Explore the codebase, implement a fix, and verify with tests. Start by understan
 **No `sesh connect`** — switch-clients when `$TMUX` set → yanks current session.
 
 ```bash
-bash "$SKILL_ROOT/scripts/launch-worker.sh" \
+PI_HANDOFF_QUIT=1 bash "$SPAWN_SKILL_ROOT/scripts/launch-worker.sh" \
   "$worktree_path" \
   'initial_prompt' \
   "<branch>" \
@@ -110,9 +113,9 @@ bash "$SKILL_ROOT/scripts/launch-worker.sh" \
   "<linear_url>"
 ```
 
-Escape single quotes in prompt (`'\''`). `test -d` worktree first.
+Escape single quotes in prompt (`'\''`). `test -d` worktree first. Single handoff → parent quit opt-in: `PI_HANDOFF_QUIT=1`; spawn-pi fan-out omits it.
 
-`tmux new-session -d` returns immediately; current client untouched. Non-zero = failure (pi not detected after 15s poll → parent stays alive). Success → deferred parent `/quit` (default 2s, `PI_HANDOFF_QUIT_DELAY`). Report → `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt`.
+`tmux new-session -d` returns immediately; current client untouched. Non-zero = failure (pi not detected after 15s poll → parent stays alive). Success → deferred parent `/quit` (default 2s, `PI_HANDOFF_QUIT_DELAY`). Report → `${PI_REPORT_FILE:-${TMPDIR:-/tmp}/agent-tmp/agent-handoff-report.txt}`.
 
 ### 6. Handoff
 
@@ -125,7 +128,7 @@ Success → launcher prints report + appends file, schedules deferred `/quit` on
 | Worktree | arg 1 |
 | Branch | arg 3 |
 | Tmux session | `SESSION=` line in output |
-| Report file | `${TMPDIR:-/tmp}/agent-tmp/linear-ticket-report.txt` |
+| Report file | `${PI_REPORT_FILE:-${TMPDIR:-/tmp}/agent-tmp/agent-handoff-report.txt}` |
 | Quit delay | `PI_HANDOFF_QUIT_DELAY` (default `2`) |
 
 Parent exit only after `pi confirmed running`. WARN/exit 1 → parent stays alive. **Never inline-kill parent** — stale ctx during `agent_settled`.
@@ -135,7 +138,7 @@ Parent exit only after `pi confirmed running`. WARN/exit 1 → parent stays aliv
 | Failure | Action |
 |---------|--------|
 | Blocked by allowlist | Use `bash "$SKILL_ROOT/scripts/..."` not inline `$(...)`. Missing binary → `lean-ctx allow` or `config.toml` |
-| Not in git repo | User `cd` into repo |
+| Not in git repo | User `cd` into repo — launcher also needs `$TMUX` set (tmux gate) |
 | Linear issue not found | Show extracted id; ask confirm |
 | `wt switch` fails | Show stderr; `wt list` |
 | Can't parse worktree path | Re-run `parse-worktree-path.sh`; or ask user path |
