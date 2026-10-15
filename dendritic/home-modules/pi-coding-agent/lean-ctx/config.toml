@@ -4,6 +4,13 @@
 # WARNING: `lean-ctx allow` round-trips this file (TOML value round-trip) and strips comments/formatting.
 # For permanent additions, edit this file and run `home-manager switch`.
 
+# PathJail allow-list widening: skills live in NixConfig (symlinked from ~/.pi/agent/skills),
+# scripts write to $TMPDIR — both outside arbitrary project roots.
+extra_roots = [
+    "/Users/mattgmak/NixConfig",
+    "/tmp"
+]
+
 shell_allowlist_extra = [
     "engram",
     "glab",

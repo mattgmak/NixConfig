@@ -3,6 +3,7 @@
 - CRITICAL: Verify symbols, fn names, config options, module paths, CLI flags, API
   fields against actual source/docs before use. NEVER guess unseen symbols.
 - Question → answer only. No coding, no files. Tools/scripts OK if needed for answer.
+- No bloated code comments. Only terse comments when necessary.
 
 # Running commands
 
