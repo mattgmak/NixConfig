@@ -35,7 +35,8 @@
     "commandcode/stealth/glyph-cluster:free",
     "commandcode/inclusionai/ling-3.1-flash:free",
     "commandcode/poolside/laguna-s-2.1-free",
-    "opencode-go/cat-jam-free"
+    "opencode-go/cat-jam-free",
+    "opencode/deepseek-v4.1-flash-free"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
