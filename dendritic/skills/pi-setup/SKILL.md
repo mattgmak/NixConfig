@@ -109,6 +109,10 @@ Upgrade pi or vendored extension submodules.
 
 Also accept comma-separated lists (e.g. `pi, cursor-provider`).
 
+Default: for every fork vendored extension in scope, also run fork upstream sync (merge upstream → push fork → bump submodule) as part of the update. Applies even when user names targets explicitly. Opt out only when user explicitly says skip fork sync.
+
+**pi bin**: `dendritic/packages/pi-bolt.nix` (pi-bolt, `github:opensec-git/Pi-Bolt`, release tag `bolt-v*`) is the default pi binary — overlays redirect the `pi-coding-agent` package to it. Every `update` that includes `pi` must also bump `pi-bolt.nix` (version + both platform sha256) to the latest `bolt-v*` release; the `coding-agents` flake bump alone does not change the installed pi., also run fork upstream sync (merge upstream → push fork → bump submodule) as part of the update. Applies even when user names targets explicitly. Opt out only when user explicitly says skip fork sync.
+
 Themes and skill submodules **out of scope** unless user names them explicitly; mention they can update same way if asked.
 
 ### Step 1 — Changelog report (required)
