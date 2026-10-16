@@ -3,124 +3,86 @@
   perSystem =
     { pkgs, ... }:
     let
-      lean-ctx =
-        pkgs.callPackage
-          (
-            {
-              lib,
-              stdenv,
-              fetchurl,
-              gnutar,
-              makeWrapper,
-              autoPatchelfHook,
-              onnxruntime,
-            }:
-            let
-              version = "3.10.2";
-              baseUrl = "https://github.com/yvgude/lean-ctx/releases/download/v${version}";
+      lean-ctx = pkgs.callPackage (
+        {
+          lib,
+          stdenv,
+          rustPlatform,
+          fetchFromGitHub,
+          makeWrapper,
+          cmake,
+          pkg-config,
+          onnxruntime,
+        }:
+        let
+          # Upstream has no release containing the shell-hook / jemalloc
+          # fixes merged 2026-10-15; build the fork tip from source instead
+          # of pinning a stale release asset. Drop this and go back to
+          # fetchurl once upstream tags a release past b4dea0cc2.
+          version = "3.11.4-unstable-2026-10-16";
+          rev = "b4dea0cc2022c1484148cc2473b5e03169534dbb";
 
-              platformAttrs = {
-                "aarch64-darwin" = {
-                  asset = "lean-ctx-aarch64-apple-darwin.tar.gz";
-                  hash = "sha256-odrDAadyNFIHKfFFGveVnWvcHbVoVhIwKDmMsG1nBhU=";
-                };
-                "x86_64-linux" = {
-                  asset = "lean-ctx-x86_64-unknown-linux-gnu.tar.gz";
-                  hash = "sha256-DHIyhOuInDWWgggIePxWUVrgP/d0K5jX5W+oo1u/8v4=";
-                };
-              };
+          ortDylib = "${lib.getLib onnxruntime}/lib/libonnxruntime.${
+            if stdenv.hostPlatform.isDarwin then "dylib" else "so"
+          }";
+        in
+        rustPlatform.buildRustPackage {
+          pname = "lean-ctx";
+          inherit version;
 
-              attrs =
-                platformAttrs.${stdenv.hostPlatform.system}
-                  or (throw "lean-ctx: unsupported platform ${stdenv.hostPlatform.system}; supported: aarch64-darwin, x86_64-linux");
+          src = fetchFromGitHub {
+            owner = "mattgmak";
+            repo = "lean-ctx";
+            inherit rev;
+            hash = "sha256-X42gqOwx1Y08z2rk4EmCN9p3tiEzbJIKTjKhq7O8kLY=";
+          };
 
-              ortDylib =
-                "${lib.getLib onnxruntime}/lib/libonnxruntime.${
-                  if stdenv.hostPlatform.isDarwin then "dylib" else "so"
-                }";
+          cargoRoot = "rust";
+          buildAndTestSubdir = "rust";
+          cargoHash = "sha256-an4/7JYKOfhIebk6tK8ymmcr09FFIvCTwayRjw3ET0s=";
 
-              runtimeDependencies = lib.optionals stdenv.hostPlatform.isLinux [
-                stdenv.cc.cc.lib
-              ];
+          # aws-lc-sys (rustls default provider) builds with cmake;
+          # pkg-config resolves the system openssl/zstd probes.
+          nativeBuildInputs = [
+            cmake
+            pkg-config
+            makeWrapper
+          ];
 
-              wrapperArgs = [
-                "--set"
-                "ORT_DYLIB_PATH"
-                ortDylib
-              ]
-              ++ lib.optionals stdenv.hostPlatform.isLinux [
-                "--prefix"
-                "LD_LIBRARY_PATH"
-                ":"
-                (lib.makeLibraryPath runtimeDependencies)
-              ];
-            in
-            stdenv.mkDerivation {
-              pname = "lean-ctx";
-              inherit version;
+          # `ort` is built with `load-dynamic`; the engine dlopens
+          # libonnxruntime at runtime, so point the wrapper at nixpkgs'.
+          postFixup = ''
+            wrapProgram "$out/bin/lean-ctx" --set ORT_DYLIB_PATH "${ortDylib}"
+          '';
 
-              src = fetchurl {
-                url = "${baseUrl}/${attrs.asset}";
-                hash = attrs.hash;
-              };
+          doCheck = false;
+          doInstallCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
 
-              # Release archives contain one root-level executable.
-              dontUnpack = true;
+          installCheckPhase = ''
+            runHook preInstallCheck
+            "$out/bin/lean-ctx" --version | grep -F "lean-ctx 3.11.4"
+            test -e "${ortDylib}"
+            runHook postInstallCheck
+          '';
 
-              # autoPatchelfHook builds its soname search cache (--libs) from
-              # the `$1/lib` of every input reported to the *host* env hooks
-              # (envHostHostHook/envHostTargetHook), i.e. buildInputs /
-              # propagatedBuildInputs. nativeBuildInputs feed envBuild*Hook and
-              # are ignored, so gcc-lib has to be a host input as well —
-              # otherwise libgcc_s.so.1 is reported unsatisfiable even though
-              # runtimeDependencies already puts it in the RPATH.
-              nativeBuildInputs =
-                [
-                  gnutar
-                  makeWrapper
-                ]
-                ++ lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+          passthru = {
+            inherit onnxruntime;
+          };
 
-              buildInputs = runtimeDependencies;
+          strictDeps = true;
 
-              inherit runtimeDependencies;
-
-              installPhase = ''
-                runHook preInstall
-                mkdir -p "$out/bin"
-                ${lib.getExe gnutar} -xOf "$src" lean-ctx > "$out/bin/lean-ctx.real"
-                chmod +x "$out/bin/lean-ctx.real"
-                makeWrapper "$out/bin/lean-ctx.real" "$out/bin/lean-ctx" \
-                  ${lib.escapeShellArgs wrapperArgs}
-                runHook postInstall
-              '';
-
-              doCheck = false;
-              doInstallCheck = stdenv.buildPlatform.canExecute stdenv.hostPlatform;
-
-              installCheckPhase = ''
-                runHook preInstallCheck
-                "$out/bin/lean-ctx" --version | grep -F "lean-ctx ${version}"
-                test -e "${ortDylib}"
-                runHook postInstallCheck
-              '';
-
-              passthru = {
-                inherit onnxruntime;
-              };
-
-              strictDeps = true;
-
-              meta = with lib; {
-                description = "Context Runtime for AI Agents — token compression, cross-session memory, CCP";
-                homepage = "https://leanctx.com";
-                license = licenses.asl20;
-                sourceProvenance = with sourceTypes; [ binaryNativeCode ];
-                platforms = builtins.attrNames platformAttrs;
-                mainProgram = "lean-ctx";
-              };
-            }
-          ) { };
+          meta = with lib; {
+            description = "Context Runtime for AI Agents — token compression, cross-session memory, CCP";
+            homepage = "https://leanctx.com";
+            license = licenses.asl20;
+            platforms = [
+              "aarch64-darwin"
+              "x86_64-linux"
+            ];
+            mainProgram = "lean-ctx";
+          };
+        }
+      ) { };
     in
     {
       packages.lean-ctx = lean-ctx;
