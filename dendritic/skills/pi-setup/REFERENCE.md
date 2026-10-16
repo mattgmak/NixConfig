@@ -352,14 +352,14 @@ ls -la ~/.pi/agent/extensions ~/.pi/agent/skills
 readlink ~/.pi/agent/extensions
 pi --verbose
 pi -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts   # interactive, extension loaded
-pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts list   # load check, non-interactive
+printf '' | pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts --mode rpc   # load check: loads it, no model turn
 ```
 
 Common failures:
 
 - Empty submodule dir → `git submodule update --init --recursive`
 - Extension load error → missing `npm install`, bad `pi.extensions` path, or stale `@mariozechner/*` peer dep
-- Load unconfirmable: `pi -e <path> --help` never loads extensions, exit 0 does not prove a load, and `pi list` prints “No packages installed” under HM symlinks. Confirm with `pi -ne -e <loader>/index.ts list`
+- Load unconfirmable by other means: `pi -e <path> --help` exits 0 even for a nonexistent path; `list` outside the first argv token is a **prompt** (real model turn, 403 on unresolved `defaultModel`); `pi list` says “No packages installed” under HM symlinks; `-ne` does not suppress compiled-in extensions. Confirm: `printf '' | pi -ne -e <loader>/index.ts --mode rpc` (load error → non-zero exit)
 - Changes not visible → `/reload` or restart pi; rebuild HM only if Nix wiring changed
 - Pi package build fails after flake update → update `npmDepsHash` in `dendritic/overlays.nix`
 

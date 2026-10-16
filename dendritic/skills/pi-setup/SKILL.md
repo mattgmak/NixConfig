@@ -83,7 +83,7 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 ### 4. Finish
 
 - Run `pi-npm-i` if any extension has runtime deps
-- Verify the loader: `pi -ne -e dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts list` per loader (`-ne` disables discovery, explicit `-e` still loads → only this loader runs). `pi list` is useless here — HM symlinks, not packages → “No packages installed”. `pi -e <path> --help` never loads extensions, and exit 0 does not prove a load.
+- Verify the loader loads: `printf '' | pi -ne -e dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts --mode rpc` — loads the extension with no model turn; load errors print (`Failed to load extension …`) and exit non-zero. `pi list` is useless here — HM symlinks, not packages → “No packages installed”; a `list` anywhere but the first argv token parses as a **prompt** (real model turn, 403 on an unresolved `defaultModel`); `pi -e <path> --help` exits 0 even for a nonexistent path.
 - Commit `.gitmodules`, submodule pointer, loader/symlink files
 - Tell user to `/reload` in pi — content edits are live; HM rebuild only when Nix wiring changed ([REFERENCE.md — Apply config changes](REFERENCE.md#apply-config-changes))
 
@@ -242,9 +242,11 @@ git add vendor/<owner>/<name>
 
 ```bash
 pi-npm-i
-# per bumped loader — `pi list` prints “No packages installed” here (HM symlinks, not packages)
-pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts list
+# per bumped loader — loads it, no model turn; load errors print + exit non-zero
+printf '' | pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts --mode rpc
 ```
+
+`pi list` prints “No packages installed” here (HM symlinks, not packages); trailing `list` = prompt, not the subcommand; `-ne` does not suppress compiled-in extensions.
 
 **Commit** with a message summarizing what was bumped (e.g. `bump pi-coding-agent`).
 
