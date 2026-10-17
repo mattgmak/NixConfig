@@ -90,7 +90,7 @@
     nixpkgs-droid.url = "github:nixos/nixpkgs/nixos-24.05";
 
     nix-on-droid = {
-      url = "github:nix-community/nix-on-droid/release-24.05";
+      url = "github:nix-community/nix-on-droid/master";
       inputs.nixpkgs.follows = "nixpkgs-droid";
       inputs.home-manager.follows = "home-manager";
     };
