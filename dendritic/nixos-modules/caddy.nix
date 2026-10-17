@@ -27,8 +27,6 @@
           config.services.transmissionGluetun.rpcPort;
       piholeEnabled = config.virtualisation.oci-containers.containers ? pi-hole;
       piholeWebPort = config.services.pihole.webPort;
-      # handmux (agent HM service) -> https://goofeus.dab-octatonic.ts.net (PWA needs HTTPS)
-      handmuxServe = "tailscale serve --yes --service=svc:handmux --https=443 127.0.0.1:19999";
     in
     {
       services.caddy = {
@@ -341,7 +339,6 @@
                 ${bazarrServe}
                 ${transmissionServe}
                 ${radicaleServe}
-                ${handmuxServe}
                 ${piholeServe}
                 ${nextcloudServe}
               '';

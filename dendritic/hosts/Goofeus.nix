@@ -70,7 +70,7 @@
       ];
     };
 
-    # Agent coding workspace: pi + tmux orchestrator + handmux phone frontend.
+    # Agent coding workspace: pi + tmux orchestrator.
     homeConfigurations.GoofeusAgent =
       { lib, pkgs, ... }:
       {
@@ -96,18 +96,10 @@
           tmux
           zellij
           worktrunk
-          handmux
           bash
           carapace
           nixconfig-sync
         ];
-        programs.handmux = {
-          enable = true;
-          enableServer = true;
-          enableAgentPi = true;
-          name = "Goofeus";
-          tokenFile = "/run/agenix/handmux-token";
-        };
         tools.nixconfigSync.enable = true;
 
         # Auto-install pi extension deps when needed (first switch after clone,
@@ -138,13 +130,12 @@
         systemd.user.services.agents-tmux = {
           Unit = {
             Description = "Empty tmux session 'agents' (pi agent workspace)";
-            After = [ "handmux.service" ];
           };
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
             # Panes spawned from this session inherit PATH — must include HM profile
-            # bins (starship/zoxide/…) or shells break (see handmux pane shell errors).
+            # bins (starship/zoxide/…) or shells break.
             # Agent user is fixed (age.identityPaths etc. assume it); login PATH is
             # ~/.nix-profile + /etc/profiles/per-user/agent + system sw.
             Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
@@ -179,16 +170,6 @@
         # readable by agent so home-manager's age.identityPaths can use it.
         age.secrets.agent-age-key = {
           file = ../../secrets/agent-age-key.age;
-          owner = "agent";
-          group = "agent";
-          mode = "0400";
-        };
-
-        # Persistent handmux auth token (HANDMUX_TOKEN=… line). Without a pinned
-        # token handmux mints a fresh one each start → phone would re-pair on
-        # every reboot. Owner=agent so the systemd user unit can env-load it.
-        age.secrets.handmux-token = {
-          file = ../../secrets/handmux-token.age;
           owner = "agent";
           group = "agent";
           mode = "0400";

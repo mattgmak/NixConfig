@@ -119,7 +119,7 @@ RULES=./secrets.nix agenix -r -i ~/.ssh/id_ed25519   # host-side; decryptor iden
 
 - Decryption on-device happens in the HM activation step `agenixMount` (`dendritic/home-modules/zsh/zsh.nix`): plain `age -d -i ~/.ssh/id_ed25519` per secret into `$HOME/.local/state/agenix/`. agenix's own mount path is unusable (see pitfalls).
 - Decrypt test syntax: `agenix -i KEY -d FILE` (NOT `agenix -d -i KEY FILE` — prints help).
-- Root-only secrets (agent-age-key, cloudflare-caddy, handmux-token, …) are NOT encrypted to `Droid` and are not deployed to the phone.
+- Root-only secrets (agent-age-key, cloudflare-caddy, …) are NOT encrypted to `Droid` and are not deployed to the phone.
 - The phone's private key exists **only in app data** — app reset = new key = rekey required.
 
 ## Pitfalls (all encountered, all real)

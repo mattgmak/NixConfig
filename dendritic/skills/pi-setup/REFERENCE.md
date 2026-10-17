@@ -414,13 +414,13 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 ## Goofeus agent workspace (GoofeusAgent)
 
-`homeConfigurations.GoofeusAgent` on `dendritic/hosts/Goofeus.nix` — dedicated `agent` Linux user running pi + tmux orchestrator + `pi-interactive-subagents` + worktrunk + handmux (phone PWA) + zellij + bash/carapace. Root stays admin/builder (no pi).
+`homeConfigurations.GoofeusAgent` on `dendritic/hosts/Goofeus.nix` — dedicated `agent` Linux user running pi + tmux orchestrator + `pi-interactive-subagents` + worktrunk + zellij + bash/carapace. Root stays admin/builder (no pi).
 
 ### Bootstrap from GoofyDesky (first deploy)
 
 ```bash
 # on GoofyDesky, repo at ~/NixConfig
-git add -A && git commit -m "goofeus: agent workspace (pi+handmux+age key)"   # then push
+git add -A && git commit -m "goofeus: agent workspace (pi+age key)"   # then push
 nh os switch --flake ~/NixConfig#Goofeus
 ```
 
@@ -435,17 +435,12 @@ sudo passwd agent                     # set agent user password (needed for sudo
 Everything else is Nix-managed:
 
 - `pi-npm-i` runs automatically via HM activation (`autoPiNpmI`, stamp-guarded in `~/.local/state/pi-npm-i.stamp`) after the first `nixconfig-sync` clone and after vendor extension bumps.
-- `handmux setup` replaced by a declarative `~/.handmux/config.json`: `{ tunnel="none"; port=19999; name=<host>` (Tailscale-only; no interactive wizard).
-- `handmux agent enable pi` replaced by the handmux HM module generating `~/.pi/agent/extensions/handmux/index.ts` (repo `extensions/handmux/index.ts`) — fingerprint = `sha256(connector)`, computed via `builtins.hashFile`, so the wrapper auto-tracks packaging bumps.
-- Persistent auth token: agenix secret `handmux-token` (`HANDMUX_TOKEN=…` line), NixOS `age.secrets.handmux-token` → `/run/agenix/handmux-token`, loaded by the systemd unit via `EnvironmentFile`. Without a pinned token handmux mints a fresh one each start (phone would re-pair on every reboot).
-- `handmux service install` is NOT used — HM owns the `systemd.user.services.handmux` unit.
 
 HM already starts an empty `agents` tmux session on boot (`systemd.user.services.agents-tmux`). Start pi inside it: `tmux attach -t agents` then `pi`.
 
-### Handmux runtime
+### Runtime
 
-- Server unit: HM-managed `systemd.user.services.handmux` (foreground supervisor `-f`, Tailscale-bound `handmux start -f --port 19999`; PATH node_22 + tmux + procps).
-- Phone: handmux PWA over **HTTPS** via Tailscale Serve — `https://goofeus.dab-octatonic.ts.net` (443 → 127.0.0.1:19999, `svc:handmux` in `caddy.nix`; PWA-installable cert). Desk: `ssh agent@goofeus -t tmux attach -t agents`.
+- No phone/PWA frontend — browser via SSH tmux only: `ssh agent@goofeus -t tmux attach -t agents`.
 - Rebuilds: `agent` runs `nh os switch` with interactive sudo password — **never** passwordless sudo.
 
 ### Secrets
