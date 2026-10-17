@@ -1,0 +1,10 @@
+{
+  "name": "agent-ste",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for agent-ste (vendored ctotheameron/agent-ste submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
