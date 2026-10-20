@@ -2,7 +2,7 @@
 name: scout
 description: Fast codebase recon — explores files, finds patterns, maps architecture
 tools: ctx_read, ctx_grep, ctx_find, ctx_ls
-model: commandcode/stealth/cat-jam:free
+model: commandcode/reflection/beam:free
 thinking: medium
 session-mode: lineage-only
 system-prompt: append

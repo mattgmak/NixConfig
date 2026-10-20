@@ -213,6 +213,7 @@
           nodejs_22
           pnpm
           bun
+          gleam
         ];
         text = ''
           set -euo pipefail
@@ -375,6 +376,17 @@
             restore_vendor_tracked_changes "$dir" "pi-agent-browser-native"
           }
 
+          install_agent_ste() {
+            local dir="$VENDOR_ROOT/ctotheameron/agent-ste"
+            [ -f "$dir/scripts/build-dist.sh" ] || return 0
+            echo "pi-npm-i: vendor/ctotheameron/agent-ste (gleam build --target javascript; build dist/)"
+            (cd "$dir" && ./scripts/build-dist.sh)
+            if [ ! -f "$dir/dist/ste/ste.mjs" ]; then
+              echo "pi-npm-i: agent-ste dist/ste/ste.mjs missing after build" >&2
+              exit 1
+            fi
+          }
+
           install_engram_deps() {
             local engram_pi="$VENDOR_ROOT/Gentleman-Programming/engram/plugin/pi"
             local engram_deps_dir="$VENDOR_ROOT/.engram-deps"
@@ -434,7 +446,7 @@
           for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
             case "$vendor" in
-              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/fitchmultz/pi-agent-browser-native") continue ;;
+              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"|"$VENDOR_ROOT/ctotheameron/agent-ste") continue ;;
             esac
             case "$(basename "$vendor")" in
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
@@ -449,6 +461,7 @@
           queue_parallel install_pi_cursor_sdk
           queue_parallel install_pi_agent_browser_native
           queue_parallel install_engram_deps
+          queue_parallel install_agent_ste
 
           wait_parallel
 

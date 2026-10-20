@@ -33,9 +33,11 @@
     "commandcode/stealth/glyph-cluster:free",
     "commandcode/inclusionai/ling-3.1-flash",
     "commandcode/poolside/laguna-s-2.1-free",
-    "opencode-go/cat-jam-free",
     "opencode/deepseek-v4.1-flash-free",
-    "commandcode/stealth/cat-jam:free"
+    "opencode-go/beam-free",
+    "commandcode/reflection/beam:free",
+    "opencode-go/minimax-m3.1-flash-free",
+    "commandcode/minimax/minimax-m3.1-flash:free"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -59,6 +61,10 @@
     "commandcode/xiaomi/mimo-v2.6-pro": "low",
     "commandcode/xiaomi/mimo-v2.6-flash": "low",
     "commandcode/stealth/glyph-cluster:free": "medium",
-    "commandcode/inclusionai/ling-3.1-flash:free": "medium"
+    "commandcode/inclusionai/ling-3.1-flash:free": "medium",
+    "commandcode/reflection/beam:free": "medium",
+    "opencode-go/beam-free": "medium",
+    "commandcode/minimax/minimax-m3.1-flash:free": "low",
+    "opencode-go/minimax-m3.1-flash-free": "low"
   }
 }
