@@ -9,10 +9,12 @@
     { config, pkgs, ... }:
     let
       system = pkgs.stdenv.hostPlatform.system;
-      repoRoot = "${config.home.homeDirectory}/NixConfig/dendritic";
+      autoExtDepsInstall = config.piCodingAgent.autoExtDepsInstall;
+      nixConfigRoot = "${config.home.homeDirectory}/NixConfig";
+      repoRoot = "${nixConfigRoot}/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
       extensionsDir = "${piAgentRoot}/extensions";
-      vendorRoot = "${config.home.homeDirectory}/NixConfig/vendor";
+      vendorRoot = "${nixConfigRoot}/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
       piStaticThemes = [
@@ -206,11 +208,11 @@
           autocomplete: ""
       '';
 
-      piNpmI = pkgs.writeShellApplication {
-        name = "pi-npm-i";
+      piExtDepsInstall = pkgs.writeShellApplication {
+        name = "pi-ext-deps-install";
         runtimeInputs = with pkgs; [
           git
-          nodejs_22
+          nodejs_24
           pnpm
           bun
           gleam
@@ -232,7 +234,7 @@
               name=$(basename "$vendor")
               restore_vendor_tracked_changes "$vendor" "$name"
               if echo "$status" | grep -E '^(\?\?|!!)' >/dev/null; then
-                echo "pi-npm-i: remove untracked files in vendor/$name"
+                echo "pi-ext-deps-install: remove untracked files in vendor/$name"
                 git -C "$vendor" clean -fd
               fi
             done
@@ -274,7 +276,7 @@
                 process.exit(1);
               }
             " "$pkg") || return 0
-            echo "pi-npm-i: $label"
+            echo "pi-ext-deps-install: $label"
             if [ -f "$dir/package-lock.json" ]; then
               if [ "$kind" = "monorepo" ]; then
                 (cd "$dir" && npm ci --omit=dev --ignore-scripts)
@@ -291,21 +293,21 @@
           install_pi_packages() {
             local dir="$VENDOR_ROOT/gotgenes/pi-packages"
             [ -f "$dir/pnpm-lock.yaml" ] || return 0
-            echo "pi-npm-i: vendor/gotgenes/pi-packages (pnpm install --frozen-lockfile)"
+            echo "pi-ext-deps-install: vendor/gotgenes/pi-packages (pnpm install --frozen-lockfile)"
             (cd "$dir" && pnpm install --frozen-lockfile)
           }
 
           install_fgladisch_pi() {
             local dir="$VENDOR_ROOT/fgladisch/pi-extensions"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/fgladisch/pi-extensions (npm ci)"
+            echo "pi-ext-deps-install: vendor/fgladisch/pi-extensions (npm ci)"
             (cd "$dir" && npm ci --omit=dev --ignore-scripts)
           }
 
           install_lean_ctx_pi() {
             local dir="$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/mattgmak/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
+            echo "pi-ext-deps-install: vendor/mattgmak/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
             if [ -f "$dir/package-lock.json" ]; then
               (cd "$dir" && npm ci)
             else
@@ -321,7 +323,7 @@
             status=$(git -C "$dir" status --porcelain 2>/dev/null || true)
             [ -n "$status" ] || return 0
             if echo "$status" | grep -Ev '^(\?\?|!!)' >/dev/null; then
-              echo "pi-npm-i: discard tracked changes in vendor/$label"
+              echo "pi-ext-deps-install: discard tracked changes in vendor/$label"
               git -C "$dir" restore .
             fi
           }
@@ -329,7 +331,7 @@
           install_pi_cursor_sdk() {
             local dir="$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/fitchmultz/pi-cursor-sdk (npm ci --ignore-scripts; build dist/)"
+            echo "pi-ext-deps-install: vendor/fitchmultz/pi-cursor-sdk (npm ci --ignore-scripts; build dist/)"
             # prepare runs npm install --include=dev when dev deps are absent, which
             # mutates package-lock.json; build explicitly instead (same as prepare.mjs).
             if [ -f "$dir/package-lock.json" ]; then
@@ -340,7 +342,7 @@
             (cd "$dir" && node scripts/build.mjs)
             (cd "$dir" && npm prune --omit=dev --ignore-scripts)
             if [ ! -f "$dir/dist/index.js" ]; then
-              echo "pi-npm-i: pi-cursor-sdk dist/index.js missing after build" >&2
+              echo "pi-ext-deps-install: pi-cursor-sdk dist/index.js missing after build" >&2
               exit 1
             fi
             # pi-bolt is a compiled bun binary; its extension loader resolves extension
@@ -361,7 +363,7 @@
           install_pi_agent_browser_native() {
             local dir="$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"
             [ -f "$dir/package.json" ] || return 0
-            echo "pi-npm-i: vendor/fitchmultz/pi-agent-browser-native (npm ci --ignore-scripts; build dist/)"
+            echo "pi-ext-deps-install: vendor/fitchmultz/pi-agent-browser-native (npm ci --ignore-scripts; build dist/)"
             if [ -f "$dir/package-lock.json" ]; then
               (cd "$dir" && npm ci --ignore-scripts)
             else
@@ -370,7 +372,7 @@
             (cd "$dir" && node scripts/build.mjs)
             (cd "$dir" && npm prune --omit=dev --ignore-scripts)
             if [ ! -f "$dir/dist/extensions/agent-browser/index.js" ]; then
-              echo "pi-npm-i: pi-agent-browser-native dist/extensions/agent-browser/index.js missing after build" >&2
+              echo "pi-ext-deps-install: pi-agent-browser-native dist/extensions/agent-browser/index.js missing after build" >&2
               exit 1
             fi
             restore_vendor_tracked_changes "$dir" "pi-agent-browser-native"
@@ -379,10 +381,10 @@
           install_agent_ste() {
             local dir="$VENDOR_ROOT/ctotheameron/agent-ste"
             [ -f "$dir/scripts/build-dist.sh" ] || return 0
-            echo "pi-npm-i: vendor/ctotheameron/agent-ste (gleam build --target javascript; build dist/)"
+            echo "pi-ext-deps-install: vendor/ctotheameron/agent-ste (gleam build --target javascript; build dist/)"
             (cd "$dir" && ./scripts/build-dist.sh)
             if [ ! -f "$dir/dist/ste/ste.mjs" ]; then
-              echo "pi-npm-i: agent-ste dist/ste/ste.mjs missing after build" >&2
+              echo "pi-ext-deps-install: agent-ste dist/ste/ste.mjs missing after build" >&2
               exit 1
             fi
           }
@@ -391,7 +393,7 @@
             local engram_pi="$VENDOR_ROOT/Gentleman-Programming/engram/plugin/pi"
             local engram_deps_dir="$VENDOR_ROOT/.engram-deps"
             [ -f "$engram_pi/package.json" ] || return 0
-            echo "pi-npm-i: gentle-engram deps (vendor/.engram-deps)"
+            echo "pi-ext-deps-install: gentle-engram deps (vendor/.engram-deps)"
             rm -f "$EXTENSIONS/node_modules"
             rm -rf "$engram_deps_dir"
             mkdir -p "$engram_deps_dir"
@@ -473,6 +475,56 @@
         '';
       };
 
+      piExtDepsInstallIfStale = pkgs.writeShellApplication {
+        name = "pi-ext-deps-install-if-stale";
+        runtimeInputs = with pkgs; [
+          piExtDepsInstall
+          git
+          nodejs_24
+          pnpm
+          bun
+          gleam
+          coreutils
+          findutils
+        ];
+        text = ''
+          set -euo pipefail
+          STATE="$HOME/.local/state"
+          STAMP="$STATE/pi-ext-deps-install.stamp"
+          VENDOR_ROOT=${lib.escapeShellArg vendorRoot}
+          EXTENSIONS=${lib.escapeShellArg extensionsDir}
+
+          fingerprint() {
+            {
+              printf 'node %s\n' "$(node --version)"
+              printf 'npm %s\n' "$(npm --version)"
+              for root in "$VENDOR_ROOT" "$EXTENSIONS"; do
+                [ -d "$root" ] || continue
+                find "$root" -name node_modules -prune -o -type f \
+                  \( -name package.json -o -name package-lock.json \
+                  -o -name pnpm-lock.yaml -o -name bun.lock \
+                  -o -name bun.lockb -o -name Cargo.lock \) \
+                  -printf '%p %T@ %s\n'
+              done | sort
+            } | sha256sum | cut -d' ' -f1
+          }
+
+          mkdir -p "$STATE"
+          want=$(fingerprint)
+          if [ -f "$STAMP" ] && [ "$(cat "$STAMP")" = "$want" ]; then
+            echo "pi-ext-deps-install: up to date"
+            exit 0
+          fi
+          echo "pi-ext-deps-install: installing pi extension deps"
+          if pi-ext-deps-install; then
+            printf '%s\n' "$want" > "$STAMP"
+          else
+            echo "pi-ext-deps-install: failed (non-fatal) — run manually" >&2
+            exit 1
+          fi
+        '';
+      };
+
       markdownPreviewDeps =
         with pkgs;
         [
@@ -483,158 +535,174 @@
         ++ lib.optionals (!pkgs.stdenv.isDarwin) [ chromium ];
     in
     {
+      options.piCodingAgent.autoExtDepsInstall = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Install pi extension dependencies when lockfiles or tool versions change. A failure is non-fatal. Use pi-ext-deps-install to install by hand.";
+        };
+      };
+
       imports = [ inputs.coding-agents.homeManagerModules.default ];
 
-      coding-agents = {
-        skillsDir = lib.mkDefault "${repoRoot}/skills";
-        agentsMdPath = lib.mkDefault "${piAgentRoot}/AGENTS.md";
-        pi-coding-agent = {
-          enable = lib.mkDefault true;
-          extensionsDir = lib.mkDefault "${piAgentRoot}/extensions";
-          promptsDir = lib.mkDefault "${piAgentRoot}/prompts";
+      config = {
+        coding-agents = {
+          skillsDir = lib.mkDefault "${repoRoot}/skills";
+          agentsMdPath = lib.mkDefault "${piAgentRoot}/AGENTS.md";
+          pi-coding-agent = {
+            enable = lib.mkDefault true;
+            extensionsDir = lib.mkDefault "${piAgentRoot}/extensions";
+            promptsDir = lib.mkDefault "${piAgentRoot}/prompts";
+          };
         };
-      };
 
-      home.packages =
-        with pkgs;
-        [
-          nodejs_22
-          ffmpeg
-          agent-browser
-          uv
-          bun
-          podman
-          piNpmI
-          self.packages.${system}.lean-ctx
-          self.packages.${system}.engram
-        ]
-        ++ markdownPreviewDeps;
+        home.packages =
+          with pkgs;
+          [
+            nodejs_24
+            ffmpeg
+            agent-browser
+            uv
+            bun
+            podman
+            piExtDepsInstall
+            self.packages.${system}.lean-ctx
+            self.packages.${system}.engram
+          ]
+          ++ markdownPreviewDeps;
 
-      systemd.user.services.crawl4ai = {
-        Unit = {
-          Description = "Crawl4AI fetch server for pi-web-access";
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+        systemd.user.services.crawl4ai = {
+          Unit = {
+            Description = "Crawl4AI fetch server for pi-web-access";
+            After = [ "network-online.target" ];
+            Wants = [ "network-online.target" ];
+          };
+          Service = {
+            Type = "simple";
+            Restart = "on-failure";
+            RestartSec = 5;
+            TimeoutStartSec = "10min";
+            # --replace breaks rootless podman pasta port forwarding (host gets RST).
+            ExecStartPre = [
+              "-${lib.getExe pkgs.podman} pull ${crawl4aiImage}"
+              "-${lib.getExe pkgs.podman} rm -f pi-crawl4ai"
+            ];
+            ExecStart =
+              let
+                hostPort = toString crawl4aiPort;
+              in
+              "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
+            ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-crawl4ai";
+          };
+          Install.WantedBy = [ "default.target" ];
         };
-        Service = {
-          Type = "simple";
-          Restart = "on-failure";
-          RestartSec = 5;
-          TimeoutStartSec = "10min";
-          # --replace breaks rootless podman pasta port forwarding (host gets RST).
-          ExecStartPre = [
-            "-${lib.getExe pkgs.podman} pull ${crawl4aiImage}"
-            "-${lib.getExe pkgs.podman} rm -f pi-crawl4ai"
-          ];
-          ExecStart =
-            let
-              hostPort = toString crawl4aiPort;
-            in
-            "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
-          ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-crawl4ai";
-        };
-        Install.WantedBy = [ "default.target" ];
-      };
 
-      # Granian binds :::8080 and ignores server.bind_address; loopback-only via host publish.
-      systemd.user.services.searxng = {
-        Unit = {
-          Description = "SearXNG metasearch server for pi-web-access";
-          After = [ "network-online.target" ];
-          Wants = [ "network-online.target" ];
+        # Granian binds :::8080 and ignores server.bind_address; loopback-only via host publish.
+        systemd.user.services.searxng = {
+          Unit = {
+            Description = "SearXNG metasearch server for pi-web-access";
+            After = [ "network-online.target" ];
+            Wants = [ "network-online.target" ];
+          };
+          Service = {
+            Type = "simple";
+            Restart = "on-failure";
+            RestartSec = 5;
+            TimeoutStartSec = "10min";
+            # --replace breaks rootless podman pasta port forwarding (host gets RST).
+            ExecStartPre = [
+              "-${lib.getExe pkgs.podman} pull ${searxngImage}"
+              "-${lib.getExe pkgs.podman} rm -f pi-searxng"
+            ];
+            ExecStart =
+              let
+                hostPort = toString searxngPort;
+              in
+              "${lib.getExe pkgs.podman} run --rm --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
+            ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-searxng";
+          };
+          Install.WantedBy = [ "default.target" ];
         };
-        Service = {
-          Type = "simple";
-          Restart = "on-failure";
-          RestartSec = 5;
-          TimeoutStartSec = "10min";
-          # --replace breaks rootless podman pasta port forwarding (host gets RST).
-          ExecStartPre = [
-            "-${lib.getExe pkgs.podman} pull ${searxngImage}"
-            "-${lib.getExe pkgs.podman} rm -f pi-searxng"
-          ];
-          ExecStart =
-            let
-              hostPort = toString searxngPort;
-            in
-            "${lib.getExe pkgs.podman} run --rm --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
-          ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-searxng";
-        };
-        Install.WantedBy = [ "default.target" ];
-      };
 
-      home.activation.linkPiPowerlineTheme =
-        inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+        home.activation.autoExtDepsInstall = lib.mkIf autoExtDepsInstall.enable (
+          inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" "ensureNixConfig" ] ''
+            ${lib.getExe piExtDepsInstallIfStale} || true
           ''
-            mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
-            ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
-            if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
-              ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
-            fi
-          '';
+        );
 
-      home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
-        map (name: {
-          inherit name;
-          path = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes/${name}";
-        }) piStaticThemes
-        ++ [
-          {
-            name = "stylix.json";
-            path = piStylixThemeFile;
-          }
-        ]
-      );
-      home.file.".pi/agent/models.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
-      home.file.".pi/agent/mcp.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
-      home.file.".pi/agent/settings.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
-      home.file.".pi/agent/keybindings.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
-      home.file.".pi/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
-      # SearXNG needs settings.yml with json in search.formats (else JSON API 403)
-      # and use_default_settings: true (else KeyError, zero engines). Written via
-      # activation (not home.file): home.file.text is a store symlink; macOS
-      # podman-machine VM shares $HOME but not /nix/store, so bind-mount of the
-      # symlink fails. Content still lives in a store derivation; secret_key is a
-      # deterministic builtins.hashString of a constant plus config.home.homeDirectory, not a credential.
-      home.activation.piSearxngSettings = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        mkdir -p "$HOME/.local/share/pi-searxng"
-        rm -f "$HOME/.local/share/pi-searxng/settings.yml"
-        cat > "$HOME/.local/share/pi-searxng/settings.yml" <<'HEND'
-        ${searxngSettingsYaml}
-        HEND
-        chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
-      '';
+        home.activation.linkPiPowerlineTheme =
+          inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+            ''
+              mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
+              ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
+              if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
+                ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
+              fi
+            '';
 
-      # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
-      # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
-      # paths so repo-managed config wins over stale /curator toggles elsewhere.
-      home.file.".pi/web-search.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
-      home.file.".pi/agent/web-search.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
-      home.file.".config/pi/web-search.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
-      home.file.".config/lean-ctx/config.toml".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
-      home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
-      home.file.".config/rpiv-todo/config.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/rpiv-todo/config.json";
+        home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
+          map (name: {
+            inherit name;
+            path = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/themes/${name}";
+          }) piStaticThemes
+          ++ [
+            {
+              name = "stylix.json";
+              path = piStylixThemeFile;
+            }
+          ]
+        );
+        home.file.".pi/agent/models.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
+        home.file.".pi/agent/mcp.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
+        home.file.".pi/agent/settings.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
+        home.file.".pi/agent/keybindings.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
+        home.file.".pi/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
+        # SearXNG needs settings.yml with json in search.formats (else JSON API 403)
+        # and use_default_settings: true (else KeyError, zero engines). Written via
+        # activation (not home.file): home.file.text is a store symlink; macOS
+        # podman-machine VM shares $HOME but not /nix/store, so bind-mount of the
+        # symlink fails. Content still lives in a store derivation; secret_key is a
+        # deterministic builtins.hashString of a constant plus config.home.homeDirectory, not a credential.
+        home.activation.piSearxngSettings = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          mkdir -p "$HOME/.local/share/pi-searxng"
+          rm -f "$HOME/.local/share/pi-searxng/settings.yml"
+          cat > "$HOME/.local/share/pi-searxng/settings.yml" <<'HEND'
+          ${searxngSettingsYaml}
+          HEND
+          chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
+        '';
 
-      home.sessionVariables = {
-        LEAN_CTX_BIN = lib.getExe leanCtx;
-        LEAN_CTX_SHELL = lib.getExe pkgs.bash;
-        PI_CURSOR_ASK_QUESTION = "0";
-        # ssh forwards TERM but never COLORTERM or TERM_PROGRAM, so pi's truecolor
-        # hint (COLORTERM=truecolor|24bit, TERM=*-direct) and the powerline
-        # extension's Nerd Font heuristic both fail and fall back remotely.
-        PI_TRUE_COLOR = "1";
-        POWERLINE_NERD_FONTS = "1";
-        CRAWL4AI_API_TOKEN = crawl4aiApiToken;
+        # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
+        # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
+        # paths so repo-managed config wins over stale /curator toggles elsewhere.
+        home.file.".pi/web-search.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+        home.file.".pi/agent/web-search.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+        home.file.".config/pi/web-search.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
+        home.file.".config/lean-ctx/config.toml".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
+        home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
+        home.file.".config/rpiv-todo/config.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/rpiv-todo/config.json";
+
+        home.sessionVariables = {
+          LEAN_CTX_BIN = lib.getExe leanCtx;
+          LEAN_CTX_SHELL = lib.getExe pkgs.bash;
+          PI_CURSOR_ASK_QUESTION = "0";
+          # ssh forwards TERM but never COLORTERM or TERM_PROGRAM, so pi's truecolor
+          # hint (COLORTERM=truecolor|24bit, TERM=*-direct) and the powerline
+          # extension's Nerd Font heuristic both fail and fall back remotely.
+          PI_TRUE_COLOR = "1";
+          POWERLINE_NERD_FONTS = "1";
+          CRAWL4AI_API_TOKEN = crawl4aiApiToken;
+        };
       };
     };
 }

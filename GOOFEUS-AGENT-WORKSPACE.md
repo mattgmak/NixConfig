@@ -124,7 +124,7 @@ Rejected: muxr, Herdr mobile relay, zellij-as-phone-primary, agent-tmux-web (unl
 | Syncthing | Music/Obsidian/OfflineMedia — not NixConfig | same |
 | Tailscale + SSH keys | ✅ (Desky/Envy/Droid keys) | ✅ |
 
-`pi-coding-agent` module wires: `dendritic/skills/` → `~/.pi/agent/skills/`, extension loaders → vendor under `~/NixConfig/vendor/`, `pi-npm-i` for vendor npm builds. See `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix`, `dendritic/skills/pi-setup/REFERENCE.md`.
+`pi-coding-agent` module wires: `dendritic/skills/` → `~/.pi/agent/skills/`, extension loaders → vendor under `~/NixConfig/vendor/`, `pi-ext-deps-install` for vendor npm builds. See `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix`, `dendritic/skills/pi-setup/REFERENCE.md`.
 
 ---
 
@@ -191,7 +191,7 @@ built, survives `nix-collect-garbage`, and needs no git, branch or pull.
 ### 7. Post-rebuild manual (until automated)
 
 ```bash
-cd ~/NixConfig && pi-npm-i
+cd ~/NixConfig && pi-ext-deps-install
 pi list   # verify exts/skills
 ```
 
@@ -257,7 +257,7 @@ pi list   # verify exts/skills
 
 - Bootstrap from GoofyDesky: `nh os switch --flake .#Goofeus` (creates agent user first run).
 - First login: `passwd agent`.
-- `pi-npm-i` in ~/NixConfig after first clone.
+- `pi-ext-deps-install` in ~/NixConfig after first clone.
 - NixOS `age.secrets.agent-age-key` path lands at `/run/agenix/agent-age-key` — already wired into agent HM `age.identityPaths`.
 
 **Notes:** Temp agent private key under `$TMPDIR/agent-tmp/agent-agekey/` (do NOT delete until Goofeus bootstrapped; needed once to re-encrypt if recipient set grows).

@@ -15,12 +15,12 @@ if (src.includes('function getPackageDir()')) {
 console.log('permission-system imports ok');
 EOF
 
-echo "Testing pi-cursor-sdk dist (built by pi-npm-i prepare)..."
+echo "Testing pi-cursor-sdk dist (built by pi-ext-deps-install prepare)..."
 test -f vendor/fitchmultz/pi-cursor-sdk/dist/index.js
 node --check vendor/fitchmultz/pi-cursor-sdk/dist/index.js
 echo "pi-cursor-sdk dist ok"
 
-echo "Testing pi-agent-browser-native dist (built by pi-npm-i)..."
+echo "Testing pi-agent-browser-native dist (built by pi-ext-deps-install)..."
 test -f vendor/fitchmultz/pi-agent-browser-native/dist/extensions/agent-browser/index.js
 node --check vendor/fitchmultz/pi-agent-browser-native/dist/extensions/agent-browser/index.js
 echo "pi-agent-browser-native dist ok"

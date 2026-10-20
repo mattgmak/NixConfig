@@ -48,7 +48,7 @@ Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github
 
 ```
 vendor/fitchmultz/pi-cursor-sdk/
-extensions/pi-cursor-sdk/index.ts     → ../vendor/fitchmultz/pi-cursor-sdk/dist/index.js (built by pi-npm-i)
+extensions/pi-cursor-sdk/index.ts     → ../vendor/fitchmultz/pi-cursor-sdk/dist/index.js (built by pi-ext-deps-install)
 extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
 ```
 
@@ -262,7 +262,7 @@ cd ~/NixConfig
 git add vendor/<owner>/<name>
 ```
 
-Then run `pi-npm-i` from the repo root if deps changed.
+Then run `pi-ext-deps-install` from the repo root if deps changed.
 
 ## Vendored skills (`mattpocock/skills`)
 
@@ -281,15 +281,15 @@ npm install --omit=dev   # if deps needed
 
 Commit directly in NixConfig (not submodule).
 
-## Install extension deps (`pi-npm-i`)
+## Install extension deps (`pi-ext-deps-install`)
 
-Home Manager installs `pi-npm-i`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
+Home Manager installs `pi-ext-deps-install`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
 
-`pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-npm-i` fails if missing.
+`pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-ext-deps-install` fails if missing.
 
 `pi-agent-browser-native` (`vendor/fitchmultz/pi-agent-browser-native`) uses the same build pattern. Loader needs `dist/extensions/agent-browser/index.js`.
 
-**pi-bolt (compiled bun host) can't resolve extension deps at runtime.** Its extension loader runs jiti in embedded mode (`isBunBinary` → `{ virtualModules, tryNative: false }`), which fails on bare specifiers reached *inside* a package's own dependency tree (`Cannot find package 'X'`), while plain node/bun resolve the same tree fine. Workaround pattern: `pi-npm-i` bundles the extension for that host and the loader picks the bundle when `process.versions.bun` is set — see `install_pi_cursor_sdk` (`bun build … --external '@earendil-works/*' --external 'typebox*' --external '*.node'`) and `extensions/pi-cursor-sdk/index.ts`. Put generated bundles in the loader dir (**not** the submodule): `discard_vendor_changes` runs `git clean -fd` in every vendor submodule at the end of `pi-npm-i`.
+**pi-bolt (compiled bun host) can't resolve extension deps at runtime.** Its extension loader runs jiti in embedded mode (`isBunBinary` → `{ virtualModules, tryNative: false }`), which fails on bare specifiers reached *inside* a package's own dependency tree (`Cannot find package 'X'`), while plain node/bun resolve the same tree fine. Workaround pattern: `pi-ext-deps-install` bundles the extension for that host and the loader picks the bundle when `process.versions.bun` is set — see `install_pi_cursor_sdk` (`bun build … --external '@earendil-works/*' --external 'typebox*' --external '*.node'`) and `extensions/pi-cursor-sdk/index.ts`. Put generated bundles in the loader dir (**not** the submodule): `discard_vendor_changes` runs `git clean -fd` in every vendor submodule at the end of `pi-ext-deps-install`.
 
 Run after submodule add/update when an extension has runtime deps.
 
@@ -334,13 +334,13 @@ home-manager switch --flake .#<host>
 
 ## Do NOT
 
-Positive defaults: submodule under `vendor/<owner>/<repo>` + HM symlink = source of truth; edit in-repo (never under `~/.pi/agent/`); run `pi-npm-i` after every submodule add/update with runtime deps; rebuild HM when Nix wiring changes.
+Positive defaults: submodule under `vendor/<owner>/<repo>` + HM symlink = source of truth; edit in-repo (never under `~/.pi/agent/`); run `pi-ext-deps-install` after every submodule add/update with runtime deps; rebuild HM when Nix wiring changes.
 
 - Put extensions in `dendritic/skills/` or skills in `extensions/`
 - Use `pi install` for extensions we already vendor — submodule + HM symlink is source of truth
 - Commit `node_modules/` in NixConfig-owned extensions unless intentional
 - Edit files under `~/.pi/agent/extensions` or `skills` directly — they symlink to repo
-- Forget `npm install --omit=dev` / `pi-npm-i` after submodule add/update when extension has runtime deps
+- Forget `npm install --omit=dev` / `pi-ext-deps-install` after submodule add/update when extension has runtime deps
 - Vendor a repo anywhere except `vendor/<owner>/<repo>` — all submodules live under the root `vendor/`, grouped by owner, named `owner/repo` in `.gitmodules`
 - Break the `extensions/vendor` compat symlink (→ repo root `vendor/`) — loaders resolve `../vendor/...` through it; treat it as read-only plumbing
 - Symlink mattpocock `caveman` over local `skills/caveman/` — keep the local copy
@@ -410,7 +410,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Bump pi package | `dendritic/packages/pi-bolt.nix` (version + both platform hashes) |
 | Bump engram binary (keep in sync with ext) | `dendritic/packages/engram.nix` (see Engram ext/bin version sync) |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap) |
-| Extension bundle for compiled bun hosts | `pi-npm-i` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
+| Extension bundle for compiled bun hosts | `pi-ext-deps-install` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
 
 ## Goofeus agent workspace (GoofeusAgent)
 
@@ -434,7 +434,7 @@ sudo passwd agent                     # set agent user password (needed for sudo
 
 Everything else is Nix-managed:
 
-- `pi-npm-i` runs automatically via HM activation (`autoPiNpmI`, stamp-guarded in `~/.local/state/pi-npm-i.stamp`) after the first `nixconfig-sync` clone and after vendor extension bumps.
+- `pi-ext-deps-install-if-stale` runs `pi-ext-deps-install` when stale. Trigger: HM activation only (`autoExtDepsInstall`), so a switch installs. Stamp: `~/.local/state/pi-ext-deps-install.stamp`. It hashes node/npm versions plus path, mtime and size of every `package.json` and lockfile under `vendor/` and `extensions/`, so a node bump or a vendor update reruns installs. Failure is non-fatal. Run `pi-ext-deps-install` by hand when you change vendor deps without a switch.
 
 HM already starts an empty `agents` tmux session on boot (`systemd.user.services.agents-tmux`). Start pi inside it: `tmux attach -t agents` then `pi`.
 
