@@ -2,8 +2,8 @@
   "externalEditor": "nvim",
   "lastChangelogVersion": "1.3.0",
   "defaultProvider": "commandcode",
-  "defaultModel": "z-ai/glm-5.3-flash",
-  "defaultThinkingLevel": "off",
+  "defaultModel": "deepseek/deepseek-v4.1-flash",
+  "defaultThinkingLevel": "high",
   "theme": "stylix",
   "powerline": {
     "preset": "full",
