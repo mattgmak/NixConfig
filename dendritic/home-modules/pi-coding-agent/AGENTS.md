@@ -1,3 +1,25 @@
+# Language: Simplified Technical English (ASD-STE100)
+
+Every reply, file prose, and commit message uses ste style. The agent-ste
+extension lints the write. A hard fault blocks it.
+
+Write each sentence in one draft:
+
+- Simple tenses only. Active voice.
+- One sentence = one thought. 20 words for a reply, 25 for file prose.
+- Replace each ban-phrase word with its approved partner: `start`, `use`,
+  `show`, `fix` — not `spin up`, `utilize`, `indicate`, `address`.
+- Split a semicolon into two sentences while you draft.
+
+Before the write lands, run `ste_lint` on the draft text. Fix every fault,
+or log the suppression. Done = zero hard faults, or one rule-id suppression
+comment per surviving fault:
+
+- code: `// ste-disable-next-line <rule-id>`
+- markdown: `<!-- ste-disable-next-line <rule-id> -->`
+
+Maintenance: keep this section short. A stale line goes out during review.
+
 # General
 
 - CRITICAL: Verify symbols, fn names, config options, module paths, CLI flags, API
