@@ -47,7 +47,7 @@ Flags precede positionals; positional order is unchanged.
 | 3 | branch (report only, default `unknown`) |
 | 4 | label/ticket (report only, default `unknown`; also feeds name auto-derive) |
 | 5 | url or `''` (empty → report omits the URL line) |
-| 6 | session name (detached) / window name (`--in-window`); omitted → auto-derived |
+| 6 | name — tmux session (detached) / window name (`--in-window`) AND pi session display name (`pi -n`, searchable via `/resume`). Omitted → auto-derived |
 
 | Flag | Effect |
 |------|--------|
@@ -111,12 +111,15 @@ One `ask_user_question`, **one single-select question per session**. Preview rul
 ```text
 cwd:     <full path the worker pi starts in — worktree/repo root>
 branch:  <existing or proposed>
+name:    <proposed tmux session/window name>
 do:      <one-line work item>
 paths:   <paths within cwd, relative>
 mode:    plain | orchestrator
 merge:   <why one session / separate>
-mux:     detach (auto name) | window in this session
+mux:     detach | window in this session
 ```
+
+`name` = agent proposes the worker name — used as both the tmux session/window name and the pi session display name (`pi -n <name>`, searchable via `/resume` in pi). Never left to launcher auto-derive. Derive from ticket id (if exactly one in item) else `gitName + worktree rel path`. Always pass it as arg 6 at launch so workers never collide and names stay user-reviewable at confirm. User may edit the name at confirm.
 
 Second option per question = Skip (no spawn). Per-session skip keeps fan-out droppable. User may edit branch/prompt/mode/mux → apply before launch. Spawn only confirmed sessions.
 

@@ -12,9 +12,9 @@
 #   --in-window            new window in caller's tmux session ($TMUX); detached default
 #
 # Args 3–5 feed the handoff report (arg 4 also seeds name auto-derive). Prompt: short
-# single-line without quotes goes inline (pi '<prompt>'); anything longer/quoted/multi-line
-# is written to a prompt file and sent as pi "$(cat <file>)" — no caller-side escaping.
-# Arg 6 = session name (detached) / window name (--in-window); omitted → auto-derived
+# single-line without quotes goes inline; anything longer/quoted/multi-line goes through
+# a prompt file — no caller-side escaping. Arg 6 = name: tmux session/window name AND
+# pi session display name (pi -n, searchable via /resume); omitted → auto-derived.
 # (exactly one ticket id in prompt+label, else sesh-style path name, else -2/+ bump).
 # Stdout keys: SESSION=<name>; WINDOW=<session>:<window> in --in-window mode;
 #              PROMPT=<submitted|unsubmitted|unknown|n/a>.
@@ -280,14 +280,16 @@ case "$prompt" in
   *$'\n'*) needs_file=1 ;;
 esac
 [ "${#prompt}" -le 400 ] || needs_file=1
+pi_name=$(sanitize_name "$name")
+
 if [ "$needs_file" = 1 ]; then
   prompt_dir="$tmp_root/agent-tmp/spawn-pi"
   mkdir -p "$prompt_dir"
   prompt_path="$prompt_dir/prompt-$$-$(date +%s).txt"
   printf '%s' "$prompt" >"$prompt_path"
-  sent_cmd="pi \"\$(cat '$prompt_path')\""
+  sent_cmd="pi -n \"$pi_name\" \"\$(cat '$prompt_path')\""
 else
-  sent_cmd="pi '$prompt'"
+  sent_cmd="pi -n \"$pi_name\" '$prompt'"
 fi
 
 # 5) Launch pi unless already running
