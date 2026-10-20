@@ -8,7 +8,7 @@
 # scripts write to $TMPDIR — both outside arbitrary project roots.
 extra_roots = [
     "/Users/mattgmak/NixConfig",
-    "/tmp"
+    "/tmp",
 ]
 
 shell_allowlist_extra = [
@@ -63,5 +63,8 @@ shell_allowlist_extra = [
     "convex",
     "avdmanager",
     "emulator",
-    "adb"
+    "adb",
 ]
+
+[telemetry]
+last_heartbeat = "2026-10-20"
