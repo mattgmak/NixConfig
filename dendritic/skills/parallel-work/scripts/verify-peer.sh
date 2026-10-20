@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
-# Read-only worker status probe. No tmux mutation — safe to run against the
-# parent's own session or any spawned worker at any time.
+# Read-only peer status probe. No tmux mutation — safe to run against the
+# caller's own session or any spawned peer at any time. Target = peer registry
+# name (session or session:window).
 #
-# Usage: verify-worker.sh [--wait <seconds>] [--lines <n>] [--marker <text>] [--marker-file <path>] <session[:window]>
+# Usage: verify-peer.sh [--wait <seconds>] [--lines <n>] [--marker <text>] [--marker-file <path>] <peer-name>
 #
 #   --wait        poll budget for pi to appear, default 5 (0 = single check)
 #   --lines       pane tail lines printed, default 40
-#   --marker      text to probe for in the input box (e.g. prompt tail) — precise
+#   --marker      text to probe for in the input box (e.g. task tail) — precise
 #                 unsubmitted check; without it the box/scrollback heuristics run
-#   --marker-file prompt file used for the launch (launcher's PromptFile:) — last
-#                 24 non-space chars become the marker
+#   --marker-file file holding the task text sent to the peer — last 24 non-space
+#                 chars become the marker
 #
 # Exit: 0 pi running · 3 pi not running within budget · 1 usage/target error
 set -euo pipefail
@@ -36,7 +37,7 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -z "$target" ]; then
-  echo "usage: verify-worker.sh [--wait N] [--lines N] [--marker TEXT|--marker-file PATH] <session[:window]>" >&2
+  echo "usage: verify-peer.sh [--wait N] [--lines N] [--marker TEXT|--marker-file PATH] <peer-name>" >&2
   exit 1
 fi
 case "$wait_secs" in ''|*[!0-9]*) echo "ERROR: --wait needs a non-negative integer" >&2; exit 1 ;; esac

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Shared tmux pane introspection for spawn-pi launcher + verifier.
+# Shared tmux pane introspection for the parallel-work verifier.
 # Source only — no side effects, no local `set` changes, no tmux mutation.
 
 # pi's foreground process name differs by runtime: node (node pi), bun

@@ -6,27 +6,28 @@ argument-hint: "<branch-name> [implementation notes] e.g. mattmak/prd-239-dashbo
 
 # Work on Linear Ticket
 
-Worktree + detached Pi worker for Linear branch. Deferred parent `/quit` — never inline kill.
+Worktree + detached pi peer for a Linear branch. Parent stays alive — never inline kill.
 
 ## Skill root + scripts
 
-Skill root = parent dir of this `SKILL.md`. Scripts committed under `scripts/` — **do not** write temp copies. Launcher + worktree parser + parent-quit live in **spawn-pi** skill.
+Skill root = parent dir of this `SKILL.md`. Scripts committed under `scripts/` — **do not** write temp copies. Worktree parser + peer spawn live in **parallel-work** skill.
 
-| Script | Purpose |
+| Script or tool | Purpose |
 |--------|---------|
 | `scripts/parse-issue-id.sh` | Branch slug → `PRD-239` |
-| `$SPAWN_SKILL_ROOT/scripts/launch-worker.sh` | Detached tmux + pi + handoff report + deferred parent quit |
+| `$SPAWN_SKILL_ROOT/scripts/prepare-worktree.sh` | Worktree prep: `wt switch` (+ `--existing`), prints `WORKTREE=<path>` |
 | `$SPAWN_SKILL_ROOT/scripts/parse-worktree-path.sh` | `wt switch` output → absolute worktree path |
-| `$SPAWN_SKILL_ROOT/scripts/lib/parent-quit.sh` | Sourced by launcher — not invoked alone |
+| `subagent` ext tool | Spawn: `agent: "peer"`, `surface`, `name`, `cwd`, `task` |
+| `subagent_message` ext tool | Steer a running peer, resume a finished peer |
 
 Resolve roots at runtime (pick one that exists):
 
 ```bash
 SKILL_ROOT="${PI_SKILL_ROOT:-$HOME/.pi/agent/skills/work-on-linear-ticket}"
-SPAWN_SKILL_ROOT="${PI_SKILL_ROOT:-$HOME/.pi/agent/skills/spawn-pi}"
+SPAWN_SKILL_ROOT="${PI_SKILL_ROOT:-$HOME/.pi/agent/skills/parallel-work}"
 # NixConfig dev:
 # SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/work-on-linear-ticket"
-# SPAWN_SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/spawn-pi"
+# SPAWN_SKILL_ROOT="$(git rev-parse --show-toplevel)/dendritic/skills/parallel-work"
 ```
 
 ## Invocation
@@ -70,12 +71,13 @@ Read title, desc, status, labels, linked PRs → work context.
 From cwd (inside target repo):
 
 ```bash
-wt switch -b @ -c <branch_name>
+bash "$SPAWN_SKILL_ROOT/scripts/prepare-worktree.sh" "$PWD" "<branch_name>"
+# prints WORKTREE=/abs/path
 ```
 
-Branch exists → `wt switch <branch_name>`.
+Branch exists → add `--existing`. Manual equivalent: `wt switch -b @ -c <branch_name>`.
 
-Capture stdout+stderr. Parse path:
+`prepare-worktree.sh` parses the path itself and prints `WORKTREE=`. Manual runs:
 
 ```bash
 bash "$SPAWN_SKILL_ROOT/scripts/parse-worktree-path.sh" <<<"$wt_output"
@@ -100,52 +102,53 @@ Implement a configurable on-press open link URL for the dashboard banner. When u
 Explore the codebase, implement a fix, and verify with tests. Start by understanding how the dashboard banner is configured and rendered.
 ```
 
-### 5. Launch worker (detached)
+### 5. Spawn peer (detached session)
 
 **No `sesh connect`** — switch-clients when `$TMUX` set → yanks current session.
 
-```bash
-PI_HANDOFF_QUIT=1 bash "$SPAWN_SKILL_ROOT/scripts/launch-worker.sh" \
-  "$worktree_path" \
-  'initial_prompt' \
-  "<branch>" \
-  "<issue_id_and_title>" \
-  "<linear_url>"
+Delegate the launch to the `subagent` ext tool. Peer = full pi, all extensions.
+
+```text
+subagent {
+  agent:   "peer",
+  name:    "<PRD-239>",
+  cwd:     "<worktree_path>",
+  surface: "NEW <PRD-239>",
+  task:    "<initial_prompt + Linear url>"
+}
 ```
 
-Escape single quotes in prompt (`'\''`). `test -d` worktree first. Single handoff → parent quit opt-in: `PI_HANDOFF_QUIT=1`; spawn-pi fan-out omits it.
-
-`tmux new-session -d` returns immediately; current client untouched. Non-zero = failure (pi not detected after 15s poll → parent stays alive). Success → deferred parent `/quit` (default 2s, `PI_HANDOFF_QUIT_DELAY`). Report → `${PI_REPORT_FILE:-${TMPDIR:-/tmp}/agent-tmp/agent-handoff-report.txt}`.
+`test -d` worktree first. Never call tmux or pi directly — the extension owns target creation. Spawn returns at once; no wait, no poll, no `sesh connect`. Result arrives later as a steer message. Parent stays alive.
 
 ### 6. Handoff
 
-Success → launcher prints report + appends file, schedules deferred `/quit` on parent (lets `agent_settled` finish). Re-attach: `sesh connect <worktree_path>` / `tmux attach -t <session>`.
+Spawn acknowledgement → peer runs in its own session. Re-attach: `sesh connect <worktree_path>` / `tmux attach -t <peer-session>`.
 
 | Field | Source |
 |-------|--------|
-| Issue | launch-worker arg 4 |
-| URL | launch-worker arg 5 |
-| Worktree | arg 1 |
-| Branch | arg 3 |
-| Tmux session | `SESSION=` line in output |
-| Report file | `${PI_REPORT_FILE:-${TMPDIR:-/tmp}/agent-tmp/agent-handoff-report.txt}` |
-| Quit delay | `PI_HANDOFF_QUIT_DELAY` (default `2`) |
+| Issue | `parse-issue-id.sh` |
+| URL | Linear `get_issue` |
+| Worktree | `WORKTREE=` line from `prepare-worktree.sh` |
+| Branch | git branch |
+| Peer name / session | `name` + `surface` in the spawn call |
+| Steer | `subagent_message` with the peer name |
 
-Parent exit only after `pi confirmed running`. WARN/exit 1 → parent stays alive. **Never inline-kill parent** — stale ctx during `agent_settled`.
+Parent stays alive. **Never inline-kill parent** — stale ctx during `agent_settled`. Read-only probe: `bash "$SPAWN_SKILL_ROOT/scripts/verify-peer.sh" <PRD-239>`.
 
 ## Error handling
 
 | Failure | Action |
 |---------|--------|
 | Blocked by allowlist | Use `bash "$SKILL_ROOT/scripts/..."` not inline `$(...)`. Missing binary → `lean-ctx allow` or `config.toml` |
-| Not in git repo | User `cd` into repo — launcher also needs `$TMUX` set (tmux gate) |
+| Not in git repo | User `cd` into repo — peer spawn also needs `$TMUX` set (tmux gate) |
 | Linear issue not found | Show extracted id; ask confirm |
 | `wt switch` fails | Show stderr; `wt list` |
 | Can't parse worktree path | Re-run `parse-worktree-path.sh`; or ask user path |
-| `send-keys` → `can't find pane` | `=` prefix breaks target (names w/ `/`). Plain `"$session"` — `has-session` tolerates `=`, `send-keys` doesn't |
-| Session exists, pi never starts | `pane_current_command` = `node` when pi alive; idle shell → launcher re-sends prompt |
-| `tmux`/`jq`/launch fails | stderr + worktree + session + manual attach cmd |
-| Parent quit fails | Handoff done; WARN + parent lives. Report file + `sesh list`. Manual `/quit` |
+| Session name taken | User edits the peer name, or pick a fresh `NEW <name>` surface |
+| Spawn error result | Read the tool result text; fix the field it names; respawn |
+| Target rejects as in-session | Peer needs `new-window`, a session name, or `NEW <name>` — never the caller's pane |
+| pi not up in peer | `verify-peer.sh <name>` — pane tail + `CWD`, exit 3. Raise `--wait` or attach |
+| `tmux`/`jq` fails | stderr + worktree + manual attach cmd |
 
 ## Example
 
@@ -157,5 +160,5 @@ Parent exit only after `pi confirmed running`. WARN/exit 1 → parent stays aliv
 2. Fetch Linear issue (parallel `git rev-parse`)
 3. `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
 4. `parse-worktree-path.sh` → e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`
-5. `launch-worker.sh` with prompt + metadata
-6. Parent `/quit` deferred; report in tmp file
+5. `prepare-worktree.sh <repo> <branch>` → `WORKTREE=…`
+6. `subagent { agent: "peer", name: "PRD-239", surface: "NEW PRD-239", cwd: <worktree>, task: … }`
