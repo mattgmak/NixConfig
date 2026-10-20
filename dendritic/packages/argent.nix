@@ -17,10 +17,10 @@
               libgcc,
             }:
             let
-              version = "0.27.0";
+              version = "0.29.0";
               npmTarball = fetchurl {
                 url = "https://registry.npmjs.org/@swmansion/argent/-/argent-${version}.tgz";
-                hash = "sha256-6qLoy9hO6HF2GHoQyRP+4cCLpKElMfiaWQ+nbFNnOls=";
+                hash = "sha256-lHvanTC9mLl7Cj2pe5f4s0buUFYWsuHeVxkkARY9Lm0=";
               };
 
               # hostPlatformKey() from the bundled tool-server / bin/argent-simulator-server.cjs.
