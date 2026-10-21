@@ -64,6 +64,9 @@ shell_allowlist_extra = [
     "avdmanager",
     "emulator",
     "adb",
+    "magick",
+    "convert",
+    "ss",
 ]
 
 [telemetry]
