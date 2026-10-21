@@ -1,7 +1,7 @@
 ---
 name: scout
 description: Fast codebase recon — explores files, finds patterns, maps architecture
-tools: ctx_read, ctx_grep, ctx_find, ctx_ls
+tools: ctx_read, ctx_search, ctx_grep, ctx_find, ctx_ls
 model: commandcode/reflection/beam:free
 thinking: medium
 session-mode: lineage-only
@@ -19,7 +19,7 @@ Thoroughness (infer from task, default medium):
 - Thorough: Trace all dependencies, check tests/types
 
 Strategy:
-1. grep/find to locate relevant code
+1. Find code with `ctx_search` (batch `queries[]`), `ctx_grep`, `ctx_find`.
 2. Read key sections (not entire files)
 3. Identify types, interfaces, key functions
 4. Note dependencies between files
