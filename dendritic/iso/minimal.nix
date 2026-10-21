@@ -22,6 +22,7 @@
         inputs.home-manager.nixosModules.home-manager
         self.nixConfig
         self.nixosModules.minimalIso
+        self.nixosModules.caTrust
       ];
     }
   );

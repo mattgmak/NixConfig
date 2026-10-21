@@ -73,6 +73,32 @@ in
       ...
     }:
     let
+      # Compromised intermediate CA keys force two roots out of the trust store.
+      # Each p11-kit entry opens with its alias line, so the filter cuts whole entries.
+      cacertFiltered = pkgs.runCommand "cacert-filtered" { } ''
+        src=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt
+        dest=$out/etc/ssl/certs/ca-bundle.crt
+        install -d $out/etc/ssl/certs
+        ${pkgs.gawk}/bin/awk '
+          /^-----BEGIN/ { inblock = 1 }
+          /^-----END/ { inblock = 0 }
+          !inblock && /^[^ \t-]/ && $0 !~ /^(Trusted for:|Traditional PEM block omitted:)/ {
+            drop = ($0 == "Comodo AAA Services root" || $0 == "emSign ECC Root CA - G3")
+          }
+          !drop { print }
+        ' $src > $dest
+
+        # Guard against an upstream alias rename, which would silence the filter.
+        ${pkgs.gnugrep}/bin/grep -qE '^(Comodo AAA Services root|emSign ECC Root CA - G3)$' $dest && {
+          echo "filtered CA bundle still holds a revoked root" >&2
+          exit 1
+        }
+        test $(${pkgs.gnugrep}/bin/grep -c '^-----BEGIN' $dest) -lt \
+          $(${pkgs.gnugrep}/bin/grep -c '^-----BEGIN' $src) || {
+          echo "filtered CA bundle lost no certificate blocks" >&2
+          exit 1
+        }
+      '';
       crawl4aiPort = 11235;
       crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
       crawl4aiApiToken = builtins.substring 0 64 (
@@ -416,6 +442,10 @@ in
         VISUAL = "nvim";
         DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
         SHELL = "${pkgs.zsh}/bin/zsh";
+        SSL_CERT_FILE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
+        NIX_SSL_CERT_FILE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
+        CURL_CA_BUNDLE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
+        GIT_SSL_CAINFO = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
       };
 
       environment.systemPackages =

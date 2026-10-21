@@ -29,6 +29,7 @@
           inputs.stylix.nixosModules.stylix
           inputs.agenix.nixosModules.default
           self.nixConfig
+          caTrust
           tailscale
           unbound
           pihole

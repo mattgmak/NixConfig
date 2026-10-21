@@ -23,6 +23,7 @@
         };
         modules = with self.nixosModules; [
           common
+          caTrust
           inputs.agenix.nixosModules.default
           copyparty-client
           GoofyDesky

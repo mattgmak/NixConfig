@@ -23,6 +23,7 @@
         };
         modules = with self.nixosModules; [
           common
+          caTrust
           GoofyEnvy
           GoofyEnvyHardware
           steam
