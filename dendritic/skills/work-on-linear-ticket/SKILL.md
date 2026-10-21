@@ -113,10 +113,12 @@ subagent {
   agent:   "peer",
   name:    "<PRD-239>",
   cwd:     "<worktree_path>",
-  surface: "NEW <PRD-239>",
+  surface: "new-session:<PRD-239>",
   task:    "<initial_prompt + Linear url>"
 }
 ```
+
+An agent's `surfaces` frontmatter field limits allowed kinds. Default = `pane` only. Kinds: `pane`, `window`, `session`.
 
 `test -d` worktree first. Never call tmux or pi directly — the extension owns target creation. Spawn returns at once; no wait, no poll, no `sesh connect`. Result arrives later as a steer message. Parent stays alive.
 
@@ -144,9 +146,9 @@ Parent stays alive. **Never inline-kill parent** — stale ctx during `agent_set
 | Linear issue not found | Show extracted id; ask confirm |
 | `wt switch` fails | Show stderr; `wt list` |
 | Can't parse worktree path | Re-run `parse-worktree-path.sh`; or ask user path |
-| Session name taken | User edits the peer name, or pick a fresh `NEW <name>` surface |
+| Session name taken | User edits the peer name, or pick a fresh `new-session:<name>` surface |
 | Spawn error result | Read the tool result text; fix the field it names; respawn |
-| Target rejects as in-session | Peer needs `new-window`, a session name, or `NEW <name>` — never the caller's pane |
+| Surface rejected | Check the agent's `surfaces` field. Removed surface values are hard errors — use `window` or `new-session:<name>` |
 | pi not up in peer | `verify-peer.sh <name>` — pane tail + `CWD`, exit 3. Raise `--wait` or attach |
 | `tmux`/`jq` fails | stderr + worktree + manual attach cmd |
 
@@ -161,4 +163,4 @@ Parent stays alive. **Never inline-kill parent** — stale ctx during `agent_set
 3. `wt switch -b @ -c mattmak/prd-239-dashboard-banner-add-url`
 4. `parse-worktree-path.sh` → e.g. `/Volumes/.../mono.mattmak-prd-239-dashboard-banner-add-url`
 5. `prepare-worktree.sh <repo> <branch>` → `WORKTREE=…`
-6. `subagent { agent: "peer", name: "PRD-239", surface: "NEW PRD-239", cwd: <worktree>, task: … }`
+6. `subagent { agent: "peer", name: "PRD-239", surface: "new-session:PRD-239", cwd: <worktree>, task: … }`

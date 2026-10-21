@@ -5,6 +5,7 @@ tools: ctx_read, ctx_grep, ctx_find, ctx_shell, Linear_get_issue, Linear_list_co
 subagent_agents: scout
 model: cursor/grok-4.7@256k:slow
 thinking: high
+surfaces: window
 system-prompt: append
 auto-exit: true
 ---

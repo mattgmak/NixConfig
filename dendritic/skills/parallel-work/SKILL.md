@@ -1,22 +1,23 @@
 ---
 name: parallel-work
-description: Fan out full-pi `peer` workers to tmux windows and sessions for work named in the last agent response. Use when user says "parallel work", "fan out pi", "spawn peers", or points at continuation work to run in parallel sessions. Requires tmux.
+description: Fan out full-pi `peer` workers to panes, tmux windows, and sessions for work named in the last agent response. Use when user says "parallel work", "fan out pi", "spawn peers", or points at continuation work to run in parallel sessions. Requires tmux.
 argument-hint: "[work item hint] — optional; rest extracted from last agent response"
 ---
 
 # Parallel Work
 
-Spawn `peer` workers for continuation work found in the last agent response. Peer = full pi session: all extensions, all tools, no allowlists. Peers start outside the calling session. Parent stays alive after spawn.
+Spawn `peer` workers for continuation work found in the last agent response. Peer = full pi session: all extensions, all tools, no allowlists. Peers start in a pane, window, or session. Parent stays alive after spawn.
 
-## Peers only start outside the caller
+## Peer surfaces
 
-| Surface | Value |
-|---------|-------|
-| New window in caller session | `new-window` |
-| New window in an existing tmux session | that session name |
-| New detached session | `NEW <name>` |
+| Placement | Value |
+|-----------|-------|
+| Pane split beside caller | omit `surface`, or `pane` |
+| New window in caller's tmux session | `window` |
+| New window inside an existing tmux session | `window:<session>`, or a bare session name |
+| Detached new tmux session | `new-session:<name>` |
 
-The extension rejects an in-session pane target for peers. Never place a peer beside the caller.
+An agent's `surfaces` frontmatter field limits allowed kinds. Default = `pane` only. Kinds: `pane`, `window`, `session`. A `peer: true` agent allows any surface its `surfaces` lists, pane included. Removed surface values are hard errors — the error names the replacement.
 
 ## Ext tools
 
@@ -24,7 +25,7 @@ Use the `interactive-subagents` extension tools. Do not call tmux directly for s
 
 | Tool | Use |
 |------|-----|
-| `subagent` | Spawn: `agent: "peer"`, `task`, `name`, `cwd`, `surface` (required for peers) |
+| `subagent` | Spawn: `agent: "peer"`, `task`, `name`, `cwd`, `surface` (placement, default `pane`) |
 | `subagents_list` | Show peer definitions. Not a status probe — never poll it |
 | `subagent_message` | Steer a running peer, or resume a finished peer by name |
 
@@ -67,7 +68,7 @@ Optional arg names which items count ('all' when absent). Read the last agent re
 
 - **Task text**: lean summary (worker explores from here — no response chunks embedded verbatim)
 - **Context params**: repo / worktree / paths / branch / Linear or GitHub ticket
-- **Surface**: `new-window`, existing session name, or `NEW <name>`
+- **Surface**: `pane`, `window`, `window:<session>`, or `new-session:<name>`
 
 Work tied to an existing checkout reuses it. No branch → propose a name from the ticket.
 
@@ -94,7 +95,7 @@ One `ask_user_question`, one single-select question per peer. Preview = condense
 cwd:     <worktree or repo root>
 branch:  <existing or proposed>
 name:    <proposed peer name>
-surface: new-window | <session> | NEW <name>
+surface: pane | window | window:<session> | new-session:<name>
 do:      <one-line work item>
 paths:   <paths within cwd, relative>
 merge:   <why one peer / separate>
@@ -127,9 +128,10 @@ Batch independent spawns in one block. Pass `agent`, `task`, `name`, `cwd`, `sur
 
 | Surface | Meaning |
 |---------|---------|
-| `new-window` | New window in the caller's tmux session |
-| `<session-name>` | New window inside that existing tmux session |
-| `NEW <name>` | New detached tmux session |
+| omit or `pane` | Pane split beside the caller |
+| `window` | New window in the caller's tmux session |
+| `window:<session>` or `<session-name>` | New window inside that existing tmux session |
+| `new-session:<name>` | New detached tmux session |
 
 Spawn returns at once with an acknowledgement. Do not wait, do not poll, do not tail session files. The harness delivers each peer result as a steer message.
 
@@ -167,8 +169,8 @@ No gates on peers, no follow-up. Parent keeps working.
 | `lean-ctx` shell blocked | `bash "$SKILL_ROOT/scripts/..."` via top-level `bash`, not inline `$()` |
 | `wt switch` fails | Show stderr; `wt list` |
 | Can't parse worktree path | Re-run parser; else ask user for the path |
-| Target rejects as in-session | Peer needs `new-window`, a session name, or `NEW <name>` — never the caller's pane |
-| Session name taken | User edits name at confirm, or pick `NEW <name>` |
+| Surface rejected | Check the agent's `surfaces` field. Removed surface values are hard errors — use `window` or `new-session:<name>` |
+| Session name taken | User edits name at confirm, or pick `new-session:<name>` |
 | Spawn error result | Read the tool result text; fix the field it names; respawn |
 | `verify-peer.sh` exit 3 | pi not up within `--wait`; pane tail + `CWD` printed — raise `--wait` or attach |
 | Unchanged re-spawn | Registry name exists → steer that peer instead of spawning a twin |
@@ -181,8 +183,8 @@ No gates on peers, no follow-up. Parent keeps working.
 
 1. tmux gate passes
 2. Last response had fix A (auth module, existing worktree) + fix B (separate ticket)
-3. Proposals: `NixConfig-auth` (`surface: new-window`, plain), `PRD-239` (`surface: NEW PRD-239`)
+3. Proposals: `NixConfig-auth` (`surface: window`, plain), `PRD-239` (`surface: new-session:PRD-239`)
 4. `ask_user_question` — user drops A, edits B's branch
 5. `prepare-worktree.sh <repo> PRD-239-…` → `WORKTREE=/Volumes/.../mono.prd-239-…`
-6. `subagent { agent: "peer", name: "PRD-239", cwd: <worktree>, surface: "NEW PRD-239", task: … }`
+6. `subagent { agent: "peer", name: "PRD-239", cwd: <worktree>, surface: "new-session:PRD-239", task: … }`
 7. Echo surface, worktree, branch; `subagent_message` when the user wants a redirect
