@@ -110,6 +110,12 @@
           }
         }
       ]
+    },
+    "commandcode": {
+      "modelOverrides": {
+        "ornith/ornith-1.5-122b:free": { "input": ["text", "image"] },
+        "minimax/minimax-m3.1-flash:free": { "input": ["text", "image"] }
+      }
     }
   }
 }
