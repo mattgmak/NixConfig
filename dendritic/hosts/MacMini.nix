@@ -314,7 +314,7 @@ in
       };
 
       # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
-      # are inert.  Ditch old profile generations weekly with nh instead.
+      # are inert.  Ditch old profile generations daily with nh instead.
       launchd.daemons.nix-gc = {
         serviceConfig = {
           ProgramArguments = [
@@ -324,7 +324,7 @@ in
             "--keep"
             "3"
           ];
-          StartInterval = 604800; # weekly
+          StartInterval = 86400; # daily
           RunAtLoad = false;
           StandardOutPath = "/var/log/nix-gc.stdout";
           StandardErrorPath = "/var/log/nix-gc.stderr";
