@@ -216,11 +216,16 @@
           pnpm
           bun
           gleam
+          coreutils
+          findutils
         ];
         text = ''
           set -euo pipefail
           EXTENSIONS=${lib.escapeShellArg extensionsDir}
           VENDOR_ROOT=${lib.escapeShellArg vendorRoot}
+          STAMP_ROOT="$HOME/.local/state/pi-ext-deps-stamps"
+          NODE_V=$(node --version)
+          NPM_V=$(npm --version)
 
           discard_vendor_changes() {
             for vendor in "$VENDOR_ROOT"/*/*; do
@@ -258,6 +263,43 @@
             if [ -d "$abs_vendor_nm" ]; then
               ln -sfn "$rel_vendor_nm" "$ext/node_modules"
             fi
+          }
+
+          # Aggregate stamp in pi-ext-deps-install-if-stale gates the whole tree.
+          # This finer gate skips one dir when the tree changed elsewhere. Key is a
+          # path hash: queue_parallel runs dirs in parallel, one stamp per dir.
+          fingerprint_dir() {
+            local dir="$1"
+            {
+              printf 'node %s\n' "$NODE_V"
+              printf 'npm %s\n' "$NPM_V"
+              find "$dir" -name node_modules -prune -o -type f \
+                \( -name package.json -o -name package-lock.json \
+                -o -name pnpm-lock.yaml -o -name bun.lock \
+                -o -name bun.lockb -o -name Cargo.lock \) \
+                -printf '%p %T@ %s\n'
+            } | sort | sha256sum | cut -d' ' -f1
+          }
+
+          gated_install() {
+            local dir="$1"
+            local label="$2"
+            shift 2
+            local stamp
+            stamp="$STAMP_ROOT/$(printf '%s' "$dir" | sha256sum | cut -c1-16)"
+            if [ -d "$dir" ]; then
+              if [ -f "$stamp" ] && [ "$(cat "$stamp")" = "$(fingerprint_dir "$dir")" ]; then
+                echo "pi-ext-deps-install: skip $label"
+                return 0
+              fi
+            fi
+            if ! "$@"; then
+              # stamp records post-install state; none on failure so the dir retries
+              rm -f "$stamp"
+              return 1
+            fi
+            [ -d "$dir" ] || return 0
+            fingerprint_dir "$dir" > "$stamp"
           }
 
           install_npm_deps() {
@@ -434,12 +476,14 @@
             fi
           }
 
+          mkdir -p "$STAMP_ROOT"
           discard_vendor_changes
           link_powerline_theme
 
           for ext in "$EXTENSIONS"/*; do
             [ -d "$ext" ] || continue
-            queue_parallel install_npm_deps "$ext" "$(basename "$ext")"
+            name=$(basename "$ext")
+            queue_parallel gated_install "$ext" "$name" install_npm_deps "$ext" "$name"
           done
 
           # vendored pi extensions (vendor/<owner>/<repo>); skip repos with
@@ -454,16 +498,16 @@
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
               skills|zen-wireframe-2|agent-sesh|woomer|whisper-dictation) continue ;;
             esac
-            queue_parallel install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
+            queue_parallel gated_install "$vendor" "vendor/$(basename "$vendor")" install_npm_deps "$vendor" "vendor/$(basename "$vendor")"
           done
 
-          queue_parallel install_pi_packages
-          queue_parallel install_fgladisch_pi
-          queue_parallel install_lean_ctx_pi
-          queue_parallel install_pi_cursor_sdk
-          queue_parallel install_pi_agent_browser_native
-          queue_parallel install_engram_deps
-          queue_parallel install_agent_ste
+          queue_parallel gated_install "$VENDOR_ROOT/gotgenes/pi-packages" "vendor/gotgenes/pi-packages" install_pi_packages
+          queue_parallel gated_install "$VENDOR_ROOT/fgladisch/pi-extensions" "vendor/fgladisch/pi-extensions" install_fgladisch_pi
+          queue_parallel gated_install "$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx" "vendor/mattgmak/lean-ctx/packages/pi-lean-ctx" install_lean_ctx_pi
+          queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-cursor-sdk" "vendor/fitchmultz/pi-cursor-sdk" install_pi_cursor_sdk
+          queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-agent-browser-native" "vendor/fitchmultz/pi-agent-browser-native" install_pi_agent_browser_native
+          queue_parallel gated_install "$VENDOR_ROOT/Gentleman-Programming/engram" "gentle-engram" install_engram_deps
+          queue_parallel gated_install "$VENDOR_ROOT/ctotheameron/agent-ste" "vendor/ctotheameron/agent-ste" install_agent_ste
 
           wait_parallel
 
@@ -500,7 +544,7 @@
               printf 'npm %s\n' "$(npm --version)"
               for root in "$VENDOR_ROOT" "$EXTENSIONS"; do
                 [ -d "$root" ] || continue
-                find "$root" -name node_modules -prune -o -type f \
+                find "$root" -name node_modules -prune -o -path '*/.engram-deps' -prune -o -type f \
                   \( -name package.json -o -name package-lock.json \
                   -o -name pnpm-lock.yaml -o -name bun.lock \
                   -o -name bun.lockb -o -name Cargo.lock \) \
@@ -516,8 +560,9 @@
             exit 0
           fi
           echo "pi-ext-deps-install: installing pi extension deps"
+          # stamp records post-install state. install rewrites lockfiles.
           if pi-ext-deps-install; then
-            printf '%s\n' "$want" > "$STAMP"
+            fingerprint > "$STAMP"
           else
             echo "pi-ext-deps-install: failed (non-fatal) — run manually" >&2
             exit 1
