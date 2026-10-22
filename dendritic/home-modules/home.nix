@@ -13,6 +13,13 @@
         home.stateVersion = "26.05"; # Please read the comment before changing.
         programs.home-manager.enable = true;
 
+        # npm cache stays on the internal disk, and a slow fetch fails in 30s
+        # instead of parking home-manager activation for 5 minutes.
+        home.file.".npmrc".text = ''
+          cache=${config.home.homeDirectory}/.npm
+          fetch-timeout=30000
+        '';
+
         # nh reads these from the environment; session vars so zsh (nh darwin
         # switch / nh os switch) sees them too, not just nu.
         home.sessionVariables = {
