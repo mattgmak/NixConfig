@@ -519,12 +519,16 @@ in
           "figma"
           "vorssaint"
         ];
+        taps = [
+          "mach-kernel/pkgs"
+        ];
         brews = [
           "xcode-build-server"
           "podman"
           "podman-compose"
           "fastlane"
           "blueutil"
+          "launchk"
         ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };
