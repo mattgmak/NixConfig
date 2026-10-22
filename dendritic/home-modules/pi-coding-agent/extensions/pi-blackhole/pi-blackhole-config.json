@@ -34,49 +34,57 @@
   "debugLog": false,
 
   "model": {
-    "_comment": "Base model (last fallback before the session model, which sessionFallback disables). OpenRouter free router: picks any eligible free endpoint, so it spreads load instead of hammering one queue.",
+    "_comment": "Base model, tried after each stage chain. MiniMax M3.1 Flash free: 777ms with a valid tool call, 1M window, zero cost.",
     "provider": "openrouter",
-    "id": "openrouter/free",
+    "id": "minimax/minimax-m3.1-flash:free",
     "thinking": "off",
     "cooldownHours": 2,
-    "contextWindow": 200000
+    "contextWindow": 1000000
   },
 
   "observerModel": {
-    "_comment": "Observer primary: Nemotron 3 Super 120B free. Fastest verified free endpoint (138-202ms, 3/3 valid structured tool calls), 262k window.",
+    "_comment": "Observer primary: MiniMax M3.1 Flash free. Fastest valid tool call on 2026-10-21 (777ms), 1M window, zero cost.",
     "provider": "openrouter",
-    "id": "nvidia/nemotron-3-super-120b-a12b:free",
+    "id": "minimax/minimax-m3.1-flash:free",
     "thinking": "low",
     "cooldownHours": 2,
-    "contextWindow": 262144
+    "contextWindow": 1000000
   },
   "observerFallbackModels": [
     {
-      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Newest 1M-window endpoint, 273-523ms, 5/6 tool calls (one plain-text miss).",
+      "_comment": "Fallback 1: Nemotron 3 Ultra 550B free (780ms, valid tool call, 1M window).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-lightning:free",
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Ling 3.1 Flash free. Newest free endpoint (2026-10-02), hybrid reasoning MoE (25B active/560B), 262k.",
+      "_comment": "Fallback 2: Beam free (commandcode, 969ms, valid tool call, 1M window).",
+      "provider": "commandcode",
+      "id": "reflection/beam:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1048576
+    },
+    {
+      "_comment": "Fallback 3: Poolside Laguna S 2.1 free (1005ms, valid tool call, 262k window).",
       "provider": "openrouter",
-      "id": "inclusionai/ling-3.1-flash",
+      "id": "poolside/laguna-s-2.1:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
+      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window). Blackhole adds the session header.",
       "provider": "opencode-go",
-      "id": "longcat-2.5-preview-free",
-      "thinking": "off",
+      "id": "minimax-m3.1-flash-free",
+      "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 4: Dots3 Note Preview free (661-840ms, 3/3 tool calls, 512k window).",
+      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, valid tool call, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -84,17 +92,25 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 5: Apodex 1.1 Mini free. Newest free release (2026-10-01), 9/9 tool calls, 693-848ms typical but spiky (3.8s observed), 262k.",
-      "provider": "openrouter",
-      "id": "apodex/apodex-1.1-mini:free",
+      "_comment": "Fallback 6: Glyph Cluster free (commandcode, 2194ms, valid tool call, 256k window).",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 256000
+    },
+    {
+      "_comment": "Fallback 7: Nemotron 3.5 Super VL free (2497ms, valid tool call, 1M window).",
+      "provider": "openrouter",
+      "id": "nvidia/nemotron-3.5-super-vl:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
     }
   ],
 
   "reflectorModel": {
-    "_comment": "Reflector primary: Nemotron 3 Ultra 550B free. Strongest reasoning among verified free endpoints, 1M window (covers reflectorInputMaxTokens 80k for large pools), 337-358ms, 3/3 tool calls.",
+    "_comment": "Reflector primary: Nemotron 3 Ultra 550B free. Strongest reasoning of the verified free models, 780ms, 1M window covers the 80k input cap.",
     "provider": "openrouter",
     "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
     "thinking": "low",
@@ -103,15 +119,39 @@
   },
   "reflectorFallbackModels": [
     {
-      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Only other verified 1M-window free endpoint, 273-523ms, 5/6 tool calls.",
+      "_comment": "Fallback 1: MiniMax M3.1 Flash free (777ms, valid tool call, 1M window).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-lightning:free",
+      "id": "minimax/minimax-m3.1-flash:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
+      "_comment": "Fallback 2: Beam free (commandcode, 969ms, valid tool call, 1M window).",
+      "provider": "commandcode",
+      "id": "reflection/beam:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1048576
+    },
+    {
+      "_comment": "Fallback 3: Poolside Laguna S 2.1 free (1005ms, 262k window).",
+      "provider": "openrouter",
+      "id": "poolside/laguna-s-2.1:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window).",
+      "provider": "opencode-go",
+      "id": "minimax-m3.1-flash-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -119,66 +159,66 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 3: Ling 3.1 Flash free (newest free endpoint, hybrid reasoning MoE, 262k).",
-      "provider": "openrouter",
-      "id": "inclusionai/ling-3.1-flash",
+      "_comment": "Fallback 6: Glyph Cluster free (commandcode, 2194ms, 256k window).",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 4: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
-      "provider": "opencode-go",
-      "id": "longcat-2.5-preview-free",
-      "thinking": "off",
+      "_comment": "Fallback 7: Nemotron 3.5 Lightning free (2902ms, 1M window).",
+      "provider": "openrouter",
+      "id": "nvidia/nemotron-3.5-lightning:free",
+      "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 1000000
-    },
-    {
-      "_comment": "Fallback 5: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
-      "provider": "openrouter",
-      "id": "apodex/apodex-1.1-mini:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 262144
     }
   ],
 
   "dropperModel": {
-    "_comment": "Dropper primary: North Mini Code free (agentic coding judgement, 332-526ms, 3/3 tool calls, 256k). Thinking off - retention decisions are cheap.",
+    "_comment": "Dropper primary: MiniMax M3.1 Flash free. Retention decisions are cheap, so the fastest verified free model wins.",
     "provider": "openrouter",
-    "id": "cohere/north-mini-code:free",
+    "id": "minimax/minimax-m3.1-flash:free",
     "thinking": "off",
     "cooldownHours": 2,
-    "contextWindow": 256000
+    "contextWindow": 1000000
   },
   "dropperFallbackModels": [
     {
-      "_comment": "Fallback 1: Nemotron 3.5 Lightning free. Replaces nemotron-3-nano-omni-30b, which now returns an empty completion half the time (3/6 tool calls). 1M window, 273-523ms.",
+      "_comment": "Fallback 1: Nemotron 3 Ultra 550B free (780ms, 1M window).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-lightning:free",
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 2: Ling 3.1 Flash free (newest free endpoint, hybrid reasoning MoE, 262k).",
+      "_comment": "Fallback 2: Beam free (commandcode, 969ms, 1M window).",
+      "provider": "commandcode",
+      "id": "reflection/beam:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1048576
+    },
+    {
+      "_comment": "Fallback 3: Poolside Laguna S 2.1 free (1005ms, 262k window).",
       "provider": "openrouter",
-      "id": "inclusionai/ling-3.1-flash",
+      "id": "poolside/laguna-s-2.1:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: LongCat 2.5 Preview Free (opencode-go). 1M window, zero-cost, 131k max tokens.",
+      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window).",
       "provider": "opencode-go",
-      "id": "longcat-2.5-preview-free",
+      "id": "minimax-m3.1-flash-free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 4: Dots3 Note Preview free (512k, 661-840ms, 3/3 tool calls).",
+      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "off",
@@ -186,9 +226,17 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 5: Apodex 1.1 Mini free (719-848ms typical, 9/9 tool calls, 262k).",
-      "provider": "openrouter",
-      "id": "apodex/apodex-1.1-mini:free",
+      "_comment": "Fallback 6: MiniMax M3.1 Flash free (commandcode, 1989ms, 1M window). Separate provider quota.",
+      "provider": "commandcode",
+      "id": "minimax/minimax-m3.1-flash:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Fallback 7: Ornith 1.5 122B free (commandcode, 3864ms, 262k window).",
+      "provider": "commandcode",
+      "id": "ornith/ornith-1.5-122b:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
