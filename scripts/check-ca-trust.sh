@@ -7,6 +7,7 @@ hosts=(dv-g3b-emudhra.we-have-a-problem.com dv-g3b-aaa-emudhra.we-have-a-problem
 
 fails=0
 skips=0
+gaps=0
 
 # The bundle keeps the alias line and marks trust in the text below it.
 check_name() {
@@ -84,7 +85,43 @@ else
   done
 fi
 
-echo "Summary: $fails failure(s), $skips skip(s)"
+# Stable bun trusts the emudhra leaf. The fix exists only on bun main after ea6a2c7.
+if ! command -v bun >/dev/null 2>&1; then
+  echo "SKIP online check: bun not found"
+  skips=$((skips + 1))
+else
+  tmp=$(mktemp -d)
+  trap 'rm -rf "${tmp:-}"' EXIT
+  cat > "$tmp/probe.mjs" <<'JS'
+const hosts = [
+  "dv-g3b-emudhra.we-have-a-problem.com",
+  "dv-g3b-aaa-emudhra.we-have-a-problem.com",
+]
+for (const host of hosts) {
+  try {
+    await fetch(`https://${host}/`, { signal: AbortSignal.timeout(10000) })
+    console.log(`TRUST ${host}`)
+  } catch {
+    console.log(`REFUSE ${host}`)
+  }
+}
+JS
+  out=$(bun "$tmp/probe.mjs" 2>/dev/null) || true
+  if [[ -z "$out" ]]; then
+    echo "SKIP bun probe gave no output"
+    skips=$((skips + 1))
+  else
+    while read -r verdict host; do
+      case "$verdict" in
+        REFUSE) echo "PASS bun rejects $host" ;;
+        TRUST)  echo "GAP bun trusts $host"; gaps=$((gaps + 1)) ;;
+        *)      echo "SKIP bun probe got $verdict"; skips=$((skips + 1)) ;;
+      esac
+    done <<< "$out"
+  fi
+fi
+
+echo "Summary: $fails failure(s), $skips skip(s), $gaps known gap(s)"
 if ((fails > 0)); then
   exit 1
 fi
