@@ -1,13 +1,12 @@
-{ self, inputs, ... }:
+{ self, ... }:
 {
   flake.homeModules.yazi =
     { pkgs, ... }:
     {
       programs.yazi = {
         enable = true;
-        package = inputs.yazi.packages.${pkgs.stdenv.hostPlatform.system}.default.override {
-          _7zz = pkgs._7zz-rar; # Support for RAR extraction
-        };
+        # Overlay maps pkgs.yazi to the prebuilt packages.yaziBin.
+        package = pkgs.yazi;
         enableNushellIntegration = false;
         shellWrapperName = "y";
         initLua = ./init.lua;
@@ -26,6 +25,7 @@
       # TODO: use nixpkgs plugins
 
       home.packages = with pkgs; [
+        _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
         glow
         bat
         fzf

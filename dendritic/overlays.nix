@@ -20,6 +20,35 @@
         glaze = glazeForHyprlandOverlay final prev;
       };
 
+      # TODO: drop once nixpkgs ships uv 0.13.4 in the binary cache.
+      # nixpkgs uv trusts the revoked eMudhra roots, so use the upstream binary.
+      uvBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+        ) {
+          uv = self.packages.${system}.uvBin;
+        };
+
+      # Linux only: upstream ships no tailscale tarball for darwin.
+      tailscaleBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          prev.stdenv.hostPlatform.isLinux && self.packages.${system} ? tailscaleBin
+        ) {
+          tailscaleBin = self.packages.${system}.tailscaleBin;
+        };
+
+      # TODO: drop once nixpkgs ships yazi 26.9.1 in the binary cache.
+      yaziBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (self.packages.${system} ? yaziBin) {
+          yazi = self.packages.${system}.yaziBin;
+        };
+
       # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [
         glazeOverlay
@@ -57,6 +86,9 @@
         (_: _: {
           ghostty = inputs.ghostty.packages.${system}.default;
         })
+        uvBinOverlay
+        tailscaleBinOverlay
+        yaziBinOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {

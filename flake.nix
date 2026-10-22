@@ -30,6 +30,7 @@
     };
 
     xremap-flake.url = "github:xremap/nix-flake";
+    xremap-flake.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -47,6 +48,7 @@
     };
 
     mac-app-util.url = "github:hraban/mac-app-util";
+    mac-app-util.inputs.nixpkgs.follows = "nixpkgs";
 
     xdg-termfilepickers = {
       url = "github:Guekka/xdg-desktop-portal-termfilepickers";
@@ -83,8 +85,7 @@
     };
 
     nix-gaming.url = "github:fufexan/nix-gaming";
-
-    yazi.url = "github:sxyazi/yazi/v26.5.6";
+    nix-gaming.inputs.nixpkgs.follows = "nixpkgs";
 
     # Stable nixpkgs for nix-on-droid modules; droid apps use mv.unstable via pkgs below.
     nixpkgs-droid.url = "github:nixos/nixpkgs/nixos-24.05";

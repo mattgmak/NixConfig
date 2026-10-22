@@ -4,11 +4,16 @@
       config,
       hostname,
       lib,
+      pkgs,
       ...
     }:
     {
       services.tailscale = {
         enable = true;
+        # TODO: drop the tailscaleBin pin once nixpkgs ships tailscale 1.104.2 in the
+        # binary cache. nixpkgs 1.102.4 trusts the revoked eMudhra roots and its Go
+        # pin cannot build 1.104.2 from source.
+        package = pkgs.tailscaleBin;
         useRoutingFeatures = "client";
         # Goofeus is the tailnet DNS server — don't accept pushed DNS (loop risk).
         extraSetFlags =
