@@ -26,6 +26,8 @@
 
       home.packages = with pkgs; [
         _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
+        file # `file` previewer/spotter, no wrapper means PATH lookup
+        imagemagick # `magick` previewer
         glow
         bat
         fzf
