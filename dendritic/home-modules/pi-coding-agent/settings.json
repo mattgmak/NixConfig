@@ -1,6 +1,6 @@
 {
   "externalEditor": "nvim",
-  "lastChangelogVersion": "1.3.0",
+  "lastChangelogVersion": "1.4.0",
   "defaultProvider": "commandcode",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
   "defaultThinkingLevel": "high",
