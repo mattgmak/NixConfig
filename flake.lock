@@ -32,14 +32,17 @@
         ]
       },
       "locked": {
-        "path": "vendor/mattgmak/agent-sesh",
-        "type": "path"
+        "lastModified": 1792229381,
+        "narHash": "sha256-0gJj5DSqRzxwHnZQmc2EjTp2lAScDzWBvByHc9r7o2Q=",
+        "rev": "7e28f8ca99755eb511c71005ff86a4fe8dbd6cae",
+        "revCount": 51,
+        "type": "git",
+        "url": "file:./vendor/mattgmak/agent-sesh"
       },
       "original": {
-        "path": "vendor/mattgmak/agent-sesh",
-        "type": "path"
-      },
-      "parent": []
+        "type": "git",
+        "url": "file:./vendor/mattgmak/agent-sesh"
+      }
     },
     "aquamarine": {
       "inputs": {
