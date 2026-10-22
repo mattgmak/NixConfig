@@ -70,4 +70,4 @@ shell_allowlist_extra = [
 ]
 
 [telemetry]
-last_heartbeat = "2026-10-20"
+enabled = false

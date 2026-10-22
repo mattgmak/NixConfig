@@ -6,3 +6,7 @@ result
 
 # lean-ctx MCP schema cache (runtime artifact beside extension config; recreated)
 mcp-schema-cache.json
+
+# lean-ctx config migration artifacts (written beside the live config)
+/dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml.bak
+/dendritic/home-modules/pi-coding-agent/lean-ctx/*.v4-migration.lock
