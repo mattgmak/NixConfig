@@ -490,6 +490,7 @@ in
           # Argent MCP server: pi's mcp.json spawns bare "argent", so it must be on the
           # global PATH, not just a devshell. Deduplicated from dev-shells/drpom.
           self.packages.${pkgs.stdenv.hostPlatform.system}.argent
+          self.packages.${pkgs.stdenv.hostPlatform.system}.launchk
         ]
         ++ (with pkgs.darwin; [
           file_cmds
@@ -519,16 +520,12 @@ in
           "figma"
           "vorssaint"
         ];
-        taps = [
-          "mach-kernel/pkgs"
-        ];
         brews = [
           "xcode-build-server"
           "podman"
           "podman-compose"
           "fastlane"
           "blueutil"
-          "launchk"
         ];
         onActivation.cleanup = "zap";
         # masApps = { "Yoink" = 457622435; };
