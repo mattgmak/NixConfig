@@ -65,6 +65,7 @@ in
   flake.darwinModules.${hostname} =
     {
       pkgs,
+      lib,
       hostname,
       username,
       mv,
@@ -98,6 +99,111 @@ in
           echo "filtered CA bundle lost no certificate blocks" >&2
           exit 1
         }
+      '';
+      caBundle = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
+      # Homebrew ruby, python and uv trust the rustls/OpenSSL default store, so
+      # each toolchain gets its own name for the filtered bundle.
+      caEnv = {
+        SSL_CERT_FILE = caBundle;
+        NIX_SSL_CERT_FILE = caBundle;
+        CURL_CA_BUNDLE = caBundle;
+        GIT_SSL_CAINFO = caBundle;
+        REQUESTS_CA_BUNDLE = caBundle;
+        CARGO_HTTP_CAINFO = caBundle;
+        UV_SYSTEM_CERTS = "1";
+      };
+      # environment.variables reaches shells only, through /etc/static/zshenv.
+      # GUI apps and launchd jobs read the launchd user domain, so seed that
+      # domain once per login. Running apps keep the old env until relaunch.
+      caEnvSetenv = pkgs.writeShellScript "ca-env-setenv" (
+        lib.concatStrings (
+          lib.mapAttrsToList (name: value: "/bin/launchctl setenv ${name} ${lib.escapeShellArg value}\n") caEnv
+        )
+      );
+      # Apple ships its own /etc/ssl/cert.pem and it keeps both revoked roots.
+      # This root job strips them at boot, then probes the advisory hosts.
+      fixSslCertPem = pkgs.writeShellScript "fix-ssl-cert-pem" ''
+        set -eu
+
+        file=/etc/ssl/cert.pem
+        aaa='CN=AAA Certificate Services'
+        emsign='CN=emSign ECC Root CA - G3'
+        grep=${pkgs.gnugrep}/bin/grep
+        awk=${pkgs.gawk}/bin/awk
+
+        [ -f "$file" ] && [ -r "$file" ] || exit 0
+
+        if ! "$grep" -qF "$aaa" "$file" && ! "$grep" -qF "$emsign" "$file"; then
+          echo "clean: $file holds no revoked root"
+          exit 0
+        fi
+
+        blocks=$("$grep" -c '^-----BEGIN CERTIFICATE-----' "$file" || true)
+        entries=$("$grep" -c '^=== ' "$file" || true)
+        if [ "$blocks" -lt 100 ] || [ "$entries" -lt 100 ]; then
+          echo "refuse: damaged $file, $blocks BEGIN blocks, $entries entries"
+          exit 2
+        fi
+
+        stamp=$(date +%Y%m%d-%H%M%S)
+        backup="$file.bak.$stamp"
+        n=0
+        while [ -e "$backup" ]; do
+          n=$((n + 1))
+          backup="$file.bak.$stamp-$n"
+        done
+        cp -p "$file" "$backup"
+        echo "backup: $backup"
+
+        tmp="$file.tmp.$$"
+        # The advisory filter leaves the ### header of each cut entry behind, so
+        # drop that header too. A rerun then finds no trace and reports clean.
+        "$awk" '/^(###|===) /{skip=0} /^=== .*\/CN=(AAA Certificate Services|emSign ECC Root CA - G3)$/{skip=1} !skip' "$backup" \
+          | "$grep" -vE '^(###|===) .*/CN=(AAA Certificate Services|emSign ECC Root CA - G3)$' >"$tmp"
+        chmod 644 "$tmp"
+        chown root:wheel "$tmp"
+        mv "$tmp" "$file"
+
+        # Offline proof. A broken filter must not pass as a fix.
+        if "$grep" -qF "$aaa" "$file" || "$grep" -qF "$emsign" "$file"; then
+          cp -p "$backup" "$file"
+          echo "patch failed, rolled back"
+          exit 1
+        fi
+
+        # curl exit 60 means the peer refuses the chain. That is the wanted state.
+        # Exit 0 means the chain still validates. Any other exit gives no verdict,
+        # so a boot without network must not count as success.
+        probe() {
+          rc=0
+          /usr/bin/curl -s -o /dev/null --max-time 10 "https://$1/" || rc=$?
+          echo "$rc"
+        }
+
+        aaa_state=0
+        emudhra_state=0
+        attempt=1
+        while [ "$attempt" -le 12 ]; do
+          aaa_code=$(probe dv-g3b-aaa-emudhra.we-have-a-problem.com)
+          emudhra_code=$(probe dv-g3b-emudhra.we-have-a-problem.com)
+          echo "probe $attempt: aaa exit $aaa_code, emudhra exit $emudhra_code"
+          if [ "$aaa_code" -eq 0 ] || [ "$emudhra_code" -eq 0 ]; then
+            cp -p "$backup" "$file"
+            echo "EXPOSED, rolled back"
+            exit 1
+          fi
+          if [ "$aaa_code" -eq 60 ]; then aaa_state=1; fi
+          if [ "$emudhra_code" -eq 60 ]; then emudhra_state=1; fi
+          if [ "$aaa_state" -eq 1 ] && [ "$emudhra_state" -eq 1 ]; then
+            echo "fixed: stripped revoked roots from $file"
+            exit 0
+          fi
+          attempt=$((attempt + 1))
+          if [ "$attempt" -le 12 ]; then sleep 10; fi
+        done
+
+        echo "unverified: probes got no verdict, patch kept"
+        exit 2
       '';
       crawl4aiPort = 11235;
       crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
@@ -298,6 +404,17 @@ in
             "$image"
         '';
       };
+      # A flake input source tree is neither a derivation nor an output, so no
+      # keep-* setting roots it. This roots the trees of the current lock.
+      rootFlakeSources = pkgs.writeShellApplication {
+        name = "root-flake-sources";
+        runtimeInputs = with pkgs; [
+          nix
+          python3
+          coreutils
+        ];
+        text = builtins.readFile ../../scripts/root-flake-sources.sh;
+      };
     in
     {
       nixpkgs.overlays = common-overlays;
@@ -309,12 +426,23 @@ in
       # disabled in home-modules/home.nix), not from nix-darwin. Keep the
       # nix-darwin manual disabled anyway — it is unnecessary on macOS.
       documentation.enable = false;
+
+      # Same two roots as dendritic/nixos-modules/ca-trust.nix.
+      security.pki.installCACerts = true;
+      security.pki.caCertificateBlacklist = [
+        "Comodo AAA Services root"
+        "emSign ECC Root CA - G3"
+      ];
+
       nix = {
         enable = false;
       };
 
       # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
       # are inert.  Ditch old profile generations daily with nh instead.
+      # Two earlier faults: nothing ran at boot, so the job never left
+      # "never exited"; and launchd hands out a bare PATH, so nh missed nix.
+      # A calendar time survives the daemon re-bootstrap every switch does.
       launchd.daemons.nix-gc = {
         serviceConfig = {
           ProgramArguments = [
@@ -323,11 +451,45 @@ in
             "all"
             "--keep"
             "3"
+            "--optimise"
           ];
-          StartInterval = 86400; # daily
-          RunAtLoad = false;
+          StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
+          RunAtLoad = true;
+          EnvironmentVariables.PATH = "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           StandardOutPath = "/var/log/nix-gc.stdout";
           StandardErrorPath = "/var/log/nix-gc.stderr";
+        };
+      };
+
+      # The root job above sees system and root profiles only. Home-manager
+      # generations sit in the user profile, so a user agent prunes those.
+      launchd.user.agents.nix-gc = {
+        serviceConfig = {
+          ProgramArguments = [
+            "${pkgs.nh}/bin/nh"
+            "clean"
+            "user"
+            "--keep"
+            "3"
+          ];
+          StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
+          RunAtLoad = true;
+          EnvironmentVariables.PATH = "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          StandardOutPath = "/Users/${username}/Library/Logs/nix-gc.stdout.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/nix-gc.stderr.log";
+        };
+      };
+
+      # /etc/ssl/cert.pem is root-owned, so this needs a daemon, not an agent.
+      launchd.daemons.fix-ssl-cert-pem = {
+        serviceConfig = {
+          ProgramArguments = [ "${fixSslCertPem}" ];
+          RunAtLoad = true;
+          # A macOS update can restore the file between reboots. A clean run exits
+          # before any network probe, so the interval costs nothing.
+          StartInterval = 86400;
+          StandardOutPath = "/var/log/fix-ssl-cert-pem.log";
+          StandardErrorPath = "/var/log/fix-ssl-cert-pem.log";
         };
       };
 
@@ -434,7 +596,17 @@ in
             ;
         };
         backupFileExtension = "hm-backup";
-        users.${username} = self.homeConfigurations.MacMini;
+        users.${username} = lib.mkMerge [
+          self.homeConfigurations.MacMini
+          {
+            home.activation.rootFlakeSources = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+              log="$HOME/Library/Logs/root-flake-sources.log"
+              mkdir -p "$HOME/Library/Logs"
+              ${lib.getExe rootFlakeSources} ${lib.escapeShellArg self.outPath} >>"$log" 2>&1 || true
+              tail -n 200 "$log" >"$log.trimmed" && mv "$log.trimmed" "$log"
+            '';
+          }
+        ];
       };
 
       environment.variables = {
@@ -442,10 +614,16 @@ in
         VISUAL = "nvim";
         DEVELOPER_DIR = "/Applications/Xcode.app/Contents/Developer";
         SHELL = "${pkgs.zsh}/bin/zsh";
-        SSL_CERT_FILE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
-        NIX_SSL_CERT_FILE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
-        CURL_CA_BUNDLE = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
-        GIT_SSL_CAINFO = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
+      } // caEnv;
+
+      launchd.user.agents.ca-env-setenv = {
+        serviceConfig = {
+          ProgramArguments = [ "${caEnvSetenv}" ];
+          RunAtLoad = true;
+          StartInterval = 300;
+          StandardOutPath = "/Users/${username}/Library/Logs/ca-env-setenv.stdout.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/ca-env-setenv.stderr.log";
+        };
       };
 
       environment.systemPackages =

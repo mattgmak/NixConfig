@@ -29,6 +29,10 @@
             "nix-command"
             "flakes"
           ];
+          # nix-direnv roots the shell closure alone. Unrooted flake sources and
+          # build-time deps die at GC, then a reload re-downloads every input.
+          keep-outputs = true;
+          keep-derivations = true;
         };
         gc = {
           options = "--delete-older-than 7d";

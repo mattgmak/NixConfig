@@ -53,6 +53,21 @@ else
   fails=$((fails + 1))
 fi
 
+# Apple keeps its own store under different names; do not fold them into names[].
+apple=/etc/ssl/cert.pem
+apple_names=("CN=AAA Certificate Services" "CN=emSign ECC Root CA - G3")
+if [[ -f "$apple" ]]; then
+  echo "Apple store: $apple"
+  for name in "${apple_names[@]}"; do
+    if grep -qF "$name" "$apple"; then
+      echo "FAIL $apple still holds $name"
+      fails=$((fails + 1))
+    else
+      echo "PASS $apple lacks $name"
+    fi
+  done
+fi
+
 if ! command -v curl >/dev/null 2>&1; then
   echo "SKIP online check: curl not found"
   skips=$((skips + 1))

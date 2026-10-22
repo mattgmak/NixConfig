@@ -25,6 +25,38 @@ Rules:
 
 New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.gitmodules` name → `owner/repo` if git used path. Full workflow + fork handling: `dendritic/skills/pi-setup/REFERENCE.md`.
 
+## New packages
+
+A package file lives in `dendritic/packages/` and uses the flake-parts module shape.
+`import-tree` auto-imports the file as a module under `dendritic/`.
+The file takes `{ ... }:` and defines `perSystem = { pkgs, ... }: { ... }`.
+It registers the derivation under `perSystem` as `packages.<name>`.
+Call `pkgs.callPackage` inline and keep the derivation logic in that one file.
+Hosts reach the package through an overlay in `dendritic/overlays.nix` or through the consuming module.
+Add the overlay to the `common-overlays` list.
+A temporary pin carries a TODO that names the version which lets it return to nixpkgs.
+
+## Flake sources
+
+`nix store gc` deletes the flake input source trees. Nothing roots them by default,
+because a source tree is neither a derivation nor an output. The
+`home.activation.rootFlakeSources` entry in `dendritic/hosts/MacMini.nix` roots the
+trees of the current lock. It calls `scripts/root-flake-sources.sh`, which makes
+out-links under `$HOME/.local/state/flake-sources`. The nix daemon registers them
+as root, so this needs no privilege. A big nixpkgs source tree costs about 5 GB.
+
+## Flake evals
+
+`builtins.getFlake "/Users/mattgmak/NixConfig"` reads the repo as a path flake. It copies the whole working tree, about 5 GB with submodules and node_modules. Every edit makes a new copy.
+
+`nix flake metadata .` and `nix eval .#...` use git mode. That copy is 254 MB, and Nix shares it across evaluations.
+
+Use the git form. An expression that needs `getFlake` names `git+file:///Users/mattgmak/NixConfig`.
+
+A git-mode flake sees tracked files only. An untracked file stays invisible, so its module never loads. Run `git add -N <path>` after you create a file, before any eval or switch. This fault reached a switch on 2026-10-22 and failed it with `error: attribute 'uvBin' missing`.
+
+Four path-flake evals cost 21 GB of store space on 2026-10-22.
+
 ## Commit convention
 
 - **Subject only** — one line, no body, no trailers (`Co-authored-by`, `Signed-off-by`, etc.) unless user explicitly requests one
