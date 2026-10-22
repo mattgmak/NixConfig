@@ -3,7 +3,8 @@ name: pi-setup
 description: >
   Add or bump pi extensions, skills, and themes. Use when adding a vendored pi
   extension/skill/theme, bumping pi or extension versions, or debugging pi
-  discovery/reload. Subcommands: `extend` (install), `update` (bump with changelog review).
+  discovery/reload. Subcommands: `extend` (install), `update` (bump with changelog review),
+  `blackhole` (refresh free memory-model chains).
 ---
 
 References are relative to `~/NixConfig/dendritic` unless noted.
@@ -18,7 +19,8 @@ Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live 
 |------------|--------|
 | `/pi-setup extend …` | Run **extend** (install) |
 | `/pi-setup update …` | Run **update** (bump) |
-| `/pi-setup` (no subcommand) | Ask the user which: `extend` or `update` (never guess) |
+| `/pi-setup blackhole …` | Run **blackhole** (refresh free memory-model chains) |
+| `/pi-setup` (no subcommand) | Ask the user which: `extend`, `update`, or `blackhole` (never guess) |
 
 Discovery/reload failures: [REFERENCE.md — Debugging](REFERENCE.md#debugging).
 
@@ -252,4 +254,83 @@ printf '' | pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensi
 
 Tell the user to `/reload` or restart pi. Rebuild HM only when pi package or Nix wiring changed.
 
-**Done when** — every in-scope target at its proposed ref, loader check passes for every bumped extension, commit made; no target skipped.
+**Done when** — every in-scope target at its proposed ref, loader check passes for every bumped extension, commit made. No target skipped.
+
+---
+
+## `blackhole` — refresh free memory-model chains
+
+Replace the pi-blackhole observer, reflector, and dropper chains with fresh zero-cost models. Probe first, then rank. Never pick a model from a name alone.
+
+### Config file
+
+Edit the repo file only:
+
+```
+dendritic/home-modules/pi-coding-agent/extensions/pi-blackhole/pi-blackhole-config.json
+```
+
+HM links it to `~/.pi/agent/pi-blackhole/pi-blackhole-config.json`. Changing the runtime copy does nothing after the next switch.
+
+### 1. List free candidates
+
+Use the live catalog, not the current config.
+
+- **openrouter** — `curl -s https://openrouter.ai/api/v1/models`. Keep ids ending `:free` with zero `pricing`, `tools` in `supported_parameters`, and text output.
+- **opencode-go** — `~/.pi/agent/models-store.json`, key `."opencode-go".models`. Keep entries with zero `cost`.
+- **commandcode** — `~/.pi/agent/commandcode-models.json`, key `.models`. Keep free ids.
+
+Drop any id that bills. Check the price, not the `:free` suffix. `inclusionai/ling-3.1-flash` dropped its free tier and still bills.
+
+### 2. Probe
+
+```bash
+node dendritic/skills/pi-setup/scripts/blackhole-probe.mjs \
+  --config dendritic/home-modules/pi-coding-agent/extensions/pi-blackhole/pi-blackhole-config.json \
+  --json /tmp/agent-tmp/blackhole/probe.json
+```
+
+The script sends one forced tool call per model with `max_tokens` 512. It resolves keys from env, then agenix, then `~/.pi/agent/auth.json`. Stdout stays TSV. Provenance and the summary go to stderr.
+
+Drop these results at once:
+
+- `404` — model gone upstream
+- `403` — geo block or agentic-harness only
+- `429` each time — quota exhausted
+- `toolCall=no` — cannot drive a worker
+
+The script sets `max_tokens` 512 on purpose. A 64-token probe truncates reasoning models and fakes a failure.
+
+### 3. Rank per stage
+
+Order the surviving models by measured latency. Then fit the stage:
+
+- **observer** — fastest valid tool call. Chunk input is `observerChunkMaxTokens`.
+- **reflector** — strongest reasoning first. Input cap is `reflectorInputMaxTokens`, so context window must cover it.
+- **dropper** — fastest model with `thinking` off. Retention decisions are cheap.
+
+Put each provider in the chain. One provider outage must not empty a stage. Keep 7 entries per stage.
+
+### 4. Rewrite the chains
+
+Each entry needs `provider`, `id`, `thinking`, `cooldownHours`, and `contextWindow`. Take `contextWindow` from the model store, not from memory. Set the base `model` to the newest verified free model.
+
+Unknown keys and `_comment` fields are dropped without error. A typo in `provider` or `id` fails at run time, not at load.
+
+### 5. Verify
+
+Run all four checks. Fix, then repeat.
+
+```bash
+# 1. parse
+jq . <config> > /dev/null
+# 2. ids exist in the provider store (openrouter, opencode-go, commandcode)
+# 3. openrouter ids price at zero in /api/v1/models
+# 4. removed ids absent: rg 'apodex|ling-3.1-flash|nemotron-3-super' <config>
+```
+
+### 6. Report
+
+Show a table of provider, model, latency, and tool call. List every removed id with its reason. Note the config path and the `nh` switch reminder. Commit only when the user asks.
+
+**Done when** — every chain holds only probe-verified zero-cost ids, all four checks pass, and the report shows the rank and the removals. No id picked by name.
