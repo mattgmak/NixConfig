@@ -138,14 +138,14 @@ rev=$(remote "git -C $DEST rev-parse --short HEAD")
 log "at revision $rev"
 
 if [ "$check" = 1 ]; then
-  log '--check: skipping nh os switch'
+  log '--check: skipping switch'
   exit 0
 fi
 
 log 'switching'
-if ! remote "cd $DEST && NH_OS_FLAKE=$DEST nh os switch --flake .#$ATTR"; then
+# -e none skips nh's root refusal. Ramsay runs as root by design.
+if ! remote "cd $DEST && NH_OS_FLAKE=$DEST nh os switch -e none .#$ATTR"; then
   log 'error: nh os switch failed'
-  log 'retry with TTY=1 when nh asks for a terminal'
   exit 1
 fi
 log 'switched'
