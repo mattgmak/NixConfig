@@ -57,7 +57,6 @@ in
       btop
       # bat
       nix-index-database
-      opencode
     ];
     stylix.targets.bat.enable = false;
   };
@@ -443,15 +442,14 @@ in
       # Two earlier faults: nothing ran at boot, so the job never left
       # "never exited"; and launchd hands out a bare PATH, so nh missed nix.
       # A calendar time survives the daemon re-bootstrap every switch does.
+      # /nix is a noauto volume that mounts late at boot, so a raw /nix/store
+      # program fails to spawn. Wait for the mount before exec.
       launchd.daemons.nix-gc = {
         serviceConfig = {
           ProgramArguments = [
-            "${pkgs.nh}/bin/nh"
-            "clean"
-            "all"
-            "--keep"
-            "3"
-            "--optimise"
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${pkgs.nh}/bin/nh clean all --keep 3 --optimise"
           ];
           StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
           RunAtLoad = true;
@@ -483,7 +481,11 @@ in
       # /etc/ssl/cert.pem is root-owned, so this needs a daemon, not an agent.
       launchd.daemons.fix-ssl-cert-pem = {
         serviceConfig = {
-          ProgramArguments = [ "${fixSslCertPem}" ];
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${fixSslCertPem}"
+          ];
           RunAtLoad = true;
           # A macOS update can restore the file between reboots. A clean run exits
           # before any network probe, so the interval costs nothing.

@@ -3,6 +3,7 @@ name: worker
 description: General-purpose worker — reads, writes, and edits code
 tools: ctx_read, write, edit, ctx_shell, fetch_content
 subagent_agents: scout, researcher
+surfaces: pane, window
 model: commandcode/deepseek/deepseek-v4.1-flash
 thinking: high
 system-prompt: append

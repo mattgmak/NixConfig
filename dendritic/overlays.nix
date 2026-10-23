@@ -49,6 +49,45 @@
           yazi = self.packages.${system}.yaziBin;
         };
 
+      # TODO: drop once nixpkgs ships bun 1.4.4 in the binary cache.
+      # 1.4.4 drops the compromised eMudhra intermediates from the bundled store.
+      bunBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+        ) {
+          bun = self.packages.${system}.bunBin;
+        };
+
+      # TODO: drop once nixpkgs go_1_27 reaches 1.27.3 in the binary cache.
+      # The pinned nixpkgs only carries go_1_27 = 1.27rc2, which keeps the chain.
+      goBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+        ) {
+          go = self.packages.${system}.goBin;
+        };
+
+      # TODO: drop once the pinned nixpkgs gleam is not a source build.
+      # The source build needs the full Rust toolchain on every bump.
+      gleamBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+        ) {
+          gleam = self.packages.${system}.gleamBin;
+        };
+
       # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [
         glazeOverlay
@@ -89,6 +128,9 @@
         uvBinOverlay
         tailscaleBinOverlay
         yaziBinOverlay
+        bunBinOverlay
+        goBinOverlay
+        gleamBinOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {

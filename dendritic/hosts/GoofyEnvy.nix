@@ -76,7 +76,6 @@
         btop
         bat
         nix-index-database
-        opencode
         tailscale-systray
         bash
       ];

@@ -86,7 +86,6 @@
         bat
         nix-index-database
         tailscale-systray
-        opencode
         bash
       ];
       whisperDictation = {
