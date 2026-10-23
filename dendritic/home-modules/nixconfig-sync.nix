@@ -44,10 +44,15 @@
               } clone --recurse-submodules -b ${mainBranch} "${repoUrl}" "${repoDir}"
             else
               echo "nixconfig-sync: fast-forward main in ${repoDir}"
-              # fetch + ff main (no-op if dirty/diverged; never force)
-              ${git} -C "${repoDir}" fetch origin ${mainBranch}
-              ${git} -C "${repoDir}" merge --ff-only origin/${mainBranch} || true
-              ${git} -C "${repoDir}" submodule update --init --recursive || true
+              # fetch + ff main (no-op if dirty/diverged; never force).
+              # A network blip must not abort the whole activation: unbound or
+              # tailscale can be down mid-switch, so warn and skip.
+              if ${git} -C "${repoDir}" fetch origin ${mainBranch}; then
+                ${git} -C "${repoDir}" merge --ff-only origin/${mainBranch} || true
+                ${git} -C "${repoDir}" submodule update --init --recursive || true
+              else
+                echo "nixconfig-sync: fetch failed, keep the current tree"
+              fi
             fi
           }
           run
