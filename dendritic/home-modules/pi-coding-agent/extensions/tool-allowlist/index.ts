@@ -13,6 +13,7 @@ const ALLOWED_TOOLS: readonly string[] = [
 	"subagent",
 	"subagents_list",
 	"subagent_message",
+	"subagent_stop",
 	"web_search",
 	"mcp",
 	"codegraph_search",
