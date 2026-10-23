@@ -35,7 +35,6 @@
     "opencode/deepseek-v4.1-flash-free",
     "opencode-go/beam-free",
     "commandcode/reflection/beam:free",
-    "commandcode/minimax/minimax-m3.1-flash:free",
     "cursor/grok-4.7@256k:slow"
   ],
   "showHardwareCursor": false,
@@ -49,16 +48,14 @@
     "opencode-go/glm-5.3-flash": "low",
     "openrouter/z-ai/glm-5.3-flash": "low",
     "opencode-go/deepseek-v4.1-flash": "high",
-    "azure/gpt-6-luna": "low",
     "deepseek/deepseek-flash": "high",
     "commandcode/z-ai/glm-5.3-flash": "low",
     "commandcode/deepseek/deepseek-v4.1-flash": "high",
     "commandcode/xiaomi/mimo-v2.6-pro": "low",
     "commandcode/xiaomi/mimo-v2.6-flash": "low",
     "commandcode/stealth/glyph-cluster:free": "medium",
-    "commandcode/inclusionai/ling-3.1-flash:free": "medium",
+    "commandcode/inclusionai/ling-3.1-flash": "medium",
     "commandcode/reflection/beam:free": "medium",
-    "opencode-go/beam-free": "medium",
-    "commandcode/minimax/minimax-m3.1-flash:free": "low"
+    "opencode-go/beam-free": "medium"
   }
 }
