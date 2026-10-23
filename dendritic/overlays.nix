@@ -33,6 +33,22 @@
           uv = self.packages.${system}.uvBin;
         };
 
+      # TODO: drop once nixpkgs ships node 24.22.1 and 22.23.4 in the binary cache.
+      # nixpkgs node embeds the revoked emSign ECC Root CA - G3, so use the upstream
+      # build. New attributes only: overriding nodejs_24 or nodejs_22 would rehash
+      # every nixpkgs package that depends on them.
+      nodeBinOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "x86_64-linux"
+          ]
+        ) {
+          node-bin = self.packages.${system}.node-bin;
+          node22-bin = self.packages.${system}.node22-bin;
+        };
+
       # Linux only: upstream ships no tailscale tarball for darwin.
       tailscaleBinOverlay =
         _final: prev:
@@ -126,6 +142,7 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         uvBinOverlay
+        nodeBinOverlay
         tailscaleBinOverlay
         yaziBinOverlay
         bunBinOverlay

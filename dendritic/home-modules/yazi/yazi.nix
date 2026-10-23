@@ -28,6 +28,7 @@
         _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
         file # `file` previewer/spotter, no wrapper means PATH lookup
         imagemagick # `magick` previewer
+        poppler-utils # `pdftoppm` PDF previewer
         glow
         bat
         fzf

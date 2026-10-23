@@ -102,8 +102,10 @@ in
       caBundle = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
       # Homebrew ruby, python and uv trust the rustls/OpenSSL default store, so
       # each toolchain gets its own name for the filtered bundle.
+      # Bun adds an env root to its own embedded store. Only the install bundle
+      # marks the revoked roots as reject entries, so SSL_CERT_FILE keeps it.
       caEnv = {
-        SSL_CERT_FILE = caBundle;
+        SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
         NIX_SSL_CERT_FILE = caBundle;
         CURL_CA_BUNDLE = caBundle;
         GIT_SSL_CAINFO = caBundle;
@@ -173,9 +175,12 @@ in
         # curl exit 60 means the peer refuses the chain. That is the wanted state.
         # Exit 0 means the chain still validates. Any other exit gives no verdict,
         # so a boot without network must not count as success.
+        # The probe reads $file, not the environment. caEnv points curl at the
+        # filtered bundle, so an ambient run would hide a bad patch.
         probe() {
           rc=0
-          /usr/bin/curl -s -o /dev/null --max-time 10 "https://$1/" || rc=$?
+          ${pkgs.coreutils}/bin/env -u SSL_CERT_FILE -u CURL_CA_BUNDLE -u NIX_SSL_CERT_FILE \
+            /usr/bin/curl -s -o /dev/null --max-time 10 --cacert "$file" "https://$1/" || rc=$?
           echo "$rc"
         }
 
@@ -453,7 +458,9 @@ in
           ];
           StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
           RunAtLoad = true;
-          EnvironmentVariables.PATH = "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          EnvironmentVariables = caEnv // {
+            PATH = "/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          };
           StandardOutPath = "/var/log/nix-gc.stdout";
           StandardErrorPath = "/var/log/nix-gc.stderr";
         };
@@ -490,6 +497,7 @@ in
           # A macOS update can restore the file between reboots. A clean run exits
           # before any network probe, so the interval costs nothing.
           StartInterval = 86400;
+          EnvironmentVariables = caEnv;
           StandardOutPath = "/var/log/fix-ssl-cert-pem.log";
           StandardErrorPath = "/var/log/fix-ssl-cert-pem.log";
         };

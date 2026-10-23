@@ -1,6 +1,10 @@
 # DrPOM dev shell: `nix develop ~/NixConfig#drpom` (or `use flake ~/NixConfig#drpom`).
 # Folded in from the former standalone dev-shells/drpom flake.
-{ inputs, ... }:
+{
+  inputs,
+  self,
+  ...
+}:
 {
   perSystem =
     { system, ... }:
@@ -26,6 +30,11 @@
             config.android_sdk.accept_license = true;
           };
         pkgs = pkgsFor inputs.nixpkgs;
+
+        # Overlay-provided: plain `import inputs.nixpkgs` above carries no
+        # common-overlays, so reach the pinned builds through the flake self.
+        nodeBin = self.packages.${system}.node-bin;
+        node22Bin = self.packages.${system}.node22-bin;
 
         androidComp = pkgs.androidenv.composeAndroidPackages {
           platformVersions = [
@@ -118,7 +127,7 @@
           nativeBuildInputs = [
             pkgs.bashNonInteractive
             pkgs.makeWrapper
-            pkgs.nodejs_22
+            node22Bin
           ];
 
           # Prebuilt .node blobs that only enable the reflink fast path; dropping them
@@ -132,16 +141,16 @@
 
             install -d $out/{bin,libexec}
             cp -R . $out/libexec/pnpm
-            makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/pnpm \
+            makeWrapper ${node22Bin}/bin/node $out/bin/pnpm \
               --add-flags "$out/libexec/pnpm/bin/pnpm.cjs"
-            makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/pnpx \
+            makeWrapper ${node22Bin}/bin/node $out/bin/pnpx \
               --add-flags "$out/libexec/pnpm/bin/pnpx.cjs"
 
             runHook postInstall
           '';
 
           passthru = {
-            inherit (pkgs.nodejs_22) nodejs;
+            inherit (node22Bin) nodejs;
           };
 
           meta = {
@@ -181,7 +190,7 @@
           packages =
             with pkgs;
             [
-              nodejs_24
+              nodeBin
               deno
               pnpmPinned
               jdk17

@@ -36,7 +36,7 @@ Deployed at runtime:
 | `home-modules/pi-coding-agent/lean-ctx/config.toml` | `~/.config/lean-ctx/config.toml` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/AGENTS.md` | `AGENTS.md` | `coding-agents.agentsMdPath` → `mkOutOfStoreSymlink` |
 
-`pi-coding-agent.nix` also imports `inputs.coding-agents.homeManagerModules.default`, enables `pi-coding-agent`, and adds `nodejs_22`.
+`pi-coding-agent.nix` also imports `inputs.coding-agents.homeManagerModules.default`, enables `pi-coding-agent`, and adds `node-bin`.
 
 User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 

@@ -212,7 +212,7 @@
         name = "pi-ext-deps-install";
         runtimeInputs = with pkgs; [
           git
-          nodejs_24
+          node-bin
           pnpm
           bun
           gleam
@@ -524,7 +524,7 @@
         runtimeInputs = with pkgs; [
           piExtDepsInstall
           git
-          nodejs_24
+          node-bin
           pnpm
           bun
           gleam
@@ -604,7 +604,7 @@
         home.packages =
           with pkgs;
           [
-            nodejs_24
+            node-bin
             ffmpeg
             agent-browser
             uv
