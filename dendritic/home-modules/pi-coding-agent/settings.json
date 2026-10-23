@@ -22,7 +22,6 @@
     "openrouter/z-ai/glm-5.3-flash",
     "openrouter/deepseek/deepseek-v4.1-flash",
     "opencode-go/deepseek-v4.1-flash",
-    "opencode-go/longcat-2.5-preview-free",
     "opencode-go/qwen3.8-flash",
     "opencode-go/mimo-v2.6-flash",
     "deepseek/deepseek-flash",
@@ -36,7 +35,6 @@
     "opencode/deepseek-v4.1-flash-free",
     "opencode-go/beam-free",
     "commandcode/reflection/beam:free",
-    "opencode-go/minimax-m3.1-flash-free",
     "commandcode/minimax/minimax-m3.1-flash:free",
     "cursor/grok-4.7@256k:slow"
   ],
@@ -51,9 +49,7 @@
     "opencode-go/glm-5.3-flash": "low",
     "openrouter/z-ai/glm-5.3-flash": "low",
     "opencode-go/deepseek-v4.1-flash": "high",
-    "opencode-go/longcat-2.5-preview-free": "medium",
     "azure/gpt-6-luna": "low",
-    "opencode-go/step-5-preview-free": "low",
     "deepseek/deepseek-flash": "high",
     "commandcode/z-ai/glm-5.3-flash": "low",
     "commandcode/deepseek/deepseek-v4.1-flash": "high",
@@ -63,7 +59,6 @@
     "commandcode/inclusionai/ling-3.1-flash:free": "medium",
     "commandcode/reflection/beam:free": "medium",
     "opencode-go/beam-free": "medium",
-    "commandcode/minimax/minimax-m3.1-flash:free": "low",
-    "opencode-go/minimax-m3.1-flash-free": "low"
+    "commandcode/minimax/minimax-m3.1-flash:free": "low"
   }
 }

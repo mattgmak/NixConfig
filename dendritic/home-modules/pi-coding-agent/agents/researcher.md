@@ -2,7 +2,7 @@
 name: researcher
 description: Web researcher — searches the web and synthesizes findings
 tools: web_search, fetch_content, safe_bash
-model: opencode-go/minimax-m3.1-flash-free
+model: opencode-go/deepseek-v4.1-flash
 thinking: medium
 system-prompt: append
 auto-exit: true

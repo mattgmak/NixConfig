@@ -381,7 +381,9 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 **Conditional:**
 - `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
-- `pi-opencode-provider` loader for `opencode/*` and `opencode-go/*` models.
+- `pi-opencode-go-usage` for the `/opencode-go-usage` command. It reads the provider key from `ctx.modelRegistry`, so it works with the built-in `opencode-go` provider.
+- The built-in `opencode-go` provider serves `opencode-go/*` models. Pi owns that catalog, so a live id missing there needs a `models.json` override.
+- `pi-opencode-provider` stays removed: third-party ext forced `supportsReasoningEffort: false`, so DeepSeek V4.1 thinking levels collapsed to on/off. The built-in provider sends the level map.
 
 **Denied (implicit):** engram, observational-memory, agent-sesh, mcp-nixos, pi-nvim*, … — not in base list; `--no-extensions` blocks discovery.
 

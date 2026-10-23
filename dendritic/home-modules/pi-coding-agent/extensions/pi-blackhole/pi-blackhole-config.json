@@ -76,15 +76,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window). Blackhole adds the session header.",
-      "provider": "opencode-go",
-      "id": "minimax-m3.1-flash-free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, valid tool call, 512k window).",
+      "_comment": "Fallback 4: Dots3 Note Preview free (1882ms, valid tool call, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -92,7 +84,7 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 6: Glyph Cluster free (commandcode, 2194ms, valid tool call, 256k window).",
+      "_comment": "Fallback 5: Glyph Cluster free (commandcode, 2194ms, valid tool call, 256k window).",
       "provider": "commandcode",
       "id": "stealth/glyph-cluster:free",
       "thinking": "low",
@@ -100,7 +92,7 @@
       "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 7: Nemotron 3.5 Super VL free (2497ms, valid tool call, 1M window).",
+      "_comment": "Fallback 6: Nemotron 3.5 Super VL free (2497ms, valid tool call, 1M window).",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-super-vl:free",
       "thinking": "low",
@@ -143,15 +135,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window).",
-      "provider": "opencode-go",
-      "id": "minimax-m3.1-flash-free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, 512k window).",
+      "_comment": "Fallback 4: Dots3 Note Preview free (1882ms, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -159,7 +143,7 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 6: Glyph Cluster free (commandcode, 2194ms, 256k window).",
+      "_comment": "Fallback 5: Glyph Cluster free (commandcode, 2194ms, 256k window).",
       "provider": "commandcode",
       "id": "stealth/glyph-cluster:free",
       "thinking": "low",
@@ -167,7 +151,7 @@
       "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 7: Nemotron 3.5 Lightning free (2902ms, 1M window).",
+      "_comment": "Fallback 6: Nemotron 3.5 Lightning free (2902ms, 1M window).",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-lightning:free",
       "thinking": "low",
@@ -210,15 +194,7 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 4: MiniMax M3.1 Flash free (opencode-go, 1535ms, 1M window).",
-      "provider": "opencode-go",
-      "id": "minimax-m3.1-flash-free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Fallback 5: Dots3 Note Preview free (1882ms, 512k window).",
+      "_comment": "Fallback 4: Dots3 Note Preview free (1882ms, 512k window).",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "off",
@@ -226,7 +202,7 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 6: MiniMax M3.1 Flash free (commandcode, 1989ms, 1M window). Separate provider quota.",
+      "_comment": "Fallback 5: MiniMax M3.1 Flash free (commandcode, 1989ms, 1M window). Separate provider quota.",
       "provider": "commandcode",
       "id": "minimax/minimax-m3.1-flash:free",
       "thinking": "off",
@@ -234,7 +210,7 @@
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 7: Ornith 1.5 122B free (commandcode, 3864ms, 262k window).",
+      "_comment": "Fallback 6: Ornith 1.5 122B free (commandcode, 3864ms, 262k window).",
       "provider": "commandcode",
       "id": "ornith/ornith-1.5-122b:free",
       "thinking": "off",
