@@ -80,7 +80,7 @@ Homebrew `python3` 3.14.9 is clean, but no `/opt/homebrew/bin/python3` symlink e
 | bun | 1.4.4 | `dendritic/packages/bun-bin.nix` plus `bunBinOverlay`. Probes return `CERT_REVOKED` with and without `SSL_CERT_FILE` |
 | pi-bolt | 0.9.9 | `SSL_CERT_FILE` names the install bundle, see the Pi-Bolt measurement below. Reopens when the variable is unset |
 | node | 24.22.1, 22.23.4 | `dendritic/packages/node-bin.nix` plus `nodeBinOverlay`. 118 and 116 embedded roots, the root absent, `CERT_REVOKED` in both modes |
-| go | 1.27.3 | `dendritic/packages/go-bin.nix` plus `goBinOverlay`. The upstream tarball carries the blocked-SPKI denylist |
+| go | 1.27.3 | `dendritic/packages/go-bin.nix` plus `goBinOverlay`, which adds `go-bin`. The overlay does not shadow `go`, because a shadow rebuilds every `buildGoModule` package from source. The upstream tarball carries the blocked-SPKI denylist |
 | uv | 0.13.4 | `dendritic/packages/uv-bin.nix:19`. Probes refuse with `UnknownIssuer` |
 | ruby (Homebrew) | 4.0.7_1 | Loads 188 CAs from the clean `openssl@4` keg. Refuses with the env deleted |
 | gem (Homebrew) | 4.0.20 | Same clean keg |
@@ -221,11 +221,13 @@ This table lists six overlays from `dendritic/overlays.nix`. Five cover this adv
 | `nodeBinOverlay` | node 24.22.1 and 22.23.4 | 24.18.0 | nodejs.org tarball |
 | `uvBinOverlay` | uv 0.13.4 | 0.13.1 | upstream tarball |
 | `bunBinOverlay` | bun 1.4.4 | 1.4.2 | upstream tarball |
-| `goBinOverlay` | go 1.27.3 | `go_1_27` = 1.27rc2 | upstream tarball |
+| `goBinOverlay` | go 1.27.3, as `go-bin` | `go_1_27` = 1.27rc2 | upstream tarball. New attribute only, so cached Go packages stay cached |
 | `tailscaleBinOverlay` | tailscale 1.104.2 | 1.104.1 | upstream tarball, Linux only |
 | `gleamBinOverlay` | gleam 1.19.2 | 1.18.0 via `buildRustPackage` | upstream tarball. Build cost only |
 
 Each carries a TODO that names the version which lets it return to nixpkgs. Delete the overlay when the channel reaches it.
+
+`go-bin` is a separate attribute. Add it to a package list. Never replace `go`, because `go` is a build input of every `buildGoModule` package.
 
 The nixpkgs route stays closed for all three pending fixes. Only nixpkgs master carries `nodejs_22` 22.23.4, `cacert` 3.131.1 and `tailscale` 1.104.2. All three cache on both architectures.
 

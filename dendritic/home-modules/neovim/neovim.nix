@@ -75,7 +75,7 @@
           shellcheck
           gcc
           gnumake
-          go
+          go-bin
           ripgrep
           fd
           treesitterPkg

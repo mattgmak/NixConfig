@@ -68,7 +68,7 @@
           '';
 
           # The darwin binary links /usr/lib/libicucore.A.dylib and is linker-signed.
-          postPhases = [ "postPatchelf" ];
+          postPhases = lib.optionals stdenvNoCC.hostPlatform.isDarwin [ "postPatchelf" ];
           postPatchelf = lib.optionalString stdenvNoCC.hostPlatform.isDarwin ''
             '${lib.getExe' cctools "${cctools.targetPrefix}install_name_tool"}' $out/bin/bun \
               -change /usr/lib/libicucore.A.dylib '${lib.getLib darwin.ICU}/lib/libicucore.A.dylib'
