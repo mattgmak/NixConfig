@@ -80,6 +80,8 @@
 
       # TODO: drop once nixpkgs go_1_27 reaches 1.27.3 in the binary cache.
       # The pinned nixpkgs only carries go_1_27 = 1.27rc2, which keeps the chain.
+      # New attribute, not an override of go: go is a build input of every
+      # buildGoModule package, so shadowing it rebuilds each one from source.
       goBinOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -88,7 +90,7 @@
             "x86_64-linux"
           ]
         ) {
-          go = self.packages.${system}.goBin;
+          go-bin = self.packages.${system}.goBin;
         };
 
       # TODO: drop once the pinned nixpkgs gleam is not a source build.

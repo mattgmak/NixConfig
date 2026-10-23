@@ -43,6 +43,12 @@
 
           sourceRoot = src.dir;
 
+          # Consumers read these off the go derivation, e.g.
+          # pkgsBuildHost.go.GOARCH in libcap.
+          inherit (stdenv.hostPlatform.go) GOOS GOARCH;
+          GOHOSTOS = stdenv.buildPlatform.go.GOOS;
+          GOHOSTARCH = stdenv.buildPlatform.go.GOARCH;
+
           # The whole tree stays in one output, so bin/go walks up to find GOROOT.
           dontPatchELF = true;
           dontStrip = true;

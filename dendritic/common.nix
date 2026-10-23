@@ -277,7 +277,7 @@
         pulseaudio-ctl
         croc
         devbox
-        go
+        go-bin
         podman-tui
         jq
         dnsutils
