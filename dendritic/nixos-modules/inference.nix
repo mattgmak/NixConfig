@@ -43,7 +43,7 @@
                 servedModelName = "flash-next";
                 speculative = "mtp";
                 mtpModel = flashNextMtp;
-                sessions = 2;
+                sessions = 3;
                 context = 131072;
               };
               useModelName = "flash-next";
