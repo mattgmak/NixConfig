@@ -338,7 +338,7 @@
               keyboardShortcuts = lib.mkIf pkgs.stdenv.isLinux self.zenBrowserShortcuts;
               # Fails activation on schema changes to detect potential regressions
               # Find this in about:config or prefs.js of your profile
-              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 19;
+              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 21;
 
               userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
               userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
