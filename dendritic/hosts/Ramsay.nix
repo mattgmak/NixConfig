@@ -172,6 +172,9 @@ in
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
+            # curl --create-dirs honours the umask. The ASR unit runs as a
+            # DynamicUser, so a 0750 model dir hides config.json from it.
+            UMask = "0022";
           };
           path = [
             pkgs.curl
@@ -189,9 +192,23 @@ in
               mv "$2.part" "$2"
             }
 
-            coder=https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/b17cb02dd882d5b6ab62fc777ad2995f19668350
-            get "$coder/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf" \
-              "$root/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+            qwen27b=https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502
+            get "$qwen27b/Qwen3.8-27B-UD-Q4_K_XL.gguf" \
+              "$root/Qwen3.8-27B-UD-Q4_K_XL.gguf"
+
+            dflash=https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2-GGUF/resolve/2d9571f8ce46e151f61c6499c99dee6079e1d610
+            get "$dflash/Qwen3.8-27B-DFlash2-Q4_K_M.gguf" \
+              "$root/Qwen3.8-27B-DFlash2-Q4_K_M.gguf"
+
+            # gufo reads token_embd.weight at Q8_0 or better, so the older
+            # IQ4_NL requant cannot load. Upstream target is UD-Q4_K_XL.
+            flash=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/38bb39ee97821de2c9009abb7e93950eec396e66
+            get "$flash/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" \
+              "$root/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
+            for shard in 00001 00002 00003 00004; do
+              file="Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00004.gguf"
+              get "$flash/UD-Q4_K_XL/$file" "$root/$file"
+            done
 
             asr=https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5
             for file in \
@@ -208,6 +225,8 @@ in
             do
               get "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
+
+            chmod -R a+rX "$root"
           '';
         };
 

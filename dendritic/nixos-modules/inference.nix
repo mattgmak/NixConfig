@@ -12,11 +12,12 @@
     let
       modelsDir = "/var/lib/inference/models";
 
-      # Gufo discovers the other eight shards from the first one.
-      flashNextModel = "${modelsDir}/Qwen3.8-Flash-Next-IQ4_NL-PROJFIX-00001-of-00009.gguf";
+      # Gufo discovers the other three shards from the first one.
+      flashNextModel = "${modelsDir}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
       flashNextMtp = "${modelsDir}/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
 
-      coderModel = "${modelsDir}/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf";
+      qwen27bModel = "${modelsDir}/Qwen3.8-27B-UD-Q4_K_XL.gguf";
+      qwen27bDraft = "${modelsDir}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
 
       # Upstream helper: same flags as the CLI, so no flag name is retyped here.
@@ -52,19 +53,23 @@
               aliases = [ "qwen3.8-flash-next" ];
             };
 
-            "coder-30b" = {
+            # Only flash-next and Qwen3.8-27B are gufo model families. The
+            # earlier Coder-30B pick is unsupported upstream.
+            "qwen3.8-27b" = {
               cmd = gufoServe {
                 modality = "llm";
-                model = coderModel;
+                model = qwen27bModel;
                 port = "\${PORT}";
-                servedModelName = "coder-30b";
+                servedModelName = "qwen3.8-27b";
+                speculative = "dflash2";
+                dflashModel = qwen27bDraft;
                 sessions = 2;
                 context = 65536;
               };
-              useModelName = "coder-30b";
+              useModelName = "qwen3.8-27b";
               ttl = 300;
               checkEndpoint = "/ready";
-              aliases = [ "qwen3-coder-30b-a3b" ];
+              aliases = [ "qwen27b" ];
             };
           };
 
@@ -80,7 +85,7 @@
               persistent = false;
               members = [
                 "flash-next"
-                "coder-30b"
+                "qwen3.8-27b"
               ];
             };
           };
