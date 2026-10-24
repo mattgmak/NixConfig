@@ -1,7 +1,7 @@
 let
   keys = (import ../dendritic/ssh-keys.nix).flake.sshKeys;
-  inherit (keys) AgentAge Droid Goofeus GoofyDesky GoofyDeskyRoot GoofyEnvy MacMini;
-  piRecipients = [ Droid GoofyDesky GoofyEnvy Goofeus AgentAge MacMini ];
+  inherit (keys) AgentAge Droid Goofeus GoofyDesky GoofyDeskyRoot GoofyEnvy MacMini Ramsay RamsayAgent;
+  piRecipients = [ Droid GoofyDesky GoofyEnvy Goofeus AgentAge MacMini Ramsay RamsayAgent ];
 in
 {
   # Encrypted private key for AgentAge (agent@Goofeus). Decryptable by Goofeus host
@@ -10,6 +10,14 @@ in
     armor = true;
     publicKeys = [
       Goofeus
+      GoofyDeskyRoot
+    ];
+  };
+  # Encrypted private key for RamsayAgent (agent@Ramsay).
+  "agent-ramsay-age-key.age" = {
+    armor = true;
+    publicKeys = [
+      Ramsay
       GoofyDeskyRoot
     ];
   };

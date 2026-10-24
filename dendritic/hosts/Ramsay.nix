@@ -54,6 +54,7 @@ in
           inputs.disko.nixosModules.disko
           inputs.home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
+          inputs.agenix.nixosModules.default
           self.nixConfig
           caTrust
           tailscale
@@ -85,6 +86,60 @@ in
       ];
     };
 
+    # Agent coding workspace: pi + tmux orchestrator.
+    homeConfigurations.RamsayAgent =
+      { lib, pkgs, ... }:
+      {
+        imports = with self.homeModules; [
+          nixos-home
+          atuin
+          zoxide
+          nushell
+          zsh
+          neovim
+          starship
+          yazi
+          git
+          delta
+          gh
+          direnv
+          devenv
+          lazygit
+          btop
+          bat
+          nix-index-database
+          pi-coding-agent
+          tmux
+          zellij
+          worktrunk
+          bash
+          carapace
+          nixconfig-sync
+        ];
+        tools.nixconfigSync.enable = true;
+
+        # Agent decrypts API secrets with its own age identity.
+        age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
+
+        # Empty `agents` tmux session on boot — pi started manually after attach.
+        systemd.user.services.agents-tmux = {
+          Unit = {
+            Description = "Empty tmux session 'agents' (pi agent workspace)";
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            # Panes spawned from this session inherit PATH — must include HM profile
+            # bins (starship/zoxide/…) or shells break.
+            Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+            ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
+        };
+      };
+
     nixosModules.Ramsay =
       {
         config,
@@ -98,6 +153,22 @@ in
         ...
       }:
       {
+        # Agent user's age identity: encrypted private key, decrypted by root at
+        # activation, made readable by agent so HM age.identityPaths can use it.
+        age.secrets."agent-ramsay-age-key" = {
+          file = ../../secrets/agent-ramsay-age-key.age;
+          owner = "agent";
+          group = "agent";
+          mode = "0400";
+        };
+
+        nix.settings.trusted-users = lib.mkAfter [
+          "root"
+          "goofy"
+          "agent"
+          "@wheel"
+        ];
+
         nixpkgs.overlays = common-overlays;
         nixpkgs.config = common-nixpkgs-config;
 
@@ -137,6 +208,21 @@ in
         security.sudo = {
           enable = true;
           wheelNeedsPassword = false;
+
+          # agent cannot join wheel: wheel is passwordless above, which the agent
+          # workspace spec forbids. nh elevates per command, so a PASSWD rule is
+          # required instead of allowing "nh" alone.
+          extraRules = [
+            {
+              users = [ "agent" ];
+              commands = [
+                {
+                  command = "ALL";
+                  options = [ "PASSWD" ];
+                }
+              ];
+            }
+          ];
         };
 
         environment.systemPackages = with pkgs; [
@@ -163,6 +249,22 @@ in
             Droid
           ];
         };
+
+        # Agent coding workspace user (AFK / phone-driven pi).
+        users.users.agent = {
+          isNormalUser = true;
+          extraGroups = [ "networkmanager" ];
+          shell = pkgs.zsh;
+          openssh.authorizedKeys.keys = with self.sshKeys; [
+            GoofyDesky
+            GoofyEnvy
+            Droid
+          ];
+        };
+
+        # isNormalUser alone does not create a same-named group, and agenix
+        # chowns the agent key to agent:agent.
+        users.groups.agent = { };
 
         services.openssh.enable = true;
 
@@ -231,6 +333,11 @@ in
         };
 
         home-manager.users.${username} = self.homeConfigurations.Ramsay;
+        home-manager.users.agent = self.homeConfigurations.RamsayAgent;
+
+        # pi is the native Pi-Bolt ELF, which hardcodes the generic
+        # /lib64/ld-linux-x86-64.so.2 interpreter that NixOS only provides as a stub.
+        programs.nix-ld.enable = true;
 
         system.stateVersion = "26.05";
       };
