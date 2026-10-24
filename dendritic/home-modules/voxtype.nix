@@ -8,6 +8,12 @@
     }:
     let
       cfg = config.voxtype;
+
+      # The package builds only the quickshell OSD frontend and ships no QML.
+      voxtypeSrc = pkgs.fetchzip {
+        url = "https://github.com/peteonrails/voxtype/archive/refs/tags/v${pkgs.voxtype.version}.tar.gz";
+        hash = "sha256-zsOG1mBTXN4gdsTb1pUPKXATfhV5ZjgEsIUk07asaGo=";
+      };
     in
     {
       options.voxtype = {
@@ -49,9 +55,12 @@
       };
 
       config = lib.mkIf cfg.enable {
-        # The nixpkgs wrapper already puts wtype, dotool and wl-copy on the
-        # daemon PATH.
-        home.packages = [ pkgs.voxtype ];
+        # `output.mode = "type"` shells out to wtype. The package wraps
+        # nothing, so the daemon PATH needs it from here.
+        home.packages = [
+          pkgs.voxtype
+          pkgs.wtype
+        ];
 
         systemd.user.services.voxtype = {
           Unit = {
@@ -80,9 +89,14 @@
           device = "default"
           # gufo resamples to 16 kHz itself, and rejects nothing on rate here.
           sample_rate = 16000
+          # Required by 0.7.5: parse fails without it, daemon crash-loops.
+          max_duration_secs = 60
 
           [whisper]
           mode = "remote"
+          # The daemon builds its remote transcriber from `model` and ignores
+          # `remote_model`, which only the `transcribe` CLI reads.
+          model = "${cfg.asrModel}"
           remote_endpoint = "${cfg.asrBaseUrl}"
           remote_model = "${cfg.asrModel}"
           remote_timeout_secs = ${toString cfg.asrTimeoutSecs}
@@ -93,9 +107,14 @@
           driver_order = [ "wtype", "clipboard" ]
 
           [output.notification]
-          on_recording_start = true
-          on_transcription = true
+          on_recording_start = false
+          on_transcription = false
+
+          [osd]
+          frontend = "quickshell"
         '';
+
+        xdg.dataFile."voxtype/quickshell".source = "${voxtypeSrc}/quickshell";
       };
     };
 }
