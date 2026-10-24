@@ -67,6 +67,8 @@ shell_allowlist_extra = [
     "magick",
     "convert",
     "ss",
+    # "voxtype",
+    # "voxtype-osd",
 ]
 
 [telemetry]
