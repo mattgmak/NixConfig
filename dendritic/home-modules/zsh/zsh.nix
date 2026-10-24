@@ -103,7 +103,12 @@
             lib.mapAttrsToList (
               env: name: ''export ${env}="$(cat "${secretPathOf name}" 2>/dev/null)"''
             ) availableSecrets
-          );
+          )
+          # zsh-abbr's job queue defaults to a single /tmp path, so the first
+          # user to log in owns it and every other user hits permission denied.
+          + ''
+            export JOB_QUEUE_TMPDIR="''${XDG_RUNTIME_DIR:-/tmp}/zsh-job-queue-''${UID}/"
+          '';
 
         # Nix-on-Droid starts the app's login zsh non-interactive (fd0 is a pts
         # but isatty fails under proot, so zsh skips .zshrc and renders no

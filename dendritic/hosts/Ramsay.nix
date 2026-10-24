@@ -337,6 +337,10 @@ in
 
         # pi is the native Pi-Bolt ELF, which hardcodes the generic
         # /lib64/ld-linux-x86-64.so.2 interpreter that NixOS only provides as a stub.
+        # Client TERMs (xterm-ghostty, xterm-kitty, wezterm, …) have no terminfo
+        # entry in the system profile, so TUIs fail or degrade on them.
+        environment.enableAllTerminfo = true;
+
         programs.nix-ld.enable = true;
 
         system.stateVersion = "26.05";
