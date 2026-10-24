@@ -112,6 +112,8 @@ A JDK reinstall restores both aliases, so rerun the deletes after a Zulu update.
 
 The bolt-v0.9.9 release notes say the build takes three fixes from bun 1.4.4. Those are cherry-picked engine patches. They do not move the base runtime.
 
+Pi-Bolt 1.0.1 still prints `1.4.3` on `x86_64-linux`, so the gap stays open.
+
 Probe through `BUN_BE_BUN=1` on host A:
 
 | `SSL_CERT_FILE` | Result |
