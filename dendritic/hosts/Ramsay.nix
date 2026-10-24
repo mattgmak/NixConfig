@@ -300,6 +300,7 @@ in
           "r8169"
         ];
         boot.initrd.kernelModules = [ ];
+        boot.kernelParams = [ "ttm.pages_limit=29400781" ];
         boot.kernelModules = [
           "kvm-amd"
           "atlantic"
