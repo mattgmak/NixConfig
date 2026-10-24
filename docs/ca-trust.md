@@ -184,6 +184,14 @@ The gap closes when upstream publishes a release whose lock carries `webpki-root
 
 The sibling root carries the same defect. `webpki-root-certs` 1.0.9 holds the revoked G3 root, and `rustls-platform-verifier` pulls that crate. Version 1.0.10 exists on crates.io. macOS uses security-framework and does not resolve the crate. That target detail is UNVERIFIED, because nobody retested it. No Linux host ships lean-ctx today.
 
+### Zen browser: OneCRL, not root removal
+
+A browser keeps its own store, so the root table decides nothing here. The block list does.
+
+The old pin, Zen 1.21.8b (2026-07-20), trusted the chain through Remote Settings alone. The new pin, 1.23.4b (2026-10-21), ships the OneCRL list that Mozilla pushed on 17 Oct.
+
+Root presence still misleads. `libxul.so` of 1.17.15b, 1.19.11b and 1.21.8b lists `emSign ECC Root CA - G3`. NSS master holds only `emSign Root CA - G1` and no distrust entries. Bug 2083449 stays `ASSIGNED`.
+
 ## Pending: node version
 
 Node needs 24.22.1 on the 24.x line, or 22.23.4 on 22.x. The release updates bundled roots to NSS 3.131.1 and rejects chains with blocked SPKI hashes. The bump is hygiene while `SSL_CERT_FILE` stays set, and it is the real fix once that variable goes missing.
@@ -246,6 +254,7 @@ The fail-open family stays on the old store until the nixpkgs input moves, becau
 - CERT-In published an advisory on 21 Oct. Mozilla bug 2083449 stays `ASSIGNED`.
 - NSS 3.132 repeats the 3.131.1 removals: `emSign Root CA - G3`, `emSign Root CA - C1`, `emSign ECC Root CA - C3`.
 - No new revocation and no new root addition. The thresholds above stay valid.
+- Zen 1.23.4b (2026-10-20) bundles the OneCRL eMudhra block list. The block then holds without Remote Settings.
 
 ## Gap: Droid
 
@@ -264,7 +273,7 @@ The fail-open family stays on the old store until the nixpkgs input moves, becau
 
 - The block arithmetic for `/etc/ssl/certs/ca-certificates.crt`. A python ssl decode reports 284 blocks and a raw `BEGIN` count reports 118. Bun refuses under the file in both cases.
 - `git` and `cargo` fail-open behaviour. An empty variable gives no verdict.
-- The `x86_64-linux` branch of `bun-bin.nix`, `go-bin.nix` and `gleam-bin.nix`. Only darwin was built.
+- The `x86_64-linux` branch of `gleam-bin.nix`. `bun-bin.nix` and `go-bin.nix` built on Linux on 23 Oct.
 - `python3.14` (Homebrew) runtime probe. The binary name sits outside the shell allowlist.
 - Zulu 17 first fixed build. The store is clean by hand, so this no longer blocks.
 - `keytool` direct output. `cacerts` was read through the Java KeyStore API instead.
