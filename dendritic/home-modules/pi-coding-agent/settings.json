@@ -56,6 +56,8 @@
     "commandcode/stealth/glyph-cluster:free": "medium",
     "commandcode/inclusionai/ling-3.1-flash": "medium",
     "commandcode/reflection/beam:free": "medium",
-    "opencode-go/beam-free": "medium"
+    "opencode-go/beam-free": "medium",
+    "ramsay/qwen3.8-flash-next": "medium",
+    "ramsay/qwen3.8-27b": "low"
   }
 }
