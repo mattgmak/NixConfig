@@ -35,7 +35,9 @@
     "opencode/deepseek-v4.1-flash-free",
     "opencode-go/beam-free",
     "commandcode/reflection/beam:free",
-    "cursor/grok-4.7@256k:slow"
+    "cursor/grok-4.7@256k:slow",
+    "ramsay/qwen3.8-27b",
+    "ramsay/qwen3.8-flash-next"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
