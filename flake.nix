@@ -163,6 +163,9 @@
       flake = false;
     };
 
+    # No inputs.nixpkgs.follows: the cached gfx1151 kernels come from its own pin.
+    gufo.url = "github:gufo-org/gufo";
+
     # code-cursor-flake = {
     #   url = "github:jacopone/code-cursor-nix";
     #   inputs.nixpkgs.follows = "nixpkgs";

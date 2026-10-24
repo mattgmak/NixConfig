@@ -57,6 +57,8 @@ in
           self.nixConfig
           caTrust
           tailscale
+          gufo
+          inference
         ];
       }
     );
@@ -163,6 +165,51 @@ in
         };
 
         services.openssh.enable = true;
+
+        systemd.services.gufo-models = {
+          description = "Fetch pinned inference weights";
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          path = [
+            pkgs.curl
+            pkgs.coreutils
+          ];
+          environment.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
+          script = ''
+            root=/var/lib/inference/models
+
+            get() {
+              if [ -s "$2" ]; then
+                return 0
+              fi
+              curl -fL --retry 3 --create-dirs -o "$2.part" "$1"
+              mv "$2.part" "$2"
+            }
+
+            coder=https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF/resolve/b17cb02dd882d5b6ab62fc777ad2995f19668350
+            get "$coder/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf" \
+              "$root/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+
+            asr=https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5
+            for file in \
+              chat_template.json \
+              config.json \
+              generation_config.json \
+              merges.txt \
+              model-00001-of-00002.safetensors \
+              model-00002-of-00002.safetensors \
+              model.safetensors.index.json \
+              preprocessor_config.json \
+              tokenizer_config.json \
+              vocab.json
+            do
+              get "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
+            done
+          '';
+        };
 
         home-manager.users.${username} = self.homeConfigurations.Ramsay;
 

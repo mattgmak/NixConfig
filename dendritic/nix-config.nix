@@ -14,6 +14,7 @@
             "https://nix-gaming.cachix.org"
             "https://yazi.cachix.org"
             "https://cache.nixos-cuda.org"
+            "https://gufo.cachix.org"
           ];
           trusted-public-keys = [
             "nix-on-droid.cachix.org-1:56snoMJTXmDRC1Ei24CmKoUqvHJ9XCp+nidK7qkMQrU="
@@ -22,6 +23,7 @@
             "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
             "yazi.cachix.org-1:Dcdz63NZKfvUCbDGngQDAZq6kOroIrFoyO064uvLh8k="
             "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+            "gufo.cachix.org-1:rfZe3n4lHINgyoACKzs5EthIZmBNvEyCCtufUpth0PE="
           ]
           ++ self.builderPublicKeys;
           warn-dirty = false;
