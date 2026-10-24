@@ -79,18 +79,20 @@
         udiskie
         zellij
         tmux
-        whisper-dictation
         worktrunk
         gh-dash
         btop
         bat
         nix-index-database
         tailscale-systray
+        voxtype
         bash
       ];
-      whisperDictation = {
-        packageName = "whisper-dictation-vulkan";
-        inputDevice = "Svalboard lightly";
+      # whisper-dictation defines no enable option. Importing it always
+      # activates it, so dropping it from the imports list is the disable path.
+      voxtype = {
+        enable = true;
+        asrBaseUrl = "https://asr.dab-octatonic.ts.net";
       };
     };
 

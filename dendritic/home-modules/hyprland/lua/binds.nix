@@ -84,13 +84,14 @@ let
     (bind "SUPER + F" "hl.dsp.exec_cmd(\"hyprctl hyprsunset temperature 4500\")" null)
     (bind "SUPER + G" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/animation-toggle.nu\")" null)
     (bind "SUPER + SPACE" "hl.dsp.exec_cmd(\"fcitx5-remote -t\")" null)
-    (bind "SUPER + period" "hl.dsp.exec_cmd(\"true\")" null)
+    (bind "SUPER + period" "hl.dsp.exec_cmd(\"voxtype record start\")" null)
+    (bind "SUPER + period" "hl.dsp.exec_cmd(\"voxtype record stop\")" { release = true; })
     (bind "ALT + Q" "hl.dsp.exec_cmd(\"wlogout\")" null)
     (bind "SUPER + T" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/floating-terminal.nu\")" null)
     (bind "ALT + Comma" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/window-switcher.nu\")" null)
   ]
   ++ lib.optionals (hostname == "GoofyDesky") [
-    # Super+, = comma key. Super+period reserved for whisper-dictation evdev pass-through.
+    # Super+, = comma key. Super+period is the voxtype push-to-talk bind.
     (bind "SUPER + Comma" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/mangohud-toggle.sh\")" null)
   ]
   ++ workspaceBinds

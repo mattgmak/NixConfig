@@ -71,16 +71,19 @@
         zellij
         tmux
         worktrunk
-        whisper-dictation
         gh-dash
         btop
         bat
         nix-index-database
         tailscale-systray
+        voxtype
         bash
       ];
-      whisperDictation = {
-        useGpu = false;
+      # whisper-dictation defines no enable option. Dropping it from the
+      # imports list is the disable path.
+      voxtype = {
+        enable = true;
+        asrBaseUrl = "https://asr.dab-octatonic.ts.net";
       };
     };
 
