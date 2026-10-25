@@ -17,6 +17,25 @@
         hostname = "Droid";
         osConfig = config;
       };
+      # One command into the tmux session "agents" on Ramsay. mosh keeps the
+      # link across a network switch; ssh -4 -t is the fallback when mosh is absent.
+      # Rename this attribute and the shellAliases entry together.
+      ramsay = pkgs.writeShellScriptBin "ramsay" ''
+        set -eu
+        # Ramsay tailnet IPv4. MagicDNS can answer AAAA on some networks and the
+        # v6 path fails there, so every transport forces IPv4. The host key for
+        # this address is the same key as ramsay.dab-octatonic.ts.net.
+        host="agent@100.76.193.66"
+        session="agents"
+        opts="-4 -p 22 -o PreferredAuthentications=publickey -o PasswordAuthentication=no"
+        case "''${TERM:-}" in
+          "" | dumb | unknown) export TERM=xterm-256color ;;
+        esac
+        if command -v mosh >/dev/null 2>&1; then
+          exec mosh --ssh="ssh $opts" "$host" -- tmux new-session -A -s "$session"
+        fi
+        exec ssh -t $opts "$host" "TERM=xterm-256color tmux new-session -A -s $session"
+      '';
     in
     {
       imports = [
@@ -50,6 +69,9 @@
         unzip
         which
         openssh
+        mosh
+        tmux
+        ramsay
         curlMinimal
         busybox
         cursor-cli
@@ -57,6 +79,8 @@
       ];
 
       home-manager.config = {
+        # The name is "ramsay": rename it here and in the wrapper above.
+        programs.zsh.shellAliases.ramsay = "${ramsay}/bin/ramsay";
         imports = with self.homeModules; [
           atuin
           zoxide
