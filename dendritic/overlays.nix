@@ -119,6 +119,32 @@
           tmax = self.packages.${system}.tmax;
         };
 
+      # TODO: drop once the pinned nixpkgs fzf is 0.74.3 or newer.
+      # tmax refuses to open its switcher below 0.74.3 (live activity dots).
+      # Shared, not per-module: a second fzf in home.packages collides in
+      # home-manager-path on bin/fzf.
+      fzfOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "aarch64-linux"
+            "x86_64-linux"
+            "x86_64-darwin"
+          ]
+        ) {
+          fzf = prev.fzf.overrideAttrs (_old: {
+            version = "0.74.5";
+            src = prev.fetchFromGitHub {
+              owner = "junegunn";
+              repo = "fzf";
+              tag = "v0.74.5";
+              hash = "sha256-+v3oSlf3HBpPkNqS3QxRV/B1yHYb07/a70WYuS0aopY=";
+            };
+            vendorHash = "sha256-NojjUf/3c4q4B96eQ/qcI+GdRvHakHUyMRaQ6/IZpEw=";
+          });
+        };
+
       # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [
         glazeOverlay
@@ -164,6 +190,7 @@
         goBinOverlay
         gleamBinOverlay
         tmaxOverlay
+        fzfOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {

@@ -12,19 +12,6 @@
       system = pkgs.stdenv.hostPlatform.system;
       powerkitPluginsDir = ./tmux/powerkit/plugins;
 
-      # tmax refuses to open the switcher below fzf 0.74.3 (live activity dots).
-      # Pinned nixpkgs has 0.74.1, so lift only the fzf that tmux profiles install.
-      fzf = pkgs.fzf.overrideAttrs (_: {
-        version = "0.74.5";
-        src = pkgs.fetchFromGitHub {
-          owner = "junegunn";
-          repo = "fzf";
-          tag = "v0.74.5";
-          hash = "sha256-+v3oSlf3HBpPkNqS3QxRV/B1yHYb07/a70WYuS0aopY=";
-        };
-        vendorHash = "sha256-NojjUf/3c4q4B96eQ/qcI+GdRvHakHUyMRaQ6/IZpEw=";
-      });
-
       mkTmuxPowerkitTheme =
         colors:
         let
@@ -160,9 +147,9 @@
       };
 
       # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
+      # tmax also needs fzf 0.74.3+ for live activity dots; the flake fzf overlay lifts pkgs.fzf.
       programs.fzf = {
         enable = true;
-        package = fzf;
         enableNushellIntegration = false;
         tmux.enableShellIntegration = true;
       };
