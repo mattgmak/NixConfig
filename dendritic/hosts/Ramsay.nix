@@ -294,6 +294,14 @@ in
             KbdInteractiveAuthentication = false;
           };
           extraConfig = ''
+            # 100.105.133.71 is the phone tailnet node. Key only, since tmax
+            # unlock asks for the password instead. Replace it when it changes.
+            Match User agent Address 100.105.133.71
+              PubkeyAuthentication yes
+              PasswordAuthentication no
+              KbdInteractiveAuthentication no
+              AuthenticationMethods publickey
+
             Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
               PubkeyAuthentication yes
               PasswordAuthentication yes
