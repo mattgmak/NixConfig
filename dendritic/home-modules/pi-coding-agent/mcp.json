@@ -1,12 +1,5 @@
 {
   "mcpServers": {
-    "context7": {
-      "url": "https://mcp.context7.com/mcp",
-      "exposure": "direct",
-      "headers": {
-        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
-      }
-    },
     "Linear": {
       "url": "https://mcp.linear.app/mcp",
       "headers": {},
@@ -34,12 +27,17 @@
         "search_repositories": "direct"
       }
     },
-    "figma": {
-      "url": "http://127.0.0.1:3845/mcp"
-    },
     "argent": {
       "command": "argent",
       "args": ["mcp"]
+    },
+    "nixos": {
+      "command": "nix",
+      "args": ["run", "github:utensils/mcp-nixos/6a517811658c21f97bd7703b35546085117fc310", "--"],
+      "toolExposure": {
+        "nix": "direct",
+        "nix_versions": "direct"
+      }
     }
   }
 }

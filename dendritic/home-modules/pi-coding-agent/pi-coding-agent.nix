@@ -17,6 +17,126 @@
       vendorRoot = "${nixConfigRoot}/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
+      piCompiled = self.packages.${system}.piCompiled;
+      piStock = self.packages.${system}.pi;
+
+      # The compiled binary uses its compiled copy of an extension only while the copy it
+      # finds is the one the compiler recorded, and those recorded paths are absolute,
+      # inside the package. A copy or the repo checkout misses that lookup, and rpiv-todo
+      # and rpiv-ask-user-question have no fallback, so they fail startup. So: a symlink
+      # into the store tree for every name the package compiled, a repo symlink for the
+      # loaders it left out (those load from files, as before). The split is read from the
+      # package, so a new compiled extension needs no edit here.
+      compiledExtensionsDir = "${piCompiled}/share/pibolt-home/.pi/agent/extensions";
+      compiledExtensions = piCompiled.extensions;
+
+      # Loader folders and loader symlinks (pi-agent-sesh resolves into vendor); `vendor`
+      # is added below with its own target, and the smoke-test script is not a loader.
+      repoExtensionNames = builtins.attrNames (
+        lib.filterAttrs (
+          name: type: name != "vendor" && (type == "directory" || type == "symlink")
+        ) (builtins.readDir ./extensions)
+      );
+
+      # These extensions write inside their own folder at run time: pi-permission-system
+      # creates logs/ on the first log line. A symlinked folder cannot take that write,
+      # because it resolves to the store or to the repo. So each name here gets a real
+      # directory in the agent dir, with every file linked to its source.
+      writableExtensions = [
+        "pi-permission-system" # permission audit trail: writes logs/ beside its config
+        "pi-lean-ctx" # MCP schema cache: writes mcp-schema-cache.json beside its config
+      ];
+      writablePresent = lib.filter (name: lib.elem name (compiledExtensions ++ repoExtensionNames)) writableExtensions;
+      writableSource =
+        name:
+        if lib.elem name compiledExtensions then
+          "${compiledExtensionsDir}/${name}"
+        else
+          "${extensionsDir}/${name}";
+
+      # Names inside a writable extension, listed at eval time. The runCommand only makes
+      # links, so a build sandbox never has to read the repo.
+      writableList =
+        name: sub:
+        builtins.readDir (
+          if lib.elem name compiledExtensions then
+            "${compiledExtensionsDir}/${name}${sub}"
+          else
+            ./extensions + "/${name}${sub}"
+        );
+
+      # A real directory, so a sibling like logs/ can appear, with each file linked to its
+      # source, so code edits take effect at once.
+      writableMirror =
+        name:
+        let
+          src = writableSource name;
+          top = writableList name "";
+          link = entry:
+            if top.${entry} == "directory" then
+              ''
+                mkdir -p $out/${name}/${entry}
+                ${lib.concatMapStrings (sub: ''
+                  ln -s ${src}/${entry}/${sub} $out/${name}/${entry}/${sub}
+                '') (builtins.attrNames (writableList name "/${entry}"))}
+              ''
+            else
+              ''
+                ln -s ${src}/${entry} $out/${name}/${entry}
+              '';
+        in
+        lib.concatMapStrings link (builtins.attrNames top);
+
+      piExtensionsDir = pkgs.runCommand "pi-agent-extensions" { } ''
+        mkdir -p $out
+        ${lib.concatMapStrings (name: ''
+          mkdir -p $out/${name}
+          ${writableMirror name}
+        '') writablePresent}
+        ${lib.concatMapStrings (name: ''
+          ln -s ${compiledExtensionsDir}/${name} $out/${name}
+        '') (lib.subtractLists writablePresent compiledExtensions)}
+        ${lib.concatMapStrings (name: ''
+          ln -s ${extensionsDir}/${name} $out/${name}
+        '') (lib.subtractLists (compiledExtensions ++ writablePresent) repoExtensionNames)}
+        ln -s ${vendorRoot} $out/vendor
+      '';
+
+      # Same guard as the overlay in overlays.nix: only x86_64-linux runs the compiled
+      # binary, so only there does the agent dir point at the store tree. Elsewhere the
+      # plain binary keeps reading the repo tree.
+      piAgentExtensions =
+        if system == "x86_64-linux" then
+          piExtensionsDir
+        else
+          config.lib.file.mkOutOfStoreSymlink extensionsDir;
+
+      agentDevDir = "${config.home.homeDirectory}/.pi/agent-dev";
+      agentDevShared = [
+        "AGENTS.md"
+        "auth.json"
+        "agents"
+        "keybindings.json"
+        "mcp.json"
+        "models.json"
+        "pi-blackhole"
+        "prompts"
+        "settings.json"
+        "skills"
+        "themes"
+        "web-search.json"
+      ];
+
+      # The fallback command. Extensions come from the repo tree, so every loader runs
+      # from files; PI_CODING_AGENT_DIR keeps it off the default agent dir.
+      piStockWrapper = pkgs.writeShellApplication {
+        name = "pi-stock";
+        text = ''
+          export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-$HOME/.pi/agent-dev}"
+          exec ${piStock}/bin/pi "$@"
+        '';
+      };
+
       piStaticThemes = [
         "ansi-dark.json"
         "ansi-light.json"
@@ -611,6 +731,7 @@
             bun
             podman
             piExtDepsInstall
+            piStockWrapper
             self.packages.${system}.lean-ctx
             self.packages.${system}.engram
           ]
@@ -684,6 +805,26 @@
                 ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
               fi
             '';
+
+        # Agent dir of the pi-stock fallback. A real directory, not a store symlink: the
+        # agent dir is written at run time (sessions, cache, auth.json), so a store path
+        # would be read-only. Its files link back to ~/.pi/agent, so both commands share
+        # settings, skills and themes.
+        home.activation.piAgentDevDir = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          run mkdir -p ${lib.escapeShellArg agentDevDir}
+          ${lib.concatMapStrings (name: ''
+            run ln -sfn ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/${name}"} ${lib.escapeShellArg "${agentDevDir}/${name}"}
+          '') agentDevShared}
+          run ln -sfn ${lib.escapeShellArg extensionsDir} ${lib.escapeShellArg "${agentDevDir}/extensions"}
+        '';
+
+        # Replaces the plain repo symlink that coding-agents writes. The compiled binary
+        # needs the store tree; the plain one needs the repo tree. Recursive, so activation
+        # makes real directories in $HOME: a writable extension can then create logs/.
+        home.file.".pi/agent/extensions" = {
+          source = lib.mkForce piAgentExtensions;
+          recursive = true;
+        };
 
         home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
           map (name: {
