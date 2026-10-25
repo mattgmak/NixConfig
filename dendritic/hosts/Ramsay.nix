@@ -283,10 +283,8 @@ in
         # chowns the agent key to agent:agent.
         users.groups.agent = { };
 
-        # Agent needs key plus password, and only from the tailnet. The Match
-        # block sits in extraConfig, which NixOS appends after its own keys.
-        # Password auth is off everywhere else, so a LAN or internet source
-        # cannot reach the agent password rule at all.
+        # Key only across the tailnet. The Match block sits in extraConfig,
+        # which NixOS appends after its own keys.
         services.openssh = {
           enable = true;
           settings = {
@@ -294,27 +292,14 @@ in
             KbdInteractiveAuthentication = false;
           };
           extraConfig = ''
-            # 100.105.133.71 is the phone tailnet node. Key only, since tmax
-            # unlock asks for the password instead. Replace it when it changes.
-            Match User agent Address 100.105.133.71
+            Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
               PubkeyAuthentication yes
               PasswordAuthentication no
               KbdInteractiveAuthentication no
               AuthenticationMethods publickey
               MaxSessions 64
-
-            Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
-              PubkeyAuthentication yes
-              PasswordAuthentication yes
-              KbdInteractiveAuthentication no
-              AuthenticationMethods publickey,password
-              MaxSessions 64
           '';
         };
-
-        # sshd derives the PAM unix rule from the global password setting, which
-        # is now false. The Match block above still needs it for the agent.
-        security.pam.services.sshd.unixAuth = lib.mkOverride 50 true;
 
         # mosh UDP 60000-61000 reach the host through tailscale0, which the
         # tailscale module already trusts. No firewall ports are needed.
