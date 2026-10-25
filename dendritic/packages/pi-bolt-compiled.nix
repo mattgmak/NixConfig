@@ -628,11 +628,14 @@
             # wrapper stays outside that directory and pins PI_PACKAGE_DIR to it.
             # PIBOLT_NPM keeps `pi update` from curl-installing over the store path.
             mkdir -p "$out/bin"
+            # Native extension modules such as koffi dlopen against libstdc++, which the
+            # bun binary does not carry and a bare shell does not export.
             makeWrapper "$out/libexec/pi/pi" "$out/bin/pi" \
               --argv0 pi \
               --set PIBOLT_NPM 1 \
               --set PI_TELEMETRY 0 \
-              --set PI_PACKAGE_DIR "$out/libexec/pi"
+              --set PI_PACKAGE_DIR "$out/libexec/pi" \
+              --prefix LD_LIBRARY_PATH : "${stdenv.cc.cc.lib}/lib"
 
             runHook postBuild
           '';

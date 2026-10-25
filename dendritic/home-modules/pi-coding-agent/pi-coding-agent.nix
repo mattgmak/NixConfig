@@ -133,6 +133,7 @@
         name = "pi-stock";
         text = ''
           export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-$HOME/.pi/agent-dev}"
+          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
           exec ${piStock}/bin/pi "$@"
         '';
       };
