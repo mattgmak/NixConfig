@@ -466,6 +466,14 @@
         ];
         boot.initrd.kernelModules = [ ];
         boot.kernelModules = [ "kvm-intel" ];
+        # The host froze twice, so these parameters save a pstore record and reboot cleanly on the next hard lock.
+        boot.kernelParams = [
+          "nmi_watchdog=1"
+          "hardlockup_panic=1"
+          "softlockup_panic=1"
+          "panic_on_oops=1"
+          "panic=10"
+        ];
         boot.extraModulePackages = [ ];
 
         fileSystems."/" = {
