@@ -21,6 +21,15 @@ in
       GoofyDeskyRoot
     ];
   };
+  # Crypt hash for the agent@Ramsay account password.
+  "agent-password.age" = {
+    armor = true;
+    publicKeys = [
+      Ramsay
+      GoofyDeskyRoot
+    ];
+  };
+
   "cloudflare-caddy.age" = {
     armor = true;
     publicKeys = [

@@ -121,6 +121,13 @@ in
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
 
+        # The pi hook and the tmux status line read these from a fixed path
+        # under $HOME, so link the packaged copies instead of a checkout path.
+        home.file.".local/share/tmax/agent_status.py".source =
+          "${pkgs.tmax}/share/tmax/scripts/agent_status.py";
+        home.file.".local/share/tmax/lab_agents.py".source =
+          "${pkgs.tmax}/share/tmax/scripts/lab_agents.py";
+
         # Empty `agents` tmux session on boot — pi started manually after attach.
         systemd.user.services.agents-tmux = {
           Unit = {
@@ -159,6 +166,14 @@ in
           file = ../../secrets/agent-ramsay-age-key.age;
           owner = "agent";
           group = "agent";
+          mode = "0400";
+        };
+
+        # Root-owned: sshd reads the crypt hash, the agent user never does.
+        age.secrets."agent-password" = {
+          file = ../../secrets/agent-password.age;
+          owner = "root";
+          group = "root";
           mode = "0400";
         };
 
@@ -253,6 +268,8 @@ in
         # Agent coding workspace user (AFK / phone-driven pi).
         users.users.agent = {
           isNormalUser = true;
+          # Second SSH factor. A password alone stays useless without the key.
+          hashedPasswordFile = config.age.secrets."agent-password".path;
           extraGroups = [ "networkmanager" ];
           shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
@@ -266,7 +283,33 @@ in
         # chowns the agent key to agent:agent.
         users.groups.agent = { };
 
-        services.openssh.enable = true;
+        # Agent needs key plus password, and only from the tailnet. The Match
+        # block sits in extraConfig, which NixOS appends after its own keys.
+        # Password auth is off everywhere else, so a LAN or internet source
+        # cannot reach the agent password rule at all.
+        services.openssh = {
+          enable = true;
+          settings = {
+            PasswordAuthentication = false;
+            KbdInteractiveAuthentication = false;
+          };
+          extraConfig = ''
+            Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
+              PubkeyAuthentication yes
+              PasswordAuthentication yes
+              KbdInteractiveAuthentication no
+              AuthenticationMethods publickey,password
+              MaxSessions 64
+          '';
+        };
+
+        # sshd derives the PAM unix rule from the global password setting, which
+        # is now false. The Match block above still needs it for the agent.
+        security.pam.services.sshd.unixAuth = lib.mkOverride 50 true;
+
+        # mosh UDP 60000-61000 reach the host through tailscale0, which the
+        # tailscale module already trusts. No firewall ports are needed.
+        programs.mosh.enable = true;
 
         systemd.services.gufo-models = {
           description = "Fetch pinned inference weights";

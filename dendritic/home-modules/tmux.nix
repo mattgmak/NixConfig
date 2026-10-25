@@ -171,9 +171,20 @@
       home.packages = [
         pkgs.fd
         pkgs.bash
+        pkgs.python3 # tmax sources scripts/remote.py through bare python3 on PATH
       ];
 
       home.file.".config/tmux-powerkit/themes/stylix.sh".source = tmuxPowerkitThemeFile;
+
+      home.file.".config/tmax/tmax.conf".text = ''
+        [switcher]
+        key = Space
+        hosts = all
+
+        [host ramsay]
+        destination = agent@ramsay.dab-octatonic.ts.net
+        label = ramsay
+      '';
 
       programs.tmux = {
         enable = true;
@@ -232,6 +243,9 @@
           set -g extended-keys on
           set -as terminal-features 'xterm*:extkeys'
           set -g extended-keys-format csi-u
+
+          # Must come after the settings above: tmax reads tmax.conf, then binds keys.
+          run-shell "${lib.getExe pkgs.bash} ${pkgs.tmax}/share/tmax/tmax.tmux"
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible

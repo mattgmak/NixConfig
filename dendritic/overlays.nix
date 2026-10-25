@@ -106,6 +106,19 @@
           gleam = self.packages.${system}.gleamBin;
         };
 
+      tmaxOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (
+          builtins.elem prev.stdenv.hostPlatform.system [
+            "aarch64-darwin"
+            "aarch64-linux"
+            "x86_64-linux"
+            "x86_64-darwin"
+          ]
+        ) {
+          tmax = self.packages.${system}.tmax;
+        };
+
       # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [
         glazeOverlay
@@ -150,6 +163,7 @@
         bunBinOverlay
         goBinOverlay
         gleamBinOverlay
+        tmaxOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {

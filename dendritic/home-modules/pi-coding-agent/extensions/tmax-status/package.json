@@ -1,0 +1,10 @@
+{
+  "name": "tmax-status",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for tmax agent activity reporting (vendored submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
