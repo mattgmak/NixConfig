@@ -28,7 +28,7 @@ Deployed at runtime:
 | Repo path | `~/.pi/agent/` target | Mechanism |
 |-----------|----------------------|-----------|
 | `dendritic/skills/` | `skills/` | `coding-agents.skillsDir` → `mkOutOfStoreSymlink` |
-| `home-modules/pi-coding-agent/extensions/` | `extensions/` | `coding-agents.pi-coding-agent.extensionsDir` → `mkOutOfStoreSymlink` |
+| `home-modules/pi-coding-agent/extensions/` | `extensions/` | x86_64-linux: built store dir (`piExtensionsDir`). elsewhere `coding-agents.pi-coding-agent.extensionsDir` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/prompts/` | `prompts/` | `coding-agents.pi-coding-agent.promptsDir` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/themes/` | `themes/` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/models.json` | `models.json` | `home.file` → `mkOutOfStoreSymlink` |
@@ -40,7 +40,7 @@ Deployed at runtime:
 
 User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 
-Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
+Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. On x86_64-linux the overlay installs `dendritic/packages/pi-bolt-compiled.nix` instead, the same binary with 28 extensions compiled in (see [Compiled host](#compiled-host-picompiled)). Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
 
 ### Loader, theme, and skill examples
 
@@ -55,7 +55,6 @@ extensions/pi-nvim/index.ts          → ../vendor/carderne/pi-nvim/extension.ts
 **Loader package** — thin dir with `package.json` + `./index.ts` re-export:
 
 ```
-extensions/mcp-nixos/index.ts       → ../vendor/utensils/mcp-nixos/...
 extensions/pi-simplify/index.ts     → ../vendor/MattDevy/pi-extensions/...
 extensions/rpiv-todo/index.ts       → ../vendor/juicesharp/rpiv-mono/...
 ```
@@ -65,8 +64,9 @@ Use `./index.ts` in `pi.extensions` so pi shows `<name>/index.ts`, not nested ve
 **Loader path depth is fixed at one level up (`../vendor/...`).** Pi resolves loader
 imports relative to the **live path** `~/.pi/agent/extensions/<name>/` (textual, no
 symlink-following), so repo-relative depths break at runtime. `../vendor` lands on the
-`extensions/vendor` **compat symlink** → repo root `vendor/`, which resolves both in the
-repo tree and through the live HM `mkOutOfStoreSymlink` chain. Things directly inside
+`extensions/vendor` **compat symlink** → repo root `vendor/`, which resolves in the repo tree
+and through the live agent dir. On x86_64-linux that dir ends in the built store tree.
+Its `vendor` entry links to the repo root `vendor/` as before. Things directly inside
 `extensions/` (smoke test, `pi-agent-sesh`) use `vendor/...` (0 ups). Never use absolute
 paths or repo-relative depths in loaders.
 
@@ -90,6 +90,107 @@ skills/tdd -> ../../vendor/mattpocock/skills/skills/engineering/tdd
 Vendored extensions are usually pi packages (`keywords: ["pi-package"]`). Pi discovers subdirs via `package.json` → `pi.extensions` array, or `index.ts`/`index.js`. Skills = `SKILL.md` in a directory.
 
 Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at the repo-root `vendor/`.
+
+## Compiled host (`piCompiled`)
+
+`packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux only. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it there, and at `packages.pi` (plain 1.0.3) elsewhere. The darwin build of the compiled host stays untested.
+
+The package compiles 28 loaders into the executable. The binary costs 562 MB. The store path costs 1.6 GB. A warm build takes 5 to 9 minutes.
+
+### Package shape
+
+Three release assets per platform, all from `bolt-v<version>`:
+
+| Asset | Content |
+|-------|---------|
+| `pi-bolt-<variant>.tar.xz` | app tree, with the hashes from `pi-bolt.nix` |
+| `pi-bolt-runtime-<variant>.tar.gz` | the bun runtime that the compiler drives |
+| `pi-bolt-kit-<variant>.tar.gz` | compile kit: patched Pi sources plus `node_modules` |
+
+`--kit` together with `--runtime` is the offline pair. Without either one the compile fetches `SHA256SUMS` and `SHA256SUMS.sig` from the release.
+
+The build stages the loaders and a real `vendor` tree. It then runs the compile with `HOME=$out/share/pibolt-home`, so the recorded root stays in the store path. Every staged file takes `@1` as its mtime (`find "$HOME" -exec touch -h -d @1 {} +`), so both sides of the fingerprint read `1000`.
+
+`dontFixup`, `dontStrip` and `dontPatchELF` stay set. The AOT image appends page-aligned sections and a trailer, and the runtime re-opens the executable to verify that trailer. A strip, a signature or an rpath rewrite corrupts it. On Linux `patchelf --set-interpreter` only grows the file, so the build sets the interpreter and passes `LD_LIBRARY_PATH` for the compile itself.
+
+`PI_PACKAGE_DIR` overrides the directory of the executable, so the wrapper pins it to `$out/libexec/pi`. `PIBOLT_NPM=1` stops `pi update` from curl-installing over the store path.
+
+### Fingerprint internals
+
+`extensionFingerprint` (`core/extensions/compiled.js`) reads one of three scopes. The generator picks the scope from where it found the loader:
+
+| Scope | Fingerprint |
+|-------|-------------|
+| `file` | `file:<size>:<mtimeMs>` of the entry |
+| `package` | `package:<manifest.version>:<size>:<mtimeMs>` of the entry |
+| `folder` | `folder:<fileCount>:<byteSum>:<newest mtimeMs>`, skips `node_modules` and `.git`, stops at 2000 files |
+
+The map key is the real path of the entry. The lookup tries the resolved extension path first, then `realpathSync(path)`. A key miss returns `undefined` with no message, and Pi loads the files as in any other build. A key hit with a different fingerprint returns `changed`, and Pi prints this warning:
+
+```
+changed since it was compiled in, so it was loaded from its files: run `pi-bolt compile` to compile it in again
+```
+
+A copy of the store tree misses every key, because the map holds store paths only. The store tree also holds no `node_modules`, so a copy of it fails the two rpiv loaders.
+
+### Writable mirror
+
+Two loaders write beside their own code, so a symlink into the store fails with `EROFS`:
+
+| Loader | Write | Cost of a missing write |
+|--------|-------|------------------------|
+| `pi-permission-system` | `logs/` on the first audit line | no audit trail |
+| `pi-lean-ctx` | `mcp-schema-cache.json` | 3.3 s on every start. A warm cache costs about 4 ms |
+
+`writableExtensions` in `pi-coding-agent.nix` names them. `writableMirror` builds a real directory for each name, with one symlink per leaf file. A compiled name takes its leaves from the store tree, else from the repo. `builtins.readDir` lists the files at eval time, so the build makes links only. A new file in a writable loader needs a rebuild.
+
+### lndir
+
+`home.file.".pi/agent/extensions"` sets `recursive = true`. Home Manager builds `home-manager-files` with `lndir -silent`, so the generation holds real directories with one symlink per leaf. Activation links those leaves into `$HOME` and makes the parent directories real. `~/.pi/agent/extensions/<name>/` is now a real directory, and `<name>/index.ts` resolves into the store tree.
+
+The compile leaves some loaders out. Each of those links to the repo directory as a whole, so a new file in it appears at once. A compiled name links into the store, so a new file there does not appear.
+
+### Offline deps
+
+The compile needs no network. Each staged repo that imports npm packages gets its own `node_modules`:
+
+| Repo | Mechanism |
+|------|-----------|
+| `mattgmak/agent-sesh/extensions/pi-agent-sesh`, `nicobailon/pi-mcp-adapter`, `nicobailon/pi-web-access`, `omaclaren/pi-markdown-preview` | `npmDepRepos`: `pkgs.importNpmLock.buildNodeModules` per repo |
+| `gotgenes/pi-packages` | `fetchPnpmDeps` for the workspace, `fetcherVersion = 4`, plus `pnpmConfigHook` |
+| `fitchmultz/pi-cursor-sdk` | lockfile install, then `bun build` as one extra kit entry |
+| `fitchmultz/pi-agent-browser-native` | dev lockfile install, then `node scripts/build.mjs` |
+| `ctotheameron/agent-ste` | gleam build, plus four hex tarballs in `$HOME/.cache/gleam/hex/hexpm/packages`, named by manifest checksum |
+| `Gentleman-Programming/engram` | manifest cut to `dependencies`, then `npm install --omit=dev --offline`. Bare imports reach the staged `vendor/node_modules` |
+| `mattgmak/lean-ctx/packages/pi-lean-ctx` | dev install trimmed to `@modelcontextprotocol/sdk` and `esbuild`, then `npm run build:vendor` |
+
+`npmNodeModules` takes `dropPackages` (a name test on lock entries) and `dropOverrides` (drop the manifest `overrides`). The lean-ctx install needs both. An override cannot name a store file, and the bundled shrinkwrap records seven `@earendil-works` tarballs with no integrity. `prodLock` drops the dev entries for the same reason.
+
+A lockfile change makes `fetchPnpmDeps` stop and print the new `hash`.
+
+### Patches
+
+One patch remains: `pi-bolt-compiled/pi-interactive-subagents-typebox.patch`. It points three `@sinclair/typebox` imports at the kit's renamed `typebox` package, which exports the same builders.
+
+The rpiv patches are gone, because 1.0.3 compiles top-level await. `vendor/juicesharp/rpiv-mono` stays on upstream.
+
+### Extension set decisions
+
+| Decision | Reason |
+|----------|--------|
+| `pi-lean-ctx` compiled in, with a writable dir | its factory wants a schema cache beside its config |
+| `pi-clinepass-provider` removed | no loader or `.gitmodules` entry remains, so the set holds no cline provider |
+| `mcp-nixos` loader removed, `nixos` MCP server added | the server pins `github:utensils/mcp-nixos/6a517811658c21f97bd7703b35546085117fc310` in `mcp.json`, so it needs no rebuild |
+
+### Failure signatures
+
+| Symptom | Cause |
+|---------|-------|
+| `EROFS` on a cache or log write | the loader is a symlink into the store, so add its name to `writableExtensions` |
+| a loader reports import time under `PI_TIMING`, with no warning | the key missed: the run-time path differs from the recorded one |
+| `changed since it was compiled in, so it was loaded from its files` in the output | same path, different content or mtime. The store copy changed after the compile |
+| every key rejected after a copy of the store tree | the map holds absolute store paths, and a copy has new paths |
+| no `builtin:` entry in the `PI_TIMING` list | the loader is not in `extensions` in `pi-bolt-compiled.nix`, so it stays a repo symlink |
 
 ## Extensions vs skills
 
@@ -316,7 +417,7 @@ Bump procedure (`dendritic/packages/engram.nix`):
 
 ## Apply config changes
 
-Repo paths are linked with `mkOutOfStoreSymlink`, so **content edits are live** at `~/.pi/agent/*` without rebuilding Home Manager.
+Repo paths are linked with `mkOutOfStoreSymlink`, so **content edits are live** at `~/.pi/agent/*` without rebuilding Home Manager. On x86_64-linux this holds for skills, prompts, themes and config files only. A compiled loader under `~/.pi/agent/extensions/` links into the store tree, so an edit to it needs `nh`.
 
 After editing extensions/skills/themes/prompts/models:
 
@@ -339,7 +440,7 @@ Positive defaults: submodule under `vendor/<owner>/<repo>` + HM symlink = source
 - Put extensions in `dendritic/skills/` or skills in `extensions/`
 - Use `pi install` for extensions we already vendor — submodule + HM symlink is source of truth
 - Commit `node_modules/` in NixConfig-owned extensions unless intentional
-- Edit files under `~/.pi/agent/extensions` or `skills` directly — they symlink to repo
+- Edit files under `~/.pi/agent/extensions` or `skills` directly — they link to the repo, or on x86_64-linux to the compiled store tree
 - Forget `npm install --omit=dev` / `pi-ext-deps-install` after submodule add/update when extension has runtime deps
 - Vendor a repo anywhere except `vendor/<owner>/<repo>` — all submodules live under the root `vendor/`, grouped by owner, named `owner/repo` in `.gitmodules`
 - Break the `extensions/vendor` compat symlink (→ repo root `vendor/`) — loaders resolve `../vendor/...` through it; treat it as read-only plumbing
@@ -385,7 +486,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 - The built-in `opencode-go` provider serves `opencode-go/*` models. Pi owns that catalog, so a live id missing there needs a `models.json` override.
 - `pi-opencode-provider` stays removed: third-party ext forced `supportsReasoningEffort: false`, so DeepSeek V4.1 thinking levels collapsed to on/off. The built-in provider sends the level map.
 
-**Denied (implicit):** engram, observational-memory, agent-sesh, mcp-nixos, pi-nvim*, … — not in base list; `--no-extensions` blocks discovery.
+**Denied (implicit):** engram, observational-memory, agent-sesh, pi-nvim*, … — not in base list; `--no-extensions` blocks discovery.
 
 **Edit list:** `vendor/mattgmak/pi-interactive-subagents/pi-extension/subagents/index.ts` → `SUBAGENT_BASE_EXTENSIONS`. Run `npm test` in that submodule. Bump NixConfig submodule pointer after push to `mattgmak/pi-interactive-subagents`.
 
@@ -409,9 +510,10 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Subagent agent profiles | `dendritic/home-modules/pi-coding-agent/agents/*.md` |
 | Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
-| Bump pi package | `dendritic/packages/pi-bolt.nix` (version + both platform hashes) |
+| Bump pi package | `dendritic/packages/pi-bolt.nix` (version + both platform hashes) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes) |
 | Bump engram binary (keep in sync with ext) | `dendritic/packages/engram.nix` (see Engram ext/bin version sync) |
-| pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap) |
+| pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap, `piCompiled` on x86_64-linux) |
+| Compiled host: extension list, deps, patches | `dendritic/packages/pi-bolt-compiled.nix` (see [Compiled host](#compiled-host-picompiled)) |
 | Extension bundle for compiled bun hosts | `pi-ext-deps-install` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
 
 ## Goofeus agent workspace (GoofeusAgent)

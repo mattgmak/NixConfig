@@ -11,7 +11,26 @@ References are relative to `~/NixConfig/dendritic` unless noted.
 
 # Pi Setup (NixConfig)
 
-Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live in-repo, HM links them into `~/.pi/agent/` via `mkOutOfStoreSymlink`. Layout, vendoring rules, debugging: [REFERENCE.md](REFERENCE.md).
+Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live in-repo, HM links them into `~/.pi/agent/` via `mkOutOfStoreSymlink`. The one exception is `~/.pi/agent/extensions` on x86_64-linux, which links into the built extensions dir of the compiled binary. Layout, vendoring rules, debugging: [REFERENCE.md](REFERENCE.md).
+
+## Compiled host (`piCompiled`)
+
+On x86_64-linux `pi` runs `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`), not the plain binary. That package compiles 28 loaders into the executable. The binary costs 562 MB. Its store path costs 1.6 GB. A warm build takes 5 to 9 minutes.
+
+**The rule that decides everything.**
+
+The compiler records the absolute path of each extension and a fingerprint of file count, byte sum and newest mtime. Compiled code runs only while the run-time files sit at that recorded path. Only the store tree holds those paths. A copy of that tree misses every key, and Pi loads the files instead. Each compiled name must resolve into the store tree, never into a copy.
+
+| Command | Binary | Loaders |
+|---------|--------|---------|
+| `pi` | `packages.piCompiled` | 28 compiled names from the store tree, plus `tmax-status` from the repo |
+| `pi-stock` | `packages.pi`, plain 1.0.3 | every loader from the repo tree, for extension development |
+
+`pi-stock` sets `PI_CODING_AGENT_DIR=~/.pi/agent-dev`, so it keeps its own sessions and cache.
+
+**Rebuild trigger.** Any edit to a compiled extension, its deps, or the extension list needs `nh`. Such an edit is not live after `/reload`. `pi-permission-system` and `pi-lean-ctx` stay writable, so their own log and cache files still land at run time.
+
+**Measured on 1.0.3:** warm first prompt 678 ms compiled against 2578 ms plain.
 
 ## Dispatch
 
@@ -87,7 +106,7 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 - Run `pi-ext-deps-install` if any extension has runtime deps
 - Verify the loader loads: `printf '' | pi -ne -e dendritic/home-modules/pi-coding-agent/extensions/<name>/index.ts --mode rpc` — loads the extension with no model turn; load errors print (`Failed to load extension …`) and exit non-zero. `pi list` is useless here — HM symlinks, not packages → “No packages installed”; a `list` anywhere but the first argv token parses as a **prompt** (real model turn, 403 on an unresolved `defaultModel`); `pi -e <path> --help` exits 0 even for a nonexistent path.
 - Commit `.gitmodules`, submodule pointer, loader/symlink files
-- Tell user to `/reload` in pi — content edits are live; HM rebuild only when Nix wiring changed ([REFERENCE.md — Apply config changes](REFERENCE.md#apply-config-changes))
+- Tell the user to `/reload` in pi — content edits are live for a repo loader; HM rebuild only when Nix wiring changed ([REFERENCE.md — Apply config changes](REFERENCE.md#apply-config-changes)). A compiled loader needs `nh` instead: see [Compiled host](#compiled-host-picompiled).
 
 **Done when** — loader check passes for the new item, commit made, user told to `/reload`.
 
@@ -109,7 +128,7 @@ Also accept comma-separated lists (e.g. `pi, cursor-provider`).
 
 **Fork upstream sync (default, every fork in scope)**: merge upstream → push fork → bump submodule. Applies even when user names targets explicitly. Opt out only when user explicitly says skip fork sync. Registry + commands: [REFERENCE.md — Fork vendored extensions](REFERENCE.md#fork-vendored-extensions).
 
-**pi bin**: `dendritic/packages/pi-bolt.nix` (pi-bolt, `github:opensec-git/Pi-Bolt`, release tag `bolt-v*`) is the default pi binary — overlays redirect the `pi-coding-agent` package to it. Every `update` that includes `pi` must also bump `pi-bolt.nix` (version + both platform sha256) to the latest `bolt-v*` release; the `coding-agents` flake bump alone does not change the installed pi.
+**pi bin**: `dendritic/packages/pi-bolt.nix` (pi-bolt, `github:opensec-git/Pi-Bolt`, release tag `bolt-v*`) holds the plain binary as `packages.pi`. `dendritic/packages/pi-bolt-compiled.nix` holds the compiled host as `packages.piCompiled`. The overlay in `dendritic/overlays.nix` installs `piCompiled` on x86_64-linux and `pi` elsewhere. Every `update` that includes `pi` must bump both files to the latest `bolt-v*` release: version, the two platform sha256 in `pi-bolt.nix`, and the six hashes (app, runtime, kit per platform) in `pi-bolt-compiled.nix`. A `coding-agents` flake bump alone changes neither binary.
 
 Themes and skill submodules **out of scope** unless user names them explicitly; mention they can update same way if asked.
 
@@ -200,7 +219,7 @@ Include **Fork upstream** subsection in preview when any fork targets in scope.
 - [ ] `nix flake update coding-agents` (+ possibly `dendritic/overlays.nix` npmDepsHash)
 - [ ] bump submodule SHAs + `git add` (include `flake.lock` when pi bumped)
 - [ ] `pi-ext-deps-install` for extensions with changed package.json
-- [ ] `home-manager switch` if pi package changed
+- [ ] `home-manager switch` if pi package, a compiled extension, or its deps changed
 ```
 
 **Done when** — every in-scope target in one preview. **Stop here.** Ask the user: **Continue with the update?** Modify no files until they confirm.
@@ -252,7 +271,7 @@ printf '' | pi -ne -e ~/NixConfig/dendritic/home-modules/pi-coding-agent/extensi
 
 **Commit** with a message summarizing what was bumped (e.g. `bump pi-coding-agent`).
 
-Tell the user to `/reload` or restart pi. Rebuild HM only when pi package or Nix wiring changed.
+Tell the user to `/reload` or restart pi. Rebuild HM when the pi package, a compiled extension or its deps changed, or when Nix wiring changed.
 
 **Done when** — every in-scope target at its proposed ref, loader check passes for every bumped extension, commit made. No target skipped.
 
