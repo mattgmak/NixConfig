@@ -301,6 +301,7 @@ in
               PasswordAuthentication no
               KbdInteractiveAuthentication no
               AuthenticationMethods publickey
+              MaxSessions 64
 
             Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
               PubkeyAuthentication yes
