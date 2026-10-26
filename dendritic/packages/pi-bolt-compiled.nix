@@ -664,6 +664,7 @@
               --argv0 pi \
               --set PIBOLT_NPM 1 \
               --set PI_TELEMETRY 0 \
+              --set ENGRAM_URL http://127.0.0.1:7437 \
               --set PI_PACKAGE_DIR "$out/libexec/pi" \
               ${wrapperLdFlag}
 
