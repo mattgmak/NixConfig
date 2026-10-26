@@ -455,7 +455,7 @@ in
           ProgramArguments = [
             "/bin/sh"
             "-c"
-            "/bin/wait4path /nix/store && exec ${pkgs.nh}/bin/nh clean all --keep 3 --optimise"
+            "/bin/wait4path /nix/store && exec ${pkgs.nh}/bin/nh clean all --keep 3 --optimise --no-direnv"
           ];
           StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
           RunAtLoad = true;
@@ -477,6 +477,7 @@ in
             "user"
             "--keep"
             "3"
+            "--no-direnv"
           ];
           StartCalendarInterval = [ { Hour = 4; Minute = 0; } ];
           RunAtLoad = true;
@@ -512,8 +513,9 @@ in
       launchd.agents.engram = {
         serviceConfig = {
           ProgramArguments = [
-            "${self.packages.${system}.engram}/bin/engram"
-            "serve"
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${self.packages.${system}.engram}/bin/engram serve"
           ];
           # nix-darwin loads agents into the system domain here; without
           # UserName the job would run as root. Pin the user explicitly.
@@ -538,7 +540,11 @@ in
       # darwin has no user systemd, so mirror engram with a launchd agent.
       launchd.agents.crawl4ai = {
         serviceConfig = {
-          ProgramArguments = [ "${piCrawl4aiServe}/bin/pi-crawl4ai-serve" ];
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${piCrawl4aiServe}/bin/pi-crawl4ai-serve"
+          ];
           UserName = username;
           EnvironmentVariables = {
             HOME = "/Users/${username}";
@@ -560,7 +566,11 @@ in
       # darwin has no user systemd, so mirror engram with a launchd agent.
       launchd.agents.searxng = {
         serviceConfig = {
-          ProgramArguments = [ "${piSearxngServe}/bin/pi-searxng-serve" ];
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${piSearxngServe}/bin/pi-searxng-serve"
+          ];
           UserName = username;
           EnvironmentVariables = {
             HOME = "/Users/${username}";
