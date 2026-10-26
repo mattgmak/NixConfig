@@ -124,6 +124,7 @@
       "models": [
         {
           "id": "qwen3.8-flash-next",
+          "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
             "off": "none",

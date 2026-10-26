@@ -45,6 +45,7 @@
                 mtpModel = flashNextMtp;
                 sessions = 2;
                 context = 131072;
+                extraArgs = [ "--mmproj" "${modelsDir}/mmproj-BF16.gguf" ];
               };
               useModelName = "flash-next";
               # 0 = never unload: this set stays resident.

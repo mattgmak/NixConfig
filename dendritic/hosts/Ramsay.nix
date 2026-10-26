@@ -348,6 +348,7 @@ in
             flash=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/38bb39ee97821de2c9009abb7e93950eec396e66
             get "$flash/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" \
               "$root/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
+            get "$flash/mmproj-BF16.gguf" "$root/mmproj-BF16.gguf"
             for shard in 00001 00002 00003 00004; do
               file="Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00004.gguf"
               get "$flash/UD-Q4_K_XL/$file" "$root/$file"
