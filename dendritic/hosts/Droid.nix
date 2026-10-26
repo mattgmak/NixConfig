@@ -17,9 +17,9 @@
         hostname = "Droid";
         osConfig = config;
       };
-      # C-; popup sends the kitty keyboard protocol encoding of Ctrl+; (ESC [ 59 ; 5 u).
+      # C-; sends the kitty keyboard protocol encoding of Ctrl+; (ESC [ 59 ; 5 u).
       termuxProperties = pkgs.writeText "termux.properties" (lib.generators.toKeyValue { } {
-        extra-keys = "[['ESC','/','-','HOME','UP','END','PGUP'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','DRAWER',{'key':'KEYBOARD','popup':{'macro':'ESC [ 5 9 ; 5 u','display':'C-;'}}]]";
+        extra-keys = "[['ESC','/','-','HOME','UP','END','PGUP',{'macro':'ESC [ 5 9 ; 5 u','display':'C-;'}],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','DRAWER','KEYBOARD']]";
       });
       # One command into the tmux session "agents" on Ramsay. mosh keeps the
       # link across a network switch; ssh -4 -t is the fallback when mosh is absent.
@@ -122,9 +122,9 @@
           enable = true;
           enableDefaultConfig = false;
         };
-        # Termux extra-keys row: DRAWER plus KEYBOARD (toggles the soft keyboard) on row 2.
-        # Swipe up on KEYBOARD sends Ctrl+; as kitty CSI-u bytes. Termux maps Ctrl only to
-        # letters and [ ] ^ _ /, so the CTRL modifier alone drops ';' (no legacy encoding).
+        # Termux extra-keys: KEYBOARD (toggles the soft keyboard) ends row 2; a C-; macro
+        # button ends row 1. Termux maps Ctrl only to letters and [ ] ^ _ /, so the CTRL
+        # modifier alone drops ';' (no legacy encoding); the button sends kitty CSI-u bytes.
         # nix-on-droid has no option for termux.properties, so manage it via home.file.
         # The app runs outside proot and reads real files only (store symlinks are invisible
         # there, docs/droid-handbook.md pitfall 9), so termuxRealFiles copies the file.
