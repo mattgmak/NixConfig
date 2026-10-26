@@ -64,6 +64,9 @@
         nushell
         bash
       ];
+      # nixpkgs defaults this to `ls -alh` in /etc/bashrc, and an alias shadows
+      # the lazygit shell function of the same name.
+      environment.shellAliases.l = null;
 
       # Set your time zone.
       time.timeZone = "Asia/Hong_Kong";
@@ -124,6 +127,7 @@
       atuin
       zoxide
       nushell
+      bash
       neovim
       starship
       yazi

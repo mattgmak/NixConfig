@@ -36,6 +36,7 @@ in
       zen-browser
       nushell
       zsh
+      bash
       wezterm
       neovim
       starship

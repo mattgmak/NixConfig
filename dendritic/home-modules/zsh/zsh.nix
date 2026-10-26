@@ -167,10 +167,5 @@
         enable = true;
         enableZshIntegration = true;
       };
-
-      programs.lazygit = {
-        enableZshIntegration = true;
-        shellWrapperName = "l";
-      };
     };
 }

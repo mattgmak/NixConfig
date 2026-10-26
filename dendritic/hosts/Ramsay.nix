@@ -71,6 +71,7 @@ in
         zoxide
         nushell
         zsh
+        bash
         neovim
         starship
         yazi
@@ -215,6 +216,9 @@ in
           zsh
           bash
         ];
+        # nixpkgs defaults this to `ls -alh` in /etc/zshrc and /etc/bashrc, and an
+        # alias shadows the lazygit shell function of the same name.
+        environment.shellAliases.l = null;
         programs.zsh.enable = true;
 
         time.timeZone = "Asia/Hong_Kong";

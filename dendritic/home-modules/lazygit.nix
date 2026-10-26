@@ -4,7 +4,9 @@
     {
       programs.lazygit = {
         enable = true;
-        # Use my own
+        # zsh/bash/fish integrations follow the enable flag of each shell.
+        # nushell defines l in config/config.nu, which also sets SHELL=bash.
+        shellWrapperName = "l";
         enableNushellIntegration = false;
         settings = {
           keybinding = {

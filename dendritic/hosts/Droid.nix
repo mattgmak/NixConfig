@@ -86,6 +86,7 @@
           zoxide
           nushell
           zsh
+          bash
           neovim
           starship
           yazi
