@@ -244,7 +244,7 @@ in
           echo "resetting podman machine after storage failure" >&2
           podman machine stop 2>/dev/null || true
           podman machine rm -f podman-machine-default 2>/dev/null || true
-          podman machine init --cpus 2 --memory 4096
+          podman machine init --cpus 2 --memory 4096 --disk-size 30
           podman machine start
           configure_podman_socket
           wait_for_podman
@@ -252,7 +252,7 @@ in
 
         ensure_podman() {
           if [ -z "$(podman machine list -q 2>/dev/null | head -n1)" ]; then
-            podman machine init --cpus 2 --memory 4096
+            podman machine init --cpus 2 --memory 4096 --disk-size 30
           fi
           if ! podman info >/dev/null 2>&1; then
             if ! podman machine start; then
@@ -526,9 +526,11 @@ in
           EnvironmentVariables = {
             HOME = "/Users/${username}";
             USER = username;
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${pkgs.podman}/bin:${pkgs.coreutils}/bin";
           };
           RunAtLoad = true;
           KeepAlive = true;
+          ThrottleInterval = 30;
           WorkingDirectory = "/Users/${username}";
           StandardOutPath = "/Users/${username}/.engram/serve.stdout.log";
           StandardErrorPath = "/Users/${username}/.engram/serve.stderr.log";
