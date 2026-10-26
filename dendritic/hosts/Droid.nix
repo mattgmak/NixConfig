@@ -129,12 +129,19 @@
         # The app runs outside proot and reads real files only (store symlinks are invisible
         # there, docs/droid-handbook.md pitfall 9), so termuxRealFiles copies the file.
         home.file.".termux/termux.properties".source = termuxProperties;
-        home.activation.termuxRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        # lib.hm is home-manager's lib; the outer lib here is nixpkgs'. Pass the dag
+        # entry attrs directly. hm.dag.isEntry requires data, after, AND before; a
+        # missing field makes HM wrap the whole attrs as the entry's data string.
+        home.activation.termuxRealFiles = {
+          after = [ "writeBoundary" ];
+          before = [ ];
+          data = ''
           mkdir -p "$HOME/.termux"
           rm -f "$HOME/.termux/termux.properties"
           cp "${termuxProperties}" "$HOME/.termux/termux.properties"
           chmod u+w "$HOME/.termux/termux.properties"
         '';
+        };
         # Root-owned store dirs in fpath fail compaudit under the non-root
         # Termux/proot uid and the [y/n] check aborts completions on every
         # new shell; -u skips the audit (nix store is still read-only).
