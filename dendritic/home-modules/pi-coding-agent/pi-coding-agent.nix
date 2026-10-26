@@ -825,6 +825,7 @@
         home.file.".pi/agent/extensions" = {
           source = lib.mkForce piAgentExtensions;
           recursive = true;
+          force = true;
         };
 
         home.file.".pi/agent/themes".source = pkgs.linkFarm "pi-agent-themes" (
