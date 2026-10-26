@@ -17,6 +17,13 @@
       vendorRoot = "${nixConfigRoot}/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
+      # mcp.json is the single source of the mcp-nixos pin. The warm activation
+      # below reads the flake URL from it, so a rev bump is one edit.
+      mcpConfig = builtins.fromJSON (builtins.readFile ./mcp.json);
+      mcpNixosFlake = lib.findFirst (arg: lib.hasPrefix "github:" arg) null (
+        mcpConfig.mcpServers.nixos.args or [ ]
+      );
+
       piCompiled = self.packages.${system}.piCompiled;
       piStock = self.packages.${system}.pi;
 
@@ -863,6 +870,24 @@
           HEND
           chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
         '';
+
+        # The nixos MCP server starts as `nix run <flake>`. A cold store must fetch a
+        # 143-path python closure first, and pi's connect timeout fires during that
+        # copy. Warm the closure here. The out-link roots it, so `nix store gc` keeps
+        # every path and the next start needs no download.
+        home.activation.piMcpNixosWarm = lib.mkIf (mcpNixosFlake != null) (
+          inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          mkdir -p "$HOME/.local/state/pi-mcp-nixos"
+          log="$HOME/.local/state/pi-mcp-nixos/warm.log"
+          nixbin=/nix/var/nix/profiles/default/bin/nix
+          [ -x "$nixbin" ] || nixbin=${pkgs.nix}/bin/nix
+          "$nixbin" build --no-write-lock-file \
+            --out-link "$HOME/.local/state/pi-mcp-nixos/result" \
+            ${lib.escapeShellArg mcpNixosFlake} \
+            >>"$log" 2>&1 || true
+          tail -n 200 "$log" >"$log.trimmed" && mv "$log.trimmed" "$log"
+          ''
+        );
 
         # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
         # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all
