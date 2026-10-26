@@ -125,7 +125,10 @@
         # lazygit, yazi, starship, …) all share 1000.
         initContent = lib.mkMerge [
           # Else vi mode inits at first precmd, after fzf, and takes ^R back.
-          (lib.mkOrder 545 "ZVM_INIT_MODE=sourcing")
+          (lib.mkOrder 545 ''
+            ZVM_INIT_MODE=sourcing
+            ZVM_SYSTEM_CLIPBOARD_ENABLED=true
+          '')
 
           # Hand-sourced so vi mode is installed before fzf/atuin bind keys.
           (lib.mkOrder 600 ''
