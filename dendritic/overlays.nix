@@ -202,13 +202,15 @@
         inputs.coding-agents.overlays.default
         # Last so it wins over coding-agents' own pi-coding-agent tweaks: swap the node
         # build for the native Pi binary, which ships bin/pi for exactly this.
-        # The compiled binary is the default on x86_64-linux only: its darwin build is
-        # untested, so aarch64-darwin keeps the plain 1.0.3 binary.
+        # The compiled binary is the default on both supported systems.
         (
           _final: _super:
           {
             pi-coding-agent =
-              if system == "x86_64-linux" then
+              if builtins.elem system [
+                "x86_64-linux"
+                "aarch64-darwin"
+              ] then
                 self.packages.${system}.piCompiled
               else
                 self.packages.${system}.pi;

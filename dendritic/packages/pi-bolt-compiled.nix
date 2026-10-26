@@ -14,6 +14,8 @@
           xz,
           patchelf,
           makeWrapper,
+          findutils,
+          coreutils,
         }:
         let
           version = "1.0.3";
@@ -75,6 +77,7 @@
             "prompt-snippets"
             "rpiv-ask-user-question"
             "rpiv-todo"
+            "tmax-status"
             "tool-allowlist"
           ];
 
@@ -83,7 +86,6 @@
             "arpagon/pi-rewind"
             "carderne/pi-nvim"
             "ctotheameron/agent-ste"
-            "dabstractor/pi-nvim-bridge"
             "fgladisch/pi-extensions"
             "fitchmultz/pi-agent-browser-native"
             "fitchmultz/pi-cursor-sdk"
@@ -93,12 +95,14 @@
             "MattDevy/pi-extensions"
             "mattgmak/agent-sesh"
             "mattgmak/pi-interactive-subagents"
+            "mattgmak/pi-nvim-bridge"
             "michalvavra/agents"
             "nicobailon/pi-mcp-adapter"
             "nicobailon/pi-powerline-footer"
             "nicobailon/pi-web-access"
             "omaclaren/pi-markdown-preview"
             "patlux/pi-commandcode-provider"
+            "theo-kirby/tmax"
             "vndv/pi-codegraph"
           ];
 
@@ -455,6 +459,12 @@
             patchelf --set-interpreter ${loader} unpack/runtime/bun
             export LD_LIBRARY_PATH=${libc}/lib
           '';
+
+          # Native extension modules such as koffi dlopen against libstdc++, which the bun
+          # binary does not carry and a bare shell does not export. macOS links libc++
+          # from the system path, so only linux needs the flag.
+          wrapperLdFlag = lib.optionalString stdenv.hostPlatform.isLinux
+            "--prefix LD_LIBRARY_PATH : ${stdenv.cc.cc.lib}/lib";
         in
         stdenv.mkDerivation {
           pname = "pi-compiled";
@@ -479,6 +489,8 @@
             xz
             jq
             makeWrapper
+            findutils
+            coreutils
           ]
           ++ lib.optional stdenv.hostPlatform.isLinux patchelf;
 
@@ -491,6 +503,7 @@
 
           # The compile writes $out itself.
           dontInstall = true;
+
 
           unpackPhase = ''
             runHook preUnpack
@@ -597,8 +610,9 @@
             chmod -R u+w "$HOME"
 
             # The fingerprint uses Math.trunc(mtimeMs). Nix sets store mtimes to 1, so pin
-            # every staged file to exactly @1 and both sides agree at 1000.
-            find "$HOME" -exec touch -h -d @1 {} +
+            # every staged file to exactly @1 and both sides agree at 1000. GNU touch on
+            # both platforms: BSD touch takes no `-d @1`.
+            ${lib.getExe findutils} "$HOME" -exec ${lib.getExe' coreutils "touch"} -h -d @1 {} +
 
             # Writable copy of the app tree: pi compile fails with EACCES on temp cleanup
             # when the tree is read-only, and it writes beside the executable.
@@ -623,19 +637,27 @@
               --kit "$PWD/kit" \
               --runtime "$PWD/unpack/runtime/bun"
 
+            # darwin splits the image: a 37K `pi` launcher execs the real `pi-bin` beside
+            # it, so the running app would be named `pi-bin`. Swap them as pi-bolt.nix
+            # does: real app becomes `pi`, and the `pi-bin` symlink keeps the launcher's
+            # sibling lookup resolving. linux ships one self-contained `pi`.
+            if [ -e "$out/libexec/pi/pi-bin" ]; then
+              mv "$out/libexec/pi/pi" "$out/libexec/pi/pi-launcher"
+              mv "$out/libexec/pi/pi-bin" "$out/libexec/pi/pi"
+              ln -s pi "$out/libexec/pi/pi-bin"
+            fi
+
             # Default command. The AOT image re-opens its own file, and the runtime reads
             # package.json, theme/ and export-html/ from the package directory, so the
             # wrapper stays outside that directory and pins PI_PACKAGE_DIR to it.
             # PIBOLT_NPM keeps `pi update` from curl-installing over the store path.
             mkdir -p "$out/bin"
-            # Native extension modules such as koffi dlopen against libstdc++, which the
-            # bun binary does not carry and a bare shell does not export.
             makeWrapper "$out/libexec/pi/pi" "$out/bin/pi" \
               --argv0 pi \
               --set PIBOLT_NPM 1 \
               --set PI_TELEMETRY 0 \
               --set PI_PACKAGE_DIR "$out/libexec/pi" \
-              --prefix LD_LIBRARY_PATH : "${stdenv.cc.cc.lib}/lib"
+              ${wrapperLdFlag}
 
             runHook postBuild
           '';

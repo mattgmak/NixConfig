@@ -42,13 +42,13 @@ local function suppress_builtin_completion_ui()
 end
 
 return {
-  'dabstractor/pi-nvim-bridge',
+  'mattgmak/pi-nvim-bridge',
   -- Pin to the vendored submodule (source of truth) instead of lazy's GitHub
-  -- clone: the pi extension half loads from vendor/dabstractor/pi-nvim-bridge,
+  -- clone: the pi extension half loads from vendor/mattgmak/pi-nvim-bridge,
   -- so the nvim plugin must match that exact revision or the bridge halves
   -- drift apart (e.g. the shell-completion subsystem lives only in newer
   -- commits). Submodule bump + this dir both move together.
-  dir = vim.fn.expand('$HOME') .. '/NixConfig/vendor/dabstractor/pi-nvim-bridge',
+  dir = vim.fn.expand('$HOME') .. '/NixConfig/vendor/mattgmak/pi-nvim-bridge',
   lazy = false,
   cond = not is_vscode,
   config = function()

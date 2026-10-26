@@ -11,11 +11,11 @@ References are relative to `~/NixConfig/dendritic` unless noted.
 
 # Pi Setup (NixConfig)
 
-Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live in-repo, HM links them into `~/.pi/agent/` via `mkOutOfStoreSymlink`. The one exception is `~/.pi/agent/extensions` on x86_64-linux, which links into the built extensions dir of the compiled binary. Layout, vendoring rules, debugging: [REFERENCE.md](REFERENCE.md).
+Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live in-repo, HM links them into `~/.pi/agent/` via `mkOutOfStoreSymlink`. The one exception is `~/.pi/agent/extensions` on x86_64-linux and aarch64-darwin, which links into the built extensions dir of the compiled binary. Layout, vendoring rules, debugging: [REFERENCE.md](REFERENCE.md).
 
 ## Compiled host (`piCompiled`)
 
-On x86_64-linux `pi` runs `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`), not the plain binary. That package compiles 28 loaders into the executable. The binary costs 562 MB. Its store path costs 1.6 GB. A warm build takes 5 to 9 minutes.
+On x86_64-linux and aarch64-darwin `pi` runs `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`), not the plain binary. That package compiles 29 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
 
 **The rule that decides everything.**
 
@@ -23,7 +23,7 @@ The compiler records the absolute path of each extension and a fingerprint of fi
 
 | Command | Binary | Loaders |
 |---------|--------|---------|
-| `pi` | `packages.piCompiled` | 28 compiled names from the store tree, plus `tmax-status` from the repo |
+| `pi` | `packages.piCompiled` | 29 compiled names from the store tree |
 | `pi-stock` | `packages.pi`, plain 1.0.3 | every loader from the repo tree, for extension development |
 
 `pi-stock` sets `PI_CODING_AGENT_DIR=~/.pi/agent-dev`, so it keeps its own sessions and cache.
@@ -128,7 +128,7 @@ Also accept comma-separated lists (e.g. `pi, cursor-provider`).
 
 **Fork upstream sync (default, every fork in scope)**: merge upstream → push fork → bump submodule. Applies even when user names targets explicitly. Opt out only when user explicitly says skip fork sync. Registry + commands: [REFERENCE.md — Fork vendored extensions](REFERENCE.md#fork-vendored-extensions).
 
-**pi bin**: `dendritic/packages/pi-bolt.nix` (pi-bolt, `github:opensec-git/Pi-Bolt`, release tag `bolt-v*`) holds the plain binary as `packages.pi`. `dendritic/packages/pi-bolt-compiled.nix` holds the compiled host as `packages.piCompiled`. The overlay in `dendritic/overlays.nix` installs `piCompiled` on x86_64-linux and `pi` elsewhere. Every `update` that includes `pi` must bump both files to the latest `bolt-v*` release: version, the two platform sha256 in `pi-bolt.nix`, and the six hashes (app, runtime, kit per platform) in `pi-bolt-compiled.nix`. A `coding-agents` flake bump alone changes neither binary.
+**pi bin**: `dendritic/packages/pi-bolt.nix` (pi-bolt, `github:opensec-git/Pi-Bolt`, release tag `bolt-v*`) holds the plain binary as `packages.pi`. `dendritic/packages/pi-bolt-compiled.nix` holds the compiled host as `packages.piCompiled`. The overlay in `dendritic/overlays.nix` installs `piCompiled` on x86_64-linux and aarch64-darwin, and `pi` on the other systems. Every `update` that includes `pi` must bump both files to the latest `bolt-v*` release: version, the two platform sha256 in `pi-bolt.nix`, and the six hashes (app, runtime, kit per platform) in `pi-bolt-compiled.nix`. A `coding-agents` flake bump alone changes neither binary.
 
 Themes and skill submodules **out of scope** unless user names them explicitly; mention they can update same way if asked.
 

@@ -109,11 +109,13 @@
         ln -s ${vendorRoot} $out/vendor
       '';
 
-      # Same guard as the overlay in overlays.nix: only x86_64-linux runs the compiled
-      # binary, so only there does the agent dir point at the store tree. Elsewhere the
-      # plain binary keeps reading the repo tree.
+      # Same guard as the overlay in overlays.nix: only the compiled binary's systems
+      # run from the store tree. Elsewhere the plain binary keeps reading the repo tree.
       piAgentExtensions =
-        if system == "x86_64-linux" then
+        if builtins.elem system [
+          "x86_64-linux"
+          "aarch64-darwin"
+        ] then
           piExtensionsDir
         else
           config.lib.file.mkOutOfStoreSymlink extensionsDir;
@@ -825,6 +827,18 @@
           '') agentDevShared}
           run ln -sfn ${lib.escapeShellArg extensionsDir} ${lib.escapeShellArg "${agentDevDir}/extensions"}
         '';
+
+        # The recursive link below builds a real tree in $HOME. If a symlink still sits at
+        # the target, that build writes through it into the checkout: repo folders become
+        # store symlinks and their tracked files look deleted. So drop a stale symlink
+        # before any linking step runs.
+        home.activation.piAgentExtensionsUnlink =
+          inputs.home-manager.lib.hm.dag.entryBefore [ "checkLinkTargets" ]
+            ''
+              if [ -L ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/extensions"} ]; then
+                run rm ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/extensions"}
+              fi
+            '';
 
         # Replaces the plain repo symlink that coding-agents writes. The compiled binary
         # needs the store tree; the plain one needs the repo tree. Recursive, so activation

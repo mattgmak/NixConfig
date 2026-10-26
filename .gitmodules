@@ -68,9 +68,6 @@
 [submodule "mattgmak/whisper-dictation"]
 	path = vendor/mattgmak/whisper-dictation
 	url = https://github.com/mattgmak/whisper-dictation.git
-[submodule "dabstractor/pi-nvim-bridge"]
-	path = vendor/dabstractor/pi-nvim-bridge
-	url = https://github.com/dabstractor/pi-nvim-bridge.git
 [submodule "fitchmultz/pi-cursor-sdk"]
 	path = vendor/fitchmultz/pi-cursor-sdk
 	url = https://github.com/fitchmultz/pi-cursor-sdk.git
@@ -92,3 +89,6 @@
 [submodule "theo-kirby/tmax"]
 	path = vendor/theo-kirby/tmax
 	url = https://github.com/theo-kirby/tmax
+[submodule "mattgmak/pi-nvim-bridge"]
+	path = vendor/mattgmak/pi-nvim-bridge
+	url = https://github.com/mattgmak/pi-nvim-bridge.git
