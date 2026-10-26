@@ -189,7 +189,7 @@
     flake
     // {
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = flake.legacyPackages.aarch64-linux.mv.unstable;
+        pkgs = flake.legacyPackages.aarch64-linux.mv.droid;
         modules = [ flake.nixOnDroidConfiguration ];
       };
 
@@ -198,7 +198,7 @@
       # will expand to `.#nixOnDroidConfigurations.device`). If you run `nix-on-droid switch --flake path/to/flake`, the
       # `default` configuration will be used.
       nixOnDroidConfigurations.x86-avd = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = flake.legacyPackages.x86_64-linux.mv.unstable;
+        pkgs = flake.legacyPackages.x86_64-linux.mv.droid;
         modules = [ flake.nixOnDroidConfiguration ];
       };
     };

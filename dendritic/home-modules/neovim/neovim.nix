@@ -75,7 +75,9 @@
           shellcheck
           gcc
           gnumake
-          go-bin
+          # go-bin overlay defines it on aarch64-darwin/x86_64-linux only; droid
+          # (aarch64-linux) falls back to the hydra-cached nixpkgs go.
+          pkgs.go-bin or pkgs.go
           ripgrep
           fd
           treesitterPkg
