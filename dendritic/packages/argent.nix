@@ -114,7 +114,7 @@
               };
             }
           )
-          { nodejs_22 = self.packages.${system}.node22-bin; };
+          { };
     in
     {
       packages.argent = argent;

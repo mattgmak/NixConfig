@@ -18,6 +18,13 @@
       # Stylix is absent on the minimal installer ISO; the lua side falls back.
       hasStylix = config.lib ? stylix;
       c = if hasStylix then config.lib.stylix.colors.withHashtag else { };
+      # The flake nixpkgs carries the fixed go_1_27 = 1.27.3. Droid builds from a
+      # multiverse anchor whose go_1_27 is 1.27rc2, so there keep plain `go`.
+      goTooling =
+        let
+          go127 = pkgs.go_1_27 or null;
+        in
+        if go127 != null && lib.versionAtLeast go127.version "1.27.3" then go127 else pkgs.go;
       restorePath = lib.makeBinPath (
         with pkgs;
         [
@@ -75,9 +82,7 @@
           shellcheck
           gcc
           gnumake
-          # go-bin overlay defines it on aarch64-darwin/x86_64-linux only; droid
-          # (aarch64-linux) falls back to the hydra-cached nixpkgs go.
-          pkgs.go-bin or pkgs.go
+          goTooling
           ripgrep
           fd
           treesitterPkg

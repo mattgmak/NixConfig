@@ -10,10 +10,10 @@
       # building them from the overlaid pkgs would recurse back into the overlay.
       pkgs = import inputs.nixpkgs { inherit system; };
 
-      # TODO: drop this file once nixpkgs ships node 24.22.1 and 22.23.4 in the
-      # binary cache. Node 24.18.0 embeds the revoked emSign ECC Root CA - G3.
+      # TODO: drop this file once nixpkgs ships node 24.22.1 in the binary cache.
+      # nixpkgs nodejs_24 is 24.21.0 and embeds the revoked emSign ECC Root CA - G3.
       # It refuses only while a CA variable is set, so it fails open.
-      # The first fixed releases are 24.22.1 and 22.23.4.
+      # 24.22.1 is the first fixed 24.x release and sits in no nixpkgs branch.
       mkNode =
         version: hashes:
         pkgs.callPackage (
@@ -57,8 +57,8 @@
 
             # Keep the tarball layout. bin/node finds lib/ and share/ in place,
             # and bin/npm stays a symlink into lib/node_modules/npm.
-            # The top-level LICENSE and README collide in buildEnv with the go-bin
-            # package. Move them out of $out's root. bin/node does not need them.
+            # The top-level LICENSE and README collide in buildEnv with the nixpkgs
+            # go package. Move them out of $out's root. bin/node does not need them.
             installPhase = ''
               runHook preInstall
               mkdir -p $out
@@ -84,10 +84,6 @@
       packages.node-bin = mkNode "24.22.1" {
         aarch64-darwin = "sha256-icaCWT12zUQjP6U7FWMmTn3py7GJytFpE1xbT637wKc=";
         x86_64-linux = "sha256-62co53xXajUWLBIsRcyt8iTYn/AKvI2uRswol8YALXw=";
-      };
-      packages.node22-bin = mkNode "22.23.4" {
-        aarch64-darwin = "sha256-yeHbx0izPtLRT0JEUZHsrxTFYlnHqaJtAELEnsK2ZCg=";
-        x86_64-linux = "sha256-uEkihMdqVLr1jWFmjdDkHuD8mK2r+VA9MPBdCPVbRAY=";
       };
     };
 }

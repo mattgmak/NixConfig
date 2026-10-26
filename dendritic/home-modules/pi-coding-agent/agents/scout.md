@@ -50,7 +50,7 @@ nix flake archive --json 'git+file:///Users/mattgmak/NixConfig' | jq -r '.inputs
 - `nix eval ...#inputs.<input>.outPath` fails on this flake. It does not expose
   its inputs as outputs.
 - Use `nix flake metadata --json` to show the locked rev only.
-- Some packages carry no source. `dendritic/packages/yazi-bin.nix` downloads a
+- Some packages carry no source. `dendritic/packages/bun-bin.nix` downloads a
   release zip instead.
 
 Use `ctx_shell` for these commands only. Do not build, test, or change

@@ -677,7 +677,7 @@ in
           ollama
           stylua
           podman-tui
-          go-bin
+          go_1_27
           cursor-cli
           bat
           llama-cpp

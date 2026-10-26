@@ -156,7 +156,7 @@
       };
       services.dbus.packages = with pkgs; [
         gnome-keyring
-        gcr
+        gcr_4
       ];
 
       # Set your time zone.
@@ -277,7 +277,7 @@
         pulseaudio-ctl
         croc
         devbox
-        go-bin
+        go_1_27
         podman-tui
         jq
         dnsutils

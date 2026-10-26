@@ -32,9 +32,9 @@
         pkgs = pkgsFor inputs.nixpkgs;
 
         # Overlay-provided: plain `import inputs.nixpkgs` above carries no
-        # common-overlays, so reach the pinned builds through the flake self.
+        # common-overlays, so reach the pinned build through the flake self.
         nodeBin = self.packages.${system}.node-bin;
-        node22Bin = self.packages.${system}.node22-bin;
+        node22Bin = pkgs.nodejs_22;
 
         androidComp = pkgs.androidenv.composeAndroidPackages {
           platformVersions = [

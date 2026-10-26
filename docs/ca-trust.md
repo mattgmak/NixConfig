@@ -2,7 +2,7 @@
 
 Advisory: 20 Oct 2026, <https://emudhra.we-have-a-problem.com/>. Eight eMudhra intermediate keys leaked. They chain to two roots that many trust stores still carry: `CN=AAA Certificate Services` and `CN=emSign ECC Root CA - G3`.
 
-Last checked: 23 Oct 2026, after the switch and the `caEnv` change. The repairs are live and measured.
+Last checked: 26 Oct 2026, after the nixpkgs pin move. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
 
 ## What covers MacMini
 
@@ -79,9 +79,10 @@ Homebrew `python3` 3.14.9 is clean, but no `/opt/homebrew/bin/python3` symlink e
 |---|---|---|
 | bun | 1.4.4 | `dendritic/packages/bun-bin.nix` plus `bunBinOverlay`. Probes return `CERT_REVOKED` with and without `SSL_CERT_FILE` |
 | pi-bolt | 0.9.9 | `SSL_CERT_FILE` names the install bundle, see the Pi-Bolt measurement below. Reopens when the variable is unset |
-| node | 24.22.1, 22.23.4 | `dendritic/packages/node-bin.nix` plus `nodeBinOverlay`. 118 and 116 embedded roots, the root absent, `CERT_REVOKED` in both modes |
-| go | 1.27.3 | `dendritic/packages/go-bin.nix` plus `goBinOverlay`, which adds `go-bin`. The overlay does not shadow `go`, because a shadow rebuilds every `buildGoModule` package from source. The upstream tarball carries the blocked-SPKI denylist |
-| uv | 0.13.4 | `dendritic/packages/uv-bin.nix:19`. Probes refuse with `UnknownIssuer` |
+| node | 24.22.1 | `dendritic/packages/node-bin.nix` plus `nodeBinOverlay`. 118 embedded roots, the root absent, `CERT_REVOKED` in both modes |
+| node (nixpkgs) | 22.23.4 | nixpkgs `nodejs_22` at the new pin. Re-measured 26 Oct: 116 embedded roots, no emSign label in `bin/node` |
+| go | 1.27.3 | nixpkgs `go_1_27` at the new pin. The source carries the blocked-SPKI denylist. `go-bin.nix` and `goBinOverlay` are gone |
+| uv | 0.13.4 | nixpkgs `uv` at the new pin. Re-measured 26 Oct: no `emSign ECC Root CA - G3` and no `AAA Certificate Services` label in `bin/uv`. `uv-bin.nix` and `uvBinOverlay` are gone |
 | ruby (Homebrew) | 4.0.7_1 | Loads 188 CAs from the clean `openssl@4` keg. Refuses with the env deleted |
 | gem (Homebrew) | 4.0.20 | Same clean keg |
 | python3 (Homebrew) | 3.14.9 | Same clean keg. Not on `PATH` as `python3` |
@@ -157,10 +158,10 @@ Bun shows the same shape. It adds the env bundle to its own embedded store, so a
 
 | Package | On this host | First fixed | Declared | Status |
 |---|---|---|---|---|
-| tailscale | absent on this host | 1.104.2, merged to nixpkgs master 22 Oct | `nixos-modules/tailscale.nix:2` | `tailscale-bin.nix:23` pins 1.104.2 for Linux only, wired by `overlays.nix`. One switch clears the four NixOS hosts |
+| tailscale | absent on this host | 1.104.2, merged to nixpkgs master 22 Oct | `nixos-modules/tailscale.nix` no longer sets `package` | nixpkgs `tailscale` is 1.104.2 at the new pin `3ec63636`, so the package needs no pin. `tailscale-bin.nix` and `tailscaleBinOverlay` are gone. One switch clears the four NixOS hosts |
 | webpki-roots | 1.0.9 | 1.0.10, 19 Oct 2026 | `dendritic/packages/lean-ctx.nix` pins v3.11.4, `vendor/mattgmak/lean-ctx` holds two lock files | pending upstream. The shipped asset inherits the tag lock, see the note below |
 
-Tailscale bakes only Lets Encrypt ISRG roots into `net/bakedroots`. Its v1.104.2 changelog names Go 1.27.3 and TS-2026-013. nixos-unstable still shows 1.104.1.
+Tailscale bakes only Lets Encrypt ISRG roots into `net/bakedroots`. Its v1.104.2 changelog names Go 1.27.3 and TS-2026-013. The root pin `3ec63636` now carries 1.104.2.
 
 ### lean-ctx: note only
 
@@ -198,9 +199,9 @@ Root presence still misleads. `libxul.so` of 1.17.15b, 1.19.11b and 1.21.8b list
 
 Node needs 24.22.1 on the 24.x line, or 22.23.4 on 22.x. The release updates bundled roots to NSS 3.131.1 and rejects chains with blocked SPKI hashes. The bump is hygiene while `SSL_CERT_FILE` stays set, and it is the real fix once that variable goes missing.
 
-`dendritic/packages/node-bin.nix` fetches both versions from nodejs.org. `dendritic/overlays.nix` registers `nodeBinOverlay` and adds two attribute names, `node-bin` and `node22-bin`. The overlay does not override `nodejs_24` or `nodejs_22`, because nixpkgs packages depend on those attributes.
+`dendritic/packages/node-bin.nix` fetches 24.22.1 from nodejs.org. `dendritic/overlays.nix` registers `nodeBinOverlay` with one attribute name, `node-bin`. The overlay does not override `nodejs_24`, because nixpkgs packages depend on that attribute.
 
-Consumers repointed: `pi-coding-agent.nix` at `:215,527,607`, `drpom.nix` at `:130,144,146,153,193`, and `argent.nix:117` by a `callPackage` override.
+Consumers repointed: `pi-coding-agent.nix` at `:215,527,607`. The new pin carries `nodejs_22` = 22.23.4, so `drpom.nix` takes `node22Bin` from `pkgs.nodejs_22` and `argent.nix` dropped its `callPackage` override.
 
 One site stays on nixpkgs. The `buildNpmPackage` call for eas-cli at `drpom.nix:85` keeps `nodejs_22`. A different npm changes lock resolution and breaks `npmDepsHash`.
 
@@ -218,36 +219,81 @@ Node 24.22.1 sits in no nixpkgs branch. It exists only at nodejs.org, and that i
 |---|---|---|---|
 | nixos-unstable `02c087f` | 24.21.0 | 22.23.3 | 3.126 |
 | nixpkgs master, 23 Oct | 24.21.0 | 22.23.4, cached | 3.131.1 |
-| root nixpkgs pin `1559d3da`, 2026-07-30 | UNVERIFIED | UNVERIFIED | UNVERIFIED |
+| root nixpkgs pin `3ec63636`, 2026-10-23 | 24.21.0 | 22.23.4, cached on both architectures | 3.131.1 |
 
 No open nixpkgs PR names 24.22.x. `dendritic/mv.nix:24-27` still holds `daysBehind "2026-08-13" 14` on all four anchors.
 
 ## Why the pins exist
 
-This table lists six overlays from `dendritic/overlays.nix`. Five cover this advisory. The sixth, `gleamBinOverlay`, exists only to avoid a Rust source build and has no CA role.
+Two advisory overlays survive in `dendritic/overlays.nix`.
 
 | Overlay | Package | Pinned rev carries | Fix came from |
 |---|---|---|---|
-| `nodeBinOverlay` | node 24.22.1 and 22.23.4 | 24.18.0 | nodejs.org tarball |
-| `uvBinOverlay` | uv 0.13.4 | 0.13.1 | upstream tarball |
+| `nodeBinOverlay` | node 24.22.1 | 24.18.0 | nodejs.org tarball |
 | `bunBinOverlay` | bun 1.4.4 | 1.4.2 | upstream tarball |
-| `goBinOverlay` | go 1.27.3, as `go-bin` | `go_1_27` = 1.27rc2 | upstream tarball. New attribute only, so cached Go packages stay cached |
-| `tailscaleBinOverlay` | tailscale 1.104.2 | 1.104.1 | upstream tarball, Linux only |
-| `gleamBinOverlay` | gleam 1.19.2 | 1.18.0 via `buildRustPackage` | upstream tarball. Build cost only |
 
 Each carries a TODO that names the version which lets it return to nixpkgs. Delete the overlay when the channel reaches it.
 
-`go-bin` is a separate attribute. Add it to a package list. Never replace `go`, because `go` is a build input of every `buildGoModule` package.
+Two overlays have no CA role. `glazeOverlay` pins glaze 7.9.1, because Hyprland v0.56.2 needs glaze 7.x and nixpkgs now ships 9.0.0. `tmaxOverlay` only adds the `tmax` package.
 
-The nixpkgs route stays closed for all three pending fixes. Only nixpkgs master carries `nodejs_22` 22.23.4, `cacert` 3.131.1 and `tailscale` 1.104.2. All three cache on both architectures.
+Five overlays died on 26 Oct, because the new pin reaches the fix. Each took its `*-bin.nix` package file with it.
 
-The root nixpkgs pin is `1559d3da`, from 2026-07-30. The `e72e4f2` commit belongs to the hyprland input, not the root pin. The multiverse anchors resolve to `1559d3da` too, so a day-0 anchor move changes nothing today. The multiverse index ends at 2026-10-20.
+| Overlay | Package | Reason it died |
+|---|---|---|
+| `uvBinOverlay` | uv 0.13.4 | nixpkgs `uv` carries 0.13.4 at the new pin |
+| `goBinOverlay` | go 1.27.3 | nixpkgs `go_1_27` carries 1.27.3 at the new pin |
+| `tailscaleBinOverlay` | tailscale 1.104.2 | nixpkgs `tailscale` carries 1.104.2 at the new pin |
+| `yaziBinOverlay` | yazi 26.9.1 | nixpkgs `yazi` carries 26.9.1 at the new pin |
+| `gleamBinOverlay` | gleam 1.19.2 | cache.nixos.org holds gleam 1.19.2 for x86_64-linux and aarch64-darwin. The overlay removal did not stop the local build, because `bunBinOverlay` still changes gleam. See the build check below |
 
-An anchor move carries no kernel or firmware risk, because both come from the root pin. It does carry homelab upgrade risk.
+Consumers moved with the overlays. `dendritic/common.nix` and `dendritic/hosts/MacMini.nix` now list `go_1_27`. `dendritic/nixos-modules/tailscale.nix` dropped its `package = pkgs.tailscaleBin;` line. `dendritic/home-modules/neovim/neovim.nix` picks the Go tooling with a version test. The multiverse droid anchor still carries `go_1_27` = 1.27rc2 and plain `go` = 1.26.5 there.
 
-The fail-open family stays on the old store until the nixpkgs input moves, because `cacert` 3.126 still ships both roots.
+cacert at the new pin is nss-cacert 3.131.1. It holds 118 anchors, no `AAA Certificate Services`, and only `emSign Root CA - G1` among the emSign names. The fail-open family that reads `SSL_CERT_FILE` now points at a clean bundle. The store-backed runtimes still need their own fixes: bun, node 24 and Pi-Bolt.
 
-`buildGoModule` still compiles with `buildPackages.go_1_26`, so `dendritic/home-modules/tmux.nix:119` keeps 1.26.5. That toolchain builds a local helper and never validates a remote chain.
+`buildGoModule` now compiles with go 1.26.10, so `dendritic/home-modules/tmux.nix:119` (tmux-jump) builds with a fixed toolchain. That helper never validates a remote chain.
+
+The multiverse anchors in `dendritic/mv.nix` still hold `daysBehind "2026-08-13" 14`. Droid and the homelab images keep the July rev, its Go, and its cacert. The multiverse index ends at 2026-10-20, so an anchor move is available. An anchor move carries homelab upgrade risk.
+
+## 26 Oct: the nixpkgs pin moved
+
+The root input moved from `1559d3da` (2026-07-30) to `3ec63636` (2026-10-23). Only that input changed in `flake.lock`.
+
+| Change | Reason or result |
+|---|---|
+| `fzfOverlay` deleted | nixpkgs fzf is 0.74.5, so zoxide and ripgrep-all download from cache again |
+| Five `*-bin` overlays deleted, with their package files | the new pin carries each fixed version |
+| `kdePackages.wacomtablet` removed from `dendritic/hosts/GoofyDesky.nix` | nixpkgs dropped it, and it needed the EOL X11 session |
+| `gcr` changed to `gcr_4` in `dendritic/common.nix` | nixpkgs removed the unversioned attribute |
+| Ramsay dry-run | 951 builds plus 1211 fetched paths, 4.5 GiB download, 12.4 GiB unpacked |
+
+All four NixOS configs, `minimalIso`, `darwinConfigurations.MacMini`, the `android`, `drpom` and `yt-dlp` devShells, `argent` on both architectures, and `nixOnDroidConfigurations.x86-avd` evaluate. `nixOnDroidConfigurations.default` needs an aarch64-linux host.
+
+### Build check on 26 Oct
+
+`nix build --no-link --dry-run` on the Ramsay toplevel splits into a build list and a fetch list. These packages sit in the fetch list, so they download:
+
+| Package | Store name in the fetch list |
+|---|---|
+| fzf | `fzf-0.74.5` |
+| zoxide | `zoxide-0.10.0` |
+| ripgrep-all | `ripgrep-all-0.10.10` |
+| uv | `uv-0.13.4` |
+| tailscale | `tailscale-1.104.2` |
+| yazi | `yazi-26.9.1` |
+
+Two packages sit in the build list.
+
+`nss-cacert-3.131.1` builds by design. `dendritic/nixos-modules/ca-trust.nix` supplies a blocklist with `Comodo AAA Services root` and `emSign ECC Root CA - G3`, so the blocklist derivation differs from nixpkgs and the chain below it has no substitute. The system bundle at `/etc/ssl/certs/ca-bundle.crt` is that local output.
+
+`gleam-1.19.2` builds because `bunBinOverlay` rewrites `bun` everywhere. gleam takes bun in `nativeBuildInputs`, so the overlay changes the gleam derivation. The drv diff shows one input change: `bun-1.4.2.drv` becomes `bun-1.4.4.drv`. `dendritic/packages/pi-bolt-compiled.nix:209` is the only real consumer of `pkgs.bun`. Pointing it at `self.packages.${system}.bunBin` and dropping `bunBinOverlay` returns the gleam substitute. That change is open.
+
+The GoofyDesky toplevel dry-run costs 1731 builds plus 4215 fetched paths, 14.0 GiB download, 38.4 GiB unpacked.
+
+`services.avahi.publish.userServices` is obsolete on the new pin. GoofyDesky prints the warning and the option still works.
+
+`cacertFiltered` on MacMini now filters a bundle that already lacks both roots. It stays as a guard.
+
+No host runs the new pin yet, so every runtime measurement in this document predates the switch.
 
 ## News since 22 Oct
 
@@ -266,7 +312,7 @@ The fail-open family stays on the old store until the nixpkgs input moves, becau
 
 | Gap | Who closes it |
 |---|---|
-| `cacert` 3.125 on the Linux hosts | nixpkgs. Only master carries 3.131.1 |
+| `cacert` 3.125 on the Linux hosts | Closed 26 Oct by the pin move to `3ec63636`. cacert is 3.131.1 there |
 | lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new upstream tag moves the shipped lock. The newest tag holds 1.0.9. The gap closes at a tag lock with 1.0.10 or later, see the note above |
 | fail-open path when the CA variable is unset | Each runtime that keeps its own store. This tree cannot close it. The `node-bin` overlay is the pattern |
 | Pi-Bolt embedded bun 1.4.3-canary.1 | Pi-Bolt upstream. A rebuild of the release asset |
@@ -275,7 +321,7 @@ The fail-open family stays on the old store until the nixpkgs input moves, becau
 
 - The block arithmetic for `/etc/ssl/certs/ca-certificates.crt`. A python ssl decode reports 284 blocks and a raw `BEGIN` count reports 118. Bun refuses under the file in both cases.
 - `git` and `cargo` fail-open behaviour. An empty variable gives no verdict.
-- The `x86_64-linux` branch of `gleam-bin.nix`. `bun-bin.nix` and `go-bin.nix` built on Linux on 23 Oct.
+- `bun-bin.nix` built on Linux on 23 Oct.
 - `python3.14` (Homebrew) runtime probe. The binary name sits outside the shell allowlist.
 - Zulu 17 first fixed build. The store is clean by hand, so this no longer blocks.
 - `keytool` direct output. `cacerts` was read through the Java KeyStore API instead.

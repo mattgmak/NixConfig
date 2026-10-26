@@ -216,7 +216,7 @@ Include **Fork upstream** subsection in preview when any fork targets in scope.
 - dependency changes, npm lockfile changes, overlay hash updates, etc.
 
 ### Post-update steps (if continuing)
-- [ ] `nix flake update coding-agents` (+ possibly `dendritic/overlays.nix` npmDepsHash)
+- [ ] `nix flake update coding-agents` (+ possibly the Pi pin hash in `dendritic/packages/pi-bolt.nix` or `pi-bolt-compiled.nix`)
 - [ ] bump submodule SHAs + `git add` (include `flake.lock` when pi bumped)
 - [ ] `pi-ext-deps-install` for extensions with changed package.json
 - [ ] `home-manager switch` if pi package, a compiled extension, or its deps changed
@@ -234,8 +234,8 @@ Apply per [REFERENCE.md](REFERENCE.md) conventions.
 cd ~/NixConfig
 nix flake update coding-agents
 git add flake.lock
-# If pi-coding-agent npm deps changed, rebuild may fail on npmDepsHash —
-# read the nix error, update hash in dendritic/overlays.nix, retry.
+# A Pi release bump can fail on a stale pin hash. Read the nix error.
+# Update the hash in dendritic/packages/pi-bolt.nix or pi-bolt-compiled.nix, then retry.
 home-manager switch --flake .#<host>   # hand off to user; ask for host if unknown
 ```
 

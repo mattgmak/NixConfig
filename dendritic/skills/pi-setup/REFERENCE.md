@@ -465,7 +465,8 @@ Common failures:
 - Extension load error → missing `npm install`, bad `pi.extensions` path, or stale `@mariozechner/*` peer dep
 - Load unconfirmable by other means: `pi -e <path> --help` exits 0 even for a nonexistent path; `list` outside the first argv token is a **prompt** (real model turn, 403 on unresolved `defaultModel`); `pi list` says “No packages installed” under HM symlinks; `-ne` does not suppress compiled-in extensions. Confirm: `printf '' | pi -ne -e <loader>/index.ts --mode rpc` (load error → non-zero exit)
 - Changes not visible → `/reload` or restart pi; rebuild HM only if Nix wiring changed
-- Pi package build fails after flake update → update `npmDepsHash` in `dendritic/overlays.nix`
+- Pi package build fails after a release bump → update the pin hash in `dendritic/packages/pi-bolt.nix` (`platformAttrs.<system>.hash`) or `dendritic/packages/pi-bolt-compiled.nix` (`appHash`)
+- Pi resolves to `piCompiled` on `x86_64-linux` and `aarch64-darwin`. Other systems get `pi`. `dendritic/overlays.nix` holds no npm hash
 
 ## pi-interactive-subagents fork (curated subagent stack)
 
