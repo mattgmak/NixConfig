@@ -106,8 +106,16 @@
             "vndv/pi-codegraph"
           ];
 
-          extensionsDir = "${self}/dendritic/home-modules/pi-coding-agent/extensions";
-          vendorRoot = "${self}/vendor";
+          # Repo source is the cache key. Copy one named subtree, minus generated
+          # directories, so an unrelated edit keeps every key stable.
+          srcOf = sub: builtins.path {
+            name = "pi-ext-src";
+            path = /. + builtins.unsafeDiscardStringContext "${self}/${sub}";
+            filter = p: _: !(builtins.elem (baseNameOf p) [ ".git" "node_modules" ".engram-deps" ]);
+          };
+
+          extensionsDir = "${srcOf "dendritic/home-modules/pi-coding-agent/extensions"}";
+          vendorRoot = "${srcOf "vendor"}";
           kitTree = "unpack/kit/tree";
 
           # Staged vendor contents that sit below a repo root. The whole repo would put
@@ -152,7 +160,7 @@
               keepDevDeps ? null,
             }:
             let
-              root = vendorRoot + "/${repo}";
+              root = srcOf "vendor/${repo}";
               manifest = lib.importJSON (root + "/package.json");
               lock = lib.importJSON (root + "/package-lock.json");
               patched = lock // {
@@ -195,7 +203,7 @@
           cursorSdkBundle = pkgs.stdenv.mkDerivation {
             pname = "pi-cursor-sdk-bundle";
             version = "0";
-            src = vendorRoot + "/fitchmultz/pi-cursor-sdk";
+            src = srcOf "vendor/fitchmultz/pi-cursor-sdk";
             nativeBuildInputs = [
               pkgs.nodejs
               pkgs.bun
@@ -262,7 +270,7 @@
           agentBrowserNative = pkgs.stdenvNoCC.mkDerivation {
             pname = "pi-agent-browser-native-dist";
             version = "0";
-            src = vendorRoot + "/fitchmultz/pi-agent-browser-native";
+            src = srcOf "vendor/fitchmultz/pi-agent-browser-native";
             nativeBuildInputs = [ pkgs.nodejs ];
             buildPhase = ''
               runHook preBuild
@@ -306,7 +314,7 @@
           agentSte = pkgs.stdenvNoCC.mkDerivation {
             pname = "agent-ste-dist";
             version = "0";
-            src = vendorRoot + "/ctotheameron/agent-ste";
+            src = srcOf "vendor/ctotheameron/agent-ste";
             nativeBuildInputs = [ pkgs.gleam ];
             postPatch = ''
               patchShebangs scripts
@@ -337,7 +345,7 @@
           piLeanCtx = pkgs.stdenvNoCC.mkDerivation {
             pname = "pi-lean-ctx-vendor-bundle";
             version = "0";
-            src = vendorRoot + "/mattgmak/lean-ctx/packages/pi-lean-ctx";
+            src = srcOf "vendor/mattgmak/lean-ctx/packages/pi-lean-ctx";
             nativeBuildInputs = [ pkgs.nodejs ];
             buildPhase = ''
               runHook preBuild
@@ -376,7 +384,7 @@
           engramDeps = pkgs.stdenvNoCC.mkDerivation {
             pname = "engram-pi-deps";
             version = "0";
-            src = vendorRoot + "/Gentleman-Programming/engram/plugin/pi";
+            src = srcOf "vendor/Gentleman-Programming/engram/plugin/pi";
             nativeBuildInputs = [
               pkgs.nodejs
               pkgs.jq
@@ -418,12 +426,12 @@
             dep:
             pkgs.stdenvNoCC.mkDerivation {
               name = "${builtins.baseNameOf dep.repo}-node-modules";
-              src = vendorRoot + "/${dep.repo}";
+              src = srcOf "vendor/${dep.repo}";
               pnpmWorkspaces = dep.workspaces;
               pnpmDeps = pkgs.fetchPnpmDeps {
                 pname = builtins.baseNameOf dep.repo;
                 version = "0";
-                src = vendorRoot + "/${dep.repo}";
+                src = srcOf "vendor/${dep.repo}";
                 fetcherVersion = 4;
                 inherit (dep) hash workspaces;
                 pnpmWorkspaces = dep.workspaces;
