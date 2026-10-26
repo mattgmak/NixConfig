@@ -17,6 +17,10 @@
         hostname = "Droid";
         osConfig = config;
       };
+      # C-; popup sends the kitty keyboard protocol encoding of Ctrl+; (ESC [ 59 ; 5 u).
+      termuxProperties = pkgs.writeText "termux.properties" (lib.generators.toKeyValue { } {
+        extra-keys = "[['ESC','/','-','HOME','UP','END','PGUP'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','DRAWER',{'key':'KEYBOARD','popup':{'macro':'ESC [ 5 9 ; 5 u','display':'C-;'}}]]";
+      });
       # One command into the tmux session "agents" on Ramsay. mosh keeps the
       # link across a network switch; ssh -4 -t is the fallback when mosh is absent.
       # Rename this attribute and the shellAliases entry together.
@@ -118,11 +122,19 @@
           enable = true;
           enableDefaultConfig = false;
         };
-        # Termux extra-keys row: default layout plus DRAWER at the end of row 2.
+        # Termux extra-keys row: DRAWER plus KEYBOARD (toggles the soft keyboard) on row 2.
+        # Swipe up on KEYBOARD sends Ctrl+; as kitty CSI-u bytes. Termux maps Ctrl only to
+        # letters and [ ] ^ _ /, so the CTRL modifier alone drops ';' (no legacy encoding).
         # nix-on-droid has no option for termux.properties, so manage it via home.file.
-        home.file.".termux/termux.properties".text = lib.generators.toKeyValue { } {
-          extra-keys = "[['ESC','/','-','HOME','UP','END','PGUP'],['TAB','CTRL','ALT','LEFT','DOWN','RIGHT','PGDN','DRAWER']]";
-        };
+        # The app runs outside proot and reads real files only (store symlinks are invisible
+        # there, docs/droid-handbook.md pitfall 9), so termuxRealFiles copies the file.
+        home.file.".termux/termux.properties".source = termuxProperties;
+        home.activation.termuxRealFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          mkdir -p "$HOME/.termux"
+          rm -f "$HOME/.termux/termux.properties"
+          cp "${termuxProperties}" "$HOME/.termux/termux.properties"
+          chmod u+w "$HOME/.termux/termux.properties"
+        '';
         # Root-owned store dirs in fpath fail compaudit under the non-root
         # Termux/proot uid and the [y/n] check aborts completions on every
         # new shell; -u skips the audit (nix store is still read-only).
