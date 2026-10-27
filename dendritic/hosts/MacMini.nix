@@ -452,9 +452,9 @@ in
 
       # sshd reads the login shell from the passwd record. nix-darwin touches
       # only the accounts in users.knownUsers, so the shell above never lands
-      # for the admin account. Without this, ssh starts bash and no
-      # home-manager zsh integration loads.
-      system.activationScripts.loginShell.text = ''
+      # for the admin account. nix-darwin runs only the named activation
+      # scripts, so this hook goes into extraActivation.
+      system.activationScripts.extraActivation.text = ''
         echo "setting login shell to zsh..." >&2
         dscl . -create /Users/${username} UserShell /run/current-system/sw/bin/zsh
       '';
