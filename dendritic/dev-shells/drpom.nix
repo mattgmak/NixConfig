@@ -209,9 +209,9 @@
               act
               railway
             ]
-            ++ (if pkgs.stdenv.isDarwin then [ ] else [ ])
+            ++ (if pkgs.stdenv.hostPlatform.isDarwin then [ ] else [ ])
             ++ (
-              if pkgs.stdenv.isLinux then
+              if pkgs.stdenv.hostPlatform.isLinux then
                 [
                   androidenv.androidPkgs.platform-tools
                   androidStudio
@@ -227,7 +227,7 @@
           shellHook = ''
             export NODE_COMPILE_CACHE=~/.cache/nodejs-compile-cache
             ${
-              if pkgs.stdenv.isDarwin then
+              if pkgs.stdenv.hostPlatform.isDarwin then
                 ''
                   export ANDROID_HOME=/Volumes/Kingston480GB/Android/sdk
                   export BUN_INSTALL="$HOME/.bun"

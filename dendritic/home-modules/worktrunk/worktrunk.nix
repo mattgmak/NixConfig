@@ -15,7 +15,7 @@
 
         [post-switch]
         copy-pwd = "printf %s {{ worktree_path }} | ${
-          if pkgs.stdenv.isDarwin then "/usr/bin/pbcopy" else "${pkgs.wl-clipboard}/bin/wl-copy"
+          if pkgs.stdenv.hostPlatform.isDarwin then "/usr/bin/pbcopy" else "${pkgs.wl-clipboard}/bin/wl-copy"
         }"
       '';
     };

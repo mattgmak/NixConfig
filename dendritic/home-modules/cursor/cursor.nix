@@ -25,7 +25,7 @@
         electron = {
           frame = false;
           # titleBarStyle = "hidden";
-          titleBarStyle = if pkgs.stdenv.isDarwin then "hiddenInset" else "hidden";
+          titleBarStyle = if pkgs.stdenv.hostPlatform.isDarwin then "hiddenInset" else "hidden";
           trafficLightPosition = {
             x = 10000;
             y = 10000;
@@ -54,7 +54,7 @@
               inherit hostname pkgs;
               colors = config.lib.stylix.colors;
             };
-            keybindings = if pkgs.stdenv.isDarwin then self.cursorKeybindingsDarwin else self.cursorKeybindings;
+            keybindings = if pkgs.stdenv.hostPlatform.isDarwin then self.cursorKeybindingsDarwin else self.cursorKeybindings;
             userMcp = self.cursorMcp;
             extensions =
               let

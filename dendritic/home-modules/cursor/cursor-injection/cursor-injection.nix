@@ -39,8 +39,8 @@
             echo "Injecting cursor customizations..."
 
             # Get the extracted directory name
-            ${optionalString pkgs.stdenv.isLinux ''extracted_dir=$(find . -maxdepth 1 -name "*extracted" -type d | head -1)''}
-            ${optionalString pkgs.stdenv.isDarwin "extracted_dir=./Cursor.app/Contents"}
+            ${optionalString pkgs.stdenv.hostPlatform.isLinux ''extracted_dir=$(find . -maxdepth 1 -name "*extracted" -type d | head -1)''}
+            ${optionalString pkgs.stdenv.hostPlatform.isDarwin "extracted_dir=./Cursor.app/Contents"}
             if [[ -z "$extracted_dir" ]]; then
               echo "Error: Could not find extracted directory"
               exit 1

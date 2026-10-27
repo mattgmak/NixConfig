@@ -7,7 +7,7 @@
         imports = [ inputs.zen-browser.homeModules.beta ];
         programs.zen-browser = {
           enable = true;
-          nativeMessagingHosts = lib.mkIf pkgs.stdenv.isLinux [ pkgs.firefoxpwa ];
+          nativeMessagingHosts = lib.mkIf pkgs.stdenv.hostPlatform.isLinux [ pkgs.firefoxpwa ];
           policies = {
             Preferences =
               let
@@ -51,7 +51,7 @@
         programs.zen-browser = {
           enable = true;
           darwinDefaultsId = "app.zen-browser.zen";
-          nativeMessagingHosts = lib.mkIf pkgs.stdenv.isLinux [ pkgs.firefoxpwa ];
+          nativeMessagingHosts = lib.mkIf pkgs.stdenv.hostPlatform.isLinux [ pkgs.firefoxpwa ];
           policies =
             let
               mkExtensionSettings = builtins.mapAttrs (
@@ -335,10 +335,10 @@
                 };
               };
 
-              keyboardShortcuts = lib.mkIf pkgs.stdenv.isLinux self.zenBrowserShortcuts;
+              keyboardShortcuts = lib.mkIf pkgs.stdenv.hostPlatform.isLinux self.zenBrowserShortcuts;
               # Fails activation on schema changes to detect potential regressions
               # Find this in about:config or prefs.js of your profile
-              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.isLinux 21;
+              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
               userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
               userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
@@ -380,7 +380,7 @@
         home.file =
           let
             configDir =
-              if pkgs.stdenv.isDarwin then "Library/Application Support/zen/Profiles" else ".config/zen";
+              if pkgs.stdenv.hostPlatform.isDarwin then "Library/Application Support/zen/Profiles" else ".config/zen";
             modules = {
               source = ../../../vendor/mattgmak/zen-wireframe-2/modules;
               recursive = true;

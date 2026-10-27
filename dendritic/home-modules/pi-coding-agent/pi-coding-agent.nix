@@ -713,7 +713,7 @@
           texliveSmall
           mermaid-cli
         ]
-        ++ lib.optionals (!pkgs.stdenv.isDarwin) [ chromium ];
+        ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ chromium ];
     in
     {
       options.piCodingAgent.autoExtDepsInstall = {

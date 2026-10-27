@@ -30,8 +30,8 @@
               # cursorOpenCmd = "nu ~/.config/yazi/scripts/cursor-open.nu";
             in
             {
-              open = if pkgs.stdenv.isDarwin then "open {{filename}}" else "xdg-open {{filename}}";
-              openLink = if pkgs.stdenv.isDarwin then "open {{link}}" else "xdg-open {{link}}";
+              open = if pkgs.stdenv.hostPlatform.isDarwin then "open {{filename}}" else "xdg-open {{filename}}";
+              openLink = if pkgs.stdenv.hostPlatform.isDarwin then "open {{link}}" else "xdg-open {{link}}";
               edit = "nvim {{filename}}";
               editAtLine = "nvim {{filename}} -c 'call cursor({{line}}, 0)'";
               editAtLineAndWait = "nvim {{filename}} -c 'call cursor({{line}}, 0)'";

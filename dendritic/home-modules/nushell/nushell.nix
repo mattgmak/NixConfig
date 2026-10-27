@@ -144,7 +144,7 @@
         environmentVariables = lib.mkMerge [
           config.home.sessionVariables
           {
-            DEVELOPER_DIR = lib.mkIf pkgs.stdenv.isDarwin "/Applications/Xcode.app/Contents/Developer";
+            DEVELOPER_DIR = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin "/Applications/Xcode.app/Contents/Developer";
           }
           # pi-markdown-preview (packages from pi-coding-agent home module)
           {
@@ -152,7 +152,7 @@
             MERMAID_CLI_PATH = lib.getExe pkgs.mermaid-cli;
             PANDOC_PDF_ENGINE = "xelatex";
           }
-          (lib.mkIf pkgs.stdenv.isDarwin {
+          (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
             # nixpkgs chromium is unsupported on darwin — Homebrew casks on MacMini
             PUPPETEER_EXECUTABLE_PATH =
               if builtins.pathExists "/Applications/Chromium.app" then
@@ -160,7 +160,7 @@
               else
                 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
           })
-          (lib.mkIf (!pkgs.stdenv.isDarwin) {
+          (lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
             PUPPETEER_EXECUTABLE_PATH = lib.getExe pkgs.chromium;
           })
         ];

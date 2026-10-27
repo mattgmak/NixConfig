@@ -18,7 +18,7 @@
       programs.ghostty = {
         enable = true;
         package =
-          if pkgs.stdenv.isLinux then
+          if pkgs.stdenv.hostPlatform.isLinux then
             inputs.ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default
           else
             # Ghostty is installed via homebrew on macOS; null keeps the HM
@@ -26,7 +26,7 @@
             # `onChange` validator calls `getExe cfg.package`).
             null;
         settings = {
-          font-size = if pkgs.stdenv.isLinux then 14 else 18;
+          font-size = if pkgs.stdenv.hostPlatform.isLinux then 14 else 18;
           font-family = [
             "IosevkaTerm Nerd Font Propo"
             "Noto Color Emoji"
@@ -133,7 +133,7 @@
       config,
       ...
     }:
-    lib.mkIf (pkgs.stdenv.isDarwin && config.programs.ghostty.package != null) {
+    lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && config.programs.ghostty.package != null) {
       programs = {
         ghostty.installBatSyntax = false;
         bat = {

@@ -40,7 +40,7 @@
           options = "--delete-older-than 7d";
         }
         // (
-          if pkgs.stdenv.isDarwin then
+          if pkgs.stdenv.hostPlatform.isDarwin then
             {
               interval = {
                 Hour = 8;

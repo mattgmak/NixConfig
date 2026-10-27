@@ -23,8 +23,8 @@
         # nh reads these from the environment; session vars so zsh (nh darwin
         # switch / nh os switch) sees them too, not just nu.
         home.sessionVariables = {
-          NH_OS_FLAKE = lib.mkIf pkgs.stdenv.isLinux "${config.home.homeDirectory}/NixConfig";
-          NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.isDarwin (
+          NH_OS_FLAKE = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "${config.home.homeDirectory}/NixConfig";
+          NH_DARWIN_FLAKE = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
             "${config.home.homeDirectory}/NixConfig#darwinConfigurations.MacMini"
           );
         };
