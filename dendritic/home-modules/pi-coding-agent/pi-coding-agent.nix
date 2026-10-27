@@ -364,13 +364,19 @@
               [ -n "$toplevel" ] || continue
               vendor_real=$(cd "$vendor" && pwd -P)
               [ "$toplevel" = "$vendor_real" ] || continue
-              status=$(git -C "$vendor" status --porcelain 2>/dev/null || true)
+              status=$(git -C "$vendor" status --porcelain -- . ':(exclude)theme.json' 2>/dev/null || true)
               [ -n "$status" ] || continue
               name=$(basename "$vendor")
               restore_vendor_tracked_changes "$vendor" "$name"
+              # The powerline theme link is an untracked symlink by design, so the
+              # status filter and the clean both leave it alone.
               if echo "$status" | grep -E '^(\?\?|!!)' >/dev/null; then
                 echo "pi-ext-deps-install: remove untracked files in vendor/$name"
-                git -C "$vendor" clean -fd
+                if [ "$name" = "pi-powerline-footer" ]; then
+                  git -C "$vendor" clean -fd -e theme.json
+                else
+                  git -C "$vendor" clean -fd
+                fi
               fi
             done
           }
@@ -806,8 +812,12 @@
           ''
         );
 
+        # Runs after the deps install, because that install discards untracked vendor
+        # files. The link itself is such a file, so a later install must not win.
         home.activation.linkPiPowerlineTheme =
-          inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+          inputs.home-manager.lib.hm.dag.entryAfter (
+            [ "writeBoundary" ] ++ lib.optional autoExtDepsInstall.enable "autoExtDepsInstall"
+          )
             ''
               mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
               ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
