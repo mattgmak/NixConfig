@@ -159,13 +159,13 @@ Bun shows the same shape. It adds the env bundle to its own embedded store, so a
 | Package | On this host | First fixed | Declared | Status |
 |---|---|---|---|---|
 | tailscale | absent on this host | 1.104.2, merged to nixpkgs master 22 Oct | `nixos-modules/tailscale.nix` no longer sets `package` | nixpkgs `tailscale` is 1.104.2 at the new pin `3ec63636`, so the package needs no pin. `tailscale-bin.nix` and `tailscaleBinOverlay` are gone. One switch clears the four NixOS hosts |
-| webpki-roots | 1.0.9 | 1.0.10, 19 Oct 2026 | `dendritic/packages/lean-ctx.nix` pins v3.11.4, `vendor/mattgmak/lean-ctx` holds two lock files | pending upstream. The shipped asset inherits the tag lock, see the note below |
+| webpki-roots | 1.0.9 | 1.0.10, 19 Oct 2026 | `dendritic/packages/lean-ctx.nix` pins v3.11.4, `vendor/mattgmak/lean-ctx` holds two lock files | pending an upstream release tag. Upstream `main` carries 1.0.11 since 23 Oct. The shipped asset inherits the tag lock |
 
 Tailscale bakes only Lets Encrypt ISRG roots into `net/bakedroots`. Its v1.104.2 changelog names Go 1.27.3 and TS-2026-013. The root pin `3ec63636` now carries 1.104.2.
 
 ### lean-ctx: note only
 
-The two lock files in `vendor/mattgmak/lean-ctx`, `rust/Cargo.lock` and `clients/rust/lean-ctx-client/Cargo.lock`, both pin `webpki-roots` 1.0.9.
+The two lock files in `vendor/mattgmak/lean-ctx`, `rust/Cargo.lock` and `clients/rust/lean-ctx-client/Cargo.lock`, pinned `webpki-roots` 1.0.9 until 27 Oct. Upstream `main` moved both to 1.0.11 at commit `ef3b3bdf7` (23 Oct). The fork merged upstream `main` on 27 Oct and now sits at `415b59508`.
 
 `dendritic/packages/lean-ctx.nix` pins version 3.11.4. It fetches a prebuilt release asset from `https://github.com/yvgude/lean-ctx/releases/download/v3.11.4/`, sets `dontUnpack = true` and runs no compile step.
 
@@ -173,9 +173,11 @@ The package makes no reference to `vendor/mattgmak/lean-ctx`. A lock bump in the
 
 Upstream `.github/workflows/release.yml` builds each asset with `cargo build --release --locked`, so the asset inherits the lock of its tag. The tag lock holds `webpki-roots` 1.0.9 and `webpki-roots` 0.26.11. Version 1.0.9 holds all four emSign roots. Version 1.0.10 drops `emSign ECC Root CA - G3`.
 
-The vendored HEAD lock differs from the tag lock only in `quinn-proto` and `rustls`. That difference changes nothing on this system.
+The vendored HEAD lock now matches upstream `main`. It differs from the tag lock in `webpki-roots`, `quinn-proto` and `rustls`. Neither difference reaches the installed binary.
 
-The newest upstream tag is v3.11.4, published 2026-10-11. No release closes the gap today. The installed binary shows the tag lock in force:
+The newest upstream tag is v3.11.4, published 2026-10-11. `rust/Cargo.toml` on `main` still reads 3.11.4, so no release closes the gap today.
+
+`main` runs 113 commits ahead of that tag. The lock changes since the tag also carry rustls 0.23.46 (RUSTSEC-2026-0346, -0348, -0349), quinn-proto 0.11.19 (RUSTSEC-2026-0338 to 0342), tokio 1.53.3 (RUSTSEC-2026-0386) and zstd 0.14.3. The installed binary shows the tag lock in force:
 
 ```bash
 rg -a -o 'emSign[ -~]{0,30}' "$(realpath "$(command -v lean-ctx)")" | sort -u
@@ -185,7 +187,7 @@ Four emSign labels come back.
 
 The gap closes when upstream publishes a release whose lock carries `webpki-roots` 1.0.10 or later. The crate source diff proves the fix. Version 1.0.9 holds `emSign ECC Root CA - G3`, and version 1.0.10 does not. The other emSign roots stay in both versions.
 
-The sibling root carries the same defect. `webpki-root-certs` 1.0.9 holds the revoked G3 root, and `rustls-platform-verifier` pulls that crate. Version 1.0.10 exists on crates.io. macOS uses security-framework and does not resolve the crate. That target detail is UNVERIFIED, because nobody retested it. No Linux host ships lean-ctx today.
+The sibling root carries the same defect. `webpki-root-certs` 1.0.9 holds the revoked G3 root, and `rustls-platform-verifier` pulls that crate. Upstream `main` resolves that crate to 1.0.11. macOS uses security-framework and does not resolve it. That target detail is UNVERIFIED, because nobody retested it. Ramsay runs the same asset on `x86_64-linux`, and its binary shows the four root labels (measured 27 Oct).
 
 ### Zen browser: OneCRL, not root removal
 
@@ -333,7 +335,7 @@ No host runs the new pin yet, so every runtime measurement in this document pred
 | Gap | Who closes it |
 |---|---|
 | `cacert` 3.125 on the Linux hosts | Closed 26 Oct by the pin move to `3ec63636`. cacert is 3.131.1 there |
-| lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new upstream tag moves the shipped lock. The newest tag holds 1.0.9. The gap closes at a tag lock with 1.0.10 or later, see the note above |
+| lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release tag. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new tag moves the shipped lock. The newest tag holds 1.0.9 and `main` holds 1.0.11, see the note above |
 | fail-open path when the CA variable is unset | Each runtime that keeps its own store. This tree cannot close it. The `node-bin` overlay is the pattern |
 | Pi-Bolt embedded bun 1.4.3-canary.1 | Pi-Bolt upstream. A rebuild of the release asset |
 
