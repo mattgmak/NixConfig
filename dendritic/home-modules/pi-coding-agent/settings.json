@@ -37,7 +37,8 @@
     "commandcode/reflection/beam:free",
     "cursor/grok-4.7@256k:slow",
     "ramsay/qwen3.8-27b",
-    "ramsay/qwen3.8-flash-next"
+    "ramsay/qwen3.8-flash-next",
+    "cursor/grok-4.7@256k:fast"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
