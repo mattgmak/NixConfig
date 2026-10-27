@@ -6,6 +6,7 @@ const ALLOWED_TOOLS: readonly string[] = [
 	"write",
 	"ctx_read",
 	"ctx_shell",
+	"ctx_bg",
 	"ctx_compose",
 	"ctx_search",
 	"todo",
