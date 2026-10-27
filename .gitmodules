@@ -92,3 +92,6 @@
 [submodule "mattgmak/pi-nvim-bridge"]
 	path = vendor/mattgmak/pi-nvim-bridge
 	url = https://github.com/mattgmak/pi-nvim-bridge.git
+[submodule "Pringled/pi-extensions"]
+	path = vendor/Pringled/pi-extensions
+	url = https://github.com/Pringled/pi-extensions.git

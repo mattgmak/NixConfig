@@ -1,0 +1,10 @@
+{
+  "name": "pi-model-pick",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-model-pick (vendored Pringled/pi-extensions submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

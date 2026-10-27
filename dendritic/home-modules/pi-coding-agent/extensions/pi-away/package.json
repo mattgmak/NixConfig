@@ -1,0 +1,10 @@
+{
+  "name": "pi-away",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-away (vendored Pringled/pi-extensions submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
