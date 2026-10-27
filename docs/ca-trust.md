@@ -2,7 +2,7 @@
 
 Advisory: 20 Oct 2026, <https://emudhra.we-have-a-problem.com/>. Eight eMudhra intermediate keys leaked. They chain to two roots that many trust stores still carry: `CN=AAA Certificate Services` and `CN=emSign ECC Root CA - G3`.
 
-Last checked: 26 Oct 2026, after the nixpkgs pin move. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
+Last checked: 27 Oct 2026, after the nixpkgs pin move and the Pi-Bolt 1.0.4 bump. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
 
 ## What covers MacMini
 
@@ -77,8 +77,8 @@ Homebrew `python3` 3.14.9 is clean, but no `/opt/homebrew/bin/python3` symlink e
 
 | Package | Version | Why it clears |
 |---|---|---|
-| bun | 1.4.4 | `dendritic/packages/bun-bin.nix` plus `bunBinOverlay`. Probes return `CERT_REVOKED` with and without `SSL_CERT_FILE` |
-| pi-bolt | 0.9.9 | `SSL_CERT_FILE` names the install bundle, see the Pi-Bolt measurement below. Reopens when the variable is unset |
+| bun | 1.4.4 | `dendritic/packages/bun-bin.nix`. Probes returned `CERT_REVOKED` with and without `SSL_CERT_FILE` on 23 Oct. 27 Oct dropped `bunBinOverlay`, so no host installs bun any more. The package builds the pi-cursor-sdk bundle |
+| pi-bolt | 1.0.4 | `SSL_CERT_FILE` names the install bundle, see the Pi-Bolt measurement below. Reopens when the variable is unset |
 | node | 24.22.1 | `dendritic/packages/node-bin.nix` plus `nodeBinOverlay`. 118 embedded roots, the root absent, `CERT_REVOKED` in both modes |
 | node (nixpkgs) | 22.23.4 | nixpkgs `nodejs_22` at the new pin. Re-measured 26 Oct: 116 embedded roots, no emSign label in `bin/node` |
 | go | 1.27.3 | nixpkgs `go_1_27` at the new pin. The source carries the blocked-SPKI denylist. `go-bin.nix` and `goBinOverlay` are gone |
@@ -225,14 +225,15 @@ No open nixpkgs PR names 24.22.x. `dendritic/mv.nix:24-27` still holds `daysBehi
 
 ## Why the pins exist
 
-Two advisory overlays survive in `dendritic/overlays.nix`.
+One advisory overlay survives in `dendritic/overlays.nix`.
 
 | Overlay | Package | Pinned rev carries | Fix came from |
 |---|---|---|---|
 | `nodeBinOverlay` | node 24.22.1 | 24.18.0 | nodejs.org tarball |
-| `bunBinOverlay` | bun 1.4.4 | 1.4.2 | upstream tarball |
 
-Each carries a TODO that names the version which lets it return to nixpkgs. Delete the overlay when the channel reaches it.
+`bunBinOverlay` died on 27 Oct. It rewrote `pkgs.bun` on two systems, and that rewrite cost gleam its substitute. `dendritic/packages/bun-bin.nix` stays, because the Pi bundle build needs bun 1.4.4. A future `pkgs.bun` consumer gets 1.4.2 and its embedded store. Point such a consumer at `bunBin`.
+
+Both files carry a TODO that names the version which lets them return to nixpkgs. Delete the pin when the channel reaches it.
 
 Two overlays have no CA role. `glazeOverlay` pins glaze 7.9.1, because Hyprland v0.56.2 needs glaze 7.x and nixpkgs now ships 9.0.0. `tmaxOverlay` only adds the `tmax` package.
 
@@ -306,9 +307,9 @@ The release carries Pi 1.4.0. Its notes state that the runtimes are the 1.0.3 ru
 | The installer checks signatures strictly (#165) | No effect here. Nix fetches the archives and pins the hashes |
 | Built-in `grep` and `find` read large files in pieces (#163, #164, #169) | Search uses less memory in the vendor trees |
 
-`bunBinOverlay` is gone. It rewrote `pkgs.bun` on two systems, and that rewrite put gleam in the local build list. `dendritic/packages/pi-bolt-compiled.nix` now takes `bunBin` from the flake for the pi-cursor-sdk bundle, the only bun consumer.
+`dendritic/packages/pi-bolt-compiled.nix` now takes `bunBin` from the flake for the pi-cursor-sdk bundle, the only bun consumer. nixpkgs bun is back to 1.4.2, so the eMudhra fix stays inside `bun-bin.nix`. No host installs bun at run time.
 
-nixpkgs bun is back to 1.4.2, so the eMudhra fix stays inside `bun-bin.nix`. No host installs bun at run time. `nix build` passes for `piCompiled` and `pi`.
+`nix build` passes for `piCompiled` and `pi`.
 
 The Ramsay dry-run now reports 948 builds plus 1173 fetched paths, 4.2 GiB download, and 11.4 GiB unpacked. gleam left the build list. `nss-cacert-3.131.1` is the only nixpkgs package still in it.
 
@@ -340,7 +341,7 @@ No host runs the new pin yet, so every runtime measurement in this document pred
 
 - The block arithmetic for `/etc/ssl/certs/ca-certificates.crt`. A python ssl decode reports 284 blocks and a raw `BEGIN` count reports 118. Bun refuses under the file in both cases.
 - `git` and `cargo` fail-open behaviour. An empty variable gives no verdict.
-- `bun-bin.nix` built on Linux on 23 Oct.
+- `bun-bin.nix` on darwin. The Linux build passed on 27 Oct inside `packages.x86_64-linux.piCompiled`.
 - `python3.14` (Homebrew) runtime probe. The binary name sits outside the shell allowlist.
 - Zulu 17 first fixed build. The store is clean by hand, so this no longer blocks.
 - `keytool` direct output. `cacerts` was read through the Java KeyStore API instead.
@@ -374,4 +375,4 @@ The measured state on 23 Oct, after the switch:
 
 `launchctl getenv` from a plain shell returns empty, because that shell is not in the `gui` bootstrap domain. Ask `launchctl print gui/$(id -u)` instead.
 
-`scripts/check-ca-trust.sh` probes the bundle, the Apple store, curl, bun, node, Apple `python3`, Java and go. The Java probe reads the JKS store by byte search, so it needs no `keytool`. The go probe runs a small program, because go resolves trust through the OS store. The script skips uv, because uv 0.13.4 has no plain HTTPS request subcommand. It still does not probe Homebrew ruby and python3.
+`scripts/check-ca-trust.sh` probes the bundle, the Apple store, curl, bun, node, Apple `python3`, Java and go. The Java probe reads the JKS store by byte search, so it needs no `keytool`. The go probe runs a small program, because go resolves trust through the OS store. The script skips uv, because uv 0.13.4 has no plain HTTPS request subcommand. It still does not probe Homebrew ruby and python3. No host installs bun after 27 Oct, so the bun probe reports `SKIP` from the next switch on.
