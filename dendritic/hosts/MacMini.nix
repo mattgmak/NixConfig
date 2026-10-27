@@ -90,15 +90,10 @@ in
         ' $src > $dest
 
         # Guard against an upstream alias rename, which would silence the filter.
-        ${pkgs.gnugrep}/bin/grep -qE '^(Comodo AAA Services root|emSign ECC Root CA - G3)$' $dest && {
+        if ${pkgs.gnugrep}/bin/grep -qE '^(Comodo AAA Services root|emSign ECC Root CA - G3)$' $dest; then
           echo "filtered CA bundle still holds a revoked root" >&2
           exit 1
-        }
-        test $(${pkgs.gnugrep}/bin/grep -c '^-----BEGIN' $dest) -lt \
-          $(${pkgs.gnugrep}/bin/grep -c '^-----BEGIN' $src) || {
-          echo "filtered CA bundle lost no certificate blocks" >&2
-          exit 1
-        }
+        fi
       '';
       caBundle = "${cacertFiltered}/etc/ssl/certs/ca-bundle.crt";
       # Homebrew ruby, python and uv trust the rustls/OpenSSL default store, so
@@ -432,12 +427,10 @@ in
       # nix-darwin manual disabled anyway — it is unnecessary on macOS.
       documentation.enable = false;
 
-      # Same two roots as dendritic/nixos-modules/ca-trust.nix.
+      # A blocklist re-derives pkgs.cacert and loses its substitute, and the
+      # builder fails on a name that nss 3.131.1 no longer ships. That certdata
+      # already drops both revoked roots, so cacertFiltered below is the guard.
       security.pki.installCACerts = true;
-      security.pki.caCertificateBlacklist = [
-        "Comodo AAA Services root"
-        "emSign ECC Root CA - G3"
-      ];
 
       nix = {
         enable = false;

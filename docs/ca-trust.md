@@ -9,7 +9,7 @@ Last checked: 27 Oct 2026, after the nixpkgs pin move, the Pi-Bolt 1.0.4 bump, a
 `dendritic/hosts/MacMini.nix` wires five layers.
 
 - `launchd.daemons.fix-ssl-cert-pem` (`:483-497`) strips both roots from `/etc/ssl/cert.pem` at boot and daily. It keeps a timestamped backup and rolls back when the advisory probe still trusts the chain. The job needed a `/bin/wait4path /nix/store` wrapper, see the root cause below.
-- `security.pki.caCertificateBlacklist` (`:432-435`) plus `security.pki.installCACerts` (`:431`) write `/etc/ssl/certs/ca-certificates.crt`. Measured: 118 anchors plus 166 reject-marked `aux` entries. Both CNs appear there, as aux entries only. The file refuses the chain at runtime, see the proof below.
+- `security.pki.installCACerts` (`:433`) writes `/etc/ssl/certs/ca-certificates.crt` from plain `pkgs.cacert`. At rev `3ec63636` that package is `nss-cacert-3.131.1`. Its `etc/ssl/certs/ca-bundle.crt` holds 287 certificate blocks. The bundle holds `Comodo AAA Services root` as a reject-marked entry. The bundle holds `emSign Root CA - G1`. The bundle holds neither `emSign ECC Root CA - G3` nor `AAA Certificate Services`. The Comodo block is not trusted for server authentication.
 - `cacertFiltered` (`:79-102`) builds the bundle that `caEnv` points at. Measured: 282 blocks, and neither revoked CN appears at all. This bundle deletes the roots. The other one rejects them.
 - `caEnv` (`:106-114`) keeps six keys on the filtered bundle: `NIX_SSL_CERT_FILE`, `CURL_CA_BUNDLE`, `GIT_SSL_CAINFO`, `REQUESTS_CA_BUNDLE`, `CARGO_HTTP_CAINFO` and `UV_SYSTEM_CERTS`. `SSL_CERT_FILE` names `/etc/ssl/certs/ca-certificates.crt`, a literal install path. Bun adds the env bundle to its own embedded store, so a deleted root does not override the embedded copy. Both delivery paths live at `:612-627`, and a nix eval of each daemon `EnvironmentVariables` shows the new value. A process that reaches neither path falls back to `nss-cacert-3.108`, which still carries both roots as plain anchors.
 - An overlay for `python3Packages.certifi` would repoint its `cacert.pem` symlink from the unfiltered `pkgs.cacert` to `cacertFiltered`. nixpkgs certifi carries no store of its own: it links `cacert.pem` at `${cacert}/etc/ssl/certs/ca-bundle.crt`. No nix python exists on this host.
@@ -253,7 +253,7 @@ Five overlays died on 26 Oct, because the new pin reaches the fix. Each took its
 
 Consumers moved with the overlays. `dendritic/common.nix` and `dendritic/hosts/MacMini.nix` now list `go_1_27`. `dendritic/nixos-modules/tailscale.nix` dropped its `package = pkgs.tailscaleBin;` line. `dendritic/home-modules/neovim/neovim.nix` picks the Go tooling with a version test. The multiverse droid anchor still carries `go_1_27` = 1.27rc2 and plain `go` = 1.26.5 there.
 
-cacert at the new pin is nss-cacert 3.131.1. It holds 118 anchors, no `AAA Certificate Services`, and only `emSign Root CA - G1` among the emSign names. The fail-open family that reads `SSL_CERT_FILE` now points at a clean bundle. The store-backed runtimes still need their own fixes: bun, node 24 and Pi-Bolt.
+cacert at the new pin is nss-cacert 3.131.1. Its `ca-bundle.crt` holds 287 certificate blocks. The bundle holds `emSign Root CA - G1`. It holds neither `emSign ECC Root CA - G3` nor `AAA Certificate Services`. `Comodo AAA Services root` stays as a reject-marked entry. That entry is not trusted for server authentication. `SSL_CERT_FILE` points at the install bundle, which keeps the entry. The other CA variables point at `cacertFiltered`, which drops the Comodo entry and holds 286 blocks. The store-backed runtimes still need their own fixes: bun, node 24 and Pi-Bolt.
 
 `buildGoModule` now compiles with go 1.26.10, so `dendritic/home-modules/tmux.nix:119` (tmux-jump) builds with a fixed toolchain. That helper never validates a remote chain.
 
@@ -288,7 +288,7 @@ All four NixOS configs, `minimalIso`, `darwinConfigurations.MacMini`, the `andro
 
 Two packages sit in the build list.
 
-`nss-cacert-3.131.1` builds by design. `dendritic/nixos-modules/ca-trust.nix` supplies a blocklist with `Comodo AAA Services root` and `emSign ECC Root CA - G3`, so the blocklist derivation differs from nixpkgs and the chain below it has no substitute. The system bundle at `/etc/ssl/certs/ca-bundle.crt` is that local output.
+On 26 Oct the dry-run listed `nss-cacert-3.131.1` because a blocklist override changed the derivation. That override is gone on MacMini. Plain `pkgs.cacert` stays `nss-cacert-3.131.1`. cache.nixos.org serves `/nix/store/49s6yz6m6c4b8nnx9d129jpsk8q6zpkl-nss-cacert-3.131.1`. See the 27 Oct switch section.
 
 `gleam-1.19.2` built because `bunBinOverlay` rewrote `bun` everywhere. gleam takes bun in `nativeBuildInputs`, so the overlay changed the gleam derivation. The drv diff showed one input change: `bun-1.4.2.drv` became `bun-1.4.4.drv`. 27 Oct removed the overlay. See the next section.
 
@@ -315,9 +315,23 @@ The release carries Pi 1.4.0. Its notes state that the runtimes are the 1.0.3 ru
 
 `nix build` passes for `piCompiled` and `pi`.
 
-The Ramsay dry-run now reports 948 builds plus 1173 fetched paths, 4.2 GiB download, and 11.4 GiB unpacked. gleam left the build list. `nss-cacert-3.131.1` is the only nixpkgs package still in it.
+The Ramsay dry-run now reports 948 builds plus 1173 fetched paths, 4.2 GiB download, and 11.4 GiB unpacked. gleam left the build list. MacMini no longer rebuilds `nss-cacert-3.131.1`. The removed override cut the darwin build plan from 142 derivations to 12.
 
 No host runs the new pin yet, so every runtime measurement in this document predates the switch.
+
+## 27 Oct: the MacMini switch failed on the cacert blocklist
+
+`security.pki.caCertificateBlacklist` made nix-darwin call `pkgs.cacert.override`. The call site is nix-darwin `modules/security/pki/default.nix` lines 8-10. The builder fails when a blocklisted name is absent from certdata. It exited 3. The message was `Certs in blocklist but not in cert store: {'emSign ECC Root CA - G3'}`. The override derivation had no cache entry. The switch stopped at the build stage. No new system generation appeared. The newest generation stayed `system-612` from 2026-10-26 17:38.
+
+The blocklist is gone from `dendritic/hosts/MacMini.nix`. `security.pki.installCACerts = true` stays. Certdata already drops `emSign ECC Root CA - G3`. The Comodo entry already carries a reject mark. The blocklist bought nothing. `dendritic/nixos-modules/ca-trust.nix` still lists both names. That override still has no cache entry. The same absent name makes the builder exit 3.
+
+`cacertFiltered` still drops the Comodo entry with awk. The bundle goes from 287 blocks to 286. The certificate-block count guard is gone. The test for a surviving revoked root stays. Upstream cert churn must not fail a switch again.
+
+`/etc/ssl/certs/ca-certificates.crt` holds the Comodo entry as upstream ships it. The entry stays reject-marked. It stays untrusted for server authentication.
+
+`NIX_SSL_CERT_FILE`, `CURL_CA_BUNDLE`, `GIT_SSL_CAINFO`, `REQUESTS_CA_BUNDLE` and `CARGO_HTTP_CAINFO` point at the filtered bundle. `SSL_CERT_FILE` points at the install bundle.
+
+An override, a blocklist or a wrapper builds a new derivation. No binary cache can serve that derivation. A plain reference keeps the upstream derivation. The cache serves it.
 
 ## News since 22 Oct
 
