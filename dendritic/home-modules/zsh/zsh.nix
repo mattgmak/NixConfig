@@ -106,6 +106,9 @@
           )
           # zsh-abbr's job queue defaults to a single /tmp path, so the first
           # user to log in owns it and every other user hits permission denied.
+          # The explicit "\n" is needed: Nix strips the leading newline of an
+          # indented string, so the export above would run into this line.
+          + "\n"
           + ''
             export JOB_QUEUE_TMPDIR="''${XDG_RUNTIME_DIR:-/tmp}/zsh-job-queue-''${UID}/"
           '';
