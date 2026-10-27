@@ -285,6 +285,8 @@
         systemctl-tui
         vesktop
         inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
+        pciutils
+        pkgconf
       ];
 
       programs.gpu-screen-recorder.enable = true;
@@ -300,6 +302,11 @@
         package = pkgs.hyprland;
         portalPackage = pkgs.xdg-desktop-portal-hyprland;
       };
+
+      # The package wraps bin/Hyprland with wrapProgram, so the cap_sys_nice
+      # wrapper fails the wrapper ELF check. Point it at the real binary.
+      # Drop this when the package uses makeBinaryWrapper (nixpkgs #573247).
+      security.wrappers.Hyprland.source = lib.mkForce "${pkgs.hyprland}/bin/.Hyprland-wrapped";
 
       # termfilepickers portal is installed via home-manager, but NIX_XDG_DESKTOP_PORTAL_DIR
       # restricts backend discovery to the system closure. Add it here so its .portal file

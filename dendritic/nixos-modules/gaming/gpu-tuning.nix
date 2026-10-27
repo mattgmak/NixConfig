@@ -151,7 +151,20 @@
             RemainAfterExit = true;
             ExecStart = pkgs.writeShellScript "gpu-tuning-apply" ''
               set -euo pipefail
-              ${nvidiaSmi} -pm 1
+              # A driver bump leaves the loaded module behind until the reboot, and a
+              # failure here rolls the whole switch back. Skip that one case.
+              if ! err=$(${nvidiaSmi} -pm 1 2>&1); then
+                case "$err" in
+                  *"Driver/library version mismatch"*)
+                    echo "gpu-tuning: loaded nvidia module lags userspace, apply after reboot" >&2
+                    exit 0
+                    ;;
+                  *)
+                    echo "$err" >&2
+                    exit 1
+                    ;;
+                esac
+              fi
               ${lib.optionalString (cfg.powerLimit != null) ''
                 # -pl takes watts on driver 595.84 (no * 1000 — that passed 341000 W, rejected)
                 ${nvidiaSmi} -i 0 -pl ${toString cfg.powerLimit}

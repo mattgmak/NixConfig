@@ -13,6 +13,10 @@
         home.stateVersion = "26.05"; # Please read the comment before changing.
         programs.home-manager.enable = true;
 
+        # Stylix still writes the renamed programs.rofi.font option. Rofi is not
+        # installed, so skip the target instead of bumping the Stylix input.
+        stylix.targets.rofi.enable = false;
+
         # npm cache stays on the internal disk, and a slow fetch fails in 30s
         # instead of parking home-manager activation for 5 minutes.
         home.file.".npmrc".text = ''

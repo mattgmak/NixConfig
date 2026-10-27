@@ -159,6 +159,16 @@
                         '';
                       };
                       npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+                      # nixpkgs patch 07ccce23 (PR ggml-org#30034) carries b10450 line
+                      # numbers and fails on the fork's rewritten test. Re-apply its
+                      # effect inline: tests read ggml_backend_dev_count() before
+                      # any backend init.
+                      patches = [ ];
+                      postPatch = ''
+                        ${oldAttrs.postPatch or ""}
+                        sed -i 's/^\(    common_init();\)$/\1\n    llama_backend_init();/' tests/test-llama-archs.cpp
+                        grep -q llama_backend_init tests/test-llama-archs.cpp
+                      '';
                       cmakeFlags =
                         (lib.filter (f: !(lib.hasInfix "LLAMA_BUILD_NUMBER" f)) (oldAttrs.cmakeFlags or [ ]))
                         ++ [
@@ -174,6 +184,10 @@
               in
               {
                 llama-cpp = goofyCudaLlamaCpp;
+
+                # The fork's CMake project version is 0.3.0; whisper-cpp asks for
+                # 0.6.0 when WHISPER_USE_SYSTEM_LLAMA is on.
+                whisper-cpp = pkgs.whisper-cpp.override { llama-cpp = pkgs.llama-cpp; };
 
                 # llama-swap from GitHub releases
                 llama-swap = pkgs.runCommand "llama-swap" { } ''

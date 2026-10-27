@@ -8,14 +8,33 @@
       hostname,
       ...
     }:
+    let
+      system = pkgs.stdenv.hostPlatform.system;
+
+      # The upstream derivation sets SETUPTOOLS_SCM_PRETEND_VERSION as an attribute.
+      # Structured attrs do not export it, so hatch-vcs cannot read it.
+      patchedCli =
+        inputs.caelestia-shell.inputs.caelestia-cli.packages.${system}.default.overrideAttrs
+          (old: {
+            patchPhase = ''
+              export SETUPTOOLS_SCM_PRETEND_VERSION=1
+            '' + (old.patchPhase or "");
+          });
+    in
     {
       imports = [ inputs.caelestia-shell.homeManagerModules.default ];
       gtk.gtk4.theme.name = config.gtk.theme.name;
       # Icon theme managed by stylix.icons (shared with Qt via qt5ct/qt6ct).
       gtk.enable = true;
 
+      # The shell wraps the CLI into its PATH, so the shell needs the patched copy too.
+      programs.caelestia.cli.package = patchedCli;
+
       programs.caelestia = {
         enable = true;
+        package = inputs.caelestia-shell.packages.${system}.with-cli.override {
+          caelestia-cli = patchedCli;
+        };
         systemd.enable = false;
         settings = {
           bar = {

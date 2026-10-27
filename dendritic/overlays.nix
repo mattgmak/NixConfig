@@ -94,6 +94,10 @@
           direnv = super.direnv.overrideAttrs (_: {
             doCheck = false;
           });
+          # test-buffer aborts (SIGABRT) at 5.20.0; upstream test regression at this pin.
+          gtksourceview5 = super.gtksourceview5.overrideAttrs (_: {
+            doCheck = false;
+          });
         })
         inputs.nix4vscode.overlays.default
         inputs.coding-agents.overlays.default

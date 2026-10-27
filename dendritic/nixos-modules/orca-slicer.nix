@@ -25,6 +25,13 @@
           # recipe doesn't build those deps. Slicer/AMS path doesn't need parametric CAD.
           "-DSLIC3R_CAD=OFF"
         ];
+        postPatch = (oldAttrs.postPatch or "") + ''
+          # Nightly pins bundled CPython 3.12.13 with EXACT; nixpkgs python312 is 3.12.15.
+          # Same 3.12 ABI, so a minimum-version check is enough.
+          substituteInPlace CMakeLists.txt --replace-fail \
+            'find_package(Python3 ''${_bundled_python_version} EXACT REQUIRED' \
+            'find_package(Python3 ''${_bundled_python_version} REQUIRED'
+        '';
         preConfigure =
           (oldAttrs.preConfigure or "")
           + ''

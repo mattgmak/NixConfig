@@ -74,6 +74,12 @@
     caelestia-shell = {
       url = "github:caelestia-dots/shell/v2.5.0";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.quickshell.follows = "quickshell";
+    };
+
+    quickshell = {
+      url = "git+https://git.outfoxxed.me/quickshell/quickshell?rev=4f508be500dea6e5732cc3d50382a0048b17e7b1";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
