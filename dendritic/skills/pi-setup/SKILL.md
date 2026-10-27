@@ -24,7 +24,7 @@ The compiler records the absolute path of each extension and a fingerprint of fi
 | Command | Binary | Loaders |
 |---------|--------|---------|
 | `pi` | `packages.piCompiled` | 29 compiled names from the store tree |
-| `pi-stock` | `packages.pi`, plain 1.0.3 | every loader from the repo tree, for extension development |
+| `pi-stock` | `packages.pi`, plain 1.0.4 | every loader from the repo tree, for extension development |
 
 `pi-stock` sets `PI_CODING_AGENT_DIR=~/.pi/agent-dev`, so it keeps its own sessions and cache.
 

@@ -93,7 +93,7 @@ Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at 
 
 ## Compiled host (`piCompiled`)
 
-`packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux and aarch64-darwin. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it on both systems, and at `packages.pi` (plain 1.0.3) on the others.
+`packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux and aarch64-darwin. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it on both systems, and at `packages.pi` (plain 1.0.4) on the others.
 
 The package compiles 29 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
 

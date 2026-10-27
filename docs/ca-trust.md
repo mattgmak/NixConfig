@@ -109,11 +109,11 @@ A JDK reinstall restores both aliases, so rerun the deletes after a Zulu update.
 
 ### Pi-Bolt: measured, not inferred
 
-`libexec/pi/pi-bin` embeds bun 1.4.3-canary.1, commit `c31670df2`. The runtime banner reads `Bun v1.4.3-canary.1+c31670df2`. The literal `1.4.4` appears zero times in the binary. `--version` under `BUN_BE_BUN=1` prints `1.4.3`.
+`libexec/pi/pi` embeds bun 1.4.3-canary.1, commit `7f4574e90`. Pi-Bolt 1.0.3 and 1.0.4 carry the same runtime, as the 1.0.4 notes state. The literal `1.4.4` appears zero times in the 1.0.4 binary. `--version` under `BUN_BE_BUN=1` prints `1.4.3`. `bin/pi --version` prints `1.4.0 (Pi-Bolt 1.0.4, linux-x64, JIT off)`.
 
 The bolt-v0.9.9 release notes say the build takes three fixes from bun 1.4.4. Those are cherry-picked engine patches. They do not move the base runtime.
 
-Pi-Bolt 1.0.1 still prints `1.4.3` on `x86_64-linux`, so the gap stays open.
+Pi-Bolt 1.0.4 still prints `1.4.3` on `x86_64-linux`, so the gap stays open.
 
 Probe through `BUN_BE_BUN=1` on host A:
 
@@ -292,6 +292,21 @@ The GoofyDesky toplevel dry-run costs 1731 builds plus 4215 fetched paths, 14.0 
 `services.avahi.publish.userServices` is obsolete on the new pin. GoofyDesky prints the warning and the option still works.
 
 `cacertFiltered` on MacMini now filters a bundle that already lacks both roots. It stays as a guard.
+
+## 27 Oct: Pi-Bolt 1.0.4
+
+`packages.pi` and `packages.piCompiled` moved from 1.0.3 to `bolt-v1.0.4`. Six hashes changed: the app hash in `dendritic/packages/pi-bolt.nix` for both platforms, and the app, runtime and kit hashes in `dendritic/packages/pi-bolt-compiled.nix`.
+
+The release carries Pi 1.4.0. Its notes state that the runtimes are the 1.0.3 runtimes.
+
+| Release change | Effect here |
+|---|---|
+| `pi-bolt compile` accepts an optional `import()` (#160, #162) | An extension that loads a package only when it exists no longer breaks the compiled build |
+| Compaction scales with the context window (#173). `compaction.thresholdPercent` and `compaction.summaryMaxTokens` are new | This config sets neither, so the new default applies |
+| The installer checks signatures strictly (#165) | No effect here. Nix fetches the archives and pins the hashes |
+| Built-in `grep` and `find` read large files in pieces (#163, #164, #169) | Search uses less memory in the vendor trees |
+
+`nix build` passes for `packages.x86_64-linux.piCompiled` and `packages.x86_64-linux.pi`. The Ramsay dry-run reports 950 builds plus 1211 fetched paths. Both Pi outputs are valid in the local store, so the plan lists no Pi build.
 
 No host runs the new pin yet, so every runtime measurement in this document predates the switch.
 
