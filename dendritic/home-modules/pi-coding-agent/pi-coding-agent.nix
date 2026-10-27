@@ -919,6 +919,22 @@
         home.file.".config/rpiv-todo/config.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/rpiv-todo/config.json";
 
+        # Rootless podman has no /etc/containers/policy.json here, so unsigned image
+        # pulls abort. insecureAcceptAnything lets the crawl4ai and searxng services
+        # pull their images.
+        home.file.".config/containers/policy.json" = {
+          force = true;
+          text = ''
+            {
+                "default": [
+                    {
+                        "type": "insecureAcceptAnything"
+                    }
+                ]
+            }
+          '';
+        };
+
         home.sessionVariables = {
           LEAN_CTX_BIN = lib.getExe leanCtx;
           LEAN_CTX_SHELL = lib.getExe pkgs.bash;
