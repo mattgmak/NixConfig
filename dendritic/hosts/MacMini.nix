@@ -450,6 +450,15 @@ in
         '';
       };
 
+      # sshd reads the login shell from the passwd record. nix-darwin touches
+      # only the accounts in users.knownUsers, so the shell above never lands
+      # for the admin account. Without this, ssh starts bash and no
+      # home-manager zsh integration loads.
+      system.activationScripts.loginShell.text = ''
+        echo "setting login shell to zsh..." >&2
+        dscl . -create /Users/${username} UserShell /run/current-system/sw/bin/zsh
+      '';
+
       # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
       # are inert.  Ditch old profile generations daily with nh instead.
       # Two earlier faults: nothing ran at boot, so the job never left
