@@ -18,10 +18,10 @@
           };
           git = {
             ignoreWhitespaceInDiffView = true;
-            pagers = [
+            diffRenderers = [
               {
                 colorArg = "always";
-                pager = "delta --paging=never --line-numbers --hunk-header-style=omit";
+                command = "delta --paging=never --line-numbers --hunk-header-style=omit";
               }
             ];
           };
