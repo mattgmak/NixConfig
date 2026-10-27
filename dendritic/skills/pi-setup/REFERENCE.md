@@ -40,7 +40,7 @@ Deployed at runtime:
 
 User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 
-Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. On x86_64-linux and aarch64-darwin the overlay installs `dendritic/packages/pi-bolt-compiled.nix` instead, the same binary with 29 extensions compiled in (see [Compiled host](#compiled-host-picompiled)). Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
+Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. On x86_64-linux and aarch64-darwin the overlay installs `dendritic/packages/pi-bolt-compiled.nix` instead, the same binary with 31 extensions compiled in (see [Compiled host](#compiled-host-picompiled)). Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
 
 ### Loader, theme, and skill examples
 
@@ -95,7 +95,7 @@ Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at 
 
 `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux and aarch64-darwin. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it on both systems, and at `packages.pi` (plain 1.0.4) on the others.
 
-The package compiles 29 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
+The package compiles 31 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
 
 ### Package shape
 

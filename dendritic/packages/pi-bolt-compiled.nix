@@ -55,6 +55,7 @@
             "gentle-engram"
             "pi-agent-browser-native"
             "pi-agent-sesh"
+            "pi-away"
             "pi-blackhole"
             "pi-caveman"
             "pi-codegraph"
@@ -65,6 +66,7 @@
             "pi-lean-ctx"
             "pi-markdown-preview"
             "pi-mcp-adapter"
+            "pi-model-pick"
             "pi-nvim"
             "pi-nvim-bridge"
             "pi-opencode-go-usage"
@@ -102,6 +104,7 @@
             "nicobailon/pi-web-access"
             "omaclaren/pi-markdown-preview"
             "patlux/pi-commandcode-provider"
+            "Pringled/pi-extensions"
             "theo-kirby/tmax"
             "vndv/pi-codegraph"
           ];
@@ -616,6 +619,13 @@
             ${lib.concatMapStrings (name: ''
               cp -a ${extensionsDir}/${name} "$HOME/.pi/agent/extensions/${name}"
             '') extensions}
+            # Git ignores the prebuilt bundle in the repo loader folder, so the flake source
+            # lacks it. Ship the compiled bundle here. Both hosts then find it beside
+            # index.ts, and the run-time fingerprint stays stable. cp -a keeps the source
+            # read-only, so make the folder writable first.
+            chmod u+w "$HOME/.pi/agent/extensions/pi-cursor-sdk"
+            cp ${cursorSdkBundle}/pi-bolt-bundle.js \
+              "$HOME/.pi/agent/extensions/pi-cursor-sdk/pi-bolt-bundle.js"
             cp -a stage/extensions/vendor "$HOME/.pi/agent/extensions/vendor"
             chmod -R u+w "$HOME"
 
