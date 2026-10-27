@@ -436,6 +436,20 @@ in
         enable = false;
       };
 
+      # Open-source tailscaled, not the GUI app: no login item, no manual click.
+      # Join once with `sudo tailscale up --hostname=macmini`.
+      services.tailscale.enable = true;
+
+      # Apple sshd. Activation turns Remote Login on, and sshd reads keys from
+      # /etc/ssh/nix_authorized_keys.d, so System Settings needs no change.
+      services.openssh = {
+        enable = true;
+        # sshd forwards no variables by default. COLORTERM gates truecolor in nvim.
+        extraConfig = ''
+          AcceptEnv COLORTERM TERM_PROGRAM
+        '';
+      };
+
       # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
       # are inert.  Ditch old profile generations daily with nh instead.
       # Two earlier faults: nothing ran at boot, so the job never left
@@ -593,6 +607,13 @@ in
       users.users.${username} = {
         home = "/Users/${username}";
         shell = pkgs.zsh;
+        openssh.authorizedKeys.keys = with self.sshKeys; [
+          Goofeus
+          GoofyDesky
+          GoofyEnvy
+          Droid
+          Ramsay
+        ];
       };
 
       environment.shells = with pkgs; [
