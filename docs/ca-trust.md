@@ -2,7 +2,7 @@
 
 Advisory: 20 Oct 2026, <https://emudhra.we-have-a-problem.com/>. Eight eMudhra intermediate keys leaked. They chain to two roots that many trust stores still carry: `CN=AAA Certificate Services` and `CN=emSign ECC Root CA - G3`.
 
-Last checked: 27 Oct 2026, after the nixpkgs pin move and the Pi-Bolt 1.0.4 bump. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
+Last checked: 27 Oct 2026, after the nixpkgs pin move, the Pi-Bolt 1.0.4 bump, and the lean-ctx fork sync. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
 
 ## What covers MacMini
 
@@ -189,6 +189,8 @@ The gap closes when upstream publishes a release whose lock carries `webpki-root
 
 The sibling root carries the same defect. `webpki-root-certs` 1.0.9 holds the revoked G3 root, and `rustls-platform-verifier` pulls that crate. Upstream `main` resolves that crate to 1.0.11. macOS uses security-framework and does not resolve it. That target detail is UNVERIFIED, because nobody retested it. Ramsay runs the same asset on `x86_64-linux`, and its binary shows the four root labels (measured 27 Oct).
 
+**Decision, 27 Oct: wait for the tag.** No local build replaces the prebuilt asset. When a tag lock carries `webpki-roots` 1.0.11 or later, bump `version` in `dendritic/packages/lean-ctx.nix`. Update both asset hashes, then re-run the `emSign` probe.
+
 ### Zen browser: OneCRL, not root removal
 
 A browser keeps its own store, so the root table decides nothing here. The block list does.
@@ -335,7 +337,7 @@ No host runs the new pin yet, so every runtime measurement in this document pred
 | Gap | Who closes it |
 |---|---|
 | `cacert` 3.125 on the Linux hosts | Closed 26 Oct by the pin move to `3ec63636`. cacert is 3.131.1 there |
-| lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release tag. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new tag moves the shipped lock. The newest tag holds 1.0.9 and `main` holds 1.0.11, see the note above |
+| lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release tag. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new tag moves the shipped lock. Decision 27 Oct: wait for that tag, see the note above |
 | fail-open path when the CA variable is unset | Each runtime that keeps its own store. This tree cannot close it. The `node-bin` overlay is the pattern |
 | Pi-Bolt embedded bun 1.4.3-canary.1 | Pi-Bolt upstream. A rebuild of the release asset |
 
