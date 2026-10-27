@@ -63,6 +63,9 @@
 
       programs.nushell = {
         enable = true;
+        # HM 26.11 changes this default to true. Keep false. sessionVariables
+        # already merge into environmentVariables below.
+        loadSessionVariables = false;
         configFile.source = ./config/config.nu;
         envFile.source = ./config/env.nu;
         # To order the extra config after zoxide with default (1000)

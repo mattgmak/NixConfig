@@ -3,9 +3,10 @@
   flake.homeModules.worktrunk =
     { pkgs, ... }:
     {
-      imports = [ inputs.worktrunk.homeModules.default ];
       programs.worktrunk = {
         enable = true;
+        # HM core now ships programs.worktrunk. Keep the pinned flake binary.
+        package = inputs.worktrunk.packages.${pkgs.stdenv.hostPlatform.system}.worktrunk;
         enableNushellIntegration = true;
       };
       home.file.".config/worktrunk/config.toml".text = ''
