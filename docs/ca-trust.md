@@ -244,7 +244,7 @@ Five overlays died on 26 Oct, because the new pin reaches the fix. Each took its
 | `goBinOverlay` | go 1.27.3 | nixpkgs `go_1_27` carries 1.27.3 at the new pin |
 | `tailscaleBinOverlay` | tailscale 1.104.2 | nixpkgs `tailscale` carries 1.104.2 at the new pin |
 | `yaziBinOverlay` | yazi 26.9.1 | nixpkgs `yazi` carries 26.9.1 at the new pin |
-| `gleamBinOverlay` | gleam 1.19.2 | cache.nixos.org holds gleam 1.19.2 for x86_64-linux and aarch64-darwin. The overlay removal did not stop the local build, because `bunBinOverlay` still changes gleam. See the build check below |
+| `gleamBinOverlay` | gleam 1.19.2 | cache.nixos.org holds gleam 1.19.2 for x86_64-linux and aarch64-darwin. The removal alone did not stop the local build, because `bunBinOverlay` still changed gleam. 27 Oct closed that leak |
 
 Consumers moved with the overlays. `dendritic/common.nix` and `dendritic/hosts/MacMini.nix` now list `go_1_27`. `dendritic/nixos-modules/tailscale.nix` dropped its `package = pkgs.tailscaleBin;` line. `dendritic/home-modules/neovim/neovim.nix` picks the Go tooling with a version test. The multiverse droid anchor still carries `go_1_27` = 1.27rc2 and plain `go` = 1.26.5 there.
 
@@ -285,7 +285,7 @@ Two packages sit in the build list.
 
 `nss-cacert-3.131.1` builds by design. `dendritic/nixos-modules/ca-trust.nix` supplies a blocklist with `Comodo AAA Services root` and `emSign ECC Root CA - G3`, so the blocklist derivation differs from nixpkgs and the chain below it has no substitute. The system bundle at `/etc/ssl/certs/ca-bundle.crt` is that local output.
 
-`gleam-1.19.2` builds because `bunBinOverlay` rewrites `bun` everywhere. gleam takes bun in `nativeBuildInputs`, so the overlay changes the gleam derivation. The drv diff shows one input change: `bun-1.4.2.drv` becomes `bun-1.4.4.drv`. `dendritic/packages/pi-bolt-compiled.nix:209` is the only real consumer of `pkgs.bun`. Pointing it at `self.packages.${system}.bunBin` and dropping `bunBinOverlay` returns the gleam substitute. That change is open.
+`gleam-1.19.2` built because `bunBinOverlay` rewrote `bun` everywhere. gleam takes bun in `nativeBuildInputs`, so the overlay changed the gleam derivation. The drv diff showed one input change: `bun-1.4.2.drv` became `bun-1.4.4.drv`. 27 Oct removed the overlay. See the next section.
 
 The GoofyDesky toplevel dry-run costs 1731 builds plus 4215 fetched paths, 14.0 GiB download, 38.4 GiB unpacked.
 
@@ -306,7 +306,11 @@ The release carries Pi 1.4.0. Its notes state that the runtimes are the 1.0.3 ru
 | The installer checks signatures strictly (#165) | No effect here. Nix fetches the archives and pins the hashes |
 | Built-in `grep` and `find` read large files in pieces (#163, #164, #169) | Search uses less memory in the vendor trees |
 
-`nix build` passes for `packages.x86_64-linux.piCompiled` and `packages.x86_64-linux.pi`. The Ramsay dry-run reports 950 builds plus 1211 fetched paths. Both Pi outputs are valid in the local store, so the plan lists no Pi build.
+`bunBinOverlay` is gone. It rewrote `pkgs.bun` on two systems, and that rewrite put gleam in the local build list. `dendritic/packages/pi-bolt-compiled.nix` now takes `bunBin` from the flake for the pi-cursor-sdk bundle, the only bun consumer.
+
+nixpkgs bun is back to 1.4.2, so the eMudhra fix stays inside `bun-bin.nix`. No host installs bun at run time. `nix build` passes for `piCompiled` and `pi`.
+
+The Ramsay dry-run now reports 948 builds plus 1173 fetched paths, 4.2 GiB download, and 11.4 GiB unpacked. gleam left the build list. `nss-cacert-3.131.1` is the only nixpkgs package still in it.
 
 No host runs the new pin yet, so every runtime measurement in this document predates the switch.
 

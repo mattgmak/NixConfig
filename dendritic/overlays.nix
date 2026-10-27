@@ -36,19 +36,6 @@
           node-bin = self.packages.${system}.node-bin;
         };
 
-      # TODO: drop once nixpkgs ships bun 1.4.4 in the binary cache.
-      # 1.4.4 drops the compromised eMudhra intermediates from the bundled store.
-      bunBinOverlay =
-        _final: prev:
-        prev.lib.optionalAttrs (
-          builtins.elem prev.stdenv.hostPlatform.system [
-            "aarch64-darwin"
-            "x86_64-linux"
-          ]
-        ) {
-          bun = self.packages.${system}.bunBin;
-        };
-
       tmaxOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -100,7 +87,6 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         nodeBinOverlay
-        bunBinOverlay
         tmaxOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay

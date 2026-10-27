@@ -1,7 +1,7 @@
 { self, ... }:
 {
   perSystem =
-    { pkgs, ... }:
+    { pkgs, system, ... }:
     let
       piCompiled = pkgs.callPackage (
         {
@@ -206,7 +206,9 @@
             src = srcOf "vendor/fitchmultz/pi-cursor-sdk";
             nativeBuildInputs = [
               pkgs.nodejs
-              pkgs.bun
+              # bunBin, not pkgs.bun: the global bun overlay used to poison every
+              # derivation that takes bun, gleam included.
+              self.packages.${system}.bunBin
             ];
             buildPhase = ''
               runHook preBuild
