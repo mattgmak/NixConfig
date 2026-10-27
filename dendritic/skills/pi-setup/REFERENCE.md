@@ -172,9 +172,7 @@ A lockfile change makes `fetchPnpmDeps` stop and print the new `hash`.
 
 ### Patches
 
-One patch remains: `pi-bolt-compiled/pi-interactive-subagents-typebox.patch`. It points three `@sinclair/typebox` imports at the kit's renamed `typebox` package, which exports the same builders.
-
-The rpiv patches are gone, because 1.0.3 compiles top-level await. `vendor/juicesharp/rpiv-mono` stays on upstream.
+No patch remains. 1.0.5 compile maps `@sinclair/typebox` and the other Pi module names to the kit, so the `pi-interactive-subagents` patch went out. The rpiv patches went out at 1.0.3, which compiles top-level await. `vendor/juicesharp/rpiv-mono` stays on upstream.
 
 ### Extension set decisions
 

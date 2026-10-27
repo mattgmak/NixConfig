@@ -18,7 +18,7 @@
           coreutils,
         }:
         let
-          version = "1.0.4";
+          version = "1.0.5";
 
           # Three assets per system, all from this base:
           #   pi-bolt-<variant>.tar.xz            release app tree
@@ -31,15 +31,15 @@
           platformAttrs = {
             "x86_64-linux" = {
               variant = "linux-x64";
-              appHash = "sha256-ZHglSWc3pgHGOaQbfqJy8V+MPs34yUzAjYhjM41O540=";
-              runtimeHash = "sha256-ufFqNfSfVpDj6f0DNWFG0DhDaZhHxzSLJ8ww1wm+M7c=";
-              kitHash = "sha256-8oOaBSenXD+eCm2woU546tgDLeFSZkEt9VTXzvsLm1A=";
+              appHash = "sha256-PYuanZSuKC0nHzAxVl5pW+j/e1mDtBwptuXUroSq/qA=";
+              runtimeHash = "sha256-GqslBtbX/g3JRHOhmP20oTjPMB8Ysl512B5P8sp1kOY=";
+              kitHash = "sha256-TVwVx41UOeBI/fw/Amxem0BNLLJ177zaPXlawY+/KqQ=";
             };
             "aarch64-darwin" = {
               variant = "darwin-arm64";
-              appHash = "sha256-i+Z8R/h7FiH1IIUAs8VE2FIpM3MNf23lQZ17krzFXK0=";
-              runtimeHash = "sha256-/c15MnQM0xns1kToDiWLcN4+1pRMHSTa0MNKGN23izA=";
-              kitHash = "sha256-Q0eTyICBkF8uvk0asX8chq0g1yqQoW12aYVsqpK7nsU=";
+              appHash = "sha256-wd4/IdbMLAcMMnDQkDX2UCDD+MnUHFHNd+i6eszn0yg=";
+              runtimeHash = "sha256-M6FjaAhY+OafSfKQRyam7Yi1VeuWma+X2KKqCzLrPkg=";
+              kitHash = "sha256-G7UhJIA99icSglseg29EVdiDjdAV2B/sSZYHaGNgWO0=";
             };
           };
 
@@ -584,14 +584,6 @@
             mkdir -p $stage/vendor/.engram-deps
             cp -a ${engramDeps}/node_modules $stage/vendor/.engram-deps/node_modules
             ln -sfn .engram-deps/node_modules $stage/vendor/node_modules
-
-            # pi-interactive-subagents imports the pre-rename @sinclair/typebox name.
-            # The kit carries the renamed `typebox` package, which exports the same
-            # builders, so the patch points the three imports at it.
-            (
-              cd stage/extensions/vendor/mattgmak/pi-interactive-subagents
-              patch -p1 --batch < ${./pi-bolt-compiled/pi-interactive-subagents-typebox.patch}
-            )
 
             # Those two packages import their workspace siblings. The bundler reads the
             # copies under .pibolt-plugins, not the vendor tree, so only the kit's
