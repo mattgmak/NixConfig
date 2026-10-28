@@ -552,7 +552,7 @@ in
           ProgramArguments = [
             "/bin/sh"
             "-c"
-            "/bin/wait4path /nix/store && exec ${raiseProcessLimit}"
+            "/bin/wait4path /nix/store && exec ${lib.getExe raiseProcessLimit}"
           ];
           RunAtLoad = true;
           StandardOutPath = "/var/log/process-limit.log";
