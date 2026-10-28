@@ -237,7 +237,7 @@
           bind-key -T prefix -N "agent-sesh: picker (profile)" C-a run-shell ${lib.escapeShellArg agentSeshProfilePicker}
 
           # Redraw status on pane switch (format-native cwd/app plugins).
-          # No tmux hook for in-pane cwd change; status-interval 1 covers cd updates.
+          # No tmux hook for in-pane cwd change; status-interval 5 covers cd updates.
           set-hook -g after-select-pane 'refresh-client -S'
 
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
@@ -277,8 +277,8 @@
               set -g @powerkit_elements_spacing "false"
               set -g @powerkit_inactive_window_fg "${hexOr "base05" "#ffffff"}"
               set -g @powerkit_status_position "top"
-              set -g status-interval 1
-              set -g @powerkit_status_interval "1"
+              set -g status-interval 5
+              set -g @powerkit_status_interval "5"
               set -g @powerkit_session_normal_color "${sessionBgHex}"
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
@@ -297,7 +297,7 @@
               set -g @powerkit_plugin_pane_application_icon ""
               set -g @powerkit_plugin_agent_counts_icon "󰚩"
               set -g @powerkit_plugin_agent_counts_bin "${agentSeshBin}"
-              set -g @powerkit_plugin_agent_counts_cache_ttl "0"
+              set -g @powerkit_plugin_agent_counts_cache_ttl "60"
             '';
           }
           {
