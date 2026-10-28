@@ -55,6 +55,7 @@
             "gentle-engram"
             "pi-agent-browser-native"
             "pi-agent-sesh"
+            "pi-autoname"
             "pi-away"
             "pi-blackhole"
             "pi-caveman"
@@ -105,6 +106,7 @@
             "omaclaren/pi-markdown-preview"
             "patlux/pi-commandcode-provider"
             "Pringled/pi-extensions"
+            "ssdiwu/pi-autoname"
             "theo-kirby/tmax"
             "vndv/pi-codegraph"
           ];
@@ -117,7 +119,22 @@
             filter = p: _: !(builtins.elem (baseNameOf p) [ ".git" "node_modules" ".engram-deps" ]);
           };
 
-          extensionsDir = "${srcOf "dendritic/home-modules/pi-coding-agent/extensions"}";
+          # Only allowlisted loaders feed the cache key, so a file-only loader add
+          # does not recompile the bundle.
+          extensionsRoot =
+            /. + builtins.unsafeDiscardStringContext
+              "${self}/dendritic/home-modules/pi-coding-agent/extensions";
+          extensionsDir = "${builtins.path {
+            name = "pi-ext-src";
+            path = extensionsRoot;
+            filter = p: type:
+              !(builtins.elem (baseNameOf p) [ ".git" "node_modules" ".engram-deps" ])
+              && !(
+                type == "directory"
+                && builtins.dirOf p == extensionsRoot
+                && !(builtins.elem (baseNameOf p) extensions)
+              );
+          }}";
           vendorRoot = "${srcOf "vendor"}";
           kitTree = "unpack/kit/tree";
 
