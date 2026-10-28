@@ -258,6 +258,8 @@ in
           powertop
           systemctl-tui
           jq
+          # CPU + APU + Strix Halo XDNA NPU TUI: btop has no NPU panel.
+          amdtop
         ];
 
         users.users.${username} = {
@@ -272,6 +274,9 @@ in
         # Agent coding workspace user (AFK / phone-driven pi).
         users.users.agent = {
           isNormalUser = true;
+          # Home Manager user activation needs a live user manager. Without linger,
+          # user@1000 dies on logout and /run/user/1000/bus goes stale.
+          linger = true;
           # Second SSH factor. A password alone stays useless without the key.
           hashedPasswordFile = config.age.secrets."agent-password".path;
           extraGroups = [ "networkmanager" ];
@@ -308,6 +313,13 @@ in
         # mosh UDP 60000-61000 reach the host through tailscale0, which the
         # tailscale module already trusts. No firewall ports are needed.
         programs.mosh.enable = true;
+
+        # The kernel keeps RAPL counters root-only (CVE-2020-8694), so btop cannot
+        # read CPU package watts. udev MODE only touches device nodes, never sysfs
+        # attribute files, so chmod the attribute through RUN.
+        services.udev.extraRules = lib.mkAfter ''
+          ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl*", TEST=="energy_uj", RUN+="${pkgs.coreutils}/bin/chmod 0444 /sys/%p/energy_uj"
+        '';
 
         systemd.services.gufo-models = {
           description = "Fetch pinned inference weights";

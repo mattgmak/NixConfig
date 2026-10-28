@@ -49,6 +49,24 @@
           tmax = self.packages.${system}.tmax;
         };
 
+      # TODO: drop once the nixpkgs pin ships btop 1.4.8 (pin 3ec636362e18 has 1.4.7).
+      # 1.4.8 adds the amdgpu sysfs backend (PR #1661), which reports the Strix Halo
+      # iGPU busy/temp/watts without rocm-smi or /dev/kfd access.
+      btopOverlay =
+        _final: prev:
+        {
+          btop = prev.btop.overrideAttrs (_old: {
+            version = "1.4.8";
+            __intentionallyOverridingVersion = true;
+            src = prev.fetchFromGitHub {
+              owner = "aristocratos";
+              repo = "btop";
+              tag = "v1.4.8";
+              hash = "sha256-NujxQ6d8K+cRlwPfcoJk9XC0GDeh6Omx8x+WkCbxTcs=";
+            };
+          });
+        };
+
       # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [
         glazeOverlay
@@ -88,6 +106,7 @@
         })
         nodeBinOverlay
         tmaxOverlay
+        btopOverlay
         self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {

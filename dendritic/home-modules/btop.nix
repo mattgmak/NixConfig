@@ -17,6 +17,8 @@
         package = btopWithNvml;
         settings = {
           update_ms = 1000;
+          # Needs a readable RAPL energy_uj counter; see the udev rule in Ramsay.nix.
+          show_cpu_watts = true;
         };
       };
     };
