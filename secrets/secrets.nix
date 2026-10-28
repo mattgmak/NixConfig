@@ -1,6 +1,6 @@
 let
   keys = (import ../dendritic/ssh-keys.nix).flake.sshKeys;
-  inherit (keys) AgentAge Droid Goofeus GoofyDesky GoofyDeskyRoot GoofyEnvy MacMini Ramsay RamsayAgent;
+  inherit (keys) AgentAge Droid Goofeus GoofyDesky GoofyDeskyRoot GoofyEnvy MacMini MacMiniHost Ramsay RamsayAgent;
   piRecipients = [ Droid GoofyDesky GoofyEnvy Goofeus AgentAge MacMini Ramsay RamsayAgent ];
 in
 {
@@ -177,15 +177,15 @@ in
   };
 
   # Simulator endpoints on MacMini. Every host may drive them, so each host
-  # key is a recipient.
+  # key is a recipient. MacMiniHost is the key that agenix can decrypt with.
   "argent-server-token.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "manzanasd-auth-token.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "nix-builder-goofydesky.age" = {

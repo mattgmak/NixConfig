@@ -578,6 +578,11 @@ in
             ''
           ];
           RunAtLoad = true;
+          # A tag or ACL change arrives after boot, so retry a failed run.
+          KeepAlive = {
+            SuccessfulExit = false;
+          };
+          ThrottleInterval = 60;
           StandardOutPath = "/var/log/tailscale-serve-sim.log";
           StandardErrorPath = "/var/log/tailscale-serve-sim.log";
         };
@@ -718,7 +723,8 @@ in
           EnvironmentVariables = {
             HOME = "/Users/${username}";
             USER = username;
-            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+            # argent spawns the tool-server through a bare `node` on PATH.
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${pkgs.nodejs_22}/bin";
           };
           RunAtLoad = true;
           KeepAlive = true;

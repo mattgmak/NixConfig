@@ -6,6 +6,9 @@
     GoofyEnvy = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcf8d+U2aI4zO/axcvK97qP1FG9cfwp5CCUuKZEYRu5 goofy@GoofyEnvy";
     Droid = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINKuInd6TqSlVSu3qottOYYODNbdVC07mfEs7Idbo20u";
     MacMini = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILvHr70WhwFy98okSEV2hpsiUMZwqVuME+T97Gd6SGvP mattgmak@Matthews-Mac-mini.local";
+    # macOS host key. agenix decrypts with /etc/ssh/ssh_host_ed25519_key, so
+    # secrets that MacMini itself must read name this key, not the login key.
+    MacMiniHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjazzROpYrCpmXEGzgTSF2Z+lK+q6KtkwicSxke5nsk root@macmini";
     Ramsay = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII1zk63+hPq2dUA/6MUgLW3ryisp/dZQ8GuiPDYpyiFK root@Ramsay";
     RamsayAgent = "age1d2cjwq3q74ms05zj4qge8lxlf5ac3nl25ajy8vxeyy2qd2x733xqg43mya";
     # Passphrase-less identity for agent@Goofeus, decrypts API secrets headlessly.
