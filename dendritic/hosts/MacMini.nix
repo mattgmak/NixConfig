@@ -685,7 +685,14 @@ in
           ProgramArguments = [
             "/bin/sh"
             "-c"
-            "/bin/wait4path /nix/store && exec env MANZANASD_AUTH_TOKEN=\"$(cat ${config.age.secrets.manzanasd-auth-token.path})\" ${self.packages.${system}.manzanas}/bin/manzanasd -addr 127.0.0.1:${toString manzanasPort}"
+            ''
+              /bin/wait4path /nix/store
+              # A missing secret means agenix has not run yet. Fail, so launchd
+              # retries and the daemon never starts without auth.
+              token=$(cat ${config.age.secrets.manzanasd-auth-token.path}) || exit 1
+              [ -n "$token" ] || exit 1
+              exec env MANZANASD_AUTH_TOKEN="$token" ${self.packages.${system}.manzanas}/bin/manzanasd -addr 127.0.0.1:${toString manzanasPort}
+            ''
           ];
           UserName = username;
           EnvironmentVariables = {
@@ -709,21 +716,28 @@ in
         owner = username;
       };
 
-      # Shared argent tool-server. `server start` stays in the foreground, so
-      # launchd owns the pid. ARGENT_AUTH_TOKEN is the token variable that the
-      # bundled tool-server reads.
+      # Shared argent tool-server. Run the bundled entry directly: the
+      # `argent server start` CLI mints its own token and prints it to stdout,
+      # which defeats a fixed token from the secret store. The entry reads
+      # ARGENT_AUTH_TOKEN, so our token reaches the server unchanged.
       launchd.agents.argent = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
             "-c"
-            "/bin/wait4path /nix/store && exec env ARGENT_AUTH_TOKEN=\"$(cat ${config.age.secrets.argent-server-token.path})\" ${self.packages.${system}.argent}/bin/argent server start --host 127.0.0.1 --port ${toString argentPort}"
+            ''
+              /bin/wait4path /nix/store
+              token=$(cat ${config.age.secrets.argent-server-token.path}) || exit 1
+              [ -n "$token" ] || exit 1
+              exec env ARGENT_AUTH_TOKEN="$token" ARGENT_HOST=127.0.0.1 ARGENT_PORT=${toString argentPort} \
+                ${pkgs.nodejs_22}/bin/node ${self.packages.${system}.argent}/libexec/argent/dist/tool-server.cjs start
+            ''
           ];
           UserName = username;
           EnvironmentVariables = {
             HOME = "/Users/${username}";
             USER = username;
-            # argent spawns the tool-server through a bare `node` on PATH.
+            # The server spawns helper binaries beside the package.
             PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${pkgs.nodejs_22}/bin";
           };
           RunAtLoad = true;
