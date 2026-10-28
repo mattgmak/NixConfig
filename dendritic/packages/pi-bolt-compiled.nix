@@ -137,6 +137,12 @@
                 && !(builtins.elem (baseNameOf p) extensions)
               );
           }}";
+
+          # A listed loader must exist in the flake source. Git mode hides an untracked
+          # path, and the build then stops at a bare `cp: cannot stat`.
+          missingLoaders = builtins.filter (
+            name: !(builtins.pathExists "${extensionsRoot}/${name}")
+          ) extensions;
           vendorRoot = "${srcOf "vendor"}";
           kitTree = "unpack/kit/tree";
 
@@ -498,6 +504,8 @@
           wrapperLdFlag = lib.optionalString stdenv.hostPlatform.isLinux
             "--prefix LD_LIBRARY_PATH : ${stdenv.cc.cc.lib}/lib";
         in
+        assert lib.assertMsg (missingLoaders == [ ])
+          "pi-bolt-compiled: loader dir absent from the flake source: ${lib.concatStringsSep ", " missingLoaders}. Run git add -N on each.";
         stdenv.mkDerivation {
           pname = "pi-compiled";
           inherit version;
