@@ -98,3 +98,6 @@
 [submodule "ssdiwu/pi-autoname"]
 	path = vendor/ssdiwu/pi-autoname
 	url = https://github.com/ssdiwu/pi-autoname
+[submodule "gsanhueza/pi-token-speed"]
+	path = vendor/gsanhueza/pi-token-speed
+	url = https://github.com/gsanhueza/pi-token-speed

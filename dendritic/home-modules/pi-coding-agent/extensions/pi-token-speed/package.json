@@ -1,0 +1,10 @@
+{
+  "name": "pi-token-speed",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-token-speed (vendored gsanhueza/pi-token-speed submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
