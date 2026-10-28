@@ -66,6 +66,7 @@ in
     {
       pkgs,
       lib,
+      config,
       hostname,
       username,
       mv,
@@ -211,6 +212,9 @@ in
         builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
       );
       searxngPort = 8888;
+      manzanasPort = 7433;
+      argentPort = 4000;
+      tailscalePackage = config.services.tailscale.package;
       # Pin the multi-arch OCI *index* digest, not a platform sub-manifest: podman
       # then selects the native image. Pinning the amd64 sub-manifest digest made
       # arm64 hosts run the image under qemu, which segfaults.
@@ -415,6 +419,21 @@ in
         ];
         text = builtins.readFile ../../scripts/root-flake-sources.sh;
       };
+      # Simulators exhaust kern.maxproc before RAM. nix-darwin has no option for
+      # a kernel tunable, so a root job sets it. /etc/sysctl.conf carries the
+      # value across a reboot, because the runtime write can be refused.
+      raiseProcessLimit = pkgs.writeShellApplication {
+        name = "raise-process-limit";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = ''
+          maxproc=8192
+          maxprocperuid=4096
+          /usr/sbin/sysctl -w kern.maxproc="$maxproc" || true
+          /usr/sbin/sysctl -w kern.maxprocperuid="$maxprocperuid" || true
+          printf 'kern.maxproc=%s\nkern.maxprocperuid=%s\n' "$maxproc" "$maxprocperuid" >/etc/sysctl.conf
+          /usr/sbin/sysctl kern.maxproc kern.maxprocperuid
+        '';
+      };
     in
     {
       nixpkgs.overlays = common-overlays;
@@ -439,6 +458,12 @@ in
       # Open-source tailscaled, not the GUI app: no login item, no manual click.
       # Join once with `sudo tailscale up --hostname=macmini`.
       services.tailscale.enable = true;
+
+      # A sleeping console stalls the simulators that agents drive.
+      power.sleep = {
+        computer = "never";
+        display = "never";
+      };
 
       # Apple sshd. Activation turns Remote Login on, and sshd reads keys from
       # /etc/ssh/nix_authorized_keys.d, so System Settings needs no change.
@@ -518,6 +543,43 @@ in
           EnvironmentVariables = caEnv;
           StandardOutPath = "/var/log/fix-ssl-cert-pem.log";
           StandardErrorPath = "/var/log/fix-ssl-cert-pem.log";
+        };
+      };
+
+      # Simulators run out of processes before they run out of RAM.
+      launchd.daemons.process-limit = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec ${raiseProcessLimit}"
+          ];
+          RunAtLoad = true;
+          StandardOutPath = "/var/log/process-limit.log";
+          StandardErrorPath = "/var/log/process-limit.log";
+        };
+      };
+
+      # Tailnet HTTPS for the two simulator endpoints. This mirrors the NixOS
+      # tailscale-serve jobs; each svc: name must exist in the tailnet admin.
+      launchd.daemons.tailscale-serve-sim = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            ''
+              /bin/wait4path /nix/store
+              for _ in $(seq 1 30); do
+                ${tailscalePackage}/bin/tailscale status >/dev/null 2>&1 && break
+                sleep 2
+              done
+              ${tailscalePackage}/bin/tailscale serve --yes --service=svc:manzanas --https=443 127.0.0.1:${toString manzanasPort}
+              ${tailscalePackage}/bin/tailscale serve --yes --service=svc:argent --https=443 127.0.0.1:${toString argentPort}
+            ''
+          ];
+          RunAtLoad = true;
+          StandardOutPath = "/var/log/tailscale-serve-sim.log";
+          StandardErrorPath = "/var/log/tailscale-serve-sim.log";
         };
       };
 
@@ -602,6 +664,68 @@ in
           WorkingDirectory = "/Users/${username}";
           StandardOutPath = "/Users/${username}/.local/state/searxng.stdout.log";
           StandardErrorPath = "/Users/${username}/.local/state/searxng.stderr.log";
+        };
+      };
+
+      # manzanasd hands out simulator leases to tailnet agents on port 7433.
+      # It binds loopback and tailscale serve publishes it. Logs go to
+      # ~/Library/Logs because launchd cannot create a missing parent dir.
+      age.secrets.manzanasd-auth-token = {
+        file = ../../secrets/manzanasd-auth-token.age;
+        owner = username;
+      };
+
+      launchd.agents.manzanasd = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec env MANZANASD_AUTH_TOKEN=\"$(cat ${config.age.secrets.manzanasd-auth-token.path})\" ${self.packages.${system}.manzanas}/bin/manzanasd -addr 127.0.0.1:${toString manzanasPort}"
+          ];
+          UserName = username;
+          EnvironmentVariables = {
+            HOME = "/Users/${username}";
+            USER = username;
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          };
+          RunAtLoad = true;
+          KeepAlive = true;
+          ThrottleInterval = 30;
+          WorkingDirectory = "/Users/${username}";
+          StandardOutPath = "/Users/${username}/Library/Logs/manzanasd.stdout.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/manzanasd.stderr.log";
+        };
+      };
+
+      # Bearer token for the shared argent tool-server. The owner is the login
+      # user, so the agent below can read it.
+      age.secrets.argent-server-token = {
+        file = ../../secrets/argent-server-token.age;
+        owner = username;
+      };
+
+      # Shared argent tool-server. `server start` stays in the foreground, so
+      # launchd owns the pid. ARGENT_AUTH_TOKEN is the token variable that the
+      # bundled tool-server reads.
+      launchd.agents.argent = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            "/bin/wait4path /nix/store && exec env ARGENT_AUTH_TOKEN=\"$(cat ${config.age.secrets.argent-server-token.path})\" ${self.packages.${system}.argent}/bin/argent server start --host 127.0.0.1 --port ${toString argentPort}"
+          ];
+          UserName = username;
+          EnvironmentVariables = {
+            HOME = "/Users/${username}";
+            USER = username;
+            PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+          };
+          RunAtLoad = true;
+          KeepAlive = true;
+          ThrottleInterval = 30;
+          WorkingDirectory = "/Users/${username}";
+          StandardOutPath = "/Users/${username}/Library/Logs/argent.stdout.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/argent.stderr.log";
         };
       };
 
@@ -714,6 +838,7 @@ in
           # Argent MCP server: pi's mcp.json spawns bare "argent", so it must be on the
           # global PATH, not just a devshell. Deduplicated from dev-shells/drpom.
           self.packages.${pkgs.stdenv.hostPlatform.system}.argent
+          self.packages.${pkgs.stdenv.hostPlatform.system}.manzanas
           self.packages.${pkgs.stdenv.hostPlatform.system}.launchk
         ]
         ++ (with pkgs.darwin; [
@@ -891,6 +1016,14 @@ in
             "com.apple.loginwindow" = {
               LoginwindowLaunchesRelaunchApps = false;
             };
+          };
+          # Boot lands on the desktop, so an agent session needs no password.
+          # FileVault must stay off: a pre-boot unlock prompt defeats this.
+          loginwindow.autoLoginUser = username;
+          # A locked screen blocks the session that the launchd agents use.
+          screensaver = {
+            askForPassword = false;
+            askForPasswordDelay = 0;
           };
         };
         primaryUser = username;

@@ -176,6 +176,18 @@ in
     publicKeys = piRecipients;
   };
 
+  # Simulator endpoints on MacMini. Every host may drive them, so each host
+  # key is a recipient.
+  "argent-server-token.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
+  "manzanasd-auth-token.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [
