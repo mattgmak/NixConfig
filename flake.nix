@@ -85,7 +85,7 @@
     # nixpkgs-xr.url = "github:nix-community/nixpkgs-xr";
 
     ghostty = {
-      url = "github:ghostty-org/ghostty?ref=v1.3.1";
+      url = "github:ghostty-org/ghostty?ref=v1.4.0";
       inputs.home-manager.follows = "home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
