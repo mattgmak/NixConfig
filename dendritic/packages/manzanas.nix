@@ -7,11 +7,13 @@
   perSystem =
     { pkgs, ... }:
     let
+      axe = self.packages.${pkgs.stdenv.hostPlatform.system}.axe;
       manzanas = pkgs.callPackage (
         {
           lib,
           stdenvNoCC,
           fetchurl,
+          makeWrapper,
         }:
         stdenvNoCC.mkDerivation (finalAttrs: {
           pname = "manzanas";
@@ -42,11 +44,18 @@
           '';
           sourceRoot = ".";
 
+          nativeBuildInputs = [ makeWrapper ];
+
           installPhase = ''
             runHook preInstall
             install -d "$out/bin"
             install -m 0755 manzanas manzanasd manzanas-broker "$out/bin/"
-            install -m 0755 ${finalAttrs.simbridge} "$out/bin/simbridge"
+            install -d "$out/libexec"
+            install -m 0755 ${finalAttrs.simbridge} "$out/libexec/simbridge"
+            # The release links FBSimulatorControl through an rpath of the CI
+            # build host, so the AXe frameworks must come from the environment.
+            makeWrapper "$out/libexec/simbridge" "$out/bin/simbridge" \
+              --prefix DYLD_FRAMEWORK_PATH : ${axe}/libexec/axe/Frameworks
             install -d "$out/share/manzanas"
             install -m 0644 LICENSE NOTICE "$out/share/manzanas/"
             runHook postInstall
