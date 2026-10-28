@@ -2,7 +2,7 @@
 
 Advisory: 20 Oct 2026, <https://emudhra.we-have-a-problem.com/>. Eight eMudhra intermediate keys leaked. They chain to two roots that many trust stores still carry: `CN=AAA Certificate Services` and `CN=emSign ECC Root CA - G3`.
 
-Last checked: 27 Oct 2026, after the nixpkgs pin move, the Pi-Bolt 1.0.4 bump, and the lean-ctx fork sync. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
+Last checked: 27 Oct 2026, after the nixpkgs pin move, the Pi-Bolt 1.0.4 bump, the lean-ctx fork sync, and the node-bin unpatch. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
 
 ## What covers MacMini
 
@@ -140,6 +140,16 @@ direnv fetchurl https://dv-g3b-emudhra.we-have-a-problem.com/ sha256-AAAA…=
 The same refusal appears with `SSL_CERT_FILE` at the filtered bundle and with `SSL_CERT_FILE` at the dirty `/etc/ssl/cert.pem`. The binary reports `go1.24.4`, so the verdict comes from the platform verifier and not from Go's 1.27.3 denylist. System curl refuses with exit 60 for the same reason.
 
 So the dirty `/etc/ssl/cert.pem` exposes only the clients that read it as a file. OpenSSL clients do, and Apple `python3` is one of them. SecureTransport and Go clients ask the keychain instead, and `SSL_CERT_FILE` does not reach them on darwin.
+
+## node-bin ships unpatched
+
+The linux tarball keeps its generic `/lib64/ld-linux-x86-64.so.2` interpreter.
+`autoPatchelf` broke node 24.22.1 with SIGSEGV, so the derivation no longer patches it.
+`nix-ld` in `dendritic/common.nix` supplies that interpreter.
+
+Verify with `nix eval --raw .#packages.x86_64-linux.node-bin.version`, then `nix build .#packages.x86_64-linux.node-bin --no-link --print-out-paths`, then `<out>/bin/node --version`. Expect `v24.22.1` and exit 0.
+
+The CA property of the tarball is unchanged, because patching never touched the embedded roots.
 
 ## Affected: fails open when the env is missing
 

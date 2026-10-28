@@ -22,7 +22,6 @@
             stdenv,
             stdenvNoCC,
             fetchurl,
-            autoPatchelfHook,
           }:
           let
             srcs = {
@@ -47,10 +46,8 @@
               inherit (src) url hash;
             };
 
-            # The linux build is a PIE that wants libgcc_s.
-            # The darwin build is a plain Mach-O and needs no patching.
-            nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
-            buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ stdenv.cc.cc.lib ];
+            # Ship the tarball unpatched. autoPatchelf rewrote the interpreter to a newer
+            # glibc and node then crashed with SIGSEGV. nix-ld resolves the /lib64 stub.
 
             dontConfigure = true;
             dontBuild = true;
