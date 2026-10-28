@@ -7,6 +7,11 @@
   hl.permission("/run/current-system/sw/bin/steam", "keyboard", "allow")
   hl.permission("/run/current-system/sw/bin/steam", "input-capture", "allow")
 
+  -- Screenshot tools. grim captures, hyprpicker paints the frozen screen behind the picker.
+  hl.permission(".*/grim", "screencopy", "allow")
+  hl.permission(".*/hyprpicker", "screencopy", "allow")
+  hl.permission(".*/hyprpicker", "cursorpos", "allow")
+
   -- Hyprland plugins (nix store paths change per rebuild, so match by name)
   hl.permission(".*/libcsgo-vulkan-fix\\.so", "plugin", "allow")
   hl.permission(".*/libhyprgrass\\.so", "plugin", "allow")

@@ -73,7 +73,7 @@ let
     (bind "SUPER + Q" "hl.dsp.exec_cmd(\"ghostty --title=btop -e btop\")" null)
     (bind "SUPER + A" "hl.dsp.exec_cmd(\"ghostty --title=wiremix -e wiremix\")" null)
     (bind "SUPER + M" "hl.dsp.exec_cmd(\"ghostty --title=nmtui -e nmtui\")" null)
-    (bind "SUPER + SHIFT + S" "hl.dsp.global(\"caelestia:screenshotFreeze\")" null)
+    (bind "SUPER + SHIFT + S" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/screenshot-copy.sh\")" null)
     (bind "SUPER + SHIFT + C" "hl.dsp.exec_cmd(\"hyprpicker -a\")" null)
     (bind "ALT + N" "hl.dsp.global(\"caelestia:clearNotifs\")" null)
     (bind "ALT + B" "hl.dsp.exec_cmd(\"caelestia shell drawers toggle sidebar\")" null)

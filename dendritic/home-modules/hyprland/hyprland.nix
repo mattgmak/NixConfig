@@ -32,6 +32,8 @@
 
       home.packages = with pkgs; [
         grim
+        imagemagick
+        jq
         hyprpaper
         hypridle
         hyprpicker
