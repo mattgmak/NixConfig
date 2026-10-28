@@ -482,6 +482,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | `pi-caveman` | caveman mode in subagents |
 | `pi-codegraph` | codegraph tools |
 | `pi-token-speed` | live tok/s in subagent footer |
+| `agent-ste` | STE lint on subagent writes and replies |
 
 **Conditional:**
 - `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
