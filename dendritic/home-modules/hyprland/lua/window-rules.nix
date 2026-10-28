@@ -98,17 +98,6 @@ let
       float = true;
     })
     (mkRule {
-      name = "floating-terminal";
-      match = {
-        title = "(floating-terminal)";
-      };
-      float = true;
-      pin = true;
-      center = true;
-      stay_focused = true;
-      size = vec2 1200 800;
-    })
-    (mkRule {
       name = "android-emulator-float";
       match = {
         class = "(Emulator)";
