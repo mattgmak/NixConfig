@@ -629,8 +629,3 @@ keymap = [
   { on = "f", run = "filter", desc = "Filter files" },
 ]
 
-[[mgr.prepend_keymap]]
-# Cursor edit
-on = ["e"]
-run = '''shell -- nu ~/.config/yazi/scripts/cursor-open.nu %s'''
-desc = "Edit with Cursor"

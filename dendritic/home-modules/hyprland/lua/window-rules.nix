@@ -120,17 +120,9 @@ let
     (mkRule {
       name = "focus-cursor-zen";
       match = {
-        class = "([Cc]ursor|zen.*)";
+        class = "(zen.*)";
       };
       focus_on_activate = true;
-    })
-    (mkRule {
-      name = "center-floating-cursor";
-      match = {
-        class = "([Cc]ursor)";
-        float = true;
-      };
-      center = true;
     })
     (mkRule {
       name = "no-anim-switcher";

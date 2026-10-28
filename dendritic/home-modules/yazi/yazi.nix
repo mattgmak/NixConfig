@@ -94,7 +94,6 @@
           "${baseConfigPath}/keymap.toml" = {
             source = ./keymap.toml;
           };
-          "${baseConfigPath}/scripts/cursor-open.nu".source = ./scripts/cursor-open.nu;
         };
     };
 }

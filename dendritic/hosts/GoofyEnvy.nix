@@ -52,7 +52,6 @@
         devenv
         lazygit
         ghostty
-        cursor
         pi-coding-agent
         carapace
         bluetui

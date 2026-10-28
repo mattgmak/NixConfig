@@ -78,8 +78,8 @@ let
     (bind "ALT + N" "hl.dsp.global(\"caelestia:clearNotifs\")" null)
     (bind "ALT + B" "hl.dsp.exec_cmd(\"caelestia shell drawers toggle sidebar\")" null)
     (bind "SUPER + R" "hl.dsp.exec_cmd(\"zen-beta\")" null)
-    (bind "SUPER + E" "hl.dsp.exec_cmd(\"cursor\")" null)
-    (bind "SUPER + W" "hl.dsp.exec_cmd(\"ghostty\")" null)
+    (bind "SUPER + E" "hl.dsp.exec_cmd(\"ghostty --class=com.mitchellh.ghostty.e\")" null)
+    (bind "SUPER + W" "hl.dsp.exec_cmd(\"ghostty --class=com.mitchellh.ghostty.w\")" null)
     (bind "ALT + Z" "hl.dsp.exec_cmd(\"${woomerLaunch}\")" null)
     (bind "SUPER + F" "hl.dsp.exec_cmd(\"hyprctl hyprsunset temperature 4500\")" null)
     (bind "SUPER + G" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/animation-toggle.nu\")" null)
@@ -154,11 +154,11 @@ let
       locked = true;
       repeating = true;
     })
-    (bind "ALT + E" "hl.dsp.focus({ window = \"class:(.*[Cc]ursor.*)\" })" {
+    (bind "ALT + E" "hl.dsp.focus({ window = \"class:(com.mitchellh.ghostty.e)\" })" {
       locked = true;
       repeating = true;
     })
-    (bind "ALT + W" "hl.dsp.focus({ window = \"class:(.*ghostty.*)\" })" {
+    (bind "ALT + W" "hl.dsp.focus({ window = \"class:(com.mitchellh.ghostty.w)\" })" {
       locked = true;
       repeating = true;
     })

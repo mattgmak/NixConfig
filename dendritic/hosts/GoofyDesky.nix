@@ -62,7 +62,6 @@
         lazygit
         mangohud
         ghostty
-        cursor
         pi-coding-agent
         carapace
         bluetui
