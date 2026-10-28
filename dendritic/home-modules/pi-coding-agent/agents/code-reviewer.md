@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Two-axis code reviewer — Standards plus Spec. Delegates context gathering to scout. Reads specs from Linear MCP or a spec file.
-tools: ctx_read, ctx_grep, ctx_find, ctx_shell, Linear_get_issue, Linear_list_comments, Linear_list_issues, Linear_get_issue_status
+tools: ctx_read, ctx_grep, ctx_find, ctx_shell, todo, Linear_get_issue, Linear_list_comments, Linear_list_issues, Linear_get_issue_status
 subagent_agents: scout
 model: cursor/grok-4.7@256k:slow
 thinking: high
