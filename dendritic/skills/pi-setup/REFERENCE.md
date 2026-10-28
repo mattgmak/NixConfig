@@ -481,6 +481,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | `pi-powerline-footer` | footer in tmux panes |
 | `pi-caveman` | caveman mode in subagents |
 | `pi-codegraph` | codegraph tools |
+| `pi-token-speed` | live tok/s in subagent footer |
 
 **Conditional:**
 - `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
