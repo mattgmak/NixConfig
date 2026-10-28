@@ -484,9 +484,16 @@ in
       # only the accounts in users.knownUsers, so the shell above never lands
       # for the admin account. nix-darwin runs only the named activation
       # scripts, so this hook goes into extraActivation.
+      # manzanasd reads a named profile from ~/qa. simslim's default profile
+      # disables the speech daemons that the iOS 26.5 hardware-keyboard typing
+      # path needs, so keep that category on.
       system.activationScripts.extraActivation.text = ''
         echo "setting login shell to zsh..." >&2
         dscl . -create /Users/${username} UserShell /run/current-system/sw/bin/zsh
+        install -d -o ${username} -g staff /Users/${username}/qa
+        printf '%s\n' '{"name":"qasafe","description":"default minus speech daemons","except":["siri"]}' \
+          > /Users/${username}/qa/qasafe.json
+        chown ${username}:staff /Users/${username}/qa/qasafe.json
       '';
 
       # Determinate Nix manages daemon itself; nix-darwin's nix.gc options
@@ -700,7 +707,7 @@ in
                 -addr 127.0.0.1:${toString manzanasPort} \
                 -axe ${self.packages.${system}.axe}/bin/axe \
                 -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \
-                -pool-slim-profile default
+                -pool-slim-profile qasafe
             ''
           ];
           UserName = username;

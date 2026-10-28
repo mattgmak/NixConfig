@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "model": "openrouter/liquid/lfm-2.5-2.6b:free",
+  "fallbackModels": [
+    "openrouter/poolside/laguna-xs-2.1:free",
+    "openrouter/recursive/flint-v1.0:free"
+  ],
+  "language": "auto",
+  "cooldownMinutes": 10,
+  "debug": false,
+  "respectManualName": true,
+  "includeCustomMessages": false
+}

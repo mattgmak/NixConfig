@@ -1,0 +1,10 @@
+{
+  "name": "pi-autoname",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pi-autoname (vendored ssdiwu/pi-autoname submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

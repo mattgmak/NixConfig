@@ -95,3 +95,6 @@
 [submodule "Pringled/pi-extensions"]
 	path = vendor/Pringled/pi-extensions
 	url = https://github.com/Pringled/pi-extensions.git
+[submodule "ssdiwu/pi-autoname"]
+	path = vendor/ssdiwu/pi-autoname
+	url = https://github.com/ssdiwu/pi-autoname

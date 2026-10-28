@@ -128,6 +128,7 @@
         "keybindings.json"
         "mcp.json"
         "models.json"
+        "pi-autoname.json"
         "pi-blackhole"
         "prompts"
         "settings.json"
@@ -975,6 +976,8 @@
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
         home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
+        home.file.".pi/agent/pi-autoname.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-autoname/pi-autoname.json";
         home.file.".config/rpiv-todo/config.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/rpiv-todo/config.json";
 
