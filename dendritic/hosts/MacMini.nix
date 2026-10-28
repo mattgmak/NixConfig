@@ -699,13 +699,16 @@ in
               exec env MANZANASD_AUTH_TOKEN="$token" ${self.packages.${system}.manzanas}/bin/manzanasd \
                 -addr 127.0.0.1:${toString manzanasPort} \
                 -axe ${self.packages.${system}.axe}/bin/axe \
-                -simbridge ${self.packages.${system}.manzanas}/bin/simbridge
+                -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \
+                -pool-slim-profile default
             ''
           ];
           UserName = username;
           EnvironmentVariables = {
             HOME = "/Users/${username}";
             USER = username;
+            # The daemon has no flag for the simslim path, only this variable.
+            MANZANASD_SIMSLIM = "${self.packages.${system}.simslim}/bin/simslim";
             PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           };
           RunAtLoad = true;
@@ -856,6 +859,7 @@ in
           cursor-cli
           bat
           llama-cpp
+          self.packages.${pkgs.stdenv.hostPlatform.system}.simslim
           inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
           nightlight
