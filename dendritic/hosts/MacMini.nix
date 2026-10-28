@@ -707,7 +707,9 @@ in
                 -addr 127.0.0.1:${toString manzanasPort} \
                 -axe ${self.packages.${system}.axe}/bin/axe \
                 -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \
-                -pool-slim-profile qasafe
+                -pool-slim-profile qasafe \
+                -pool-max-running 6 \
+                -warm-max-targets 6
             ''
           ];
           UserName = username;
