@@ -816,6 +816,26 @@ in
         };
       };
 
+      # kern.maxproc caps the login session limit below kern.maxprocperuid.
+      # The session starts at 2666, so lift it to the kernel ceiling.
+      launchd.user.agents.process-limit-session = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/bin/sh"
+            "-c"
+            ''
+              maxproc=$(/usr/sbin/sysctl -n kern.maxproc) || exit 1
+              /bin/launchctl limit maxproc "$maxproc" "$maxproc"
+              /bin/launchctl limit maxproc
+            ''
+          ];
+          RunAtLoad = true;
+          StartInterval = 300;
+          StandardOutPath = "/Users/${username}/Library/Logs/process-limit.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/process-limit.log";
+        };
+      };
+
       environment.systemPackages =
         with pkgs;
         [
