@@ -432,6 +432,11 @@ in
           /usr/sbin/sysctl -w kern.maxprocperuid="$maxprocperuid" || true
           printf 'kern.maxproc=%s\nkern.maxprocperuid=%s\n' "$maxproc" "$maxprocperuid" >/etc/sysctl.conf
           /usr/sbin/sysctl kern.maxproc kern.maxprocperuid
+          # The login session keeps a soft limit of 2666. A user process cannot
+          # raise it, so a root job enters the user bootstrap and sets it there.
+          uid=$(/usr/bin/id -u ${username})
+          /bin/launchctl asuser "$uid" /bin/launchctl limit maxproc "$maxprocperuid" "$maxprocperuid" || true
+          /bin/launchctl asuser "$uid" /bin/launchctl limit maxproc || true
         '';
       };
     in
@@ -813,26 +818,6 @@ in
           StartInterval = 300;
           StandardOutPath = "/Users/${username}/Library/Logs/ca-env-setenv.stdout.log";
           StandardErrorPath = "/Users/${username}/Library/Logs/ca-env-setenv.stderr.log";
-        };
-      };
-
-      # kern.maxproc caps the login session limit below kern.maxprocperuid.
-      # The session starts at 2666, so lift it to the kernel ceiling.
-      launchd.user.agents.process-limit-session = {
-        serviceConfig = {
-          ProgramArguments = [
-            "/bin/sh"
-            "-c"
-            ''
-              maxproc=$(/usr/sbin/sysctl -n kern.maxproc) || exit 1
-              /bin/launchctl limit maxproc "$maxproc" "$maxproc"
-              /bin/launchctl limit maxproc
-            ''
-          ];
-          RunAtLoad = true;
-          StartInterval = 300;
-          StandardOutPath = "/Users/${username}/Library/Logs/process-limit.log";
-          StandardErrorPath = "/Users/${username}/Library/Logs/process-limit.log";
         };
       };
 
