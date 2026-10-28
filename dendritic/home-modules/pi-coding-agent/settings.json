@@ -14,17 +14,13 @@
     "-builtin:mcp"
   ],
   "enabledModels": [
-    "opencode/big-pickle",
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
-    "openrouter/qwen/qwen3.8-flash",
     "opencode-go/glm-5.3-flash",
     "openrouter/z-ai/glm-5.3-flash",
     "openrouter/deepseek/deepseek-v4.1-flash",
     "opencode-go/deepseek-v4.1-flash",
-    "opencode-go/qwen3.8-flash",
     "opencode-go/mimo-v2.6-flash",
-    "deepseek/deepseek-flash",
     "commandcode/z-ai/glm-5.3-flash",
     "commandcode/deepseek/deepseek-v4.1-flash",
     "commandcode/xiaomi/mimo-v2.6-pro",
@@ -32,13 +28,11 @@
     "commandcode/stealth/glyph-cluster:free",
     "commandcode/inclusionai/ling-3.1-flash",
     "commandcode/poolside/laguna-s-2.1-free",
-    "opencode/deepseek-v4.1-flash-free",
     "opencode-go/beam-free",
     "commandcode/reflection/beam:free",
     "cursor/grok-4.7@256k:slow",
-    "ramsay/qwen3.8-27b",
-    "ramsay/qwen3.8-flash-next",
-    "cursor/grok-4.7@256k:fast"
+    "cursor/grok-4.7@256k:fast",
+    "ramsay/qwen3.8-flash-next"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
