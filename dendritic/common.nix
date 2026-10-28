@@ -287,6 +287,9 @@
         inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default
         pciutils
         pkgconf
+        # Hyprland plugins resolve hook symbols by parsing `nm -D` output on
+        # /proc/self/exe. The cap wrapper below skips the package's PATH wrapper.
+        binutils
       ];
 
       programs.gpu-screen-recorder.enable = true;
@@ -305,6 +308,7 @@
 
       # The package wraps bin/Hyprland with wrapProgram, so the cap_sys_nice
       # wrapper fails the wrapper ELF check. Point it at the real binary.
+      # That also drops the wrapped PATH, hence binutils above.
       # Drop this when the package uses makeBinaryWrapper (nixpkgs #573247).
       security.wrappers.Hyprland.source = lib.mkForce "${pkgs.hyprland}/bin/.Hyprland-wrapped";
 
