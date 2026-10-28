@@ -87,7 +87,6 @@ let
     (bind "SUPER + period" "hl.dsp.exec_cmd(\"voxtype record start\")" null)
     (bind "SUPER + period" "hl.dsp.exec_cmd(\"voxtype record stop\")" { release = true; })
     (bind "ALT + Q" "hl.dsp.exec_cmd(\"wlogout\")" null)
-    (bind "SUPER + T" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/floating-terminal.nu\")" null)
     (bind "ALT + Comma" "hl.dsp.exec_cmd(\"~/.config/hypr/scripts/window-switcher.nu\")" null)
   ]
   ++ lib.optionals (hostname == "GoofyDesky") [

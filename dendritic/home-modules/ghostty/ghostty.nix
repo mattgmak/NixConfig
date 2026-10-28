@@ -45,7 +45,6 @@
           keybind = [
             "ctrl+enter=unbind"
             "ctrl+,=unbind"
-            "global:super+t=toggle_quick_terminal"
             # "super+alt+shift+j=write_screen_file:open"
             # "super+alt+shift+w=close_all_windows"
             # "super+alt+i=inspector:toggle"
@@ -64,7 +63,6 @@
             # "super+ctrl+left=resize_split:left,10"
             # "super+shift+d=new_split:down"
             # "super+shift+j=write_screen_file:paste"
-            "ctrl+shift+v=paste_from_selection"
             # "super+shift+w=close_window"
             "ctrl+shift+comma=reload_config"
             "ctrl+page_up=previous_tab"
