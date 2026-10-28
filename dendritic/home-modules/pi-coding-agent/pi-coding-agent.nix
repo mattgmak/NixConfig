@@ -147,6 +147,23 @@
         '';
       };
 
+      # The MCP OAuth encrypted-file store reads its key from the environment.
+      # Only this wrapper exports it, so other shells and their children never
+      # hold it. hiPrio wins the bin/pi clash against the package.
+      piOauthKey = config.age.secrets."pi-mcp-adapter-oauth-file-key".path;
+      piOauthWrapper = pkgs.writeShellApplication {
+        name = "pi";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = ''
+          key="${piOauthKey}"
+          if [ -r "$key" ]; then
+            PI_MCP_ADAPTER_OAUTH_FILE_KEY="$(cat "$key")"
+            export PI_MCP_ADAPTER_OAUTH_FILE_KEY
+          fi
+          exec ${piCompiled}/bin/pi "$@"
+        '';
+      };
+
       piStaticThemes = [
         "ansi-dark.json"
         "ansi-light.json"
@@ -724,9 +741,21 @@
         };
       };
 
-      imports = [ inputs.coding-agents.homeManagerModules.default ];
+      imports = [
+        inputs.coding-agents.homeManagerModules.default
+        inputs.agenix.homeManagerModules.default
+      ];
 
       config = {
+        # Sealed for every pi host. The wrapper above reads the plaintext.
+        # A fixed path keeps the wrapper free of ${XDG_RUNTIME_DIR}, which fails
+        # under the wrapper's nounset on hosts that leave it unset.
+        age.secrets."pi-mcp-adapter-oauth-file-key" = {
+          file = ../../../secrets/pi-mcp-adapter-oauth-file-key.age;
+          path = "${config.home.homeDirectory}/.pi/agent/oauth-file-key";
+          mode = "0400";
+        };
+
         coding-agents = {
           skillsDir = lib.mkDefault "${repoRoot}/skills";
           agentsMdPath = lib.mkDefault "${piAgentRoot}/AGENTS.md";
@@ -748,6 +777,7 @@
             podman
             piExtDepsInstall
             piStockWrapper
+            (lib.hiPrio piOauthWrapper)
             self.packages.${system}.lean-ctx
             self.packages.${system}.engram
           ]
@@ -802,6 +832,25 @@
               in
               "${lib.getExe pkgs.podman} run --rm --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
             ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-searxng";
+          };
+          Install.WantedBy = [ "default.target" ];
+        };
+
+        # The pi wrapper passes ENGRAM_URL=http://127.0.0.1:7437, which stops the
+        # gentle-engram plugin from starting its own server. Without a server every
+        # prompt pays the plugin's fail-and-retry loop, about 9s. MacMini mirrors this
+        # with a launchd agent, because darwin has no user systemd.
+        systemd.user.services.engram = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
+          Unit = {
+            Description = "Engram HTTP memory server for pi";
+            After = [ "network-online.target" ];
+            Wants = [ "network-online.target" ];
+          };
+          Service = {
+            Type = "simple";
+            Restart = "always";
+            RestartSec = 2;
+            ExecStart = "${lib.getExe self.packages.${system}.engram} serve";
           };
           Install.WantedBy = [ "default.target" ];
         };

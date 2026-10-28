@@ -552,6 +552,7 @@ HM already starts an empty `agents` tmux session on boot (`systemd.user.services
 ### Secrets
 
 - `secrets/secrets.nix`: `AgentAge` pubkey added to the 8 pi API secrets (opencode/cursor/github-mcp/cline/mercury/context7/cursor-usage/deepseek) + `agent-age-key.age` (agent's private age identity, encrypted to Goofeus host key + GoofyDeskyRoot).
+- MCP OAuth for Linear: `mcp.json` sets `settings.oauthCredentialStore` to `encrypted-file`. Tokens go to `~/.pi/agent/mcp-oauth-encrypted/`. Key comes from `secrets/pi-mcp-adapter-oauth-file-key.age` (`scripts/make-pi-oauth-key.sh` makes it) and lands at `~/.pi/agent/oauth-file-key`. The `pi` wrapper exports the key, so other shells never hold it. No keychain, so headless hosts work and no dialog appears.
 - NixOS: `age.secrets.agent-age-key` → `/run/agenix/agent-age-key` (owner=agent, 0400). Agent HM: `age.identityPaths = [ "/run/agenix/agent-age-key" ]`.
 - Rekey after adding/removing a recipient: `cd secrets && RULES=./secrets.nix agenix -r -i <decrypting-identity>` — ensure every `.age` file's recipients include an identity you hold, or comment that secret out of `secrets.nix` first (agent-age-key only decrypts with Goofeus host key / GoofyDeskyRoot, not a user key).
 - Agent's private key backup: `$TMPDIR/agent-tmp/agent-agekey/id_agent_age` (keep until Goofeus bootstrapped; needed to re-encrypt if recipient set grows).

@@ -145,6 +145,12 @@ in
     publicKeys = piRecipients;
   };
 
+  # Key for the MCP OAuth encrypted-file store. Script: scripts/make-pi-oauth-key.sh.
+  "pi-mcp-adapter-oauth-file-key.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   "cursor-api-key.age" = {
     armor = true;
     publicKeys = piRecipients;
