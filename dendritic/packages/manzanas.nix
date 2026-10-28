@@ -25,6 +25,13 @@
             hash = "sha256-MtmMnRpTSHzgYL+UWmTDroxiI8GFsAFq5t8pPYD9sf8=";
           };
 
+          # Warm-action helper. It ships as its own asset and the daemon looks for
+          # the name in lockstep with this release.
+          simbridge = fetchurl {
+            url = "https://github.com/BariBariGood/manzanas/releases/download/v${finalAttrs.version}/simbridge_${finalAttrs.version}_darwin_arm64";
+            hash = "sha256-YlRW+jKjLoMZp9cyjPQg70NIjMw48W14SKIM2x131Ao=";
+          };
+
           dontConfigure = true;
           dontBuild = true;
           # Prebuilt Mach-O, not build output: leave the binaries alone.
@@ -39,6 +46,7 @@
             runHook preInstall
             install -d "$out/bin"
             install -m 0755 manzanas manzanasd manzanas-broker "$out/bin/"
+            install -m 0755 ${finalAttrs.simbridge} "$out/bin/simbridge"
             install -d "$out/share/manzanas"
             install -m 0644 LICENSE NOTICE "$out/share/manzanas/"
             runHook postInstall

@@ -696,7 +696,10 @@ in
               # retries and the daemon never starts without auth.
               token=$(cat ${config.age.secrets.manzanasd-auth-token.path}) || exit 1
               [ -n "$token" ] || exit 1
-              exec env MANZANASD_AUTH_TOKEN="$token" ${self.packages.${system}.manzanas}/bin/manzanasd -addr 127.0.0.1:${toString manzanasPort}
+              exec env MANZANASD_AUTH_TOKEN="$token" ${self.packages.${system}.manzanas}/bin/manzanasd \
+                -addr 127.0.0.1:${toString manzanasPort} \
+                -axe ${self.packages.${system}.axe}/bin/axe \
+                -simbridge ${self.packages.${system}.manzanas}/bin/simbridge
             ''
           ];
           UserName = username;
