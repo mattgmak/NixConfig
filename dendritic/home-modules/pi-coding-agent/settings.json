@@ -1,8 +1,8 @@
 {
   "externalEditor": "nvim",
   "lastChangelogVersion": "1.4.0",
-  "defaultProvider": "commandcode",
-  "defaultModel": "deepseek/deepseek-v4.1-flash",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4.1-flash",
   "defaultThinkingLevel": "high",
   "theme": "stylix",
   "powerline": {
