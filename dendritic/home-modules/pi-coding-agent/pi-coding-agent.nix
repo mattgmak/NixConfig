@@ -140,6 +140,7 @@
         "auth.json"
         "agents"
         "keybindings.json"
+        "mcp-adapter.json"
         "mcp.json"
         "models.json"
         "pi-autoname.json"
@@ -940,6 +941,12 @@
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
         # The store path pins the mcp-nixos binary, so this file is generated, not live.
         home.file.".pi/agent/mcp.json".source = pkgs.writeText "pi-mcp.json" (builtins.toJSON mcpConfig);
+        # The adapter ignores `settings` in mcp.json and warns. Its own keys live here.
+        # force clears the plain file that a test run may leave behind.
+        home.file.".pi/agent/mcp-adapter.json" = {
+          source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp-adapter.json";
+          force = true;
+        };
         home.file.".pi/agent/settings.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
         home.file.".pi/agent/keybindings.json".source =

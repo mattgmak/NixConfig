@@ -1,8 +1,4 @@
 {
-  "settings": {
-    "oauthCredentialStore": "encrypted-file",
-    "deferWithMissingMetadata": true
-  },
   "mcpServers": {
     "Linear": {
       "url": "https://mcp.linear.app/mcp",

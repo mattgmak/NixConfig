@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "deferWithMissingMetadata": true,
+    "oauthCredentialStore": "encrypted-file"
+  }
+}
