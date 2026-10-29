@@ -30,10 +30,14 @@
         );
       };
       base = builtins.fromJSON (builtins.readFile ./mcp.json);
+      # manzanas and mcp-nixos need absolute paths: neither reaches every node's PATH.
       mcpConfig = base // {
         mcpServers = base.mcpServers // {
           nixos = base.mcpServers.nixos // {
             command = "${mcpNixos}/bin/mcp-nixos";
+          };
+          manzanas = base.mcpServers.manzanas // {
+            command = "${self.packages.${system}.manzanas}/bin/manzanas";
           };
         };
       };

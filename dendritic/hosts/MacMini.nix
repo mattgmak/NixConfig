@@ -689,11 +689,8 @@ in
       # manzanasd hands out simulator leases to tailnet agents on port 7433.
       # It binds loopback and tailscale serve publishes it. Logs go to
       # ~/Library/Logs because launchd cannot create a missing parent dir.
-      age.secrets.manzanasd-auth-token = {
-        file = ../../secrets/manzanasd-auth-token.age;
-        owner = username;
-      };
-
+      # No bearer token: the Tailscale ACL on svc:manzanas is the only gate.
+      # A token-free daemon also closes POST /v0/devices, which spawns host processes.
       launchd.agents.manzanasd = {
         serviceConfig = {
           ProgramArguments = [
@@ -701,10 +698,6 @@ in
             "-c"
             ''
               /bin/wait4path /nix/store
-              # A missing secret means agenix has not run yet. Fail, so launchd
-              # retries and the daemon never starts without auth.
-              token=$(cat ${config.age.secrets.manzanasd-auth-token.path}) || exit 1
-              [ -n "$token" ] || exit 1
               # The pool takes UDIDs. Resolve the four names at launch, so a
               # recreated sim rejoins. CoreSimulatorService can lag at login.
               pool_sims=
@@ -715,7 +708,7 @@ in
                 sleep 2
               done
               [ -n "$pool_sims" ] || echo "warn: no pool sims resolved" >&2
-              exec env MANZANASD_AUTH_TOKEN="$token" MANZANASD_POOL_SIMS="$pool_sims" ${self.packages.${system}.manzanas}/bin/manzanasd \
+              exec env MANZANASD_POOL_SIMS="$pool_sims" ${self.packages.${system}.manzanas}/bin/manzanasd \
                 -addr 127.0.0.1:${toString manzanasPort} \
                 -axe ${self.packages.${system}.axe}/bin/axe \
                 -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \

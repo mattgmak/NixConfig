@@ -18,6 +18,10 @@
       "command": "argent",
       "args": ["mcp"]
     },
+    "manzanas": {
+      "command": "manzanas",
+      "args": ["mcp", "--daemon", "https://manzanas.dab-octatonic.ts.net"]
+    },
     "nixos": {
       "command": "mcp-nixos",
       "args": []
