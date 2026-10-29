@@ -188,6 +188,11 @@ in
     publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
+  "hermes-env.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [

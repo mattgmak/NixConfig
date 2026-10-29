@@ -139,6 +139,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hermes-agent = {
+      # Exact tag commit for v0.22.5+canary.20261029T064840Z. The tag-name ref
+      # form locks a non-tag rev. This rev carries the patchelf fix for
+      # NixOS/patchelf#674: patchelf 0.19.2 corrupts the pinned prebuilt node
+      # 26.12.1, and node then segfaults in the hermes-tui build.
+      url = "github:NousResearch/hermes-agent/ef75bc708867e3884cb40a91363be6dc6fddc034";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    hermes-webui = {
+      url = "github:nesquena/hermes-webui/v0.52.544";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     codegraph = {
       url = "github:mattgmak/codegraph/implement-nix-flake-support";
       inputs.nixpkgs.follows = "nixpkgs";
