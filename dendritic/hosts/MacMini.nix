@@ -705,7 +705,17 @@ in
               # retries and the daemon never starts without auth.
               token=$(cat ${config.age.secrets.manzanasd-auth-token.path}) || exit 1
               [ -n "$token" ] || exit 1
-              exec env MANZANASD_AUTH_TOKEN="$token" ${self.packages.${system}.manzanas}/bin/manzanasd \
+              # The pool takes UDIDs. Resolve the four names at launch, so a
+              # recreated sim rejoins. CoreSimulatorService can lag at login.
+              pool_sims=
+              for _ in $(seq 1 15); do
+                pool_sims=$(/usr/bin/xcrun simctl list devices -j \
+                  | ${pkgs.jq}/bin/jq -r '[.devices[][] | select(.name | test("^slim-[1-4]$"))] | sort_by(.name) | map(.udid) | join(",")')
+                [ -n "$pool_sims" ] && break
+                sleep 2
+              done
+              [ -n "$pool_sims" ] || echo "warn: no pool sims resolved" >&2
+              exec env MANZANASD_AUTH_TOKEN="$token" MANZANASD_POOL_SIMS="$pool_sims" ${self.packages.${system}.manzanas}/bin/manzanasd \
                 -addr 127.0.0.1:${toString manzanasPort} \
                 -axe ${self.packages.${system}.axe}/bin/axe \
                 -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \
