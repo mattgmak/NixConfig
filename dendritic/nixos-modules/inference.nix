@@ -27,6 +27,11 @@
       qwen27bDraft = "${modelsDir}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
 
+      # The Swift requant and its projector live in a subdir, because gufo picks
+      # a sibling mmproj by base name.
+      swiftModel = "${modelsDir}/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf";
+      swiftMmproj = "${modelsDir}/swift/mmproj-BF16.gguf";
+
       # Upstream helper: same flags as the CLI, so no flag name is retyped here.
       gufoServe = args: inputs.gufo.lib.mkGufoServe ({ gufo = pkgs.gufo; } // args);
     in
@@ -82,6 +87,26 @@
               aliases = [ "qwen3.8-flash-next-uncensored" ];
             };
 
+            # Swift 1.5 keeps the shared Unsloth MTP head and cuts thinking
+            # tokens. A requant costs quality, so the stock build stays first.
+            "flash-next-swift" = {
+              cmd = gufoServe {
+                modality = "llm";
+                model = swiftModel;
+                port = "\${PORT}";
+                servedModelName = "flash-next-swift";
+                speculative = "mtp";
+                mtpModel = flashNextMtp;
+                sessions = 2;
+                context = 131072;
+                extraArgs = [ "--mmproj" swiftMmproj ];
+              };
+              useModelName = "flash-next-swift";
+              ttl = 300;
+              checkEndpoint = "/ready";
+              aliases = [ "qwen3.8-flash-next-swift" ];
+            };
+
             # Only flash-next and Qwen3.8-27B are gufo model families. The
             # earlier Coder-30B pick is unsupported upstream.
             "qwen3.8-27b" = {
@@ -115,6 +140,7 @@
               members = [
                 "flash-next"
                 "flash-next-uncensored"
+                "flash-next-swift"
                 "qwen3.8-27b"
               ];
             };

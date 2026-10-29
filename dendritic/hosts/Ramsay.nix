@@ -369,6 +369,21 @@ in
               get "$flash/UD-Q4_K_XL/$file" "$root/$file"
             done
 
+            # Swift 1.5 publishes no UD-Q4_K_XL build, so these Q8_0 shards feed
+            # gufo-swift-requant. The projector takes its own dir because gufo
+            # resolves a sibling by base name.
+            swift=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GGUF/resolve/0142554c963a8653912c0c8283f05f13f63653f3
+            for shard in 00001 00002 00003 00004 00005; do
+              file="Swift-1.5-Qwen3.8-Flash-Next-Q8_0-$shard-of-00005.gguf"
+              get "$swift/Q8_0/$file" "$root/swift/$file"
+            done
+            get "$swift/mmproj-Swift-1.5-Qwen3.8-Flash-Next-BF16.gguf" \
+              "$root/swift/mmproj-BF16.gguf"
+
+            imatrix=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/99bb8f7f95c7aa7b24a36a7786a4f657b30f5d3d
+            get "$imatrix/imatrix-swiftfn-v1mix.gguf" \
+              "$root/swift/imatrix-swiftfn-v1mix.gguf"
+
             # This projector shares its base name with the stock one. Gufo picks
             # the wrong sibling for the parent dir, so the subdir stays separate.
             uncensored=https://huggingface.co/vmlinux/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix-GGUF/resolve/0a0843cce72b4d8c377096960b3f0f9c0f4d197f
@@ -394,6 +409,55 @@ in
             do
               get "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
+
+            chmod -R a+rX "$root"
+          '';
+        };
+
+        # gufo loads one Flash-Next tensor map only, so Swift 1.5 needs a requant
+        # of its Q8_0 source to the types of the stock build.
+        systemd.services.gufo-swift-requant = {
+          description = "Requantize Swift 1.5 for gufo";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "gufo-models.service" ];
+          requires = [ "gufo-models.service" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            Nice = 15;
+            IOSchedulingClass = "idle";
+          };
+          path = [
+            pkgs.coreutils
+            pkgs.llama-cpp
+            (pkgs.python3.withPackages (ps: [ ps.gguf ]))
+          ];
+          script = ''
+            set -eu
+            root=/var/lib/inference/models
+            swift=$root/swift
+            out=$swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL
+
+            if [ -s "$out-00001-of-00005.gguf" ]; then
+              exit 0
+            fi
+
+            # The map comes from the stock build, so the result stays identical to
+            # what gufo loads today. The name check stops a mismatch before 103 GiB
+            # are written.
+            python3 ${../../scripts/gguf-tensor-types.py} \
+              "$root"/Qwen3.8-Flash-Next-UD-Q4_K_XL-*-of-00004.gguf \
+              -- "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf \
+              > "$swift/tensor-types.txt"
+
+            llama-quantize \
+              --imatrix "$swift/imatrix-swiftfn-v1mix.gguf" \
+              --allow-requantize \
+              --keep-split \
+              --tensor-type-file "$swift/tensor-types.txt" \
+              -o "$out" \
+              "$swift/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-00001-of-00005.gguf" \
+              Q4_K_M
 
             chmod -R a+rX "$root"
           '';
