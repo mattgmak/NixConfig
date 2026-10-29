@@ -38,6 +38,11 @@
         };
       };
 
+      # The pi-codegraph extension spawns a bare `codegraph`. The MCP servers and
+      # that extension cannot start unless both binaries are on the profile PATH.
+      argent = self.packages.${system}.argent;
+      codegraph = inputs.codegraph.packages.${system}.default;
+
       piCompiled = self.packages.${system}.piCompiled;
       piStock = self.packages.${system}.pi;
 
@@ -791,6 +796,8 @@
             uv
             bun
             mcpNixos
+            argent
+            codegraph
             podman
             piExtDepsInstall
             piStockWrapper

@@ -552,6 +552,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Wire paths / enable pi | `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix` |
 | Custom models/providers | `dendritic/home-modules/pi-coding-agent/models.json` |
 | MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json`. Human-edited source. `pi-coding-agent.nix` generates the store file from it |
+| MCP server binaries | `home.packages` in `pi-coding-agent.nix`. `mcp.json` names a bare command, so pi finds it on the profile PATH only |
 | MCP adapter settings | `dendritic/home-modules/pi-coding-agent/mcp-adapter.json`. The adapter ignores `settings` in `mcp.json` and warns at session start |
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
 | lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
