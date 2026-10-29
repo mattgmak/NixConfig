@@ -40,6 +40,7 @@ const ALLOWED_TOOLS: readonly string[] = [
 	"ctx_patch",
 	"read_session",
 	"preview_export",
+	"ask_user_question",
 ];
 
 function supportsDynamicTools(pi: ExtensionAPI): boolean {
