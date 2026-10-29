@@ -92,7 +92,6 @@
       tmuxPowerkitSrc = pkgs.runCommand "tmux-powerkit-src" { } ''
         cp -R ${tmuxPowerkitRoot}/. $out/
         chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/src/contract $out/bin
-        install -Dm755 ${powerkitPluginsDir}/directory.sh $out/src/plugins/directory.sh
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
         install -Dm755 ${powerkitPluginsDir}/agent_counts.sh $out/src/plugins/agent_counts.sh
         # Patched: pill caps, session mode, format-native escape, render cache TTL
@@ -236,8 +235,8 @@
 
           bind-key -T prefix -N "agent-sesh: picker (profile)" C-a run-shell ${lib.escapeShellArg agentSeshProfilePicker}
 
-          # Redraw status on pane switch (format-native cwd/app plugins).
-          # No tmux hook for in-pane cwd change; status-interval 5 covers cd updates.
+          # Redraw status on pane switch (format-native app plugin).
+          # No tmux hook for in-pane command change; status-interval covers it.
           set-hook -g after-select-pane 'refresh-client -S'
 
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
@@ -268,7 +267,7 @@
             plugin = tmuxPowerkit;
             extraConfig = ''
               set -g @powerkit_status_order "session,plugins"
-              set -g @powerkit_plugins "directory,pane_application,agent_counts,datetime"
+              set -g @powerkit_plugins "hostname,pane_application,agent_counts,datetime"
               set -g @powerkit_theme "custom"
               set -g @powerkit_custom_theme_path "${config.home.homeDirectory}/.config/tmux-powerkit/themes/stylix.sh"
               set -g @powerkit_transparent "true"
@@ -290,10 +289,8 @@
               set -g @powerkit_active_window_title "#W "
               set -g @powerkit_inactive_window_title "#W "
               set -g @powerkit_zoomed_window_icon "󰊔"
+              set -g @powerkit_plugin_hostname_format "short"
               set -g @powerkit_plugin_datetime_format "time"
-              set -g @powerkit_plugin_directory_icon "󰉋"
-              set -g @powerkit_plugin_directory_max_length "24"
-              set -g @powerkit_plugin_directory_ellipsis "…"
               set -g @powerkit_plugin_pane_application_icon ""
               set -g @powerkit_plugin_agent_counts_icon "󰚩"
               set -g @powerkit_plugin_agent_counts_bin "${agentSeshBin}"
