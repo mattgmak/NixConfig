@@ -484,6 +484,7 @@ in
       # only the accounts in users.knownUsers, so the shell above never lands
       # for the admin account. nix-darwin runs only the named activation
       # scripts, so this hook goes into extraActivation.
+
       # manzanasd reads a named profile from ~/qa. simslim's default profile
       # disables the speech daemons that the iOS 26.5 hardware-keyboard typing
       # path needs, so keep that category on.
