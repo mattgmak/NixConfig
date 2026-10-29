@@ -268,6 +268,7 @@ in
             GoofyDesky
             GoofyEnvy
             Droid
+            MacMini
           ];
         };
 
@@ -285,6 +286,7 @@ in
             GoofyDesky
             GoofyEnvy
             Droid
+            MacMini
           ];
         };
 
