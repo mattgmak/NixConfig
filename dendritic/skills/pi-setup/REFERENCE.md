@@ -383,6 +383,38 @@ npm install --omit=dev   # if deps needed
 
 Commit directly in NixConfig (not submodule).
 
+## Tool allowlist
+
+`extensions/tool-allowlist/index.ts` caps the tools each pi session declares. The cap
+is a DENYLIST. `BLOCKED_TOOLS` and `BLOCKED_PATTERNS` hold every name the setup hides.
+A registered tool that matches no entry stays active.
+
+`REVIEWED_TOOLS` records the tools the setup keeps active on purpose. It never filters.
+
+An entry with `*`, `?`, or `[` works as a glob. MCP direct names change with the server
+prefix and the metadata cache, so they need patterns such as `Linear_*` and
+`github-readonly_*`.
+
+### Change the list
+
+1. Decide the tool. Add it to `BLOCKED_TOOLS` to hide it, or to `REVIEWED_TOOLS` to keep it.
+2. Run `sh dendritic/home-modules/pi-coding-agent/scripts/tool-audit.sh`. It prints
+   every registered tool that carries no decision.
+3. Repeat until the script exits zero.
+
+The audit script fails the compiled build on an unknown name. `pi-bolt-compiled.nix`
+runs it in the build.
+
+At session start the extension prints one `console.debug` line per undecided tool.
+Nothing hides by silence.
+
+**Done when** — the audit script exits zero, and every new tool carries a decision.
+
+### Two pairings
+
+- Denying `read` or `bash` also denies the pi-cursor-sdk replay wrappers. They share those names.
+- agent-ste lints only `write`, `edit`, `say`, and `bash`. A write through `ctx_patch` skips the hard-fault gate.
+
 ## Install extension deps (`pi-ext-deps-install`)
 
 Home Manager installs `pi-ext-deps-install`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
@@ -446,6 +478,7 @@ Positive defaults: submodule under `vendor/<owner>/<repo>` + HM symlink = source
 - Vendor a repo anywhere except `vendor/<owner>/<repo>` — all submodules live under the root `vendor/`, grouped by owner, named `owner/repo` in `.gitmodules`
 - Break the `extensions/vendor` compat symlink (→ repo root `vendor/`) — loaders resolve `../vendor/...` through it; treat it as read-only plumbing
 - Symlink mattpocock `caveman` over local `skills/caveman/` — keep the local copy
+- Add an extension that registers tools, then skip `BLOCKED_TOOLS` and the audit script.
 
 ## Debugging
 
@@ -521,6 +554,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap, `piCompiled` on x86_64-linux and aarch64-darwin) |
 | Compiled host: extension list, deps, patches | `dendritic/packages/pi-bolt-compiled.nix` (see [Compiled host](#compiled-host-picompiled)) |
 | Extension bundle for compiled bun hosts | `pi-ext-deps-install` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
+| Tool deny list | `dendritic/home-modules/pi-coding-agent/extensions/tool-allowlist/index.ts` |
 
 ## Goofeus agent workspace (GoofeusAgent)
 

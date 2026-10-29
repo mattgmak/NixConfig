@@ -101,6 +101,8 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 
 **Done when** — item present at its repo path, deps installed, exposed (loader dir, symlink, or `SKILL.md`).
 
+**Tool allowlist.** A new extension that registers tools changes the visible tool set. Deny each new name in `BLOCKED_TOOLS`, or record it in `REVIEWED_TOOLS`. Then run the audit script. Detail: [REFERENCE.md — Tool allowlist](REFERENCE.md#tool-allowlist).
+
 ### 4. Finish
 
 - Run `pi-ext-deps-install` if any extension has runtime deps

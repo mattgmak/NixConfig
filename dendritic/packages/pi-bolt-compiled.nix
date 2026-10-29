@@ -707,6 +707,12 @@
             runHook preInstallCheck
             "$out/libexec/pi/pi" --version
             "$out/bin/pi" --version
+            # Store paths are read-only, so the audit reads a writable copy of the staged
+            # home. The script comes from the source tree, not from $out.
+            cp ${../home-modules/pi-coding-agent/scripts/tool-audit.sh} tool-audit.sh
+            cp -a "$out/share/pibolt-home" "$TMPDIR/audit-home"
+            HOME=$TMPDIR/audit-home PI_BIN="$out/libexec/pi/pi" PI_AUDIT_COMPILED=1 \
+              PI_COMPILED="$out" sh tool-audit.sh
             runHook postInstallCheck
           '';
 
