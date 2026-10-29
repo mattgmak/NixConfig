@@ -573,8 +573,10 @@ in
         };
       };
 
-      # Tailnet HTTPS for the two simulator endpoints. This mirrors the NixOS
+      # Tailnet HTTPS for the simulator endpoint. This mirrors the NixOS
       # tailscale-serve jobs; each svc: name must exist in the tailnet admin.
+      # The argent tool-server refuses non-loopback Host headers, so it gets
+      # no entry here.
       launchd.daemons.tailscale-serve-sim = {
         serviceConfig = {
           ProgramArguments = [
@@ -587,7 +589,6 @@ in
                 sleep 2
               done
               ${tailscalePackage}/bin/tailscale serve --yes --service=svc:manzanas --https=443 127.0.0.1:${toString manzanasPort}
-              ${tailscalePackage}/bin/tailscale serve --yes --service=svc:argent --https=443 127.0.0.1:${toString argentPort}
             ''
           ];
           RunAtLoad = true;
