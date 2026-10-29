@@ -16,6 +16,13 @@
       flashNextModel = "${modelsDir}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
       flashNextMtp = "${modelsDir}/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
 
+      # The uncensored projector repeats the stock base name, so it lives in a
+      # subdirectory and both paths below stay explicit.
+      uncensoredDir = "${modelsDir}/uncensored";
+      uncensoredModel = "${uncensoredDir}/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf";
+      uncensoredMmproj = "${uncensoredDir}/mmproj-BF16.gguf";
+      uncensoredMtp = "${uncensoredDir}/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf";
+
       qwen27bModel = "${modelsDir}/Qwen3.8-27B-UD-Q4_K_XL.gguf";
       qwen27bDraft = "${modelsDir}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
@@ -54,6 +61,27 @@
               aliases = [ "qwen3.8-flash-next" ];
             };
 
+            "flash-next-uncensored" = {
+              cmd = gufoServe {
+                modality = "llm";
+                model = uncensoredModel;
+                port = "\${PORT}";
+                servedModelName = "flash-next-uncensored";
+                speculative = "mtp";
+                mtpModel = uncensoredMtp;
+                sessions = 2;
+                context = 131072;
+                extraArgs = [
+                  "--mmproj"
+                  uncensoredMmproj
+                ];
+              };
+              useModelName = "flash-next-uncensored";
+              ttl = 300;
+              checkEndpoint = "/ready";
+              aliases = [ "qwen3.8-flash-next-uncensored" ];
+            };
+
             # Only flash-next and Qwen3.8-27B are gufo model families. The
             # earlier Coder-30B pick is unsupported upstream.
             "qwen3.8-27b" = {
@@ -86,6 +114,7 @@
               persistent = false;
               members = [
                 "flash-next"
+                "flash-next-uncensored"
                 "qwen3.8-27b"
               ];
             };

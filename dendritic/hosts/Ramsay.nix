@@ -60,6 +60,7 @@ in
           tailscale
           gufo
           inference
+          hermes
         ];
       }
     );
@@ -367,6 +368,16 @@ in
               file="Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00004.gguf"
               get "$flash/UD-Q4_K_XL/$file" "$root/$file"
             done
+
+            # This projector shares its base name with the stock one. Gufo picks
+            # the wrong sibling for the parent dir, so the subdir stays separate.
+            uncensored=https://huggingface.co/vmlinux/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix-GGUF/resolve/0a0843cce72b4d8c377096960b3f0f9c0f4d197f
+            get "$uncensored/mmproj-BF16.gguf" "$root/uncensored/mmproj-BF16.gguf"
+            get "$uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf" \
+              "$root/uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf"
+            mtp=https://huggingface.co/jcbtc/Qwen3.8-Flash-CIRU-STRIX-Orca/resolve/139c9f5eb561dafbcf7cfab0622661b6fc0137e7
+            get "$mtp/mtp/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf" \
+              "$root/uncensored/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf"
 
             asr=https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5
             for file in \

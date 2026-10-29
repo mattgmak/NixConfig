@@ -151,6 +151,34 @@
           "maxTokens": 32768
         },
         {
+          "id": "qwen3.8-flash-next-uncensored",
+          "input": ["text", "image"],
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": "minimal",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": "max"
+          },
+          "samplingParams": {
+            "temperature": 0.6,
+            "top_p": 0.95,
+            "top_k": 20
+          },
+          "samplingParamsByThinkingLevel": {
+            "off": {
+              "temperature": 0.7,
+              "top_p": 0.8,
+              "presence_penalty": 1.5
+            }
+          },
+          "contextWindow": 131072,
+          "maxTokens": 32768
+        },
+        {
           "id": "qwen3.8-27b",
           "reasoning": true,
           "thinkingLevelMap": {
