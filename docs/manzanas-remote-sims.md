@@ -49,9 +49,11 @@ Do not bind a public address. A bind to `0.0.0.0` or the tailnet IP skips Serve 
 ```json
 "manzanas": {
   "command": "manzanas",
-  "args": ["mcp", "--daemon", "https://manzanas.dab-octatonic.ts.net"]
+  "args": ["--daemon", "https://manzanas.dab-octatonic.ts.net", "mcp"]
 }
 ```
+
+The `--daemon` flag is global, so it comes before the `mcp` subcommand. Put it after, and the server fails with `unexpected argument "--daemon"`. The `MANZANASD_ADDR` variable carries the same value when a flag does not fit.
 
 The entry carries no `toolExposure`, so all 28 tools stay behind one namespace. An agent names `mcp__manzanas` in its `tools:` line. The parent session reaches the same tools through the `mcp` gateway.
 
@@ -140,6 +142,10 @@ So a shim costs more code than `manzanas mcp`, and it weakens the argent side. D
 | `manzanas --daemon https://manzanas.dab-octatonic.ts.net lease ls` | Lease table, exit 0 |
 | `tailscale serve status` | `https://manzanas.dab-octatonic.ts.net (tailnet only) (svc:manzanas)` → `proxy http://127.0.0.1:7433` |
 | `argent mcp` transports in the bundle | `StdioServerTransport` only |
+| `manzanas --daemon 127.0.0.1:7433 mcp` with an MCP `initialize` frame | `connected to manzanasd`, serverInfo returned |
+| `MANZANASD_ADDR` env plus `manzanas mcp` | Same handshake, no flag |
+| `tools/list` over that session | 28 tools |
+| `manzanas mcp --daemon URL` | `unexpected argument "--daemon"` |
 
 ## Setup from scratch
 

@@ -20,7 +20,7 @@
     },
     "manzanas": {
       "command": "manzanas",
-      "args": ["mcp", "--daemon", "https://manzanas.dab-octatonic.ts.net"]
+      "args": ["--daemon", "https://manzanas.dab-octatonic.ts.net", "mcp"]
     },
     "nixos": {
       "command": "mcp-nixos",
