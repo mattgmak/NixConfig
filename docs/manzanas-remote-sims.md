@@ -98,9 +98,9 @@ A lease carries `lease_id`, `target_udid`, `labels`, `state`, `expires_at`, `age
 | Lease | `lease_acquire`, `lease_release`, `lease_renew` |
 | Fleet | `targets` |
 | Lifecycle | `state`, `app` |
-| Element driving | `ui_tree`, `tap_element`, `tap_template`, `type_into_element`, `scroll_to_element`, `wait_for_element`, `wait_tree_stable` |
-| Raw input | `tap`, `swipe`, `type_text`, `button`, `paste` |
-| Observation | `screenshot`, `observe`, `audit`, `wait_pixel_stable`, `scroll_until`, `scroll_collect` |
+| Element driving | `ui_tree`, `tap_element`, `tap_template`, `type_into_element`, `scroll_to_element`, `wait_for_element`, `wait_tree_stable`, `wait_for_stable` |
+| Raw input | `tap`, `swipe`, `type_text`, `button` |
+| Observation | `screenshot`, `observe`, `audit`, `scroll_until`, `scroll_collect` |
 | Recording | `record_start`, `record_stop` |
 | Flow | `run`, `run_status`, `journal_export` |
 
@@ -146,6 +146,9 @@ So a shim costs more code than `manzanas mcp`, and it weakens the argent side. D
 | `MANZANASD_ADDR` env plus `manzanas mcp` | Same handshake, no flag |
 | `tools/list` over that session | 28 tools |
 | `manzanas mcp --daemon URL` | `unexpected argument "--daemon"` |
+| Tokenless daemon, `lease ls` with no token | `{"leases": []}`, exit 0 |
+| Tokenless daemon, `manzanas mcp` with no token | `connected`, 28 tools |
+| `pi mcp list` with the new entry | `manzanas: connected, 28 tools` |
 
 ## Setup from scratch
 
@@ -153,7 +156,8 @@ So a shim costs more code than `manzanas mcp`, and it weakens the argent side. D
 2. **ACL.** Grant the nodes that need simulators access to `svc:manzanas` on port 443. The token is gone, so this grant is the only gate.
 3. **Host module.** Copy the rows above from `MacMini.nix`. Keep the loopback bind.
 4. **Switch.** Run `nh` on `macmini`. The build is the user's step, not an agent's.
-5. **Verify.** Run `manzanas --daemon "$URL" lease ls` from a second node. It must exit 0 without a token.
+5. **Reload the agent.** Run the two `launchctl` calls in the failure table. The switch writes the plist and leaves the old process running.
+6. **Verify.** Run `manzanas --daemon "$URL" lease ls` from a second node. It must exit 0 without a token.
 
 ## Failure modes
 
@@ -161,7 +165,7 @@ So a shim costs more code than `manzanas mcp`, and it weakens the argent side. D
 |---|---|---|
 | `connection refused` on `IP:7433` | Loopback bind, by design | Use the service URL |
 | `connection refused` on the service URL | `tailscale-serve-sim` down | `launchctl kickstart gui/$(id -u)/org.nixos.tailscale-serve-sim` |
-| `unauthorized` after the token removal | The daemon still runs an old generation | Switch `macmini`, then check the log for `bearer-token auth enabled` |
+| `unauthorized` after the token removal | The daemon still runs the old generation. A plist change does not restart a launchd job | Run `launchctl bootout gui/$(id -u)/org.nixos.manzanasd`, then `launchctl bootstrap gui/$(id -u) /Library/LaunchAgents/org.nixos.manzanasd.plist` |
 | `not_found: lease not found` | Lease expired or released | Get a new lease, then reinstall the app |
 | `svc:manzanas` not found | Service absent in the admin console | Create it, then restart the Serve job |
 | `mcp__manzanas` missing in an agent | The agent `tools:` line omits it | Name it, or reach the tools through the `mcp` gateway |
@@ -217,7 +221,6 @@ Return the evidence paths, the latency table, and any gap against the pass crite
 
 ## Unverified as of 29 Oct 2026
 
-- **Tokenless daemon.** The config change is written. Confirm after the next switch that the log holds no `bearer-token auth enabled` line, and that `lease ls` needs no token.
 - **Reachability from another node.** The SSH probe to `goofeus` stopped at an unverified host key.
 - **ACL grant.** The console config is not readable from this host.
 - **`argent link` against a manzanas-leased sim.** argent lists local CoreSimulator devices, so a leased sim should appear. Test with `list-devices` before any work relies on it.
