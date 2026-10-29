@@ -17,12 +17,26 @@
       vendorRoot = "${nixConfigRoot}/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
 
-      # mcp.json is the single source of the mcp-nixos pin. The warm activation
-      # below reads the flake URL from it, so a rev bump is one edit.
-      mcpConfig = builtins.fromJSON (builtins.readFile ./mcp.json);
-      mcpNixosFlake = lib.findFirst (arg: lib.hasPrefix "github:" arg) null (
-        mcpConfig.mcpServers.nixos.args or [ ]
-      );
+      # mcp.json is the human-edited source. The `nixos` entry names the bare
+      # binary; the store path below pins it.
+      # This nixpkgs ships mcp-nixos 3.0.1, which builds against mcp v2 and so
+      # pulls the broken fastmcp-slim. Upstream pins mcp_1; do the same until
+      # nixpkgs carries mcp-nixos 3.0.2.
+      mcpNixos = pkgs.mcp-nixos.override {
+        python3Packages = pkgs.python3Packages.overrideScope (
+          final: _: {
+            mcp = final.mcp_1;
+          }
+        );
+      };
+      base = builtins.fromJSON (builtins.readFile ./mcp.json);
+      mcpConfig = base // {
+        mcpServers = base.mcpServers // {
+          nixos = base.mcpServers.nixos // {
+            command = "${mcpNixos}/bin/mcp-nixos";
+          };
+        };
+      };
 
       piCompiled = self.packages.${system}.piCompiled;
       piStock = self.packages.${system}.pi;
@@ -775,6 +789,7 @@
             agent-browser
             uv
             bun
+            mcpNixos
             podman
             piExtDepsInstall
             piStockWrapper
@@ -923,8 +938,8 @@
         );
         home.file.".pi/agent/models.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/models.json";
-        home.file.".pi/agent/mcp.json".source =
-          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp.json";
+        # The store path pins the mcp-nixos binary, so this file is generated, not live.
+        home.file.".pi/agent/mcp.json".source = pkgs.writeText "pi-mcp.json" (builtins.toJSON mcpConfig);
         home.file.".pi/agent/settings.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
         home.file.".pi/agent/keybindings.json".source =
@@ -944,24 +959,6 @@
           HEND
           chmod 644 "$HOME/.local/share/pi-searxng/settings.yml"
         '';
-
-        # The nixos MCP server starts as `nix run <flake>`. A cold store must fetch a
-        # 143-path python closure first, and pi's connect timeout fires during that
-        # copy. Warm the closure here. The out-link roots it, so `nix store gc` keeps
-        # every path and the next start needs no download.
-        home.activation.piMcpNixosWarm = lib.mkIf (mcpNixosFlake != null) (
-          inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p "$HOME/.local/state/pi-mcp-nixos"
-          log="$HOME/.local/state/pi-mcp-nixos/warm.log"
-          nixbin=/nix/var/nix/profiles/default/bin/nix
-          [ -x "$nixbin" ] || nixbin=${pkgs.nix}/bin/nix
-          "$nixbin" build --no-write-lock-file \
-            --out-link "$HOME/.local/state/pi-mcp-nixos/result" \
-            ${lib.escapeShellArg mcpNixosFlake} \
-            >>"$log" 2>&1 || true
-          tail -n 200 "$log" >"$log.trimmed" && mv "$log.trimmed" "$log"
-          ''
-        );
 
         # pi-web-access resolves web-search.json from PI_CODING_AGENT_DIR, then
         # XDG_CONFIG_HOME/pi, then ~/.pi (legacy), then ~/.pi/agent. Symlink all

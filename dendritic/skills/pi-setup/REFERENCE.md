@@ -180,7 +180,7 @@ No patch remains. 1.0.5 compile maps `@sinclair/typebox` and the other Pi module
 |----------|--------|
 | `pi-lean-ctx` compiled in, with a writable dir | its factory wants a schema cache beside its config |
 | `pi-clinepass-provider` removed | no loader or `.gitmodules` entry remains, so the set holds no cline provider |
-| `mcp-nixos` loader removed, `nixos` MCP server added | the server pins `github:utensils/mcp-nixos/6a517811658c21f97bd7703b35546085117fc310` in `mcp.json`, so it needs no rebuild |
+| `mcp-nixos` loader removed, `nixos` MCP server added | the generated store path from nixpkgs `mcp-nixos` pins the server. `mcp.json` is the human-edited source |
 
 ### Failure signatures
 
@@ -531,6 +531,16 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 **Agent tools:** use `ctx_read`, `ctx_grep`, `ctx_find`, `ctx_ls`, `ctx_shell` in `dendritic/home-modules/pi-coding-agent/agents/*.md` (not native `read`/`bash`).
 
+**MCP tools in subagents:** name each tool. Do not name bare `mcp`.
+
+- `mcp` is the gateway. It calls every tool of every enabled server. A child that names `mcp` bypasses the parent deny list. Live proof: the gateway reached 105 tools, including Linear write verbs.
+- Name direct tools instead: `Linear_get_issue`. The name exists only when `mcp.json` sets `"toolExposure": {"get_issue": "direct"}`. The child `--tools` flag still filters the final set.
+- Name a server namespace to limit a child to one server: `mcp__argent`. Omit `mcp` at the same time.
+- An unknown name fails silent. The child starts without the tool and prints nothing. Verify with a dump extension or `pi mcp list`.
+- `peer.md` declares no `tools:` line. It keeps the full surface by design.
+
+**Per-agent MCP files:** avoid `cwd/.pi/agent/mcp.json`. The fork exports `PI_CODING_AGENT_DIR` from it, and the child loses the global `settings.json`, `auth.json`, skills and extension list. A malformed file crashes the child with SIGSEGV.
+
 **Permissions:** mirror `bash` rules under `ctx_shell` in `extensions/pi-permission-system/config.json`.
 
 **Upstream merges:** fetch `upstream` (amosblomqvist), merge into fork, re-apply fork commits if needed, push `origin`, bump submodule SHA in NixConfig.
@@ -541,7 +551,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 |------|---------|
 | Wire paths / enable pi | `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix` |
 | Custom models/providers | `dendritic/home-modules/pi-coding-agent/models.json` |
-| MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json` |
+| MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json`. Human-edited source. `pi-coding-agent.nix` generates the store file from it |
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
 | lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Agent shell permission rules | `dendritic/home-modules/pi-coding-agent/extensions/pi-permission-system/config.json` |

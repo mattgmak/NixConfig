@@ -1,6 +1,7 @@
 {
   "settings": {
-    "oauthCredentialStore": "encrypted-file"
+    "oauthCredentialStore": "encrypted-file",
+    "deferWithMissingMetadata": true
   },
   "mcpServers": {
     "Linear": {
@@ -15,19 +16,6 @@
       "url": "https://api.githubcopilot.com/mcp/readonly",
       "headers": {
         "Authorization": "Bearer ${GITHUB_MCP_TOKEN}"
-      },
-      "toolExposure": {
-        "pull_request_read": "direct",
-        "get_file_contents": "direct",
-        "search_code": "direct",
-        "search_issues": "direct",
-        "search_pull_requests": "direct",
-        "issue_read": "direct",
-        "list_commits": "direct",
-        "get_commit": "direct",
-        "list_branches": "direct",
-        "list_pull_requests": "direct",
-        "search_repositories": "direct"
       }
     },
     "argent": {
@@ -35,12 +23,8 @@
       "args": ["mcp"]
     },
     "nixos": {
-      "command": "nix",
-      "args": ["run", "github:utensils/mcp-nixos/6a517811658c21f97bd7703b35546085117fc310", "--"],
-      "toolExposure": {
-        "nix": "direct",
-        "nix_versions": "direct"
-      }
+      "command": "mcp-nixos",
+      "args": []
     }
   }
 }

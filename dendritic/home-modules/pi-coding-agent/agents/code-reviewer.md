@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Two-axis code reviewer — Standards plus Spec. Delegates context gathering to scout. Reads specs from Linear MCP or a spec file.
-tools: ctx_read, ctx_grep, ctx_find, ctx_shell, todo, Linear_get_issue, Linear_list_comments, Linear_list_issues, Linear_get_issue_status
+tools: ctx_read, ctx_grep, ctx_find, ctx_shell, todo, Linear_get_issue, Linear_list_issues
 subagent_agents: scout
 model: cursor/grok-4.7@256k:slow
 thinking: high
@@ -17,8 +17,14 @@ Your context is isolated. The task gives the worktree path, branch, fixed point,
 ## Inputs
 - Worktree path, branch, fixed point (for example `origin/main`).
 - Spec source. Read `spec-context.md` in the worktree root when present. Otherwise
-  use the Linear ticket ids: description plus comments are the spec. Otherwise use
-  the path in the task. When no spec exists, skip the Spec axis and say so.
+  read the Linear ticket through the MCP gateway tool. It shows as `mcp`, or as
+  `pi__mcp` in a profile that prefixes the pi tools. Call
+  `mcp({tool:"Linear_get_issue", args:{id:"TECH-000"}})` for the description, then
+  `mcp({tool:"Linear_list_comments", args:{issueId:"TECH-000"}})` for the comments.
+  Description plus comments are the spec. Otherwise use the path in the task.
+
+  When no spec exists, skip the Spec axis and say so. Never name a bare
+  `Linear_get_issue` tool, because no such tool exists.
 - Standards sources: root `AGENTS.md`, area `AGENTS.md` files, ADRs, guidelines.
 
 ## Process
