@@ -68,6 +68,7 @@ shell_allowlist_extra = [
     "convert",
     "ss",
     "rclone",
+    "manzanas",
 ]
 
 [telemetry]
