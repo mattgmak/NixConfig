@@ -55,6 +55,10 @@ Do not bind a public address. A bind to `0.0.0.0` or the tailnet IP skips Serve 
 
 The `--daemon` flag is global, so it comes before the `mcp` subcommand. Put it after, and the server fails with `unexpected argument "--daemon"`. The `MANZANASD_ADDR` variable carries the same value when a flag does not fit.
 
+`dendritic/packages/manzanas.nix` takes the release binaries for darwin and linux.
+A linux node runs the client only. `simbridge` ships for darwin-arm64 only, so a
+daemon on another host takes cold AXe actions.
+
 The entry carries no `toolExposure`, so all 28 tools stay behind one namespace. An agent names `mcp__manzanas` in its `tools:` line. The parent session reaches the same tools through the `mcp` gateway.
 
 ## Lease then drive
