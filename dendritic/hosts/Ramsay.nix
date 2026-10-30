@@ -343,12 +343,19 @@ in
           environment.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           script = ''
             set -eu
+            export LC_ALL=C
             root=/var/lib/inference/models
             manifest=$(mktemp)
+            keep=$(mktemp)
+            found=$(mktemp)
 
-            # Each line is "url dest". One curl per 45 GiB shard runs at about
-            # 77 MB/s, so the serial form cost 41 minutes for the Swift set.
-            want() { printf '%s %s\n' "$1" "$2" >> "$manifest"; }
+            # Each manifest line is "url dest". One curl per 45 GiB shard runs at
+            # about 77 MB/s, so the serial form cost 41 minutes for the Swift set.
+            # The keep list drives the prune at the end.
+            want() {
+              printf '%s %s\n' "$1" "$2" >> "$manifest"
+              printf '%s\n' "$2" >> "$keep"
+            }
 
             fetch() {
               [ -s "$2" ] && exit 0
@@ -421,10 +428,37 @@ in
               want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
 
+            # The requant writes this map and its guard path never rebuilds it, so
+            # the prune must not treat it as litter.
+            printf '%s\n' "$root/swift/tensor-types.txt" >> "$keep"
+
+            # The requant unit produces these five files. This fetch never
+            # downloads them and gufo loads them, so the prune needs their names.
+            for shard in 00001 00002 00003 00004 00005; do
+              printf '%s\n' \
+                "$root/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00005.gguf" >> "$keep"
+            done
+
             # Name bash by store path. A unit PATH carries coreutils, findutils,
             # grep, sed and systemd, but not bash.
             xargs -a "$manifest" -P 4 -n 2 ${pkgs.bash}/bin/bash -c 'fetch "$0" "$1"'
-            rm -f "$manifest"
+
+            # Drop files this unit does not name. A pinned URL change leaves the
+            # old build behind, and a 45 GiB shard is hard to find by hand. The
+            # Q8_0 set leaves the list once the requant output exists, so this
+            # reclaims 175 GiB.
+            sort "$keep" > "$keep.sorted"
+            if [ "$(wc -l < "$keep.sorted")" -lt 20 ]; then
+              echo "keep list holds fewer than 20 files, skip prune" >&2
+              exit 1
+            fi
+            find "$root" -type f | sort > "$found"
+            comm -13 "$keep.sorted" "$found" | while read -r f; do
+              echo "prune $f"
+              rm -f "$f"
+            done
+            find "$root" -mindepth 1 -type d -empty -delete
+            rm -f "$manifest" "$keep" "$keep.sorted" "$found"
 
             chmod -R a+rX "$root"
           '';
@@ -454,7 +488,16 @@ in
             swift=$root/swift
             out=$swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL
 
+            # gufo loads the requant output. The Q8_0 sources cost 175 GiB and
+            # feed nothing after this point.
+            cleanup() {
+              rm -f "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf
+            }
+
+            # The guard exits before the quantize step, so cleanup has to run on
+            # both paths.
             if [ -s "$out-00001-of-00005.gguf" ]; then
+              cleanup
               exit 0
             fi
 
@@ -476,9 +519,7 @@ in
               "$out.gguf" \
               Q4_K_M
 
-            # gufo loads the requant output. The Q8_0 sources cost 175 GiB and
-            # feed nothing after this point, so they do not stay on disk.
-            rm -f "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf
+            cleanup
 
             chmod -R a+rX "$root"
           '';
