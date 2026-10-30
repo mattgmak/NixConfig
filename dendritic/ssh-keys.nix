@@ -10,6 +10,8 @@
     # secrets that MacMini itself must read name this key, not the login key.
     MacMiniHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGjazzROpYrCpmXEGzgTSF2Z+lK+q6KtkwicSxke5nsk root@macmini";
     Ramsay = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII1zk63+hPq2dUA/6MUgLW3ryisp/dZQ8GuiPDYpyiFK root@Ramsay";
+    # Passphrase-less identity of agent@Ramsay, generated on the host.
+    RamsayAgentSsh = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMRrZix9Vj/LdMVlXlpH2vnNUdofbJ7Vj9jHknMhtfMS agent@Ramsay";
     RamsayAgent = "age1d2cjwq3q74ms05zj4qge8lxlf5ac3nl25ajy8vxeyy2qd2x733xqg43mya";
     # Passphrase-less identity for agent@Goofeus, decrypts API secrets headlessly.
     AgentAge = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC5KIsxMM9XNnktIidlFgdgLjkAM7hTETiVy5dBYtcgq agent@Goofeus";

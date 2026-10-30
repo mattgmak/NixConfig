@@ -791,6 +791,7 @@ in
           GoofyEnvy
           Droid
           Ramsay
+          RamsayAgentSsh
         ];
       };
 
