@@ -421,7 +421,9 @@ in
               want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
 
-            xargs -a "$manifest" -P 4 -n 2 bash -c 'fetch "$0" "$1"'
+            # Name bash by store path. A unit PATH carries coreutils, findutils,
+            # grep, sed and systemd, but not bash.
+            xargs -a "$manifest" -P 4 -n 2 ${pkgs.bash}/bin/bash -c 'fetch "$0" "$1"'
             rm -f "$manifest"
 
             chmod -R a+rX "$root"
