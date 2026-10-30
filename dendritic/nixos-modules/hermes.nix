@@ -37,9 +37,9 @@
             enabled = "always";
             url = "https://hermes-api.dab-octatonic.ts.net:8443";
           };
-          # llama-swap lists flash-next, flash-next-uncensored and qwen3.8-27b
-          # on /v1/models. The aliases let a running session switch with
-          # /model <name>.
+          # llama-swap lists flash-next, flash-next-uncensored, flash-next-swift
+          # and qwen3.8-27b on /v1/models. The aliases let a running session
+          # switch with /model <name>.
           model_aliases = {
             flash-next = {
               model = "flash-next";
@@ -48,6 +48,11 @@
             };
             flash-uncensored = {
               model = "flash-next-uncensored";
+              provider = "custom";
+              base_url = localBaseUrl;
+            };
+            swift = {
+              model = "flash-next-swift";
               provider = "custom";
               base_url = localBaseUrl;
             };

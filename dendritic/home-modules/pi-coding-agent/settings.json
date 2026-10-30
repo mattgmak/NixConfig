@@ -32,7 +32,8 @@
     "commandcode/reflection/beam:free",
     "cursor/grok-4.7@256k:slow",
     "cursor/grok-4.7@256k:fast",
-    "ramsay/qwen3.8-flash-next"
+    "ramsay/qwen3.8-flash-next",
+    "ramsay/qwen3.8-flash-next-swift"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -54,6 +55,7 @@
     "commandcode/reflection/beam:free": "medium",
     "opencode-go/beam-free": "medium",
     "ramsay/qwen3.8-flash-next": "medium",
+    "ramsay/qwen3.8-flash-next-swift": "medium",
     "ramsay/qwen3.8-27b": "low"
   }
 }
