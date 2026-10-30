@@ -58,6 +58,7 @@ Maintenance: keep this section short. A stale line goes out during review.
 
 # Git
 
+- Create and manage git worktrees with `wt` (worktrunk) always. Do not use raw `git worktree`.
 - NEVER mutate PRs — merges, closes, approvals, admin bypass (`gh pr merge`, `gh pr close`, `gh pr review --approve`, `gh api .../pulls/.../merge`) unless explicit same-session request. Stop + ask first.
 - NEVER modify previous commits or make commits unless explicitly asked.
 - Commits: subject only, empty body. Follow project convention.
