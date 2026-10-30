@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for pi-autoname (vendored ssdiwu/pi-autoname submodule)",
+  "description": "Pi loader for pi-autoname (vendored mattgmak/pi-autoname fork)",
   "pi": {
     "extensions": ["./index.ts"]
   }

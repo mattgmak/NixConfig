@@ -99,6 +99,7 @@
             "k0valik/pi-blackhole"
             "MattDevy/pi-extensions"
             "mattgmak/agent-sesh"
+            "mattgmak/pi-autoname"
             "mattgmak/pi-interactive-subagents"
             "mattgmak/pi-nvim-bridge"
             "michalvavra/agents"
@@ -108,7 +109,6 @@
             "omaclaren/pi-markdown-preview"
             "patlux/pi-commandcode-provider"
             "Pringled/pi-extensions"
-            "ssdiwu/pi-autoname"
             "theo-kirby/tmax"
             "vndv/pi-codegraph"
           ];

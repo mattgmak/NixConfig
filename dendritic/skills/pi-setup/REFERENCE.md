@@ -316,6 +316,7 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
 | `pi-interactive-subagents` (`vendor/mattgmak/pi-interactive-subagents`) | `mattgmak/pi-interactive-subagents` | `https://github.com/amosblomqvist/pi-interactive-subagents.git` | `main` |
 | `pi-nvim-bridge` (`vendor/mattgmak/pi-nvim-bridge`) | `mattgmak/pi-nvim-bridge` | `https://github.com/dabstractor/pi-nvim-bridge.git` | `main` |
+| `pi-autoname` (`vendor/mattgmak/pi-autoname`) | `mattgmak/pi-autoname` | `https://github.com/ssdiwu/pi-autoname.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
 
 Add new rows here when vendoring through a fork.

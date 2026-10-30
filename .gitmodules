@@ -95,9 +95,9 @@
 [submodule "Pringled/pi-extensions"]
 	path = vendor/Pringled/pi-extensions
 	url = https://github.com/Pringled/pi-extensions.git
-[submodule "ssdiwu/pi-autoname"]
-	path = vendor/ssdiwu/pi-autoname
-	url = https://github.com/ssdiwu/pi-autoname
+[submodule "mattgmak/pi-autoname"]
+	path = vendor/mattgmak/pi-autoname
+	url = https://github.com/mattgmak/pi-autoname.git
 [submodule "gsanhueza/pi-token-speed"]
 	path = vendor/gsanhueza/pi-token-speed
 	url = https://github.com/gsanhueza/pi-token-speed

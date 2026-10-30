@@ -9,5 +9,7 @@
   "cooldownMinutes": 10,
   "debug": false,
   "respectManualName": true,
-  "includeCustomMessages": false
+  "includeCustomMessages": false,
+  "kebabCase": true,
+  "maxWords": 5
 }
