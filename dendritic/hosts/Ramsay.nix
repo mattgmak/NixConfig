@@ -246,6 +246,7 @@ in
         };
 
         environment.systemPackages = with pkgs; [
+          inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix
           fzf
           ripgrep
           zip
@@ -450,13 +451,14 @@ in
               -- "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf \
               > "$swift/tensor-types.txt"
 
+            # This build takes the output path as the second positional argument.
             llama-quantize \
               --imatrix "$swift/imatrix-swiftfn-v1mix.gguf" \
               --allow-requantize \
               --keep-split \
               --tensor-type-file "$swift/tensor-types.txt" \
-              -o "$out" \
               "$swift/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-00001-of-00005.gguf" \
+              "$out.gguf" \
               Q4_K_M
 
             chmod -R a+rX "$root"
