@@ -503,12 +503,6 @@
           # from the system path, so only linux needs the flag.
           wrapperLdFlag = lib.optionalString stdenv.hostPlatform.isLinux
             "--prefix LD_LIBRARY_PATH : ${stdenv.cc.cc.lib}/lib";
-        in
-        assert lib.assertMsg (missingLoaders == [ ])
-          "pi-bolt-compiled: loader dir absent from the flake source: ${lib.concatStringsSep ", " missingLoaders}. Run git add -N on each.";
-        stdenv.mkDerivation {
-          pname = "pi-compiled";
-          inherit version;
 
           appSrc = fetchurl {
             url = "${baseUrl}/pi-bolt-${attrs.variant}.tar.xz";
@@ -523,14 +517,133 @@
             hash = attrs.kitHash;
           };
 
+          # The loader tree, the vendor copies and the patched kit depend on the extension
+          # sources alone. They live in their own derivation, so a source change rebuilds
+          # this output and the final step runs only the compile.
+          compileStage = pkgs.stdenvNoCC.mkDerivation {
+            pname = "pi-compile-stage";
+            version = "0";
+            inherit kitSrc;
+            dontUnpack = true;
+            dontFixup = true;
+
+            nativeBuildInputs = [
+              gnutar
+              gzip
+              jq
+              findutils
+              coreutils
+            ];
+
+            buildPhase = ''
+              runHook preBuild
+
+              mkdir -p unpack/kit
+              tar -xf "$kitSrc" -C unpack/kit --strip-components=1
+              chmod -R u+w unpack/kit
+
+              # Loader folder plus a real `vendor` sibling. `pi compile` copies the whole
+              # extensions folder into .pibolt-plugins/src/global/, so
+              # ../vendor/<owner>/<repo>/... resolves there. A symlinked vendor does not
+              # survive the copy.
+              stage=$PWD/stage/extensions
+              mkdir -p $stage/vendor
+              ${lib.concatMapStrings (repo: ''
+                mkdir -p $stage/vendor/${repo}
+                # node_modules and .git stay out: they are gitignored, so they may be absent
+                # from the store tree, and they are not needed. Any level counts: a nested one
+                # holds pnpm links to install-time paths, and `pi compile` dies dereferencing
+                # them.
+                tar -cf - -C ${vendorRoot}/${repo} --exclude=node_modules --exclude=.git . \
+                  | tar -xf - -C $stage/vendor/${repo}
+              '') vendorRepos}
+              ${lib.concatMapStrings (s: ''
+                mkdir -p $stage/vendor/${s.repo}/${s.subdir}
+                tar -cf - -C ${vendorRoot}/${s.repo}/${s.subdir} --exclude=node_modules --exclude=.git . \
+                  | tar -xf - -C $stage/vendor/${s.repo}/${s.subdir}
+              '') vendorSubdirs}
+
+              ${lib.concatMapStrings (name: ''
+                cp -a ${extensionsDir}/${name} $stage/${name}
+              '') extensions}
+              chmod -R u+w $stage
+
+              # pi-powerline-footer carries its palette as a home-manager symlink to a
+              # generated store file that the sandbox does not have, and `pi compile`
+              # dereferences every link it meets. Drop the link: the compiled copy falls back
+              # to the vendor's own presets, while the on-disk extension keeps the symlink.
+              find $stage -name theme.json -type l -delete
+
+              ${lib.concatMapStrings (repo: ''
+                cp -a ${npmNodeModules { inherit repo; }}/node_modules $stage/vendor/${repo}/node_modules
+              '') npmDepRepos}
+              ${lib.concatMapStrings (dep: ''
+                cp -a ${pnpmNodeModules dep}/. $stage/vendor/${dep.repo}/
+              '') pnpmDepRepos}
+
+              # pi-agent-browser-native loads a built file, and its bundles leave the
+              # runtime deps external.
+              cp -a ${agentBrowserNative}/dist \
+                $stage/vendor/fitchmultz/pi-agent-browser-native/
+              cp -a ${npmNodeModules {
+                repo = "fitchmultz/pi-agent-browser-native";
+              }}/node_modules $stage/vendor/fitchmultz/pi-agent-browser-native/node_modules
+
+              # agent-ste loads its compiled Gleam output from dist/.
+              cp -a ${agentSte}/dist $stage/vendor/ctotheameron/agent-ste/
+
+              # pi-lean-ctx loads its bundled MCP SDK from extensions/vendor. The staged dir
+              # already exists, so copy the contents, not the dir itself.
+              cp -a ${piLeanCtx}/vendor/. \
+                $stage/vendor/mattgmak/lean-ctx/packages/pi-lean-ctx/extensions/vendor/
+
+              # gentle-engram resolves its bare imports through vendor/node_modules.
+              mkdir -p $stage/vendor/.engram-deps
+              cp -a ${engramDeps}/node_modules $stage/vendor/.engram-deps/node_modules
+              ln -sfn .engram-deps/node_modules $stage/vendor/node_modules
+
+              # Those two packages import their workspace siblings. The bundler reads the
+              # copies under .pibolt-plugins, not the vendor tree, so only the kit's
+              # node_modules is on its path.
+              mkdir -p ${kitTree}/node_modules/@juicesharp
+              cp -a ${rpivRoot}/packages/rpiv-config ${rpivRoot}/packages/rpiv-i18n \
+                ${kitTree}/node_modules/@juicesharp/
+
+              # Git ignores the prebuilt bundle in the repo loader folder, so the flake source
+              # lacks it. Ship the compiled bundle here. Both hosts then find it beside
+              # index.ts, and the run-time fingerprint stays stable.
+              chmod u+w $stage/pi-cursor-sdk
+              cp ${cursorSdkBundle}/pi-bolt-bundle.js \
+                $stage/pi-cursor-sdk/pi-bolt-bundle.js
+
+              # The bundle entry needs a writable kit, so this copy is the one patched.
+              cp -a unpack/kit kit
+              chmod -R u+w kit
+              cp ${cursorSdkBundle}/pi-bolt-bundle.js kit/tree/packages/coding-agent/pi-bolt-bundle.js
+              jq '.entries += ["./pi-bolt-bundle.js"]' kit/kit.json > kit.json.new
+              mv kit.json.new kit/kit.json
+
+              runHook postBuild
+            '';
+
+            installPhase = ''
+              mkdir -p $out
+              cp -a stage/extensions $out/extensions
+              cp -a kit $out/kit
+            '';
+          };
+        in
+        assert lib.assertMsg (missingLoaders == [ ])
+          "pi-bolt-compiled: loader dir absent from the flake source: ${lib.concatStringsSep ", " missingLoaders}. Run git add -N on each.";
+        stdenv.mkDerivation {
+          pname = "pi-compiled";
+          inherit version appSrc runtimeSrc compileStage;
+
           nativeBuildInputs = [
             gnutar
             gzip
             xz
-            jq
             makeWrapper
-            findutils
-            coreutils
           ]
           ++ lib.optional stdenv.hostPlatform.isLinux patchelf;
 
@@ -547,84 +660,11 @@
 
           unpackPhase = ''
             runHook preUnpack
-            mkdir -p unpack/app unpack/runtime unpack/kit
+            mkdir -p unpack/app unpack/runtime
             tar -xf "$appSrc" -C unpack/app --strip-components=1
             tar -xf "$runtimeSrc" -C unpack/runtime --strip-components=1
-            tar -xf "$kitSrc" -C unpack/kit --strip-components=1
             chmod -R u+w unpack
             runHook postUnpack
-          '';
-
-          # Stage the extension tree before the build: loader folder plus a real `vendor`
-          # sibling. `pi compile` copies the whole extensions folder into
-          # .pibolt-plugins/src/global/, so ../vendor/<owner>/<repo>/... resolves there. A
-          # symlinked vendor does not survive the copy.
-          postPatch = ''
-            stage=$PWD/stage/extensions
-            mkdir -p $stage/vendor
-            ${lib.concatMapStrings (repo: ''
-              mkdir -p $stage/vendor/${repo}
-              # node_modules and .git stay out: they are gitignored, so they may be absent
-              # from the store tree, and they are not needed. Any level counts: a nested one
-              # holds pnpm links to install-time paths, and `pi compile` dies dereferencing
-              # them.
-              tar -cf - -C ${vendorRoot}/${repo} --exclude=node_modules --exclude=.git . \
-                | tar -xf - -C $stage/vendor/${repo}
-            '') vendorRepos}
-            ${lib.concatMapStrings (s: ''
-              mkdir -p $stage/vendor/${s.repo}/${s.subdir}
-              tar -cf - -C ${vendorRoot}/${s.repo}/${s.subdir} --exclude=node_modules --exclude=.git . \
-                | tar -xf - -C $stage/vendor/${s.repo}/${s.subdir}
-            '') vendorSubdirs}
-            chmod -R u+w $stage
-
-            # pi-powerline-footer carries its palette as a home-manager symlink to a
-            # generated store file that the sandbox does not have, and `pi compile`
-            # dereferences every link it meets. Drop the link: the compiled copy falls back
-            # to the vendor's own presets, while the on-disk extension keeps the symlink.
-            find $stage -name theme.json -type l -delete
-
-            ${lib.concatMapStrings (repo: ''
-              cp -a ${npmNodeModules { inherit repo; }}/node_modules $stage/vendor/${repo}/node_modules
-            '') npmDepRepos}
-            ${lib.concatMapStrings (dep: ''
-              cp -a ${pnpmNodeModules dep}/. $stage/vendor/${dep.repo}/
-            '') pnpmDepRepos}
-
-            # pi-agent-browser-native loads a built file, and its bundles leave the
-            # runtime deps external.
-            cp -a ${agentBrowserNative}/dist \
-              $stage/vendor/fitchmultz/pi-agent-browser-native/
-            cp -a ${npmNodeModules {
-              repo = "fitchmultz/pi-agent-browser-native";
-            }}/node_modules $stage/vendor/fitchmultz/pi-agent-browser-native/node_modules
-
-            # agent-ste loads its compiled Gleam output from dist/.
-            cp -a ${agentSte}/dist $stage/vendor/ctotheameron/agent-ste/
-
-            # pi-lean-ctx loads its bundled MCP SDK from extensions/vendor. The staged dir
-            # already exists, so copy the contents, not the dir itself.
-            cp -a ${piLeanCtx}/vendor/. \
-              $stage/vendor/mattgmak/lean-ctx/packages/pi-lean-ctx/extensions/vendor/
-
-            # gentle-engram resolves its bare imports through vendor/node_modules.
-            mkdir -p $stage/vendor/.engram-deps
-            cp -a ${engramDeps}/node_modules $stage/vendor/.engram-deps/node_modules
-            ln -sfn .engram-deps/node_modules $stage/vendor/node_modules
-
-            # Those two packages import their workspace siblings. The bundler reads the
-            # copies under .pibolt-plugins, not the vendor tree, so only the kit's
-            # node_modules is on its path.
-            mkdir -p ${kitTree}/node_modules/@juicesharp
-            cp -a ${rpivRoot}/packages/rpiv-config ${rpivRoot}/packages/rpiv-i18n \
-              ${kitTree}/node_modules/@juicesharp/
-
-            # The bundle entry needs a writable kit, so the build reads a copy.
-            cp -a unpack/kit kit
-            chmod -R u+w kit
-            cp ${cursorSdkBundle}/pi-bolt-bundle.js kit/tree/packages/coding-agent/pi-bolt-bundle.js
-            jq '.entries += ["./pi-bolt-bundle.js"]' kit/kit.json > kit.json.new
-            mv kit.json.new kit/kit.json
           '';
 
           buildPhase = ''
@@ -635,23 +675,13 @@
             # recorded root equals the run-time root and the fingerprint lookup hits.
             export HOME="$out/share/pibolt-home"
             mkdir -p "$HOME/.pi/agent/extensions" "$HOME/.bun"
-            ${lib.concatMapStrings (name: ''
-              cp -a ${extensionsDir}/${name} "$HOME/.pi/agent/extensions/${name}"
-            '') extensions}
-            # Git ignores the prebuilt bundle in the repo loader folder, so the flake source
-            # lacks it. Ship the compiled bundle here. Both hosts then find it beside
-            # index.ts, and the run-time fingerprint stays stable. cp -a keeps the source
-            # read-only, so make the folder writable first.
-            chmod u+w "$HOME/.pi/agent/extensions/pi-cursor-sdk"
-            cp ${cursorSdkBundle}/pi-bolt-bundle.js \
-              "$HOME/.pi/agent/extensions/pi-cursor-sdk/pi-bolt-bundle.js"
-            cp -a stage/extensions/vendor "$HOME/.pi/agent/extensions/vendor"
+            # The staged tree comes from the store, so every file keeps the store mtime of 1:
+            # the fingerprint reads 1000 on both sides, as the run-time copy does.
+            cp -a ${compileStage}/extensions/. "$HOME/.pi/agent/extensions/"
             chmod -R u+w "$HOME"
 
-            # The fingerprint uses Math.trunc(mtimeMs). Nix sets store mtimes to 1, so pin
-            # every staged file to exactly @1 and both sides agree at 1000. GNU touch on
-            # both platforms: BSD touch takes no `-d @1`.
-            ${lib.getExe findutils} "$HOME" -exec ${lib.getExe' coreutils "touch"} -h -d @1 {} +
+            cp -a ${compileStage}/kit kit
+            chmod -R u+w kit
 
             # Writable copy of the app tree: pi compile fails with EACCES on temp cleanup
             # when the tree is read-only, and it writes beside the executable.

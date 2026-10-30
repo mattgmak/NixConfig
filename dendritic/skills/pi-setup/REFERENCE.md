@@ -109,7 +109,7 @@ Three release assets per platform, all from `bolt-v<version>`:
 
 `--kit` together with `--runtime` is the offline pair. Without either one the compile fetches `SHA256SUMS` and `SHA256SUMS.sig` from the release.
 
-The build stages the loaders and a real `vendor` tree. It then runs the compile with `HOME=$out/share/pibolt-home`, so the recorded root stays in the store path. Every staged file takes `@1` as its mtime, so both sides of the fingerprint read `1000`. The step calls the nixpkgs `find` and the nixpkgs `touch`: BSD `touch` takes no `-d @1`.
+The build stages the loaders and a real `vendor` tree in its own derivation, `pi-compile-stage`. That output holds the loader tree and the patched kit. The final derivation copies it to `HOME=$out/share/pibolt-home` and runs the compile, so the recorded root stays in the store path. Nix sets the mtime of every store file to `@1`, and `cp -a` keeps it, so both sides of the fingerprint read `1000`.
 
 `dontFixup`, `dontStrip` and `dontPatchELF` stay set. The AOT image appends page-aligned sections and a trailer, and the runtime re-opens the executable to verify that trailer. A strip, a signature or an rpath rewrite corrupts it. On Linux `patchelf --set-interpreter` only grows the file, so the build sets the interpreter and passes `LD_LIBRARY_PATH` for the compile itself.
 
