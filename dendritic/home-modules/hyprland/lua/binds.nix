@@ -6,6 +6,9 @@
 let
   allWorkspacesIndex = lib.map (i: toString i) (lib.range 1 10);
 
+  # Ramsay HM starts the "agents" tmux session on boot; -A attaches to it.
+  ramsayTerm = "ghostty --class=com.mitchellh.ghostty.e -e ssh -t agent@ramsay.dab-octatonic.ts.net 'tmux new-session -A -s agents'";
+
   bind =
     key: action: opts:
     let
@@ -78,7 +81,7 @@ let
     (bind "ALT + N" "hl.dsp.global(\"caelestia:clearNotifs\")" null)
     (bind "ALT + B" "hl.dsp.exec_cmd(\"caelestia shell drawers toggle sidebar\")" null)
     (bind "SUPER + R" "hl.dsp.exec_cmd(\"zen-beta\")" null)
-    (bind "SUPER + E" "hl.dsp.exec_cmd(\"ghostty --class=com.mitchellh.ghostty.e\")" null)
+    (bind "SUPER + E" "hl.dsp.exec_cmd(\"${ramsayTerm}\")" null)
     (bind "SUPER + W" "hl.dsp.exec_cmd(\"ghostty --class=com.mitchellh.ghostty.w\")" null)
     (bind "ALT + Z" "hl.dsp.exec_cmd(\"${woomerLaunch}\")" null)
     (bind "SUPER + F" "hl.dsp.exec_cmd(\"hyprctl hyprsunset temperature 4500\")" null)
