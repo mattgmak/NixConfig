@@ -29,8 +29,8 @@
           # cacheOptions = "--timeout 604800";
           # };
           push.recurseSubmodules = "on-demand";
-          # Implies --recurse-submodules on checkout/pull (replaces githooks).
-          submodule.recurse = true;
+          # Pull must not block on submodules. githooks/post-merge refreshes them in background.
+          submodule.recurse = false;
           # Clone new vendor submodules on pull/ff without manual --init.
           submodule.autoInit = true;
         }

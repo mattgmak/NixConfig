@@ -1,0 +1,10 @@
+#!/bin/sh
+# Start the vendor submodule refresh in the background. Pull returns at once.
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -x "$root/githooks/submodule-refresh.sh" ] || exit 0
+
+log="${XDG_STATE_HOME:-$HOME/.local/state}/nixconfig/submodule-refresh.log"
+mkdir -p "${log%/*}"
+
+( "$root/githooks/submodule-refresh.sh" >>"$log" 2>&1 </dev/null & )
+exit 0

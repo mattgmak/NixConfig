@@ -272,17 +272,35 @@ git submodule update --init --recursive
 
 Git config in `dendritic/home-modules/git.nix`:
 
-- `submodule.recurse = true` — checkout/pull update submodules to recorded SHAs
+- `submodule.recurse = false` — pull stays fast. The hook owns submodule updates.
 - `fetch.recurseSubmodules = on-demand`
 - `clone.recurseSubmodules = true`
 
-For a full upstream fetch across all vendor submodules:
+### Pull hook
+
+Enable the hooks once per clone:
+
+```bash
+git config --local core.hooksPath githooks
+```
+
+`githooks/post-merge` starts `githooks/submodule-refresh.sh` in background. Pull returns at once, so the lazygit UI never blocks.
+
+The refresh does three steps:
+
+1. `git submodule sync --recursive`
+2. fetch each vendor submodule in parallel (8 jobs, `SUBMODULE_REFRESH_JOBS` changes it)
+3. `git submodule update --init --recursive`
+
+Output goes to `~/.local/state/nixconfig/submodule-refresh.log`. A lock in `.git/` stops two runs at the same time.
+
+For a manual full upstream fetch across all vendor submodules:
 
 ```bash
 ~/NixConfig/githooks/submodule-refresh.sh
 ```
 
-Do **not** re-add `post-checkout`/`post-merge` hooks that run `git submodule foreach fetch`.
+Keep the hook detached and parallel. A blocking serial `git submodule foreach fetch` hook goes back to the old stall.
 
 ### Fork vendored extensions
 
