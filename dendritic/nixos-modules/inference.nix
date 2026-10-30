@@ -60,8 +60,7 @@
                 extraArgs = [ "--mmproj" "${modelsDir}/mmproj-BF16.gguf" ];
               };
               useModelName = "flash-next";
-              # 0 = never unload: this set stays resident.
-              ttl = 0;
+              ttl = 300;
               checkEndpoint = "/ready";
               aliases = [ "qwen3.8-flash-next" ];
             };
@@ -88,7 +87,7 @@
             };
 
             # Swift 1.5 keeps the shared Unsloth MTP head and cuts thinking
-            # tokens. A requant costs quality, so the stock build stays first.
+            # tokens. It is the resident default: 51 tok/s decode beats stock.
             "flash-next-swift" = {
               cmd = gufoServe {
                 modality = "llm";
@@ -102,7 +101,8 @@
                 extraArgs = [ "--mmproj" swiftMmproj ];
               };
               useModelName = "flash-next-swift";
-              ttl = 300;
+              # 0 = never unload: this set stays resident.
+              ttl = 0;
               checkEndpoint = "/ready";
               aliases = [ "qwen3.8-flash-next-swift" ];
             };
@@ -127,12 +127,12 @@
             };
           };
 
-          hooks.on_startup.preload = [ "flash-next" ];
+          hooks.on_startup.preload = [ "flash-next-swift" ];
 
           routing.router.settings.groups = {
-            # Both models come from one group: 96G of weights plus 17G of coder
-            # leaves no room for a second KV cache. swap makes them evict each
-            # other. ttl 0 on flash-next still keeps it loaded while idle.
+            # All models share one group: about 104G of weights leaves no room
+            # for a second KV cache. swap makes them evict each other. ttl 0 on
+            # flash-next-swift keeps it loaded while idle.
             gpu = {
               swap = true;
               exclusive = false;
