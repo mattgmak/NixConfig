@@ -60,6 +60,7 @@ in
           tailscale
           gufo
           inference
+          strixHaloMemory
           hermes
         ];
       }
@@ -327,7 +328,7 @@ in
 
         systemd.services.gufo-models = {
           description = "Fetch pinned inference weights";
-          wantedBy = [ "multi-user.target" ];
+          wantedBy = [ "inference.target" ];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
@@ -341,58 +342,67 @@ in
           ];
           environment.SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
           script = ''
+            set -eu
             root=/var/lib/inference/models
+            manifest=$(mktemp)
 
-            get() {
-              if [ -s "$2" ]; then
-                return 0
-              fi
-              curl -fL --retry 3 --create-dirs -o "$2.part" "$1"
+            # Each line is "url dest". One curl per 45 GiB shard runs at about
+            # 77 MB/s, so the serial form cost 41 minutes for the Swift set.
+            want() { printf '%s %s\n' "$1" "$2" >> "$manifest"; }
+
+            fetch() {
+              [ -s "$2" ] && exit 0
+              curl -fL --retry 3 --retry-all-errors --create-dirs -o "$2.part" "$1"
               mv "$2.part" "$2"
             }
+            export -f fetch
 
             qwen27b=https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502
-            get "$qwen27b/Qwen3.8-27B-UD-Q4_K_XL.gguf" \
+            want "$qwen27b/Qwen3.8-27B-UD-Q4_K_XL.gguf" \
               "$root/Qwen3.8-27B-UD-Q4_K_XL.gguf"
 
             dflash=https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2-GGUF/resolve/2d9571f8ce46e151f61c6499c99dee6079e1d610
-            get "$dflash/Qwen3.8-27B-DFlash2-Q4_K_M.gguf" \
+            want "$dflash/Qwen3.8-27B-DFlash2-Q4_K_M.gguf" \
               "$root/Qwen3.8-27B-DFlash2-Q4_K_M.gguf"
 
             # gufo reads token_embd.weight at Q8_0 or better, so the older
             # IQ4_NL requant cannot load. Upstream target is UD-Q4_K_XL.
             flash=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/38bb39ee97821de2c9009abb7e93950eec396e66
-            get "$flash/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" \
+            want "$flash/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" \
               "$root/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
-            get "$flash/mmproj-BF16.gguf" "$root/mmproj-BF16.gguf"
+            want "$flash/mmproj-BF16.gguf" "$root/mmproj-BF16.gguf"
             for shard in 00001 00002 00003 00004; do
               file="Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00004.gguf"
-              get "$flash/UD-Q4_K_XL/$file" "$root/$file"
+              want "$flash/UD-Q4_K_XL/$file" "$root/$file"
             done
 
             # Swift 1.5 publishes no UD-Q4_K_XL build, so these Q8_0 shards feed
             # gufo-swift-requant. The projector takes its own dir because gufo
-            # resolves a sibling by base name.
+            # resolves a sibling by base name. The requant deletes the shards,
+            # so gate them on its output: an ungated loop re-downloads 175 GiB
+            # at every boot.
             swift=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GGUF/resolve/0142554c963a8653912c0c8283f05f13f63653f3
-            for shard in 00001 00002 00003 00004 00005; do
-              file="Swift-1.5-Qwen3.8-Flash-Next-Q8_0-$shard-of-00005.gguf"
-              get "$swift/Q8_0/$file" "$root/swift/$file"
-            done
-            get "$swift/mmproj-Swift-1.5-Qwen3.8-Flash-Next-BF16.gguf" \
+            if [ ! -s "$root/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf" ]; then
+              for shard in 00001 00002 00003 00004 00005; do
+                file="Swift-1.5-Qwen3.8-Flash-Next-Q8_0-$shard-of-00005.gguf"
+                want "$swift/Q8_0/$file" "$root/swift/$file"
+              done
+            fi
+            want "$swift/mmproj-Swift-1.5-Qwen3.8-Flash-Next-BF16.gguf" \
               "$root/swift/mmproj-BF16.gguf"
 
             imatrix=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/99bb8f7f95c7aa7b24a36a7786a4f657b30f5d3d
-            get "$imatrix/imatrix-swiftfn-v1mix.gguf" \
+            want "$imatrix/imatrix-swiftfn-v1mix.gguf" \
               "$root/swift/imatrix-swiftfn-v1mix.gguf"
 
             # This projector shares its base name with the stock one. Gufo picks
             # the wrong sibling for the parent dir, so the subdir stays separate.
             uncensored=https://huggingface.co/vmlinux/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix-GGUF/resolve/0a0843cce72b4d8c377096960b3f0f9c0f4d197f
-            get "$uncensored/mmproj-BF16.gguf" "$root/uncensored/mmproj-BF16.gguf"
-            get "$uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf" \
+            want "$uncensored/mmproj-BF16.gguf" "$root/uncensored/mmproj-BF16.gguf"
+            want "$uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf" \
               "$root/uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf"
             mtp=https://huggingface.co/jcbtc/Qwen3.8-Flash-CIRU-STRIX-Orca/resolve/139c9f5eb561dafbcf7cfab0622661b6fc0137e7
-            get "$mtp/mtp/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf" \
+            want "$mtp/mtp/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf" \
               "$root/uncensored/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf"
 
             asr=https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5
@@ -408,8 +418,11 @@ in
               tokenizer_config.json \
               vocab.json
             do
-              get "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
+              want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
+
+            xargs -a "$manifest" -P 4 -n 2 bash -c 'fetch "$0" "$1"'
+            rm -f "$manifest"
 
             chmod -R a+rX "$root"
           '';
@@ -419,7 +432,7 @@ in
         # of its Q8_0 source to the types of the stock build.
         systemd.services.gufo-swift-requant = {
           description = "Requantize Swift 1.5 for gufo";
-          wantedBy = [ "multi-user.target" ];
+          wantedBy = [ "inference.target" ];
           after = [ "gufo-models.service" ];
           requires = [ "gufo-models.service" ];
           serviceConfig = {
@@ -460,6 +473,10 @@ in
               "$swift/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-00001-of-00005.gguf" \
               "$out.gguf" \
               Q4_K_M
+
+            # gufo loads the requant output. The Q8_0 sources cost 175 GiB and
+            # feed nothing after this point, so they do not stay on disk.
+            rm -f "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf
 
             chmod -R a+rX "$root"
           '';
@@ -544,7 +561,11 @@ in
           "r8169"
         ];
         boot.initrd.kernelModules = [ ];
-        boot.kernelParams = [ "ttm.pages_limit=29400781" ];
+        # GTT caps the RAM the GPU may map. 29400781 pages = 112.15 GiB of
+        # 124.9 GiB, which left 12.75 GiB for the kernel and all userspace. The
+        # 2026-10-30 hang peaked at 95.5 GiB mapped, so 108 GiB keeps the
+        # resident model and widens the host buffer to 16.9 GiB.
+        boot.kernelParams = [ "ttm.pages_limit=28311552" ];
         boot.kernelModules = [
           "kvm-amd"
           "atlantic"

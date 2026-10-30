@@ -148,7 +148,19 @@
         };
       };
 
+      # The weight fetch and the Swift requant are long oneshots. Hanging them
+      # off multi-user.target makes every switch wait for the download chain:
+      # a 175 GiB fetch cost 41 minutes on 2026-10-30. This target reaches after
+      # multi-user.target, so activation returns and the stack comes up behind
+      # it. Check progress with `systemctl status inference.target`.
+      systemd.targets.inference = {
+        description = "Inference stack";
+        wantedBy = [ "multi-user.target" ];
+        unitConfig.After = [ "multi-user.target" ];
+      };
+
       systemd.services.llama-swap = {
+        wantedBy = lib.mkForce [ "inference.target" ];
         after = [ "gufo-models.service" ];
         wants = [ "gufo-models.service" ];
         serviceConfig = {
@@ -165,7 +177,7 @@
 
       systemd.services.gufo-asr = {
         description = "gufo ASR (Qwen3-ASR-1.7B)";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "inference.target" ];
         after = [
           "network.target"
           "gufo-models.service"
