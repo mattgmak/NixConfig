@@ -27,9 +27,15 @@
         settings = {
           model = {
             provider = "custom";
-            default = "flash-next";
+            default = "flash-next-uncensored";
             base_url = localBaseUrl;
             context_length = 131072;
+          };
+          # The webui reads this from the same config.yaml. Without it the
+          # Dashboard link points at the loopback probe URL.
+          webui.dashboard = {
+            enabled = "always";
+            url = "https://hermes-api.dab-octatonic.ts.net:8443";
           };
           # llama-swap lists flash-next, flash-next-uncensored and qwen3.8-27b
           # on /v1/models. The aliases let a running session switch with
