@@ -71,8 +71,10 @@
         # credentials reach $HERMES_HOME/.env from the secret below.
         # A 0.0.0.0 bind makes the Host guard accept every name, so the
         # dashboard works on the MagicDNS name and through a proxy.
+        # "serve" sets HERMES_SERVE_HEADLESS=1 and never serves the browser
+        # SPA. "dashboard" is serve plus the SPA, and keeps /api/ws.
         backend = {
-          mode = "serve";
+          mode = "dashboard";
           host = "0.0.0.0";
           port = 9119;
         };
