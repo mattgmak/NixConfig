@@ -86,6 +86,29 @@
               aliases = [ "qwen3.8-flash-next-uncensored" ];
             };
 
+            # Same weights as flash-next-uncensored with a small KV footprint.
+            # The refusal probe sends short prompts and froze the box at 131072.
+            "flash-next-uncensored-bench" = {
+              cmd = gufoServe {
+                modality = "llm";
+                model = uncensoredModel;
+                port = "\${PORT}";
+                servedModelName = "flash-next-uncensored-bench";
+                speculative = "mtp";
+                mtpModel = uncensoredMtp;
+                sessions = 1;
+                context = 32768;
+                extraArgs = [
+                  "--mmproj"
+                  uncensoredMmproj
+                ];
+              };
+              useModelName = "flash-next-uncensored-bench";
+              ttl = 300;
+              checkEndpoint = "/ready";
+              aliases = [ "qwen3.8-flash-next-uncensored-bench" ];
+            };
+
             # Swift 1.5 keeps the shared Unsloth MTP head and cuts thinking
             # tokens. It is the resident default: 51 tok/s decode beats stock.
             "flash-next-swift" = {
@@ -140,6 +163,7 @@
               members = [
                 "flash-next"
                 "flash-next-uncensored"
+                "flash-next-uncensored-bench"
                 "flash-next-swift"
                 "qwen3.8-27b"
               ];
