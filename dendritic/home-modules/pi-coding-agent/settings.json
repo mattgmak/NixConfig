@@ -32,7 +32,6 @@
     "commandcode/stealth/glyph-cluster:free",
     "commandcode/inclusionai/ling-3.1-flash",
     "commandcode/poolside/laguna-s-2.1-free",
-    "opencode-go/beam-free",
     "commandcode/reflection/beam:free",
     "cursor/grok-4.7@256k:slow",
     "cursor/grok-4.7@256k:fast",
@@ -57,7 +56,6 @@
     "commandcode/stealth/glyph-cluster:free": "medium",
     "commandcode/inclusionai/ling-3.1-flash": "medium",
     "commandcode/reflection/beam:free": "medium",
-    "opencode-go/beam-free": "medium",
     "ramsay/qwen3.8-flash-next": "medium",
     "ramsay/qwen3.8-flash-next-swift": "medium",
     "ramsay/qwen3.8-27b": "low"
