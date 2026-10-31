@@ -177,7 +177,7 @@ in
             packDir,
           }:
           {
-            image = "ghcr.io/peonist-ai/halogen-flash-server:0.18.18";
+            image = "ghcr.io/peonist-ai/halogen-flash-server:0.18.22";
             # Host networking shares the host stack, so the API answers the
             # tailnet. The engine keeps its loopback bind, because the engine
             # protocol has no authentication.
@@ -201,9 +201,16 @@ in
               HALOGEN_VISION_TOWER = "1";
               HALOGEN_CTX = "131072";
               HALOGEN_MAX_TOK = "16384";
-              HALOGEN_KV_SLOTS = "1";
-              HALOGEN_KV_POOL_POSITIONS = "131072";
-              HALOGEN_PROMPT_CACHE = "0";
+              HALOGEN_KV_SLOTS = "4";
+              HALOGEN_KV_POOL_POSITIONS = "262144";
+              HALOGEN_PROMPT_CACHE = "2";
+              HALOGEN_COMPOSABLE_CONTEXT = "1";
+              # Parent plus forked subagents: keeps the parent's resume point
+              # when two children store theirs. Raises the entry count to 32.
+              HALOGEN_CACHE_BRANCHES = "3";
+              # Stops the kernel reclaiming weight pages for ngram rows, which
+              # makes the driver remove and restore the engine mapping.
+              HALOGEN_WEIGHTS_LOCK = "1";
             };
           };
       in
@@ -764,7 +771,14 @@ SEED
         # 124.9 GiB, which left 12.75 GiB for the kernel and all userspace. The
         # 2026-10-30 hang peaked at 95.5 GiB mapped, so 108 GiB keeps the
         # resident model and widens the host buffer to 16.9 GiB.
-        boot.kernelParams = [ "ttm.pages_limit=28311552" ];
+        boot.kernelParams = [
+          "ttm.pages_limit=28311552"
+          # Passthrough domain keeps device translation for the NPU driver
+          # while dropping the per-map IOMMU work on the GPU path.
+          "iommu=pt"
+        ];
+        # Locked weight pages cannot move, so skip compaction.
+        boot.kernel.sysctl."vm.compact_unevictable_allowed" = 0;
         boot.kernelModules = [
           "kvm-amd"
           "atlantic"
