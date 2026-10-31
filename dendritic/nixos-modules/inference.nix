@@ -23,8 +23,6 @@
       uncensoredMmproj = "${uncensoredDir}/mmproj-BF16.gguf";
       uncensoredMtp = "${uncensoredDir}/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf";
 
-      qwen27bModel = "${modelsDir}/Qwen3.8-27B-UD-Q4_K_XL.gguf";
-      qwen27bDraft = "${modelsDir}/Qwen3.8-27B-DFlash2-Q4_K_M.gguf";
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
 
       # The Swift requant and its projector live in a subdir, because gufo picks
@@ -47,30 +45,29 @@
           logToStdout = "both";
 
           models = {
-            "flash-next" = {
+            "gufo-flash-next" = {
               cmd = gufoServe {
                 modality = "llm";
                 model = flashNextModel;
                 port = "\${PORT}";
-                servedModelName = "flash-next";
+                servedModelName = "gufo-flash-next";
                 speculative = "mtp";
                 mtpModel = flashNextMtp;
                 sessions = 2;
                 context = 131072;
                 extraArgs = [ "--mmproj" "${modelsDir}/mmproj-BF16.gguf" ];
               };
-              useModelName = "flash-next";
+              useModelName = "gufo-flash-next";
               ttl = 300;
               checkEndpoint = "/ready";
-              aliases = [ "qwen3.8-flash-next" ];
             };
 
-            "flash-next-uncensored" = {
+            "gufo-flash-next-uncensored-abliterated" = {
               cmd = gufoServe {
                 modality = "llm";
                 model = uncensoredModel;
                 port = "\${PORT}";
-                servedModelName = "flash-next-uncensored";
+                servedModelName = "gufo-flash-next-uncensored-abliterated";
                 speculative = "mtp";
                 mtpModel = uncensoredMtp;
                 sessions = 2;
@@ -80,20 +77,20 @@
                   uncensoredMmproj
                 ];
               };
-              useModelName = "flash-next-uncensored";
+              useModelName = "gufo-flash-next-uncensored-abliterated";
               ttl = 300;
               checkEndpoint = "/ready";
-              aliases = [ "qwen3.8-flash-next-uncensored" ];
             };
 
-            # Same weights as flash-next-uncensored with a small KV footprint.
-            # The refusal probe sends short prompts and froze the box at 131072.
-            "flash-next-uncensored-bench" = {
+            # Same weights as gufo-flash-next-uncensored-abliterated with a small KV
+            # footprint. The refusal probe sends short prompts and froze the box
+            # at 131072.
+            "gufo-flash-next-uncensored-abliterated-bench" = {
               cmd = gufoServe {
                 modality = "llm";
                 model = uncensoredModel;
                 port = "\${PORT}";
-                servedModelName = "flash-next-uncensored-bench";
+                servedModelName = "gufo-flash-next-uncensored-abliterated-bench";
                 speculative = "mtp";
                 mtpModel = uncensoredMtp;
                 sessions = 1;
@@ -103,69 +100,68 @@
                   uncensoredMmproj
                 ];
               };
-              useModelName = "flash-next-uncensored-bench";
+              useModelName = "gufo-flash-next-uncensored-abliterated-bench";
               ttl = 300;
               checkEndpoint = "/ready";
-              aliases = [ "qwen3.8-flash-next-uncensored-bench" ];
             };
 
             # Swift 1.5 keeps the shared Unsloth MTP head and cuts thinking
-            # tokens. It is the resident default: 51 tok/s decode beats stock.
-            "flash-next-swift" = {
+            # tokens: 51 tok/s decode beats stock.
+            "gufo-flash-next-swift" = {
               cmd = gufoServe {
                 modality = "llm";
                 model = swiftModel;
                 port = "\${PORT}";
-                servedModelName = "flash-next-swift";
+                servedModelName = "gufo-flash-next-swift";
                 speculative = "mtp";
                 mtpModel = flashNextMtp;
                 sessions = 2;
                 context = 131072;
                 extraArgs = [ "--mmproj" swiftMmproj ];
               };
-              useModelName = "flash-next-swift";
-              # 0 = never unload: this set stays resident.
-              ttl = 0;
-              checkEndpoint = "/ready";
-              aliases = [ "qwen3.8-flash-next-swift" ];
-            };
-
-            # Only flash-next and Qwen3.8-27B are gufo model families. The
-            # earlier Coder-30B pick is unsupported upstream.
-            "qwen3.8-27b" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = qwen27bModel;
-                port = "\${PORT}";
-                servedModelName = "qwen3.8-27b";
-                speculative = "dflash2";
-                dflashModel = qwen27bDraft;
-                sessions = 2;
-                context = 65536;
-              };
-              useModelName = "qwen3.8-27b";
+              useModelName = "gufo-flash-next-swift";
               ttl = 300;
               checkEndpoint = "/ready";
-              aliases = [ "qwen27b" ];
             };
           };
 
-          hooks.on_startup.preload = [ "flash-next-swift" ];
+          # The Halogen containers own the graphics memory. These peers only
+          # appear in the model list while the container that serves them runs.
+          peers = {
+            halogen-signal = {
+              proxy = "http://127.0.0.1:8731";
+              models = [ "halogen-flash-next-signal-abliterated" ];
+            };
+            halogen-abliter-v2 = {
+              proxy = "http://127.0.0.1:8741";
+              models = [ "halogen-flash-next-v2-abliterated" ];
+            };
+          };
+
+          # Peers list under peer/model. A pin selector gives the clean id.
+          selectors = {
+            halogen-flash-next-signal-abliterated = {
+              strategy = "pin";
+              targets = [ "halogen-signal/halogen-flash-next-signal-abliterated" ];
+            };
+            halogen-flash-next-v2-abliterated = {
+              strategy = "pin";
+              targets = [ "halogen-abliter-v2/halogen-flash-next-v2-abliterated" ];
+            };
+          };
 
           routing.router.settings.groups = {
-            # All models share one group: about 104G of weights leaves no room
-            # for a second KV cache. swap makes them evict each other. ttl 0 on
-            # flash-next-swift keeps it loaded while idle.
+            # All gufo models share one group: about 104G of weights leaves no
+            # room for a second KV cache. swap makes them evict each other.
             gpu = {
               swap = true;
               exclusive = false;
               persistent = false;
               members = [
-                "flash-next"
-                "flash-next-uncensored"
-                "flash-next-uncensored-bench"
-                "flash-next-swift"
-                "qwen3.8-27b"
+                "gufo-flash-next"
+                "gufo-flash-next-uncensored-abliterated"
+                "gufo-flash-next-uncensored-abliterated-bench"
+                "gufo-flash-next-swift"
               ];
             };
           };

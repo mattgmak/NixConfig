@@ -162,6 +162,51 @@ in
         common-nixpkgs-config,
         ...
       }:
+      let
+        halogenSignalPack = "/var/lib/inference/models/halogen-signal";
+        halogenAbliterPack = "/var/lib/inference/models/halogen-abliter-v2";
+
+        # The two stacks differ in four values only. The rest is the tuning set
+        # the bench ran with success.
+        halogenContainer =
+          {
+            enginePort,
+            apiPort,
+            modelId,
+            checkpoint,
+            packDir,
+          }:
+          {
+            image = "ghcr.io/peonist-ai/halogen-flash-server:0.18.18";
+            # Host networking shares the host stack, so the API answers the
+            # tailnet. The engine keeps its loopback bind, because the engine
+            # protocol has no authentication.
+            networks = [ "host" ];
+            devices = [
+              "/dev/kfd"
+              "/dev/dri"
+            ];
+            volumes = [ "${packDir}:/models:ro" ];
+            extraOptions = [
+              "--group-add=keep-groups"
+              "--ipc=host"
+              "--ulimit=memlock=-1:-1"
+            ];
+            environment = {
+              HALOGEN_PORT = toString enginePort;
+              HALOGEN_API_PORT = toString apiPort;
+              HALOGEN_MODEL_ID = modelId;
+              HALOGEN_CHECKPOINT = checkpoint;
+              HALOGEN_NGRAM_TABLE = "/models/qwen38-flash-next-ngram.hgn";
+              HALOGEN_VISION_TOWER = "1";
+              HALOGEN_CTX = "131072";
+              HALOGEN_MAX_TOK = "16384";
+              HALOGEN_KV_SLOTS = "1";
+              HALOGEN_KV_POOL_POSITIONS = "131072";
+              HALOGEN_PROMPT_CACHE = "0";
+            };
+          };
+      in
       {
         # Agent user's age identity: encrypted private key, decrypted by root at
         # activation, made readable by agent so HM age.identityPaths can use it.
@@ -364,14 +409,6 @@ in
             }
             export -f fetch
 
-            qwen27b=https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/4ca720788d1e01f1bff70c033e0d0028fd02e502
-            want "$qwen27b/Qwen3.8-27B-UD-Q4_K_XL.gguf" \
-              "$root/Qwen3.8-27B-UD-Q4_K_XL.gguf"
-
-            dflash=https://huggingface.co/z-lab/Qwen3.8-27B-DFlash2-GGUF/resolve/2d9571f8ce46e151f61c6499c99dee6079e1d610
-            want "$dflash/Qwen3.8-27B-DFlash2-Q4_K_M.gguf" \
-              "$root/Qwen3.8-27B-DFlash2-Q4_K_M.gguf"
-
             # gufo reads token_embd.weight at Q8_0 or better, so the older
             # IQ4_NL requant cannot load. Upstream target is UD-Q4_K_XL.
             flash=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/38bb39ee97821de2c9009abb7e93950eec396e66
@@ -428,6 +465,50 @@ in
               want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
 
+            # Halogen packs. The engine needs tokenizer.json in tokenizer/ beside
+            # the checkpoint, and the Signal repo ships only three tokenizer
+            # files, so tokenizer.json and the merges come from peonist-ai.
+            signal=https://huggingface.co/Quat3rnion/Signal-3.8-Flash-Next-HGN-v2-abliterated/resolve/d293172ad15cefcad27d4cfda829f2d2e02f3fda
+            for file in \
+              model.hgn \
+              qwen38-flash-next-ngram.hgn \
+              qwen38-flash-next-vision.hgn \
+              config.json \
+              preprocessor_config.json \
+              video_preprocessor_config.json
+            do
+              want "$signal/$file" "$root/halogen-signal/$file"
+            done
+            for file in chat_template.jinja config.json tokenizer_config.json; do
+              want "$signal/tokenizer/$file" "$root/halogen-signal/tokenizer/$file"
+            done
+
+            tok=https://huggingface.co/peonist-ai/halogen-qwen3.8-flash-next/resolve/e053f488b120b99ed2525e6ac99f68c51b3b6179
+            for file in generation_config.json merges.txt tokenizer.json vocab.json; do
+              want "$tok/tokenizer/$file" "$root/halogen-signal/tokenizer/$file"
+            done
+
+            # The v2 repo ships one .hgn and no lookup table, no image sidecar
+            # and no tokenizer. Both stacks run with the vision tower on, so the
+            # v2 dir takes the same shared files.
+            v2=https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated/resolve/2fd96054e10fd12ac5d667a5be897fd58ab6b6ad
+            want "$v2/qwen38-flash-next-v2-abliterated.hgn" \
+              "$root/halogen-abliter-v2/qwen38-flash-next-v2-abliterated.hgn"
+            want "$signal/qwen38-flash-next-ngram.hgn" \
+              "$root/halogen-abliter-v2/qwen38-flash-next-ngram.hgn"
+            want "$signal/qwen38-flash-next-vision.hgn" \
+              "$root/halogen-abliter-v2/qwen38-flash-next-vision.hgn"
+            for file in \
+              chat_template.jinja \
+              generation_config.json \
+              merges.txt \
+              tokenizer.json \
+              tokenizer_config.json \
+              vocab.json
+            do
+              want "$tok/tokenizer/$file" "$root/halogen-abliter-v2/tokenizer/$file"
+            done
+
             # The requant writes this map and its guard path never rebuilds it, so
             # the prune must not treat it as litter.
             printf '%s\n' "$root/swift/tensor-types.txt" >> "$keep"
@@ -438,6 +519,43 @@ in
               printf '%s\n' \
                 "$root/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00005.gguf" >> "$keep"
             done
+
+            # The bench trees live on this filesystem and hold the same bytes, so
+            # a hardlink costs no space and no download. A dest that exists wins,
+            # and the bench file is only read as the link target.
+            seed() {
+              if [ -f "$1" ] && [ ! -e "$2" ]; then
+                mkdir -p "$(dirname "$2")"
+                ln -f "$1" "$2" 2>/dev/null || true
+              fi
+            }
+            bench=/home/agent/bench-models/halogen-packs
+            while read -r src dest; do
+              seed "$bench/$src" "$root/$dest"
+            done <<'SEED'
+signal/model.hgn halogen-signal/model.hgn
+signal/qwen38-flash-next-ngram.hgn halogen-signal/qwen38-flash-next-ngram.hgn
+signal/qwen38-flash-next-vision.hgn halogen-signal/qwen38-flash-next-vision.hgn
+signal/config.json halogen-signal/config.json
+signal/preprocessor_config.json halogen-signal/preprocessor_config.json
+signal/video_preprocessor_config.json halogen-signal/video_preprocessor_config.json
+signal/tokenizer/chat_template.jinja halogen-signal/tokenizer/chat_template.jinja
+signal/tokenizer/config.json halogen-signal/tokenizer/config.json
+signal/tokenizer/generation_config.json halogen-signal/tokenizer/generation_config.json
+signal/tokenizer/merges.txt halogen-signal/tokenizer/merges.txt
+signal/tokenizer/tokenizer_config.json halogen-signal/tokenizer/tokenizer_config.json
+signal/tokenizer/tokenizer.json halogen-signal/tokenizer/tokenizer.json
+signal/tokenizer/vocab.json halogen-signal/tokenizer/vocab.json
+abliter-v2/qwen38-flash-next-v2-abliterated.hgn halogen-abliter-v2/qwen38-flash-next-v2-abliterated.hgn
+abliter-v2/qwen38-flash-next-ngram.hgn halogen-abliter-v2/qwen38-flash-next-ngram.hgn
+signal/qwen38-flash-next-vision.hgn halogen-abliter-v2/qwen38-flash-next-vision.hgn
+abliter-v2/tokenizer/chat_template.jinja halogen-abliter-v2/tokenizer/chat_template.jinja
+abliter-v2/tokenizer/generation_config.json halogen-abliter-v2/tokenizer/generation_config.json
+abliter-v2/tokenizer/merges.txt halogen-abliter-v2/tokenizer/merges.txt
+abliter-v2/tokenizer/tokenizer_config.json halogen-abliter-v2/tokenizer/tokenizer_config.json
+abliter-v2/tokenizer/tokenizer.json halogen-abliter-v2/tokenizer/tokenizer.json
+abliter-v2/tokenizer/vocab.json halogen-abliter-v2/tokenizer/vocab.json
+SEED
 
             # Name bash by store path. A unit PATH carries coreutils, findutils,
             # grep, sed and systemd, but not bash.
@@ -523,6 +641,44 @@ in
 
             chmod -R a+rX "$root"
           '';
+        };
+
+        # One Halogen stack runs at a time: each maps a whole pack into graphics
+        # memory, so a second start would evict the first anyway. Signal is the
+        # resident main model, abliter-v2 waits for an explicit start.
+        virtualisation.oci-containers = {
+          backend = "podman";
+          containers = {
+            halogen-signal = halogenContainer {
+              enginePort = 8730;
+              apiPort = 8731;
+              modelId = "halogen-flash-next-signal-abliterated";
+              checkpoint = "/models/model.hgn";
+              packDir = halogenSignalPack;
+            };
+            halogen-abliter-v2 = halogenContainer {
+              enginePort = 8740;
+              apiPort = 8741;
+              modelId = "halogen-flash-next-v2-abliterated";
+              checkpoint = "/models/qwen38-flash-next-v2-abliterated.hgn";
+              packDir = halogenAbliterPack;
+            } // {
+              autoStart = false;
+            };
+          };
+        };
+
+        systemd.services.podman-halogen-signal = {
+          wantedBy = lib.mkForce [ "inference.target" ];
+          after = [ "gufo-models.service" ];
+          wants = [ "gufo-models.service" ];
+          conflicts = [ "podman-halogen-abliter-v2.service" ];
+        };
+
+        systemd.services.podman-halogen-abliter-v2 = {
+          after = [ "gufo-models.service" ];
+          wants = [ "gufo-models.service" ];
+          conflicts = [ "podman-halogen-signal.service" ];
         };
 
         home-manager.users.${username} = self.homeConfigurations.Ramsay;

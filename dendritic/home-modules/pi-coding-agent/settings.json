@@ -18,6 +18,8 @@
     "-find"
   ],
   "enabledModels": [
+    "ramsay/halogen-flash-next-signal-abliterated",
+    "ramsay/halogen-flash-next-v2-abliterated",
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
     "opencode-go/glm-5.3-flash",
@@ -34,8 +36,10 @@
     "commandcode/poolside/laguna-s-2.1-free",
     "cursor/grok-4.7@256k:slow",
     "cursor/grok-4.7@256k:fast",
-    "ramsay/qwen3.8-flash-next",
-    "ramsay/qwen3.8-flash-next-swift"
+    "ramsay/gufo-flash-next",
+    "ramsay/gufo-flash-next-swift",
+    "ramsay/gufo-flash-next-uncensored-abliterated",
+    "ramsay/gufo-flash-next-uncensored-abliterated-bench"
   ],
   "showHardwareCursor": false,
   "hideThinkingBlock": true,
@@ -54,8 +58,11 @@
     "commandcode/xiaomi/mimo-v2.6-flash": "low",
     "commandcode/stealth/glyph-cluster:free": "medium",
     "commandcode/inclusionai/ling-3.1-flash": "medium",
-    "ramsay/qwen3.8-flash-next": "medium",
-    "ramsay/qwen3.8-flash-next-swift": "medium",
-    "ramsay/qwen3.8-27b": "low"
+    "ramsay/halogen-flash-next-signal-abliterated": "high",
+    "ramsay/halogen-flash-next-v2-abliterated": "high",
+    "ramsay/gufo-flash-next": "medium",
+    "ramsay/gufo-flash-next-swift": "medium",
+    "ramsay/gufo-flash-next-uncensored-abliterated": "medium",
+    "ramsay/gufo-flash-next-uncensored-abliterated-bench": "medium"
   }
 }

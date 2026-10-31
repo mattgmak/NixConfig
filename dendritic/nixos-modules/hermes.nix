@@ -27,7 +27,7 @@
         settings = {
           model = {
             provider = "custom";
-            default = "flash-next-uncensored";
+            default = "halogen-flash-next-signal-abliterated";
             base_url = localBaseUrl;
             context_length = 131072;
           };
@@ -37,27 +37,31 @@
             enabled = "always";
             url = "https://hermes-api.dab-octatonic.ts.net:8443";
           };
-          # llama-swap lists flash-next, flash-next-uncensored, flash-next-swift
-          # and qwen3.8-27b on /v1/models. The aliases let a running session
-          # switch with /model <name>.
+          # Every id below is on the llama-swap /v1/models list. The aliases
+          # let a running session switch with /model <name>.
           model_aliases = {
-            flash-next = {
-              model = "flash-next";
+            halogen-flash-next-v2-abliterated = {
+              model = "halogen-flash-next-v2-abliterated";
               provider = "custom";
               base_url = localBaseUrl;
             };
-            flash-uncensored = {
-              model = "flash-next-uncensored";
+            gufo-flash-next = {
+              model = "gufo-flash-next";
               provider = "custom";
               base_url = localBaseUrl;
             };
-            swift = {
-              model = "flash-next-swift";
+            gufo-flash-next-uncensored-abliterated = {
+              model = "gufo-flash-next-uncensored-abliterated";
               provider = "custom";
               base_url = localBaseUrl;
             };
-            qwen-27b = {
-              model = "qwen3.8-27b";
+            gufo-flash-next-uncensored-abliterated-bench = {
+              model = "gufo-flash-next-uncensored-abliterated-bench";
+              provider = "custom";
+              base_url = localBaseUrl;
+            };
+            gufo-flash-next-swift = {
+              model = "gufo-flash-next-swift";
               provider = "custom";
               base_url = localBaseUrl;
             };
