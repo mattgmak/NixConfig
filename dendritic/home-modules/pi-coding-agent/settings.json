@@ -13,6 +13,10 @@
   "extensions": [
     "-builtin:mcp"
   ],
+  "defaultTools": [
+    "-grep",
+    "-find"
+  ],
   "enabledModels": [
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
