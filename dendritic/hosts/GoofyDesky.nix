@@ -437,6 +437,17 @@
               PermitRootLogin prohibit-password
           '';
         };
+        # ssh ramsay: mirror this desktop's Wayland clipboard socket onto Ramsay,
+        # so wl-paste and pi's Ctrl+V read the GoofyDesky clipboard remotely.
+        # Fix both paths if the uid on either host ever moves off 1000. NixOS 26.11
+        # has no programs.ssh.matchBlocks, so append to common.nix's extraConfig.
+        programs.ssh.extraConfig = lib.mkAfter ''
+          Host ramsay
+            User agent
+            RemoteForward /run/user/1000/wayland-0:/run/user/1000/wayland-0
+            SetEnv WAYLAND_DISPLAY=wayland-0
+        '';
+
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         system.stateVersion = "24.11";

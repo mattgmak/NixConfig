@@ -842,6 +842,15 @@ in
         };
       };
 
+      # ssh ramsay with X11 forwarding: pi on Ramsay reads the Mac clipboard
+      # through xclip. ssh needs xauth on PATH, which XQuartz provides.
+      # nix-darwin has no programs.ssh.enable or matchBlocks, so use extraConfig.
+      programs.ssh.extraConfig = ''
+        Host ramsay
+          User agent
+          ForwardX11 yes
+      '';
+
       environment.systemPackages =
         with pkgs;
         [
@@ -852,6 +861,8 @@ in
           nh
           nvd
           nix-output-monitor
+          # Dump the macOS clipboard image to stdout for pi on a remote host.
+          pngpaste
           fastfetch
           stats
           base16-shell-preview
@@ -915,6 +926,9 @@ in
           "ghostty"
           "figma"
           "vorssaint"
+          # X11 for ssh -X: gives the Mac an X server plus /opt/X11/bin/xauth,
+          # which ssh needs for ForwardX11.
+          "xquartz"
         ];
         brews = [
           "xcode-build-server"

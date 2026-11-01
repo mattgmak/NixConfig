@@ -121,6 +121,10 @@ in
         ];
         tools.nixconfigSync.enable = true;
 
+        # pi's X11 clipboard backend for the ssh -X route. wl-clipboard needs a
+        # live compositor, so it cannot serve a headless host.
+        home.packages = with pkgs; [ xclip ];
+
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
 
@@ -356,8 +360,15 @@ in
           settings = {
             PasswordAuthentication = false;
             KbdInteractiveAuthentication = false;
+            # ssh -X hands the client's X server to the agent, so pi reads the
+            # clipboard through xclip. NixOS derives programs.ssh.setXAuthLocation
+            # from this key and points sshd at pkgs.xauth.
+            X11Forwarding = true;
           };
           extraConfig = ''
+            # Not a settings key in this nixpkgs. Unlink the stale remote socket of
+            # a dead unix RemoteForward (the Wayland mirror) on reconnect.
+            StreamLocalBindUnlink yes
             Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
               PubkeyAuthentication yes
               PasswordAuthentication no
