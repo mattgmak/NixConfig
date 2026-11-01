@@ -211,10 +211,6 @@
           set -ga update-environment COLORTERM
           set -ga update-environment PI_TRUE_COLOR
           set -ga update-environment POWERLINE_NERD_FONTS
-          # pi reads clipboard images through these, so panes need the values the
-          # attached client brings in (ssh -X or the ssh -R Wayland socket).
-          set -ga update-environment DISPLAY
-          set -ga update-environment WAYLAND_DISPLAY
           # A server started before agenix mounted carries empty secret vars plus
           # HM's exported once-guard; drop the guard so panes re-read them.
           # run-shell blocks the config queue, so this lands before the first

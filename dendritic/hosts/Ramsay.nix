@@ -360,6 +360,14 @@ in
           settings = {
             PasswordAuthentication = false;
             KbdInteractiveAuthentication = false;
+            # sshd imports only listed names, so an unlisted SetEnv gets dropped.
+            # The client sends COLORTERM and TERM_PROGRAM (common.nix) plus
+            # WAYLAND_DISPLAY from the Host ramsay block.
+            AcceptEnv = [
+              "COLORTERM"
+              "TERM_PROGRAM"
+              "WAYLAND_DISPLAY"
+            ];
             # ssh -X hands the client's X server to the agent, so pi reads the
             # clipboard through xclip. NixOS derives programs.ssh.setXAuthLocation
             # from this key and points sshd at pkgs.xauth.
