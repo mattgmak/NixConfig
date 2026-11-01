@@ -153,10 +153,11 @@
       ];
 
       # Hermes needs a writable clone. /root/NixConfig stays root-owned, and
-      # /home/agent is 0700. The clone is the deploy source. Submodules come
-      # from upstream once, so this service needs the network on first run.
+      # /home/agent is 0700. A root-owned bare mirror carries the tree that was
+      # last switched, and the clone takes its origin from the mirror. Without
+      # the mirror, a deploy from a stale clone would roll the machine back.
       systemd.services.hermes-nixconfig = {
-        description = "Clone NixConfig for the Hermes deploy path";
+        description = "Mirror NixConfig and clone it for the Hermes deploy path";
         wantedBy = [ "multi-user.target" ];
         wants = [ "network-online.target" ];
         after = [ "network-online.target" ];
@@ -170,11 +171,24 @@
           RemainAfterExit = true;
         };
         script = ''
+          src=/home/agent/NixConfig
+          mirror=${config.services.hermes-agent.stateDir}/NixConfig.git
           target=${config.services.hermes-agent.stateDir}/NixConfig
-          [ -d "$target/.git" ] && exit 0
-          [ -d /root/NixConfig/.git ] || exit 0
+          if [ -d "$src/.git" ]; then
+            [ -d "$mirror" ] || git init --bare --quiet --shared=group "$mirror"
+            git -C "$src" -c safe.directory="$src" push --quiet --force \
+              "$mirror" HEAD:refs/heads/main || true
+            chgrp -R ${config.services.hermes-agent.group} "$mirror"
+            chmod -R g+rX "$mirror"
+          fi
+          [ -d "$mirror/refs/heads/main" ] || [ -f "$mirror/packed-refs" ] || exit 0
+          if [ -d "$target/.git" ]; then
+            # The first clone took /root/NixConfig as origin. Move it here.
+            git -C "$target" -c safe.directory="$target" remote set-url origin "$mirror"
+            exit 0
+          fi
           rm -rf "$target.partial"
-          git clone --recurse-submodules /root/NixConfig "$target.partial"
+          git clone --recurse-submodules --quiet "$mirror" "$target.partial"
           mv "$target.partial" "$target"
           chown -R ${config.services.hermes-agent.user}:${config.services.hermes-agent.group} "$target"
         '';

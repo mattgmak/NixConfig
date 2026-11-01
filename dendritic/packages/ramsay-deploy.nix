@@ -45,7 +45,7 @@
               git -C "$repo" -c user.name=hermes -c user.email=hermes@ramsay \
                 commit -q -m "Hermes deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             fi
-            # origin is /root/NixConfig, so this fetch stays local and cheap.
+            # origin is the root-owned mirror, so this fetch stays local and cheap.
             git -C "$repo" fetch --quiet origin main
             if git -C "$repo" merge-base --is-ancestor origin/main HEAD; then
               echo "clone is current with origin/main"
@@ -103,6 +103,14 @@
             fi
             exec 9>/run/lock/ramsay-deploy.lock
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
+            # Publish the tree that was last switched. Without this, a stale
+            # origin/main lets the clone roll the machine back.
+            src=/home/agent/NixConfig
+            mirror=/var/lib/hermes/NixConfig.git
+            if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
+              git -C "$src" -c safe.directory="$src" push --quiet --force \
+                "$mirror" HEAD:refs/heads/main || true
+            fi
             # A revert of a newer origin/main is a silent rollback. Refuse it.
             git -C "$repo" -c safe.directory="$repo" fetch --quiet origin main || true
             if ! git -C "$repo" -c safe.directory="$repo" \
