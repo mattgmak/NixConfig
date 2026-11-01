@@ -26,11 +26,52 @@
         enable = true;
         # pi for coding work, and the Hermes user skill that teaches it to call
         # pi as a subagent. See dendritic/packages/pi-local-hermes.nix.
-        extraPackages = [ pkgs.piLocalHermes ];
+        # ramsayDeploy holds the deploy scripts. See
+        # dendritic/packages/ramsay-deploy.nix.
+        extraPackages = [
+          pkgs.piLocalHermes
+          pkgs.ramsayDeploy
+        ];
         hermesHomeFiles = {
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
+          "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
         };
         settings = {
+          # The deploy gate. `manual` asks the owner on every flagged call, and
+          # the mode stays here so the agent cannot reach the bypass keys.
+          # `off` and YOLO return approved before the gate in tools/approval.py.
+          approvals = {
+            mode = "manual";
+            timeout = 300;
+            unattended_mode = "deny";
+            cron_mode = "deny";
+            single_query_mode = "deny";
+            # A raw root route must never reach a prompt. These match before
+            # YOLO and before `mode: off`. The sudoers wrapper is the only path.
+            deny = [
+              "*nh os switch*"
+              "*nh os boot*"
+              "*nixos-rebuild*"
+              "*sudo -i*"
+              "*sudo -s*"
+              "*sudo su*"
+            ];
+          };
+          security.approval = {
+            transport = "builtin";
+            transport_fallback = "deny";
+          };
+          # The gate itself: escalate any call that names the switch wrapper.
+          # `fail_closed` blocks the call when the hook crashes or times out.
+          hooks_auto_accept = true;
+          hooks.pre_tool_call = [
+            {
+              matcher = "terminal|execute_code";
+              command = "${pkgs.ramsayDeploy}/bin/ramsay-gate";
+              timeout = 15;
+              fail_closed = true;
+            }
+          ];
           model = {
             provider = "custom";
             default = "halogen-flash-next-signal-abliterated";
@@ -93,6 +134,50 @@
           host = "0.0.0.0";
           port = 9119;
         };
+      };
+
+      # The sudoers rule needs a fixed argv, so the switch wrapper sits at the
+      # one stable name. The rule allows that name, with no arguments.
+      environment.systemPackages = [ pkgs.ramsayDeploy ];
+
+      security.sudo.extraRules = [
+        {
+          users = [ "hermes" ];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/ramsay-deploy-switch";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+        }
+      ];
+
+      # Hermes needs a writable clone. /root/NixConfig stays root-owned, and
+      # /home/agent is 0700. The clone is the deploy source. Submodules come
+      # from upstream once, so this service needs the network on first run.
+      systemd.services.hermes-nixconfig = {
+        description = "Clone NixConfig for the Hermes deploy path";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        before = [ "hermes-agent.service" ];
+        path = [
+          pkgs.git
+          pkgs.coreutils
+        ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          target=${config.services.hermes-agent.stateDir}/NixConfig
+          [ -d "$target/.git" ] && exit 0
+          [ -d /root/NixConfig/.git ] || exit 0
+          rm -rf "$target.partial"
+          git clone --recurse-submodules /root/NixConfig "$target.partial"
+          mv "$target.partial" "$target"
+          chown -R ${config.services.hermes-agent.user}:${config.services.hermes-agent.group} "$target"
+        '';
       };
 
       services.hermes-webui = {

@@ -44,6 +44,14 @@
           piLocalHermes = self.packages.${system}.piLocalHermes;
         };
 
+      # The autonomous deploy helpers for the hermes user. See
+      # dendritic/packages/ramsay-deploy.nix.
+      ramsayDeployOverlay =
+        _final: _prev:
+        {
+          ramsayDeploy = self.packages.${system}.ramsayDeploy;
+        };
+
       tmaxOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -114,6 +122,7 @@
         })
         nodeBinOverlay
         piLocalHermesOverlay
+        ramsayDeployOverlay
         tmaxOverlay
         btopOverlay
         self.agentBrowserOverlay

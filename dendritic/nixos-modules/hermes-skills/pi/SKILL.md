@@ -30,7 +30,7 @@ stdout holds the final text. stderr holds errors. A nonzero exit means the run f
 
 ## Worktree rule
 
-pi edits files only. It never deploys. `nh os switch` needs root and a password, so the human runs it. Run pi inside a worktrunk worktree and keep the main checkout clean:
+pi edits files only. It never deploys. Use the `deploy` skill for the switch. Run pi inside a worktrunk worktree and keep the main checkout clean:
 
     cd <worktree> && pi-local -p "<brief>"
 
