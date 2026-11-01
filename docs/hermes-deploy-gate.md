@@ -60,6 +60,8 @@ Notes:
 - The store path is read-only for `hermes`. The agent cannot edit the wrapper.
 - The wrapper refuses to run when the clone is behind `origin/main`. A stale clone would roll the
   machine back. `ramsay-deploy-sync` fetches and rebases first.
+- A root-owned bare mirror at `/var/lib/hermes/NixConfig.git` carries the tree that was last
+  switched, and the clone takes the mirror as origin. `/root/NixConfig` is never the origin.
 - The wrapper commits the staged tree before the switch. Nix git mode then sees every file, and
   the change has a commit id to review.
 
