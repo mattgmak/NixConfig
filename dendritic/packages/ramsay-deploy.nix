@@ -53,6 +53,10 @@
               git -C "$repo" -c user.name=hermes -c user.email=hermes@ramsay \
                 rebase origin/main
             fi
+            # The mirror carries main-repo objects only. Materialize the submodule
+            # commits the new HEAD records, or the switch builds a mixed tree.
+            git -C "$repo" submodule update --init --recursive --quiet
+            echo "submodules at their recorded commits"
           '')
           (script "ramsay-deploy-diff" ''
             #!${pkgs.runtimeShell}
@@ -93,6 +97,7 @@
               pkgs.nh
               pkgs.git
               pkgs.coreutils
+              pkgs.gnugrep
               pkgs.util-linux
             ]}:/run/current-system/sw/bin
             repo=${repo}
@@ -110,16 +115,27 @@
             if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
               git -C "$src" -c safe.directory="$src" push --quiet --force \
                 "$mirror" HEAD:refs/heads/main || true
+              # A root push adds root-owned objects. Keep the mirror readable.
+              chgrp -R "$(stat -c '%G' "$repo")" "$mirror"
+              chmod -R g+rX "$mirror"
             fi
             # A revert of a newer origin/main is a silent rollback. Refuse it.
-            git -C "$repo" -c safe.directory="$repo" fetch --quiet origin main || true
-            if ! git -C "$repo" -c safe.directory="$repo" \
-              merge-base --is-ancestor origin/main HEAD; then
+            # Read the mirror ref directly: a fetch here writes root-owned objects
+            # into the hermes clone and breaks the next sync.
+            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
+            if [ -n "$mirror_head" ] && ! git -C "$repo" -c safe.directory="$repo" \
+              merge-base --is-ancestor "$mirror_head" HEAD; then
               echo "clone is behind origin/main: run ramsay-deploy-sync first" >&2
               exit 1
             fi
             # A git-mode flake sees tracked files only, so stage first.
             git -C "$repo" -c safe.directory="$repo" add -A
+            # A stale submodule checkout builds a tree that no commit describes.
+            if git -C "$repo" -c safe.directory="$repo" submodule status \
+              | grep -q '^[+-]'; then
+              echo "clone has unmaterialized submodules: run ramsay-deploy-sync first" >&2
+              exit 1
+            fi
             if ! git -C "$repo" -c safe.directory="$repo" diff --cached --quiet; then
               git -C "$repo" -c safe.directory="$repo" \
                 diff --cached --stat | tee -a "$log"
@@ -128,6 +144,8 @@
                 commit -q -m "Hermes deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             fi
             rev=$(git -C "$repo" rev-parse --short HEAD)
+            # Root git leaves root-owned files behind. Give the clone back to its owner.
+            chown -R "$(stat -c '%U:%G' "$repo")" "$repo/.git"
             echo "deploy $rev" | tee -a "$log"
             exec nh os switch -e none "$repo#Ramsay"
           '')
