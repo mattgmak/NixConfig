@@ -36,6 +36,14 @@
           node-bin = self.packages.${system}.node-bin;
         };
 
+      # pi for the hermes user, built from the same compiled derivation as the
+      # agent user's pi. See dendritic/nixos-modules/hermes.nix.
+      piLocalHermesOverlay =
+        _final: _prev:
+        {
+          piLocalHermes = self.packages.${system}.piLocalHermes;
+        };
+
       tmaxOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -105,6 +113,7 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         nodeBinOverlay
+        piLocalHermesOverlay
         tmaxOverlay
         btopOverlay
         self.agentBrowserOverlay

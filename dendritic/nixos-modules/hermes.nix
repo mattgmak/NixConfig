@@ -24,6 +24,12 @@
       };
       services.hermes-agent = {
         enable = true;
+        # pi for coding work, and the Hermes user skill that teaches it to call
+        # pi as a subagent. See dendritic/packages/pi-local-hermes.nix.
+        extraPackages = [ pkgs.piLocalHermes ];
+        hermesHomeFiles = {
+          "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
+        };
         settings = {
           model = {
             provider = "custom";
