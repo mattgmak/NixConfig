@@ -467,6 +467,80 @@ Bump procedure (`dendritic/packages/engram.nix`):
 4. `nix build --no-link .#engram` → installCheck confirms version.
 5. Running server = old bin until `nixos-rebuild switch` / home-manager switch applies the new generation.
 
+## Agent directories (loadouts)
+
+`pi-coding-agent.nix` builds every agent dir from one list, so `pi`, `pi-stock`, and `pi-local` cannot drift apart. Only the model config differs per loadout. The summary table lives in [SKILL.md](SKILL.md#loadouts-pi-pi-stock-pi-local). This section holds the mechanism and the recipes.
+
+### `agentDir`
+
+`agentDir dir overrides` is a `let` binding in `pi-coding-agent.nix`. It emits one activation entry:
+
+1. `run mkdir -p <dir>` — the dir must be a real directory, because pi writes `sessions/`, `cache`, and `auth.json` into it at runtime.
+2. For each parent directory of a nested path: `if [ -L <parent> ]; then run rm -f <parent>; fi` then `run mkdir -p <parent>`.
+3. One `run ln -sfn <source> <dir>/<path>` per entry.
+
+`agentSharedFiles` maps each name in `agentSharedPaths` to `~/.pi/agent/<name>`, which is the home-manager source. `overrides` merges on top of it:
+
+| Override value | Effect |
+|---|---|
+| a string path | replaces the source for that name |
+| `null` | drops the name, so a deeper path can take its place |
+| a key with `/` | links one file inside a real dir, which keeps the dir writable for the app's runtime files |
+
+Current overrides:
+
+| Loadout | Entry | Source |
+|---|---|---|
+| `piAgentDevDir` | `extensions` | repo `extensionsDir` (plain `pi` loads loaders from files) |
+| `piAgentLocalDir` | `extensions` | `~/.pi/agent/extensions` |
+| `piAgentLocalDir` | `settings.json` | `piLocalSettings` (ramsay provider, model, and `enabledModels`) |
+| `piAgentLocalDir` | `agents` | `piLocalAgents` (every `model:` frontmatter line rewritten to the ramsay model) |
+| `piAgentLocalDir` | `pi-autoname.json` | `piLocalAutoname` (ramsay model, empty `fallbackModels`) |
+| `piAgentLocalDir` | `pi-blackhole` → `pi-blackhole/pi-blackhole-config.json` | `piLocalBlackholeConfig` (all seven model slots on the ramsay model, empty fallback lists) |
+
+Each wrapper exports `PI_CODING_AGENT_DIR` for its own dir, so sessions and caches stay separate. `pi` and `pi-local` exec the same `piCompiled` binary. `pi-stock` execs the plain `pi` package.
+
+### Add a shared file
+
+1. Add the name to `agentSharedPaths`.
+2. Add the `home.file` entry that installs it into `~/.pi/agent`, unless one already exists.
+3. Run `nh`. Every loadout picks the file up with no per-loadout edit.
+
+### Add a per-loadout variant
+
+1. Build the variant as a `let` binding. `piLocalSettings` and `piLocalBlackholeConfig` are the models.
+2. Add `"<name>" = <binding>;` to that loadout's `overrides`.
+3. For a directory an app writes into, ship only the file: `pi-blackhole = null` plus `"pi-blackhole/pi-blackhole-config.json" = <binding>;`. The `null` is mandatory: a leftover symlink at that name makes `mkdir -p` follow it and `ln -sfn` write through into `~/.pi/agent`.
+
+### Add a loadout
+
+1. Add a `writeShellApplication` wrapper that exports `PI_CODING_AGENT_DIR` and execs the chosen binary. Copy `piLocalWrapper`.
+2. Add the wrapper to `home.packages`.
+3. Add one `home.activation.<name>Dir = agentDir <dir> { ... };` entry.
+4. Run `nh`, then run the check below.
+
+### Verify a switch
+
+```bash
+readlink /run/current-system                       # must match the build you switched to
+gen=$(grep -h home-manager-generation \
+  /run/current-system/etc/systemd/system/home-manager-agent.service | sed 's|ExecStart=[^ ]* ||')
+"$gen/activate" 2>&1 | tail -20                    # or run `nh os switch` instead
+ls -l ~/.pi/agent-local ~/.pi/agent-dev            # links must match agentSharedPaths
+for b in pi pi-local pi-stock; do command -v "$b"; done
+pi --version; pi-local --version                   # must report the same Pi-Bolt version
+pi-local -p "Reply with exactly: OK"               # one model turn through the loadout
+```
+
+Print mode exits before the naming cycle runs, so a `name` field needs an interactive run.
+
+### Two activation failures seen
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `Existing file '<path>' would be clobbered`, `EXIT=1`, no later entry runs | The file is a symlink Home Manager does not own, so `checkLinkTargets` refuses to replace it. A nested `ln -sfn` wrote through a stale symlink. | Relink the file to `<generation>/home-files/<path>` and rerun the activation. Prevent it with the `null` plus parent-unlink rule above. |
+| Activation exits 0, but `~/.pi/agent-dev` and `~/.pi/agent-local` never appear and `linkGeneration` never runs | A `home.activation` body defined a shell function named `run`, which shadowed Home Manager's `run` runner for every later entry. Fixed in `nixconfig-sync.nix`. | Never name a shell function `run` in an activation body. Grep the built `activate` for `^run()`. |
+
 ## Apply config changes
 
 Repo paths are linked with `mkOutOfStoreSymlink`, so **content edits are live** at `~/.pi/agent/*` without rebuilding Home Manager. On the compiled systems this holds for skills, prompts, themes and config files only. A compiled loader under `~/.pi/agent/extensions/` links into the store tree, so an edit to it needs `nh`.
@@ -569,6 +643,8 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Task | File(s) |
 |------|---------|
 | Wire paths / enable pi | `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix` |
+| Agent dir per loadout | `agentDir`, `agentSharedPaths`, `agentSharedFiles` in `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix` (see [Agent directories](#agent-directories-loadouts)) |
+| pi-local variants | `piLocalSettings`, `piLocalAgents`, `piLocalAutoname`, `piLocalBlackholeConfig`, `piLocalWrapper` in the same file |
 | Custom models/providers | `dendritic/home-modules/pi-coding-agent/models.json` |
 | MCP servers (Pi global override) | `dendritic/home-modules/pi-coding-agent/mcp.json`. Human-edited source. `pi-coding-agent.nix` generates the store file from it |
 | MCP server binaries | `home.packages` in `pi-coding-agent.nix`. `mcp.json` names a bare command, so pi finds it on the profile PATH only |

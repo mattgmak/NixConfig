@@ -2,8 +2,9 @@
 name: pi-setup
 description: >
   Add or bump pi extensions, skills, and themes. Use when adding a vendored pi
-  extension/skill/theme, bumping pi or extension versions, or debugging pi
-  discovery/reload. Subcommands: `extend` (install), `update` (bump with changelog review),
+  extension/skill/theme, bumping pi or extension versions, editing an agent dir or
+  loadout (`pi`, `pi-stock`, `pi-local`), or debugging pi discovery/reload. Subcommands:
+  `extend` (install), `update` (bump with changelog review),
   `blackhole` (refresh free memory-model chains).
 ---
 
@@ -26,11 +27,25 @@ The compiler records the absolute path of each extension and a fingerprint of fi
 | `pi` | `packages.piCompiled` | 31 compiled names from the store tree |
 | `pi-stock` | `packages.pi`, plain 1.0.4 | every loader from the repo tree, for extension development |
 
-`pi-stock` sets `PI_CODING_AGENT_DIR=~/.pi/agent-dev`, so it keeps its own sessions and cache.
-
 **Rebuild trigger.** Any edit to a compiled extension, its deps, or the extension list needs `nh`. Such an edit is not live after `/reload`. `pi-permission-system` and `pi-lean-ctx` stay writable, so their own log and cache files still land at run time.
 
 **Measured on 1.0.3:** warm first prompt 678 ms compiled against 2578 ms plain.
+
+## Loadouts: `pi`, `pi-stock`, `pi-local`
+
+Three binaries, three agent dirs, one source. `pi-coding-agent.nix` builds every agent dir from `agentSharedPaths`, so the loadouts cannot drift and only the model config differs. Steps and failure signatures: [REFERENCE.md — Agent directories](REFERENCE.md#agent-directories-loadouts).
+
+| Binary | Agent dir | Wrapper runs | Model scope |
+|---|---|---|---|
+| `pi` | `~/.pi/agent` | `piOauthWrapper` → `piCompiled` | repo `settings.json` |
+| `pi-stock` | `~/.pi/agent-dev` | `piStockWrapper` → plain `pi` | same files, repo `extensions/` loaders |
+| `pi-local` | `~/.pi/agent-local` | `piLocalWrapper` → `piCompiled` | ramsay only: `enabledModels = ["ramsay/*"]`, own `settings.json`, `agents`, `pi-autoname.json`, `pi-blackhole` config |
+
+Three rules keep the dirs working:
+
+1. An agent dir is a real directory. Never turn one into a store symlink: pi writes `sessions/`, `cache`, and `auth.json` into it.
+2. Every shared name comes from `agentSharedPaths`. A loadout that needs its own version of one file adds an override, never a second list.
+3. A file inside a directory an app writes into gets linked one by one (`pi-blackhole/pi-blackhole-config.json`), and the old name gets dropped with `null`. A leftover symlink makes `ln -sfn` write through it into `~/.pi/agent`.
 
 ## Dispatch
 
