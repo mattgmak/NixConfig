@@ -79,7 +79,14 @@
             set -uo pipefail
             export PATH=${pkgs.lib.makeBinPath [ pkgs.jq pkgs.git pkgs.coreutils ]}
             payload=$(cat 2>/dev/null || true)
-            cmd=$(printf '%s' "$payload" | jq -r '(.tool_input.command // .tool_input.code // "") | tostring' 2>/dev/null || true)
+            cmd=$(printf '%s' "$payload" | jq -r '(.tool_input.command // .tool_input.code // .args.command // .args.code // "") | tostring' 2>/dev/null || true)
+            # A payload with no readable command still gets matched on its raw text. A card on a
+            # harmless command costs one tap. A missed gate costs the machine.
+            [ -n "$cmd" ] || cmd=$payload
+            # Record every call. A silent gate hides its own failure.
+            log=/var/lib/hermes/ramsay-gate.log            tool=$(printf '%s' "$payload" | jq -r '.tool_name // "?"' 2>/dev/null || true)
+            { printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$tool" \
+              "$(printf '%s' "$cmd" | head -c 200 | tr '\n' ' ')" >> "$log"; } 2>/dev/null || true
             case "$cmd" in
               *ramsay-deploy-switch*)
                 stat=$(git -C ${repo} --no-pager diff --stat origin/main 2>/dev/null | tail -1)
