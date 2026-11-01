@@ -91,7 +91,23 @@ in
 
     # Agent coding workspace: pi + tmux orchestrator.
     homeConfigurations.RamsayAgent =
-      { lib, pkgs, ... }:
+      { lib, pkgs, config, ... }:
+      let
+        # Panes spawned from a systemd-started tmux server inherit its PATH — must
+        # include HM profile bins (starship/zoxide/…) or shells break.
+        tmuxServicePath = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+
+        # btop has no NPU panel, so the second window runs amdtop for the XDNA side.
+        # The windows run the tools directly: closing the tool closes the window.
+        monitorTmux = pkgs.writeShellScript "monitor-tmux" ''
+          set -eu
+          tmux=${lib.getExe pkgs.tmux}
+
+          $tmux has-session -t monitor 2>/dev/null && exit 0
+          $tmux new-session -d -s monitor -n btop '${config.programs.btop.package}/bin/btop'
+          $tmux new-window -d -t monitor -n amdtop '${pkgs.amdtop}/bin/amdtop'
+        '';
+      in
       {
         imports = with self.homeModules; [
           nixos-home
@@ -143,10 +159,29 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            # Panes spawned from this session inherit PATH — must include HM profile
-            # bins (starship/zoxide/…) or shells break.
-            Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+            Environment = tmuxServicePath;
             ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+          };
+          Install = {
+            WantedBy = [ "default.target" ];
+          };
+        };
+
+        systemd.user.services.monitor-tmux = {
+          Unit = {
+            Description = "tmux session 'monitor' with btop and amdtop";
+            # One tmux server serves both units, so order them: two parallel
+            # new-session calls can race the server startup. Wants not Requires —
+            # agents-tmux exits non-zero when its session already exists, and the
+            # monitor session should not depend on it.
+            After = [ "agents-tmux.service" ];
+            Wants = [ "agents-tmux.service" ];
+          };
+          Service = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            Environment = tmuxServicePath;
+            ExecStart = "${monitorTmux}";
           };
           Install = {
             WantedBy = [ "default.target" ];
