@@ -183,8 +183,22 @@
           entries = lib.filterAttrs (_: source: source != null) (agentSharedFiles // overrides);
           paths = lib.attrNames entries;
           parents = lib.filter (parent: parent != ".") (lib.unique (map builtins.dirOf paths));
+          # A parent left over from an older generation is a symlink. mkdir follows it and
+          # the link below writes through into the shared tree, so drop it first.
+          parentLines = map (
+            parent:
+            let
+              path = lib.escapeShellArg "${dir}/${parent}";
+            in
+            ''
+              if [ -L ${path} ]; then
+                run rm -f ${path}
+              fi
+              run mkdir -p ${path}
+            ''
+          ) parents;
           lines = [ "run mkdir -p ${lib.escapeShellArg dir}" ]
-            ++ map (parent: "run mkdir -p ${lib.escapeShellArg "${dir}/${parent}"}") parents
+            ++ parentLines
             ++ map (path: "run ln -sfn ${lib.escapeShellArg entries.${path}} ${lib.escapeShellArg "${dir}/${path}"}") paths;
         in
         inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.concatStringsSep "\n" lines);
