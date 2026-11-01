@@ -176,23 +176,31 @@
           src=/home/agent/NixConfig
           mirror=${config.services.hermes-agent.stateDir}/NixConfig.git
           target=${config.services.hermes-agent.stateDir}/NixConfig
-          if [ -d "$src/.git" ]; then
-            [ -d "$mirror" ] || git init --bare --quiet --shared=group "$mirror"
-            git -C "$src" -c safe.directory="$src" push --quiet --force \
-              "$mirror" HEAD:refs/heads/main || true
-            chgrp -R ${config.services.hermes-agent.group} "$mirror"
-            chmod -R g+rX "$mirror"
+          if [ ! -d "$src/.git" ]; then
+            echo "hermes-nixconfig: no git tree at $src" >&2
+            exit 1
           fi
-          [ -d "$mirror/refs/heads/main" ] || [ -f "$mirror/packed-refs" ] || exit 0
+          [ -d "$mirror" ] || git init --bare --quiet --shared=group "$mirror"
+          # The clone tracks the mirror. Do not hide a failed push: a stale
+          # origin here lets a later deploy roll the machine back.
+          if ! git -C "$src" -c safe.directory="$src" push --quiet --force \
+            "$mirror" HEAD:refs/heads/main; then
+            echo "hermes-nixconfig: push of $src to $mirror failed" >&2
+            exit 1
+          fi
+          chgrp -R ${config.services.hermes-agent.group} "$mirror"
+          chmod -R g+rX "$mirror"
           if [ -d "$target/.git" ]; then
             # The first clone took /root/NixConfig as origin. Move it here.
             git -C "$target" -c safe.directory="$target" remote set-url origin "$mirror"
+            echo "hermes-nixconfig: origin of $target set to $mirror"
             exit 0
           fi
           rm -rf "$target.partial"
           git clone --recurse-submodules --quiet "$mirror" "$target.partial"
           mv "$target.partial" "$target"
           chown -R ${config.services.hermes-agent.user}:${config.services.hermes-agent.group} "$target"
+          echo "hermes-nixconfig: cloned $target from $mirror"
         '';
       };
 
