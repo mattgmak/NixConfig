@@ -35,27 +35,27 @@
       };
 
       config = lib.mkIf config.tools.nixconfigSync.enable {
+        # The body must not define a shell function named `run`: the activation
+        # script runs entries in one shell, so the definition would shadow Home
+        # Manager's `run` runner for every later entry and swallow their commands.
         home.activation.ensureNixConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          run() {
-            if [ ! -d "${repoDir}/.git" ]; then
-              echo "nixconfig-sync: cloning ${repoUrl} → ${repoDir}"
-              ${
-                lib.getExe pkgs.git
-              } clone --recurse-submodules -b ${mainBranch} "${repoUrl}" "${repoDir}"
+          if [ ! -d "${repoDir}/.git" ]; then
+            echo "nixconfig-sync: cloning ${repoUrl} → ${repoDir}"
+            ${
+              lib.getExe pkgs.git
+            } clone --recurse-submodules -b ${mainBranch} "${repoUrl}" "${repoDir}"
+          else
+            echo "nixconfig-sync: fast-forward main in ${repoDir}"
+            # fetch + ff main (no-op if dirty/diverged; never force).
+            # A network blip must not abort the whole activation: unbound or
+            # tailscale can be down mid-switch, so warn and skip.
+            if ${git} -C "${repoDir}" fetch origin ${mainBranch}; then
+              ${git} -C "${repoDir}" merge --ff-only origin/${mainBranch} || true
+              ${git} -C "${repoDir}" submodule update --init --recursive || true
             else
-              echo "nixconfig-sync: fast-forward main in ${repoDir}"
-              # fetch + ff main (no-op if dirty/diverged; never force).
-              # A network blip must not abort the whole activation: unbound or
-              # tailscale can be down mid-switch, so warn and skip.
-              if ${git} -C "${repoDir}" fetch origin ${mainBranch}; then
-                ${git} -C "${repoDir}" merge --ff-only origin/${mainBranch} || true
-                ${git} -C "${repoDir}" submodule update --init --recursive || true
-              else
-                echo "nixconfig-sync: fetch failed, keep the current tree"
-              fi
+              echo "nixconfig-sync: fetch failed, keep the current tree"
             fi
-          }
-          run
+          fi
         '';
       };
     };

@@ -144,10 +144,18 @@
           config.lib.file.mkOutOfStoreSymlink extensionsDir;
 
       agentDevDir = "${config.home.homeDirectory}/.pi/agent-dev";
-      agentDevShared = [
+      agentLocalDir = "${config.home.homeDirectory}/.pi/agent-local";
+
+      # Every path an agent directory holds, from one source. home.file installs these
+      # in ~/.pi/agent for pi; each loadout links the same names back to that dir, so
+      # the binaries can never drift. A loadout swaps a single file through its own
+      # override instead of keeping a separate list. `extensions` always comes from an
+      # override because each binary needs a different tree.
+      agentSharedPaths = [
         "AGENTS.md"
-        "auth.json"
         "agents"
+        "auth.json"
+        "extensions"
         "keybindings.json"
         "mcp-adapter.json"
         "mcp.json"
@@ -156,10 +164,21 @@
         "pi-blackhole"
         "prompts"
         "settings.json"
-        "skills"
         "themes"
         "web-search.json"
       ];
+
+      # Activation entry that fills `dir` from agentSharedPaths plus `overrides`.
+      # An agent dir is a real directory, never a store symlink: pi writes sessions,
+      # cache and auth.json into it at run time.
+      agentDir = dir: overrides:
+        let
+          sourceOf = path: overrides.${path} or "${config.home.homeDirectory}/.pi/agent/${path}";
+          lines = [ "run mkdir -p ${lib.escapeShellArg dir}" ]
+            ++ map (path: "run ln -sfn ${lib.escapeShellArg (sourceOf path)} ${lib.escapeShellArg "${dir}/${path}"}")
+            agentSharedPaths;
+        in
+        inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.concatStringsSep "\n" lines);
 
       # The fallback command. Extensions come from the repo tree, so every loader runs
       # from files; PI_CODING_AGENT_DIR keeps it off the default agent dir.
@@ -180,6 +199,67 @@
         name = "pi";
         runtimeInputs = [ pkgs.coreutils ];
         text = ''
+          key="${piOauthKey}"
+          if [ -r "$key" ]; then
+            PI_MCP_ADAPTER_OAUTH_FILE_KEY="$(cat "$key")"
+            export PI_MCP_ADAPTER_OAUTH_FILE_KEY
+          fi
+          exec ${piCompiled}/bin/pi "$@"
+        '';
+      };
+
+      # The ramsay loadout. One settings.json derived from the canonical file, with the
+      # model set clamped to the ramsay provider. enabledModels is the same pattern list
+      # the --models flag takes, so one glob gates every source at once.
+      piLocalModel = "ramsay/halogen-flash-next-signal-abliterated";
+      settingsJson = builtins.fromJSON (builtins.readFile ./settings.json);
+      piLocalSettings = pkgs.writeText "pi-local-settings.json" (
+        builtins.toJSON (
+          settingsJson
+          // {
+            defaultProvider = "ramsay";
+            defaultModel = piLocalModel;
+            enabledModels = [ "ramsay/*" ];
+            modelThinkingLevels = lib.filterAttrs (
+              key: _: lib.hasPrefix "ramsay/" key
+            ) settingsJson.modelThinkingLevels;
+          }
+        )
+      );
+
+      # pi-autoname reads its own model field and ignores enabledModels, so the loadout
+      # needs its own copy. The ramsay model names itself and the openrouter fallbacks
+      # go away, which keeps every naming call on the local server.
+      piLocalAutoname = pkgs.writeText "pi-local-pi-autoname.json" (
+        builtins.toJSON (
+          (builtins.fromJSON (builtins.readFile ./extensions/pi-autoname/pi-autoname.json))
+          // {
+            model = piLocalModel;
+            fallbackModels = [ ];
+          }
+        )
+      );
+
+      # Subagent definitions for the loadout. pi-interactive-subagents hands the frontmatter
+      # model to the child pi as --model, which bypasses enabledModels, so every model line
+      # gets rewritten to piLocalModel. The rest of each file stays as the repo defines it.
+      piLocalAgents = pkgs.runCommand "pi-local-agents" {
+        src = ./agents;
+        model = piLocalModel;
+      } ''
+        mkdir -p $out
+        for f in $src/*.md; do
+          sed "s|^model:.*|model: $model|" "$f" > "$out/$(basename "$f")"
+        done
+      '';
+
+      # Second binary on the same compiled package, same shape as pi-stock. The oauth key
+      # block matches piOauthWrapper, so mcp-adapter keeps working off the shared agent dir.
+      piLocalWrapper = pkgs.writeShellApplication {
+        name = "pi-local";
+        runtimeInputs = [ pkgs.coreutils ];
+        text = ''
+          export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-${agentLocalDir}}"
           key="${piOauthKey}"
           if [ -r "$key" ]; then
             PI_MCP_ADAPTER_OAUTH_FILE_KEY="$(cat "$key")"
@@ -805,6 +885,7 @@
             podman
             piExtDepsInstall
             piStockWrapper
+            piLocalWrapper
             (lib.hiPrio piOauthWrapper)
             self.packages.${system}.lean-ctx
             self.packages.${system}.engram
@@ -903,17 +984,20 @@
               fi
             '';
 
-        # Agent dir of the pi-stock fallback. A real directory, not a store symlink: the
-        # agent dir is written at run time (sessions, cache, auth.json), so a store path
-        # would be read-only. Its files link back to ~/.pi/agent, so both commands share
-        # settings, skills and themes.
-        home.activation.piAgentDevDir = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          run mkdir -p ${lib.escapeShellArg agentDevDir}
-          ${lib.concatMapStrings (name: ''
-            run ln -sfn ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/${name}"} ${lib.escapeShellArg "${agentDevDir}/${name}"}
-          '') agentDevShared}
-          run ln -sfn ${lib.escapeShellArg extensionsDir} ${lib.escapeShellArg "${agentDevDir}/extensions"}
-        '';
+        # Agent dir of pi-stock, the plain binary. It reads extensions from the repo
+        # tree, so its override names the repo dir instead of the store tree.
+        home.activation.piAgentDevDir = agentDir agentDevDir {
+          extensions = extensionsDir;
+        };
+
+        # Agent dir of pi-local. Every shared name resolves to ~/.pi/agent, so
+        # extensions lands on the same tree the compiled image came from and stays a
+        # writable directory. Three names get loadout versions instead.
+        home.activation.piAgentLocalDir = agentDir agentLocalDir {
+          "settings.json" = piLocalSettings;
+          agents = piLocalAgents;
+          "pi-autoname.json" = piLocalAutoname;
+        };
 
         # The recursive link below builds a real tree in $HOME. If a symlink still sits at
         # the target, that build writes through it into the checkout: repo folders become
@@ -923,7 +1007,7 @@
           inputs.home-manager.lib.hm.dag.entryBefore [ "checkLinkTargets" ]
             ''
               if [ -L ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/extensions"} ]; then
-                run rm ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/extensions"}
+                run rm -f ${lib.escapeShellArg "${config.home.homeDirectory}/.pi/agent/extensions"}
               fi
             '';
 
