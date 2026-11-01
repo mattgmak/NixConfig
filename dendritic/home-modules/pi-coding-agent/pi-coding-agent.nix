@@ -168,15 +168,24 @@
         "web-search.json"
       ];
 
+      # The shared list as an attrset, every name mapped to its path in ~/.pi/agent.
+      agentSharedFiles = lib.listToAttrs (map (
+        path: lib.nameValuePair path "${config.home.homeDirectory}/.pi/agent/${path}"
+      ) agentSharedPaths);
+
       # Activation entry that fills `dir` from agentSharedPaths plus `overrides`.
       # An agent dir is a real directory, never a store symlink: pi writes sessions,
-      # cache and auth.json into it at run time.
+      # cache and auth.json into it at run time. A nested path needs its parent dir
+      # first, so the app keeps a writable place beside the link. An override value of
+      # null drops a name when a deeper entry takes its place.
       agentDir = dir: overrides:
         let
-          sourceOf = path: overrides.${path} or "${config.home.homeDirectory}/.pi/agent/${path}";
+          entries = lib.filterAttrs (_: source: source != null) (agentSharedFiles // overrides);
+          paths = lib.attrNames entries;
+          parents = lib.filter (parent: parent != ".") (lib.unique (map builtins.dirOf paths));
           lines = [ "run mkdir -p ${lib.escapeShellArg dir}" ]
-            ++ map (path: "run ln -sfn ${lib.escapeShellArg (sourceOf path)} ${lib.escapeShellArg "${dir}/${path}"}")
-            agentSharedPaths;
+            ++ map (parent: "run mkdir -p ${lib.escapeShellArg "${dir}/${parent}"}") parents
+            ++ map (path: "run ln -sfn ${lib.escapeShellArg entries.${path}} ${lib.escapeShellArg "${dir}/${path}"}") paths;
         in
         inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] (lib.concatStringsSep "\n" lines);
 
@@ -211,13 +220,19 @@
       # The ramsay loadout. One settings.json derived from the canonical file, with the
       # model set clamped to the ramsay provider. enabledModels is the same pattern list
       # the --models flag takes, so one glob gates every source at once.
-      piLocalModel = "ramsay/halogen-flash-next-signal-abliterated";
+      piLocalProvider = "ramsay";
+      piLocalModelId = "halogen-flash-next-signal-abliterated";
+      piLocalModel = "${piLocalProvider}/${piLocalModelId}";
       settingsJson = builtins.fromJSON (builtins.readFile ./settings.json);
+      modelsJson = builtins.fromJSON (builtins.readFile ./models.json);
+      piLocalModelEntry = lib.findFirst (
+        model: (model.id or "") == piLocalModelId
+      ) null modelsJson.providers.${piLocalProvider}.models;
       piLocalSettings = pkgs.writeText "pi-local-settings.json" (
         builtins.toJSON (
           settingsJson
           // {
-            defaultProvider = "ramsay";
+            defaultProvider = piLocalProvider;
             defaultModel = piLocalModel;
             enabledModels = [ "ramsay/*" ];
             modelThinkingLevels = lib.filterAttrs (
@@ -252,6 +267,33 @@
           sed "s|^model:.*|model: $model|" "$f" > "$out/$(basename "$f")"
         done
       '';
+
+      # pi-blackhole reads its config from <agent dir>/pi-blackhole/, so the loadout
+      # needs its own file. Every model slot names the ramsay model and the openrouter
+      # and commandcode fallback lists go away, which keeps observation on the local
+      # server. The repo file names models the current catalog dropped.
+      blackholeConfig = builtins.fromJSON (builtins.readFile ./extensions/pi-blackhole/pi-blackhole-config.json);
+      ramsayModelRef = thinking: {
+        provider = piLocalProvider;
+        id = piLocalModelId;
+        inherit thinking;
+        cooldownHours = 2;
+        contextWindow = piLocalModelEntry.contextWindow;
+      };
+      piLocalBlackholeConfig = pkgs.writeText "pi-local-pi-blackhole-config.json" (
+        builtins.toJSON (
+          blackholeConfig
+          // {
+            model = ramsayModelRef "low";
+            observerModel = ramsayModelRef "low";
+            observerFallbackModels = [ ];
+            reflectorModel = ramsayModelRef "low";
+            reflectorFallbackModels = [ ];
+            dropperModel = ramsayModelRef "off";
+            dropperFallbackModels = [ ];
+          }
+        )
+      );
 
       # Second binary on the same compiled package, same shape as pi-stock. The oauth key
       # block matches piOauthWrapper, so mcp-adapter keeps working off the shared agent dir.
@@ -992,11 +1034,15 @@
 
         # Agent dir of pi-local. Every shared name resolves to ~/.pi/agent, so
         # extensions lands on the same tree the compiled image came from and stays a
-        # writable directory. Three names get loadout versions instead.
+        # writable directory. Four names get loadout versions instead. The pi-blackhole
+        # entry is a real dir with one linked file, so its runtime files (cooldown,
+        # pending buffers) land in agent-local instead of the shared dir.
         home.activation.piAgentLocalDir = agentDir agentLocalDir {
           "settings.json" = piLocalSettings;
           agents = piLocalAgents;
           "pi-autoname.json" = piLocalAutoname;
+          pi-blackhole = null;
+          "pi-blackhole/pi-blackhole-config.json" = piLocalBlackholeConfig;
         };
 
         # The recursive link below builds a real tree in $HOME. If a symlink still sits at
