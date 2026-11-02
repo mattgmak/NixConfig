@@ -58,12 +58,16 @@ Notes:
 - Root reads a `hermes`-owned repo. Pass `safe.directory` to `git`. Confirm that `nh` and `nix`
   accept the same path. Test this before you rely on it.
 - The store path is read-only for `hermes`. The agent cannot edit the wrapper.
-- The wrapper refuses to run when the clone is behind `origin/main`. A stale clone would roll the
-  machine back. `ramsay-deploy-sync` fetches and rebases first.
-- A root-owned bare mirror at `/var/lib/hermes/NixConfig.git` carries the tree that was last
-  switched, and the clone takes the mirror as origin. `/root/NixConfig` is never the origin.
+- `ramsay-deploy-approve` publishes `/home/agent/NixConfig` HEAD to the mirror, then refuses when
+  the clone does not hold that commit. A publish inside the switch moves `origin/main` past a
+  clone that just synced, and the switch then refuses its own push.
+- A root-owned bare mirror at `/var/lib/hermes/NixConfig.git` carries the published tree, and the
+  clone takes the mirror as origin. `/root/NixConfig` is never the origin.
+- The wrapper checks the token before it touches git. A call without one writes nothing: no
+  staging, no root-owned index, no clone change.
 - The wrapper commits the staged tree before the switch. Nix git mode then sees every file, and
   the change has a commit id to review.
+- A trap gives `.git` back to hermes on every exit path, including a refusal.
 
 Hard-block the raw root paths, so the wrapper is the only route:
 
@@ -127,6 +131,7 @@ directive let the switch run with no human.
 | The token names the tree hash of the pending change | The owner approves exact bytes |
 | The token expires in 300 s | A stale approval cannot unlock a later deploy |
 | The switch deletes the token before `nh` | One approval, one switch |
+| The switch checks the token before any git write | A call without approval leaves the clone clean |
 | The switch recomputes the tree hash after `git add -A` | An edit after approval refuses, and the owner approves again |
 
 The tree hash comes from `git add -A` then `git write-tree`. A commit does not change it, and one

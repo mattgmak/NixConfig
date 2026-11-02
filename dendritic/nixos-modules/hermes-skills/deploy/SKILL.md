@@ -34,7 +34,7 @@ Run the steps in this order. Step 3 and step 5 may need several minutes between 
 | `ramsay-deploy-diff` | no | `git diff origin/main` plus the untracked file list |
 | `ramsay-deploy-tree` | no | Tree hash of the pending change |
 | `sudo /run/current-system/sw/bin/ramsay-deploy-switch` | yes | Check the token and the tree, commit, then `nh os switch -e none .#Ramsay` |
-| `sudo /run/current-system/sw/bin/ramsay-deploy-approve` | yes, with a password | Show the diff, then write a 300 second token. The owner runs this one |
+| `sudo /run/current-system/sw/bin/ramsay-deploy-approve` | yes, with a password | Publish HEAD, refuse a stale clone, show the diff, then write a 300 second token. The owner runs this one |
 
 The wrapper takes no arguments. It always reads `/var/lib/hermes/NixConfig`.
 
@@ -50,6 +50,7 @@ sudo asks for a password. This session cannot answer that prompt. Write the full
 - The token names the tree hash.
 - If you edit a file after the approval, the switch refuses. Sync, ask for a new approval, then retry.
 - One approval allows one switch.
+- `ramsay-deploy-approve` publishes your HEAD first. A clone behind that commit makes approve refuse, so sync before you ask.
 - Do not ask the owner to approve twice for the same diff.
 
 ## Never
@@ -68,7 +69,7 @@ sudo asks for a password. This session cannot answer that prompt. Write the full
 | `Deploy blocked: no approval token` | No live token | Ask the owner for `ramsay-deploy-approve`, then retry |
 | `approval expired` | More than 300 s since the approval | Ask the owner to approve again |
 | `tree changed since approval` | The working tree changed after the approval | Sync, show the diff, ask for a new approval |
-| `clone is behind origin/main` | The mirror moved ahead of the clone | Run `ramsay-deploy-sync`, then retry |
+| `clone is behind origin/main` | The published mirror holds a commit the clone lacks | Run `ramsay-deploy-sync`, then ask the owner to approve again |
 | `clone has unmaterialized submodules` | Old submodule checkouts | Run `ramsay-deploy-sync`, then retry |
 | `another deploy runs` | A switch holds the lock | Wait. Check `systemctl status hermes-agent` |
 | `no clone at /var/lib/hermes/NixConfig` | The clone unit failed | Check `systemctl status hermes-nixconfig` |

@@ -129,7 +129,7 @@
           (script "ramsay-deploy-approve" ''
             #!${pkgs.runtimeShell}
             set -euo pipefail
-            export PATH=${pkgs.lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.gnused ]}
+            export PATH=${pkgs.lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.gnused pkgs.util-linux ]}
             repo=${repo}
             token=${approvalFile}
             if [ "$(id -u)" -ne 0 ]; then
@@ -140,7 +140,28 @@
               echo "no clone at $repo" >&2
               exit 1
             fi
+            exec 9>/run/lock/ramsay-deploy.lock
+            flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
+            # Root git leaves root-owned objects and an index. Every exit path gives the clone back.
+            trap 'chown -R "$(stat -c "%U:%G" "$repo")" "$repo/.git"' EXIT
+            src=/home/agent/NixConfig
+            mirror=/var/lib/hermes/NixConfig.git
+            # Publish here, never inside the switch. A publish after the clone synced moves
+            # origin/main past it, and the switch then refuses its own push.
+            if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
+              git -C "$src" -c safe.directory="$src" push --quiet --force \
+                "$mirror" HEAD:refs/heads/main
+              chgrp -R "$(stat -c '%G' "$repo")" "$mirror"
+              chmod -R g+rX "$mirror"
+            fi
             git -C "$repo" ${gitCommon} fetch --quiet origin main || true
+            # A revert of a published commit is a silent rollback. Refuse it.
+            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
+            if [ -n "$mirror_head" ] && ! git -C "$repo" ${gitCommon} \
+              merge-base --is-ancestor "$mirror_head" HEAD; then
+              echo "clone is behind origin/main: run ramsay-deploy-sync first, then approve again" >&2
+              exit 1
+            fi
             echo "== diffstat against origin/main =="
             git -C "$repo" ${gitCommon} --no-pager diff --stat origin/main
             echo
@@ -183,34 +204,9 @@
             fi
             exec 9>/run/lock/ramsay-deploy.lock
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
-            # Publish the tree that was last switched. Without this, a stale
-            # origin/main lets the clone roll the machine back.
-            src=/home/agent/NixConfig
-            mirror=/var/lib/hermes/NixConfig.git
-            if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
-              git -C "$src" -c safe.directory="$src" push --quiet --force \
-                "$mirror" HEAD:refs/heads/main || true
-              # A root push adds root-owned objects. Keep the mirror readable.
-              chgrp -R "$(stat -c '%G' "$repo")" "$mirror"
-              chmod -R g+rX "$mirror"
-            fi
-            # A revert of a newer origin/main is a silent rollback. Refuse it.
-            # Read the mirror ref directly: a fetch here writes root-owned objects
-            # into the hermes clone and breaks the next sync.
-            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
-            if [ -n "$mirror_head" ] && ! git -C "$repo" ${gitCommon} \
-              merge-base --is-ancestor "$mirror_head" HEAD; then
-              echo "clone is behind origin/main: run ramsay-deploy-sync first" >&2
-              exit 1
-            fi
-            # A git-mode flake sees tracked files only, so stage first.
-            git -C "$repo" ${gitCommon} add -A
-            # A stale submodule checkout builds a tree that no commit describes.
-            if git -C "$repo" ${gitCommon} submodule status | grep -q '^[+-]'; then
-              echo "clone has unmaterialized submodules: run ramsay-deploy-sync first" >&2
-              exit 1
-            fi
-            # The owner answers through this file, and no agent can write it.
+            # Root git leaves root-owned objects and an index. Every exit path gives the clone back.
+            trap 'chown -R "$(stat -c "%U:%G" "$repo")" "$repo/.git"' EXIT
+            # Answer the token first. A call without one leaves the clone untouched.
             if [ ! -r "$token" ]; then
               echo "no approval token: ask the owner to run sudo /run/current-system/sw/bin/ramsay-deploy-approve" >&2
               exit 1
@@ -225,6 +221,22 @@
             if [ "$expires" -lt "$now" ]; then
               rm -f "$token"
               echo "approval expired: ask the owner to approve again" >&2
+              exit 1
+            fi
+            # A revert of the published commit is a silent rollback. Refuse it. This reads
+            # the mirror only: a fetch here writes root-owned objects into the clone.
+            mirror=/var/lib/hermes/NixConfig.git
+            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
+            if [ -n "$mirror_head" ] && ! git -C "$repo" ${gitCommon} \
+              merge-base --is-ancestor "$mirror_head" HEAD; then
+              echo "clone is behind origin/main: run ramsay-deploy-sync first" >&2
+              exit 1
+            fi
+            # A git-mode flake sees tracked files only, so stage first.
+            git -C "$repo" ${gitCommon} add -A
+            # A stale submodule checkout builds a tree that no commit describes.
+            if git -C "$repo" ${gitCommon} submodule status | grep -q '^[+-]'; then
+              echo "clone has unmaterialized submodules: run ramsay-deploy-sync first" >&2
               exit 1
             fi
             have=$(git -C "$repo" ${gitCommon} write-tree)
