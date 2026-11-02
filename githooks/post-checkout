@@ -1,0 +1,12 @@
+#!/bin/sh
+# A branch switch can record a vendor submodule that is not checked out yet.
+# Refresh only in that case, so file checkouts stay cheap.
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -x "$root/githooks/submodule-refresh.sh" ] || exit 0
+git -C "$root" submodule status --recursive 2>/dev/null | grep -q '^-' || exit 0
+
+log="${XDG_STATE_HOME:-$HOME/.local/state}/nixconfig/submodule-refresh.log"
+mkdir -p "${log%/*}"
+
+( "$root/githooks/submodule-refresh.sh" >>"$log" 2>&1 </dev/null & )
+exit 0

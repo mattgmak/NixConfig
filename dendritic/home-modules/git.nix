@@ -1,6 +1,11 @@
 {
   flake.homeModules.git =
-    { hostname, ... }:
+    {
+      hostname,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       programs.git = {
         enable = true;
@@ -43,5 +48,17 @@
             { }
         );
       };
+
+      # githooks/post-merge and post-checkout refresh vendor submodules. A pull
+      # that records a new submodule leaves an empty dir, and Nix then fails
+      # with "Failed to fetch git repository". The path is repo-local, so set it
+      # for every host that keeps the repo in ~/NixConfig.
+      home.activation.nixConfigHooks =
+        lib.hm.dag.entryAfter [ "writeBoundary" ]
+          ''
+            if [ -d "$HOME/NixConfig/.git" ]; then
+              ${lib.getExe pkgs.git} -C "$HOME/NixConfig" config --local core.hooksPath githooks || true
+            fi
+          '';
     };
 }

@@ -51,10 +51,13 @@
             # tailscale can be down mid-switch, so warn and skip.
             if ${git} -C "${repoDir}" fetch origin ${mainBranch}; then
               ${git} -C "${repoDir}" merge --ff-only origin/${mainBranch} || true
-              ${git} -C "${repoDir}" submodule update --init --recursive || true
             else
               echo "nixconfig-sync: fetch failed, keep the current tree"
             fi
+            # A pull can record a new vendor submodule as an empty dir, and Nix
+            # then fails with "Failed to fetch git repository". Init after any
+            # pull, even when the fetch above failed.
+            ${git} -C "${repoDir}" submodule update --init --recursive || true
           fi
         '';
       };
