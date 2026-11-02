@@ -523,6 +523,25 @@ in
 
       # The root job above sees system and root profiles only. Home-manager
       # generations sit in the user profile, so a user agent prunes those.
+      # pi-ssh-image-clipboard server: launchd itself binds 127.0.0.1:7779 and
+      # runs pngpaste once per connection, so no daemon sits idle. The ssh
+      # RemoteForward above reaches this port from Ramsay; the extension there
+      # writes the bytes to /tmp/pi-clipboard-<uuid>.png and inserts the path.
+      # StandardErrorPath keeps pngpaste's "no image" text off the socket.
+      launchd.user.agents.pi-clip-serve = {
+        command = "${pkgs.pngpaste}/bin/pngpaste -";
+        serviceConfig = {
+          inetdCompatibility.Wait = false;
+          Sockets.ListenerTCP = {
+            SockFamily = "IPv4";
+            SockNodeName = "127.0.0.1";
+            SockServiceName = "7779";
+            SockType = "stream";
+          };
+          StandardErrorPath = "/Users/${username}/Library/Logs/pi-clip-serve.stderr.log";
+        };
+      };
+
       launchd.user.agents.nix-gc = {
         serviceConfig = {
           ProgramArguments = [
@@ -842,13 +861,22 @@ in
         };
       };
 
-      # ssh ramsay with X11 forwarding: pi on Ramsay reads the Mac clipboard
-      # through xclip. ssh needs xauth on PATH, which XQuartz provides.
+      # ssh to Ramsay, Mac side of pi-ssh-image-clipboard. The RemoteForward
+      # tunnels the launchd clipboard server on 127.0.0.1:7779 into
+      # /home/agent/.pi-clip/macmini.sock on Ramsay. SetEnv names the box for
+      # the login hook there; stock sshd takes LC_* variables without AcceptEnv.
       # nix-darwin has no programs.ssh.enable or matchBlocks, so use extraConfig.
+      # ForwardX11 is gone on purpose: the extension registers only when the
+      # pi process has no DISPLAY, and X11 forwarding sets it.
       programs.ssh.extraConfig = ''
         Host ramsay
           User agent
-          ForwardX11 yes
+          ControlMaster auto
+          ControlPath ~/.ssh/cm-%r@%h:%p
+          ControlPersist yes
+          ServerAliveInterval 30
+          RemoteForward /home/agent/.pi-clip/macmini.sock localhost:7779
+          SetEnv LC_PI_CLIP=macmini
       '';
 
       environment.systemPackages =

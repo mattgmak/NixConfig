@@ -1,0 +1,10 @@
+{
+  "name": "pi-ssh-image-clipboard",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for pasky/pi-ssh-image-clipboard (vendored submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

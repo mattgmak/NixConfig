@@ -101,3 +101,6 @@
 [submodule "gsanhueza/pi-token-speed"]
 	path = vendor/gsanhueza/pi-token-speed
 	url = https://github.com/gsanhueza/pi-token-speed
+[submodule "pasky/pi-ssh-image-clipboard"]
+	path = vendor/pasky/pi-ssh-image-clipboard
+	url = https://github.com/pasky/pi-ssh-image-clipboard
