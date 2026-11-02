@@ -867,9 +867,10 @@ in
       # the login hook there; stock sshd takes LC_* variables without AcceptEnv.
       # nix-darwin has no programs.ssh.enable or matchBlocks, so use extraConfig.
       # ForwardX11 is gone on purpose: the extension registers only when the
-      # pi process has no DISPLAY, and X11 forwarding sets it.
+      # pi process has no DISPLAY, and X11 forwarding sets it. The FQDN joins the
+      # pattern so a connection by Tailscale name gets the same forward.
       programs.ssh.extraConfig = ''
-        Host ramsay
+        Host ramsay ramsay.dab-octatonic.ts.net
           User agent
           ControlMaster auto
           ControlPath ~/.ssh/cm-%r@%h:%p

@@ -495,8 +495,12 @@
         # extraConfig. sshd removes the forwarded socket when its connection
         # exits. The first connection stays as a shared master, so the forward
         # survives logout. ServerAliveInterval kills a master the network dropped.
+        #
+        # The FQDN joins the pattern because the Ghostty launcher on Desky runs
+        # `ssh -t agent@ramsay.dab-octatonic.ts.net tmux ...`. ssh applies a Host
+        # block only when its pattern matches the name on the command line.
         programs.ssh.extraConfig = lib.mkAfter ''
-          Host ramsay
+          Host ramsay ramsay.dab-octatonic.ts.net
             User agent
             RemoteForward /home/agent/.pi-clip/desky.sock localhost:7779
             SetEnv LC_PI_CLIP=desky

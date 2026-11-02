@@ -111,6 +111,33 @@
           + "\n"
           + ''
             export JOB_QUEUE_TMPDIR="''${XDG_RUNTIME_DIR:-/tmp}/zsh-job-queue-''${UID}/"
+          ''
+          # pi-clip: point this ssh tty at the client box's clipboard socket so
+          # pi-ssh-image-clipboard can find it. The extension resolves the
+          # clipboard of the tmux client that pressed Ctrl+V through
+          # ~/.pi-clip/by-tty/<tty>.sock. Only the ssh login shell knows which
+          # box it belongs to, so the TMUX guard keeps pane shells from writing
+          # a link. PI_CLIP_SOCK is the et transport, LC_PI_CLIP the ssh one.
+          # This lives in .zshenv because `ssh host tmux ...` runs `zsh -c`,
+          # which reads only .zshenv and never .zshrc.
+          + ''
+            if [[ -z "$TMUX" ]]; then
+              _pi_clip_target=""
+              if [[ -n "$PI_CLIP_SOCK" ]]; then
+                _pi_clip_target="$PI_CLIP_SOCK"
+              elif [[ -n "$SSH_TTY" && -n "$LC_PI_CLIP" ]]; then
+                _pi_clip_target="$HOME/.pi-clip/$LC_PI_CLIP.sock"
+              fi
+              if [[ -n "$_pi_clip_target" ]] && _pi_clip_tty=$(tty 2>/dev/null); then
+                case "$_pi_clip_tty" in
+                  /dev/pts/*)
+                    mkdir -p ~/.pi-clip/by-tty
+                    ln -sf "$_pi_clip_target" ~/.pi-clip/by-tty/"''${_pi_clip_tty##*/}".sock
+                    ;;
+                esac
+              fi
+              unset _pi_clip_target _pi_clip_tty
+            fi
           '';
 
         # Nix-on-Droid starts the app's login zsh non-interactive (fd0 is a pts
