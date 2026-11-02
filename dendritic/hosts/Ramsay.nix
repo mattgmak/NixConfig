@@ -396,12 +396,14 @@ in
             PasswordAuthentication = false;
             KbdInteractiveAuthentication = false;
             # sshd imports only listed names, so an unlisted SetEnv gets dropped.
-            # The client sends COLORTERM and TERM_PROGRAM (common.nix) plus
-            # WAYLAND_DISPLAY from the Host ramsay block.
+            # Clients send COLORTERM and TERM_PROGRAM (common.nix) plus LC_PI_CLIP, the
+            # name of their clipboard socket. The old WAYLAND_DISPLAY entry is gone. With
+            # that variable set the pi extension returns early, and pi then runs
+            # wl-paste against a socket that no longer exists.
             AcceptEnv = [
               "COLORTERM"
               "TERM_PROGRAM"
-              "WAYLAND_DISPLAY"
+              "LC_PI_CLIP"
             ];
             # ssh -X hands the client's X server to the agent, so pi reads the
             # clipboard through xclip. NixOS derives programs.ssh.setXAuthLocation
@@ -409,8 +411,8 @@ in
             X11Forwarding = true;
           };
           extraConfig = ''
-            # Not a settings key in this nixpkgs. Unlink the stale remote socket of
-            # a dead unix RemoteForward (the Wayland mirror) on reconnect.
+            # Not a settings key in this nixpkgs. Unlink the stale .sock file that a dead
+            # unix RemoteForward leaves behind, so reconnects bind again.
             StreamLocalBindUnlink yes
             Match User agent Address 100.64.0.0/10,fd7a:115c:a1e0::/48
               PubkeyAuthentication yes

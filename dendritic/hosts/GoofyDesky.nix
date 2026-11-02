@@ -41,7 +41,7 @@
       }
     );
 
-    homeConfigurations.GoofyDesky = {
+    homeConfigurations.GoofyDesky = { pkgs, ... }: {
       imports = with self.homeModules; [
         nixos-home
         atuin
@@ -92,6 +92,28 @@
       voxtype = {
         enable = true;
         asrBaseUrl = "https://asr.dab-octatonic.ts.net";
+      };
+
+      # pi-clip server: ssh -R localhost:7779 lands here and gets one PNG back.
+      # systemd 262 has no Target= key for a socket. With Accept set it runs the
+      # template named after the socket, pi-clip-serve@.service, once per
+      # connection, and passes that connection in as fd 3.
+      #
+      # The user manager starts before Hyprland, so the unit names the Wayland
+      # socket by hand. ExecStart needs bash because systemd runs it directly and
+      # cannot interpret the >&3 redirect on its own.
+      systemd.user.sockets.pi-clip-serve = {
+        Unit.Description = "pi-clip clipboard server socket";
+        Socket.ListenStream = "127.0.0.1:7779";
+        Socket.Accept = true;
+        Install.WantedBy = [ "sockets.target" ];
+      };
+
+      systemd.user.services."pi-clip-serve@" = {
+        Unit.Description = "pi-clip clipboard server for one connection";
+        Service.Environment = "WAYLAND_DISPLAY=wayland-1";
+        Service.ExecStart = "${pkgs.bash}/bin/bash -c 'exec ${pkgs.wl-clipboard}/bin/wl-paste -t image/png >&3'";
+        Service.Type = "oneshot";
       };
     };
 
@@ -437,21 +459,26 @@
               PermitRootLogin prohibit-password
           '';
         };
-        # ssh ramsay: mirror this desktop's Wayland clipboard socket onto Ramsay,
-        # so wl-paste and pi's Ctrl+V read the GoofyDesky clipboard remotely.
-        # The Hyprland socket here is wayland-1, not wayland-0: Hyprland takes the
-        # free index at session start. The Ramsay side keeps the stable wayland-0
-        # name, so only the source side tracks the real index. If Hyprland's index
-        # changes, fix the source path here. NixOS 26.11 has no
-        # programs.ssh.matchBlocks, so append to common.nix's extraConfig.
-        # sshd removes the forwarded socket when its connection exits, so the first
-        # connection stays as a shared master and keeps the forward alive after you
-        # log out. ServerAliveInterval kills a master the network has dropped.
+        # pi-clip: ssh -R maps /home/agent/.pi-clip/desky.sock on Ramsay to port
+        # 7779 here, where the user socket answers with wl-paste. The
+        # pi-ssh-image-clipboard extension on Ramsay reads that socket for
+        # Ctrl+V. SetEnv names the client, so the zsh login hook can point
+        # ~/.pi-clip/by-tty/<tty>.sock at it.
+        #
+        # The Wayland forward is gone. OpenSSH cannot pass the file descriptors
+        # Wayland needs, so it only ever listed clipboard types. Ramsay loses
+        # WAYLAND_DISPLAY, so pi's text paste stops and the extension covers
+        # images only.
+        #
+        # NixOS 26.11 has no programs.ssh.matchBlocks, so append to common.nix's
+        # extraConfig. sshd removes the forwarded socket when its connection
+        # exits. The first connection stays as a shared master, so the forward
+        # survives logout. ServerAliveInterval kills a master the network dropped.
         programs.ssh.extraConfig = lib.mkAfter ''
           Host ramsay
             User agent
-            RemoteForward /run/user/1000/wayland-0:/run/user/1000/wayland-1
-            SetEnv WAYLAND_DISPLAY=wayland-0
+            RemoteForward /home/agent/.pi-clip/desky.sock localhost:7779
+            SetEnv LC_PI_CLIP=desky
             ControlMaster auto
             ControlPath ~/.ssh/cm-%r@%h:%p
             ControlPersist yes
