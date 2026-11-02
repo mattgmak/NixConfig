@@ -20,6 +20,38 @@ One lane per ticket. A lane owns its worktree and its branch. You own the base b
 
 Completion criterion: you merge, block, or escalate every ticket in the wave with a reason.
 
+## Grilling
+
+The user grills in a peer. The orchestrator never runs an interview round in its own session.
+
+A grill round here floods the context with decisions that belong to the wave. It also breaks the base rule: the orchestrator reads no source file and writes no prose.
+
+Spawn a `peer` with a brief that names the tickets. The peer uses `ask_user_question` for each round and waits for the answers. The peer reports the settled decisions, one line per ticket.
+
+Then the orchestrator starts the wave and treats those decisions as rulings.
+
+| Do | Do not |
+|---|---|
+| spawn `peer` for the grill | ask a numbered question round here |
+| pass the tickets and the open facts | ask the user for a fact a scout can find |
+| take the settled rulings into the wave | hold the wave until the grill ends |
+
+## CodeRabbit loop
+
+Run this loop after a lane opens a pull request.
+
+1. Start the watch with `ctx_bg`. The timeout is 20 minutes:
+
+```bash
+bash ~/NixConfig/dendritic/skills/master-orchestrator/watch-coderabbit.sh <pr> DrPOM-Medical/tcm 1200
+```
+
+2. The script exits on one of four states: `FOUND` new unresolved threads, `RATE_LIMIT`, `TIMEOUT`, or `CLOSED`.
+3. On `FOUND`, send each thread to the lane: file, line, fault, and the fix. The lane fixes, gates, pushes, and resolves the thread. Start the watch again.
+4. On `RATE_LIMIT`, stop the loop. Report the limit to the user.
+5. On `TIMEOUT`, the pull request holds no new CodeRabbit thread. Report it at the gate.
+6. Never poll by hand. The script holds the loop.
+
 ## 1. Plan the wave
 
 Read each ticket with the Linear MCP tool (`get_issue`). Take the id, title, state, and `gitBranchName`.
@@ -52,12 +84,12 @@ subagent {
   agent:   "peer",
   name:    "lane-1424",
   cwd:     "<worktree path>",
-  surface: "window",
+  surface: "new-session:lane-1424",
   task:    "<lane brief>"
 }
 ```
 
-`peer` lists `surfaces: window, session`. A pane fails. Always pass `surface: "window"`.
+`peer` lists `surfaces: window, session`. A pane fails. A window dies with the parent. Always pass a dedicated session: `surface: "new-session:<name>"`, where `<name>` is the lane name. The user then finds each lane in its own tmux session.
 
 Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrives as a steer message.
 
@@ -176,7 +208,11 @@ Run install, types, and tests on the fresh base before you trust it.
 
 ## 13. Cleanup
 
-After a merge, remove the worktree and delete the branch.
+After a merge, remove the worktree, delete the branch, and kill the lane session.
+
+```bash
+tmux kill-session -t lane-1424
+```
 
 A dirty worktree: save `git diff` and the untracked files under `/tmp/agent-tmp/<project>/patches/` first.
 
@@ -185,6 +221,8 @@ git -C <worktree> diff > /tmp/agent-tmp/<project>/patches/<branch>.diff
 wt remove <branch>
 git branch -D <branch>
 ```
+
+The pull request landing is the trigger. Do not leave a session or a worktree behind.
 
 ## 14. Background gates
 
