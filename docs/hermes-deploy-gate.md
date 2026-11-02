@@ -181,10 +181,12 @@ server, `NTFY_APPROVAL_TOKEN`. Add it only if the app is often closed.
 | `HERMES_MANAGED=true` plus `.managed` | Shell edits of Nix-owned keys are refused |
 | `security.approval.transport` set to a broken plugin | Transport error denies, unless the fallback is `builtin` |
 | Chat opened before the hook reached `config.yaml` | The worker registers hooks from the session snapshot. No hook, no card |
-| One-shot `hermes -z` turn | The gate returns `approve`, and the CLI answers it without a human. The call runs |
+| Detached exec worker (`HERMES_AGENT` plus `HERMES_GATEWAY_DETACHED`) | Hermes ignores `{"action":"approve"}` there, and the call runs. `{"action":"block"}` does stop it |
 
-Two tests prove the last two rows. `scripts/hermes-gate-test.sh` reproduces the one-shot
-case on the local model. Open a new chat after each switch that changes the hook block.
+Two tests prove the last two rows. `scripts/hermes-gate-test.sh` spawns one turn on the local
+model. `scripts/hermes-gate-tmux-test.sh` compares `block` against `approve` in a tmux pane.
+
+So `approve` is not a gate. The wrapper must check a token that only a human answer writes.
 
 Keep `mode = "manual"` under Nix control. That keeps the bypass keys out of the agent's reach
 between switches.
