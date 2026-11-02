@@ -399,6 +399,27 @@
           ];
         };
 
+        # Astro HD Camera audio interface fails to start ("set_hw_params:
+        # Connection timed out") and stalls the daemon while it retries. New
+        # PipeWire clients then wait on their first sync. Hide the card; the
+        # HyperX SoloCast stays the default source.
+        services.pipewire.wireplumber.extraConfig."50-astro-camera-off" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [
+                {
+                  "device.name" = "~alsa_card.usb-QCM_Astro_HD_Camera.*";
+                }
+              ];
+              actions = {
+                "update-props" = {
+                  "device.disabled" = true;
+                };
+              };
+            }
+          ];
+        };
+
         systemd.user.services.nvidia-gaming-settings = {
           description = "NVIDIA max-performance PowerMizer";
           after = [

@@ -102,7 +102,7 @@
                 ""
               ];
             };
-            on-click = "ghostty --title=wiremix -e wiremix";
+            on-click = "ghostty --title=wiremix -e wiremix-run";
           };
           network = {
             format-wifi = "{essid} ({signalStrength}%) ";

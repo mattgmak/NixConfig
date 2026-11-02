@@ -66,7 +66,7 @@
                 "${
                   (pkgs.writeShellApplication {
                     name = "wiremix-term-audio";
-                    text = "ghostty -e wiremix";
+                    text = "ghostty -e wiremix-run";
                   })
                 }/bin/wiremix-term-audio"
               ];
