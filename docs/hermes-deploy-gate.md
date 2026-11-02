@@ -180,6 +180,11 @@ server, `NTFY_APPROVAL_TOKEN`. Add it only if the app is often closed.
 | Edit of `~/.hermes/config.yaml` | Nix merge replaces the Nix keys on the next switch |
 | `HERMES_MANAGED=true` plus `.managed` | Shell edits of Nix-owned keys are refused |
 | `security.approval.transport` set to a broken plugin | Transport error denies, unless the fallback is `builtin` |
+| Chat opened before the hook reached `config.yaml` | The worker registers hooks from the session snapshot. No hook, no card |
+| One-shot `hermes -z` turn | The gate returns `approve`, and the CLI answers it without a human. The call runs |
+
+Two tests prove the last two rows. `scripts/hermes-gate-test.sh` reproduces the one-shot
+case on the local model. Open a new chat after each switch that changes the hook block.
 
 Keep `mode = "manual"` under Nix control. That keeps the bypass keys out of the agent's reach
 between switches.
