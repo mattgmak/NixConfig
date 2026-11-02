@@ -63,7 +63,9 @@
             transport = "builtin";
             transport_fallback = "deny";
           };
-          # The gate itself: escalate any call that names the switch wrapper.
+          # The gate: block any call that names the switch wrapper unless a
+          # live approval token exists. Hermes drops the `approve` directive in
+          # its exec worker, so `block` is the only directive that holds.
           # `fail_closed` blocks the call when the hook crashes or times out.
           hooks_auto_accept = true;
           hooks.pre_tool_call = [

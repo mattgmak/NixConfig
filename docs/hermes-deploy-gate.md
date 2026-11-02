@@ -78,7 +78,7 @@ approvals.deny = [
 ];
 ```
 
-## Layer 2: the agent gate
+## Layer 2: the token gate
 
 `nh` and `nix` are absent from `DANGEROUS_PATTERNS` in `tools/approval_detection.py`. So a plain
 `nh os switch` raises no prompt. Add one shell hook instead.
@@ -95,34 +95,44 @@ hooks.pre_tool_call = [
 ];
 ```
 
-`ramsay-gate` reads JSON on stdin and writes JSON on stdout. The `approve` action escalates the
-call to the same human gate that handles dangerous shell patterns.
+`ramsay-gate` reads JSON on stdin and writes JSON on stdout. It blocks the switch unless a live
+approval token exists.
 
 ```sh
-#!/usr/bin/env bash
-set -uo pipefail
 payload=$(cat)
-cmd=$(printf '%s' "$payload" | jq -r '.tool_input.command // .tool_input.code // ""')
+cmd=$(printf '%s' "$payload" | jq -r '.tool_input.command // ""')
 case "$cmd" in
   *ramsay-deploy-switch*)
-    stat=$(git -C /var/lib/hermes/NixConfig diff --stat | tail -1)
-    printf '{"action":"approve","message":"Deploy NixConfig: %s","rule_key":"ramsay-deploy"}\n' "$stat"
+    now=$(date +%s)
+    expires=$(sed -n 's/^expires=//p' /var/lib/ramsay-deploy/approval 2>/dev/null | head -1)
+    if [ -n "$expires" ] && [ "$expires" -ge "$now" ] 2>/dev/null; then
+      printf '{}\n'; exit 0
+    fi
+    printf '{"action":"block","message":"Deploy blocked: no approval token."}\n'
     ;;
   *) printf '{}\n' ;;
 esac
 ```
 
-Why this is a hard gate, per source:
+Use `block`, not `approve`. I measured both with `scripts/hermes-gate-tmux-test.sh`. Hermes runs a
+tool in a detached exec worker, and that worker honors `block` and drops `approve`. An `approve`
+directive let the switch run with no human.
 
-- `hermes_cli/plugins.py::_resolve_block_from_details` runs the gate for an `approve` directive. A
-  deny, a timeout or a gate error returns a block. The tool never runs.
-- `tools/approval.py::request_tool_approval` sets `fail_closed_when_no_human`. A non-interactive
-  session with no approval bridge blocks at once.
-- `tools/approval_context.py` marks `api_server` as an unattended platform. It keeps an approval
-  bridge only when the running turn registered a notifier. `/v1/runs` and streaming chat
-  completions do register one. A plain webhook does not.
+### The token
 
-Set the approval modes explicitly:
+| Rule | Reason |
+|---|---|
+| `ramsay-deploy-approve` needs root and a password | Hermes holds no sudo rule for it, so it cannot approve itself |
+| `/var/lib/ramsay-deploy/approval` is root-owned, 0644 | The gate reads it, and no agent writes it |
+| The token names the tree hash of the pending change | The owner approves exact bytes |
+| The token expires in 300 s | A stale approval cannot unlock a later deploy |
+| The switch deletes the token before `nh` | One approval, one switch |
+| The switch recomputes the tree hash after `git add -A` | An edit after approval refuses, and the owner approves again |
+
+The tree hash comes from `git add -A` then `git write-tree`. A commit does not change it, and one
+edited file does.
+
+Set the approval modes explicitly as well. They guard every other dangerous pattern:
 
 ```nix
 approvals = {
@@ -134,41 +144,25 @@ approvals = {
 };
 ```
 
-## Layer 3: the diff review
+## The diff review
 
-The approve card holds a description and a command. It holds no patch. No client renders a diff
-inside an approval card.
+`ramsay-deploy-approve` prints three things, then writes the token: the diffstat against
+`origin/main`, the diff itself (first 500 lines), and the untracked file list. Read that output
+before you approve.
 
-### hermes-webui
+For a phone review, ask Hermes for `ramsay-deploy-diff` first. It prints the same diff. Put the
+output in a `diff` fence in the chat. The chat is the review surface now, because the token
+replaces the card.
 
-The web UI has the richest surface. Use it for a full review.
+### The order
 
-- `api/route_approvals.py` serves the approval cards.
-- The PWA manifest sets `display: standalone`. The Android home-screen app is this web UI.
-- The tree has an inline diff viewer, an SSE approval stream and queue tests.
+1. Hermes runs `ramsay-deploy-sync`. The clone commits, fetches, rebases, and updates submodules.
+2. Hermes runs `ramsay-deploy-diff`, and posts the output in a `diff` fence.
+3. Hermes calls `sudo /run/current-system/sw/bin/ramsay-deploy-switch`. The gate blocks it.
+4. The owner reads the diff, then runs `sudo /run/current-system/sw/bin/ramsay-deploy-approve`.
+5. Hermes retries the switch within 300 s. The wrapper checks the token and the tree, then switches.
 
-### Hermes Android client
-
-`rusty4444/hermes-android` (Dart) reads `gateway_approval_dialog.dart`. The card shows
-`request.description` and `request.command`, in monospace. The model `gateway_approval.dart`
-parses no diff field. There is no diff widget in `lib/`.
-
-The chat transcript is the review surface. It renders fenced code blocks with a copy button and a
-wrap toggle, and long lines scroll sideways. Links open in the browser.
-
-So the recipe posts the diff as a chat message first:
-
-1. Sync. `ramsay-deploy-sync` fetches `origin/main` and rebases.
-2. Run `ramsay-deploy-diff`. It prints `git diff HEAD` and the untracked file list.
-3. Post the output in a `diff` fence. Add the web UI URL of the same commit.
-4. Call `ramsay-deploy-switch`. The approve card appears with the diffstat.
-5. Approve on the phone or in the web UI. A deny, or no answer, stops the switch.
-
-### Optional: ntfy push
-
-`AhmetArif0/hermes-ntfy-approval` sends the card to a phone as a push message. It has the buttons
-Approve once, Approve for session and Deny. It needs `NTFY_APPROVAL_TOPIC` and, for a private
-server, `NTFY_APPROVAL_TOKEN`. Add it only if the app is often closed.
+A second switch needs a second approval.
 
 ## What defeats the gate
 
@@ -180,7 +174,7 @@ server, `NTFY_APPROVAL_TOKEN`. Add it only if the app is often closed.
 | Edit of `~/.hermes/config.yaml` | Nix merge replaces the Nix keys on the next switch |
 | `HERMES_MANAGED=true` plus `.managed` | Shell edits of Nix-owned keys are refused |
 | `security.approval.transport` set to a broken plugin | Transport error denies, unless the fallback is `builtin` |
-| Chat opened before the hook reached `config.yaml` | The worker registers hooks from the session snapshot. No hook, no card |
+| Chat opened before the hook reached `config.yaml` | The worker registers hooks from the session snapshot, so that chat has no gate. The token still holds |
 | Detached exec worker (`HERMES_AGENT` plus `HERMES_GATEWAY_DETACHED`) | Hermes ignores `{"action":"approve"}` there, and the call runs. `{"action":"block"}` does stop it |
 
 Two tests prove the last two rows. `scripts/hermes-gate-test.sh` spawns one turn on the local
@@ -211,21 +205,26 @@ guarantee. The Hermes layer is the convenience gate.
 
 | File | Holds |
 |---|---|
-| `dendritic/packages/ramsay-deploy.nix` | `ramsay-deploy-sync`, `ramsay-deploy-diff`, `ramsay-gate`, `ramsay-deploy-switch` |
+| `dendritic/packages/ramsay-deploy.nix` | `ramsay-deploy-sync`, `ramsay-deploy-diff`, `ramsay-deploy-tree`, `ramsay-gate`, `ramsay-deploy-approve`, `ramsay-deploy-switch` |
 | `dendritic/overlays.nix` | `pkgs.ramsayDeploy`, in `common-overlays` |
 | `dendritic/nixos-modules/hermes.nix` | approvals, hooks, deny globs, `extraPackages`, sudo rule, clone unit |
 | `dendritic/nixos-modules/hermes-skills/deploy/SKILL.md` | the five-step recipe for the agent |
+| `scripts/hermes-gate-test.sh` | one spawned Hermes turn, with the payload and the verdict |
+| `scripts/hermes-gate-tmux-test.sh` | the `block` against `approve` comparison |
 
 One manual step remains: deploy with `nh os switch`. The agent must not build this change itself.
 
 ## Verification
 
 ```sh
-# The wrapper is the only sudo path for hermes.
+# The wrapper is the only sudo path for hermes, and approve is absent.
 sudo -l -U hermes
-# The hook blocks when it fails, and escalates when it matches.
-hermes hooks list
-hermes hooks test pre_tool_call --tool terminal --input '{"command":"ramsay-deploy-switch"}'
+# The gate blocks the switch with no token, and it allows a benign call.
+printf '%s' '{"tool_name":"terminal","tool_input":{"command":"sudo /run/current-system/sw/bin/ramsay-deploy-switch"}}' \
+  | /run/current-system/sw/bin/ramsay-gate
+# A fresh approval writes the token, and hermes can read it.
+sudo /run/current-system/sw/bin/ramsay-deploy-approve
+ls -l /var/lib/ramsay-deploy/approval
 # The clone is a git-mode flake that evaluates.
 systemctl status hermes-nixconfig
 sudo -u hermes git -C /var/lib/hermes/NixConfig status --short
