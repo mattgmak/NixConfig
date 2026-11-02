@@ -178,7 +178,7 @@
             }
           },
           "contextWindow": 131072,
-          "maxTokens": 32768
+          "maxTokens": 16384
         },
         {
           "id": "halogen-flash-next-v2-abliterated",
@@ -206,7 +206,7 @@
             }
           },
           "contextWindow": 131072,
-          "maxTokens": 32768
+          "maxTokens": 16384
         },
         {
           "id": "gufo-flash-next",

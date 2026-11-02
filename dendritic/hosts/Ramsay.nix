@@ -204,6 +204,8 @@ in
       let
         halogenSignalPack = "/var/lib/inference/models/halogen-signal";
         halogenAbliterPack = "/var/lib/inference/models/halogen-abliter-v2";
+        halogenCacheRoot = "/var/lib/inference/halogen-cache";
+        halogenRecordRoot = "/var/lib/inference/halogen-records";
 
         # The two stacks differ in four values only. The rest is the tuning set
         # the bench ran with success.
@@ -214,6 +216,7 @@ in
             modelId,
             checkpoint,
             packDir,
+            stack,
           }:
           {
             image = "ghcr.io/peonist-ai/halogen-flash-server:0.18.22";
@@ -225,7 +228,11 @@ in
               "/dev/kfd"
               "/dev/dri"
             ];
-            volumes = [ "${packDir}:/models:ro" ];
+            volumes = [
+              "${packDir}:/models:ro"
+              "${halogenCacheRoot}/${stack}:/cache"
+              "${halogenRecordRoot}/${stack}:/records"
+            ];
             extraOptions = [
               "--group-add=keep-groups"
               "--ipc=host"
@@ -241,9 +248,20 @@ in
               HALOGEN_CTX = "131072";
               HALOGEN_MAX_TOK = "16384";
               HALOGEN_KV_SLOTS = "4";
-              HALOGEN_KV_POOL_POSITIONS = "262144";
+              # Each live conversation holds prompt + max_tokens between turns.
+              # Five agent conversations filled the old 262144 pool and evicted
+              # each other's prefix. KV8 halves a position's bytes, so 524288
+              # costs about 1 GiB more than the old pool did in bf16.
+              HALOGEN_KV8 = "1";
+              HALOGEN_KV_POOL_POSITIONS = "524288";
               HALOGEN_PROMPT_CACHE = "2";
-              HALOGEN_COMPOSABLE_CONTEXT = "1";
+              # A conversation the pool forgot restores from disk. This needs
+              # O_DIRECT, so the mount must not compress the files.
+              HALOGEN_CACHE_DIR = "/cache";
+              HALOGEN_CACHE_DISK_GIB = "64";
+              # Per-request lines, no prompt or reply text.
+              HALOGEN_RECORD_DIR = "/records";
+              HALOGEN_RECORD_TEXT = "none";
               # Parent plus forked subagents: keeps the parent's resume point
               # when two children store theirs. Raises the entry count to 32.
               HALOGEN_CACHE_BRANCHES = "3";
@@ -706,6 +724,15 @@ SEED
           '';
         };
 
+        # Each stack owns its cache and record directories. The cache subtree keys
+        # on build and settings, so a shared one would only mix them.
+        systemd.tmpfiles.rules = [
+          "d ${halogenCacheRoot}/signal 0750 root root -"
+          "d ${halogenCacheRoot}/abliter-v2 0750 root root -"
+          "d ${halogenRecordRoot}/signal 0750 root root -"
+          "d ${halogenRecordRoot}/abliter-v2 0750 root root -"
+        ];
+
         # One Halogen stack runs at a time: each maps a whole pack into graphics
         # memory, so a second start would evict the first anyway. Signal is the
         # resident main model, abliter-v2 waits for an explicit start.
@@ -718,6 +745,7 @@ SEED
               modelId = "halogen-flash-next-signal-abliterated";
               checkpoint = "/models/model.hgn";
               packDir = halogenSignalPack;
+              stack = "signal";
             };
             halogen-abliter-v2 = halogenContainer {
               enginePort = 8740;
@@ -725,6 +753,7 @@ SEED
               modelId = "halogen-flash-next-v2-abliterated";
               checkpoint = "/models/qwen38-flash-next-v2-abliterated.hgn";
               packDir = halogenAbliterPack;
+              stack = "abliter-v2";
             } // {
               autoStart = false;
             };
