@@ -118,7 +118,7 @@ pnpm --filter <package> test
 Rules to state in every brief:
 
 - Commit with a subject only. No body, no trailers.
-- Push the branch. Open no pull request. Merge nothing.
+- Push the branch. Open one pull request against the base. Merge nothing.
 - Run no simulator or device tooling.
 - Report the head sha, the changed files, and the exit code of each gate.
 
@@ -183,6 +183,35 @@ The shell policy denies `gh pr merge` and `gh pr close`. On route 1 the user mer
 
 Never take route 2 by default. Never take route 2 because a lane finished. Never mutate a pull request without an explicit request.
 
+## PR checks and conflicts
+
+A pull request at the gate holds three states. Read all three. A lane report is not one of them.
+
+```bash
+gh pr checks <pr>
+gh pr view <pr> --json mergeable,mergeStateStatus
+gh api graphql -f query='{repository(owner:"DrPOM-Medical",name:"tcm"){pullRequest(number:<pr>){reviewThreads(first:50){nodes{isResolved}}}}}' --jq '[.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)]|length'
+```
+
+| Result | Action |
+|---|---|
+| a check reads `fail` | run `gh run view <run-id> --log-failed`, name the failing job and test, send it to the lane |
+| `mergeable` reads CONFLICTING | send the rebase steps: fetch, rebase onto the base head, take the delete on a deleted file, force-push with `--force-with-lease` |
+| the thread count is above zero | run the CodeRabbit loop |
+| all pass, MERGEABLE, zero threads | report the gate |
+
+Rules for a red check:
+
+- A green local gate with a red CI run is a failed lane. Say so in the message.
+- Send the failing job, the test name, and the run url. Never send the whole log.
+- The `ci` check runs the turbo pipeline. Its error names a task, for example `tcm-app#test:unit`. Pass the task name to the lane.
+
+Rules for a stale artifact or a moved base:
+
+- Re-read all three states after every lane push. A fix can turn one green and another red.
+- A generated artifact stale against new data fails a repo test. Tell the lane to run the generator that the test runs. Never edit the test.
+- The base moves. A pull request that read MERGEABLE an hour ago can read CONFLICTING now.
+
 ## 9. Keep moving
 
 Do not wait for the user's merge gate. While a gate waits, rebase and stack the next branch. Spawn the lanes that the merge unblocks in the same turn.
@@ -232,7 +261,19 @@ Write one line of status per phase change.
 
 ## 15. Tracker
 
-Keep the wave todo list current. Set each ticket to Done in Linear with a comment. The comment names the pull request url, or the merge commit on route 2, and the evidence.
+Set the state at every lane milestone. Do not wait for the GitHub integration, and do not trust it alone.
+
+| Milestone | Linear state | Extra |
+|---|---|---|
+| lane spawned | `In Progress` | assignee `me` |
+| branch pushed, PR open | `In Review` | comment the PR url |
+| PR merged | `Done` | comment the merge commit, the head sha, and the gate exit codes |
+| lane blocked or parked | `Backlog` | comment the blocker |
+| scope split | unchanged | one comment on each ticket |
+
+Link the PR with `Fixes TECH-123` in the title only when the PR completes the ticket. Use `Refs TECH-123` for partial work.
+
+After a merge, read the ticket back and confirm the state. A ticket that still sits at `In Progress` after its PR merged is a stale tracker.
 
 ## 16. Escalate
 
