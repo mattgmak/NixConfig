@@ -34,25 +34,25 @@
   "debugLog": false,
 
   "model": {
-    "_comment": "Base model, tried after each stage chain. Nemotron 3 Ultra 550B free: strongest free reasoning, 1M window, 5115ms.",
+    "_comment": "Base model. Nemotron 3.5 Super VL free: 850ms, 1M window.",
     "provider": "openrouter",
-    "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "id": "nvidia/nemotron-3.5-super-vl:free",
     "thinking": "low",
     "cooldownHours": 2,
     "contextWindow": 1000000
   },
 
   "observerModel": {
-    "_comment": "Observer primary: Laguna XS 2.1 free. Fastest valid tool call in this run (494ms) with a 262k window.",
+    "_comment": "Observer 1: Nemotron 3.5 Super VL free. Fastest valid tool call (850ms), 1M window.",
     "provider": "openrouter",
-    "id": "poolside/laguna-xs-2.1:free",
+    "id": "nvidia/nemotron-3.5-super-vl:free",
     "thinking": "low",
     "cooldownHours": 2,
-    "contextWindow": 262144
+    "contextWindow": 1000000
   },
   "observerFallbackModels": [
     {
-      "_comment": "Fallback 2: Beam free (commandcode, 973ms, 1M window).",
+      "_comment": "Observer 2: Beam free (commandcode, 1098ms, 1M window).",
       "provider": "commandcode",
       "id": "reflection/beam:free",
       "thinking": "off",
@@ -60,23 +60,23 @@
       "contextWindow": 1048576
     },
     {
-      "_comment": "Fallback 3: Flint v1.0 free (982ms, 262k window).",
+      "_comment": "Observer 3: North Mini Code free (1202ms, 256k window).",
       "provider": "openrouter",
-      "id": "recursive/flint-v1.0:free",
+      "id": "cohere/north-mini-code:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 4: Nemotron 3.5 Super VL free (1109ms, 1M window).",
+      "_comment": "Observer 4: Dots 3 Note Preview free (1852ms, 512k window, reasoning).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-super-vl:free",
+      "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 1000000
+      "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 5: Nemotron 3.5 Lightning free (1252ms, 1M window).",
+      "_comment": "Observer 5: Nemotron 3.5 Lightning free (1895ms, 1M window).",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-lightning:free",
       "thinking": "low",
@@ -84,25 +84,33 @@
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 6: Laguna S 2.1 free (1533ms, 262k window).",
-      "provider": "openrouter",
-      "id": "poolside/laguna-s-2.1:free",
+      "_comment": "Observer 6: Iceman Contributor free (opencode-go, 2768ms, 262k window, reasoning).",
+      "provider": "opencode-go",
+      "id": "iceman-contributor-free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 7: LFM 2.5 2.6B free (482ms, 65k window). Last entry because the window is small.",
-      "provider": "openrouter",
-      "id": "liquid/lfm-2.5-2.6b:free",
+      "_comment": "Observer 7: Glyph Cluster free (commandcode, 3140ms, 256k window, reasoning).",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 65536
+      "contextWindow": 256000
+    },
+    {
+      "_comment": "Observer 8: Nemotron 3 Ultra 550B free. Slow probe (30982ms), so it stays last.",
+      "provider": "openrouter",
+      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
     }
   ],
 
   "reflectorModel": {
-    "_comment": "Reflector primary: Nemotron 3 Ultra 550B free. Strongest reasoning of the free models, 1M window covers the 80k input cap.",
+    "_comment": "Reflector 1: Nemotron 3 Ultra 550B free. Strongest free reasoning, 1M window covers the 80k input cap.",
     "provider": "openrouter",
     "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
     "thinking": "low",
@@ -111,15 +119,15 @@
   },
   "reflectorFallbackModels": [
     {
-      "_comment": "Fallback 2: Dots 3 Note Preview free (4903ms, 512k window, reasoning).",
-      "provider": "openrouter",
-      "id": "dots-studio/dots-3-note-preview:free",
+      "_comment": "Reflector 2: Iceman Contributor free (opencode-go, 2768ms, reasoning, 262k window).",
+      "provider": "opencode-go",
+      "id": "iceman-contributor-free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 512000
+      "contextWindow": 262144
     },
     {
-      "_comment": "Fallback 3: Glyph Cluster free (commandcode, 4012ms, reasoning, 256k window).",
+      "_comment": "Reflector 3: Glyph Cluster free (commandcode, 3140ms, reasoning, 256k window).",
       "provider": "commandcode",
       "id": "stealth/glyph-cluster:free",
       "thinking": "low",
@@ -127,50 +135,50 @@
       "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 4: Laguna S 2.1 free (commandcode, 2783ms, reasoning, 256k window).",
-      "provider": "commandcode",
-      "id": "poolside/laguna-s-2.1-free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 256000
-    },
-    {
-      "_comment": "Fallback 5: Iceman Contributor free (opencode-go, 2502ms, reasoning, 262k window).",
-      "provider": "opencode-go",
-      "id": "iceman-contributor-free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 262144
-    },
-    {
-      "_comment": "Fallback 6: North Mini Code free (1765ms, 256k window).",
+      "_comment": "Reflector 4: Dots 3 Note Preview free (1852ms, reasoning, 512k window).",
       "provider": "openrouter",
-      "id": "cohere/north-mini-code:free",
+      "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 256000
+      "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 7: Nemotron 3.5 Super VL free (1109ms, 1M window).",
+      "_comment": "Reflector 5: Nemotron 3.5 Super VL free (850ms, 1M window).",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-super-vl:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 1000000
+    },
+    {
+      "_comment": "Reflector 6: Nemotron 3.5 Lightning free (1895ms, 1M window).",
+      "provider": "openrouter",
+      "id": "nvidia/nemotron-3.5-lightning:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Reflector 7: Beam free (commandcode, 1098ms, 1M window).",
+      "provider": "commandcode",
+      "id": "reflection/beam:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1048576
     }
   ],
 
   "dropperModel": {
-    "_comment": "Dropper primary: Laguna XS 2.1 free. Retention decisions are cheap, so the fastest valid model wins.",
+    "_comment": "Dropper 1: Nemotron 3.5 Super VL free. Retention decisions are cheap, so the fastest valid model wins.",
     "provider": "openrouter",
-    "id": "poolside/laguna-xs-2.1:free",
+    "id": "nvidia/nemotron-3.5-super-vl:free",
     "thinking": "off",
     "cooldownHours": 2,
-    "contextWindow": 262144
+    "contextWindow": 1000000
   },
   "dropperFallbackModels": [
     {
-      "_comment": "Fallback 2: Beam free (commandcode, 973ms, 1M window).",
+      "_comment": "Dropper 2: Beam free (commandcode, 1098ms, 1M window).",
       "provider": "commandcode",
       "id": "reflection/beam:free",
       "thinking": "off",
@@ -178,23 +186,23 @@
       "contextWindow": 1048576
     },
     {
-      "_comment": "Fallback 3: Flint v1.0 free (982ms, 262k window).",
+      "_comment": "Dropper 3: North Mini Code free (1202ms, 256k window).",
       "provider": "openrouter",
-      "id": "recursive/flint-v1.0:free",
+      "id": "cohere/north-mini-code:free",
       "thinking": "off",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 256000
     },
     {
-      "_comment": "Fallback 4: Nemotron 3.5 Super VL free (1109ms, 1M window).",
+      "_comment": "Dropper 4: Dots 3 Note Preview free (1852ms, 512k window).",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-super-vl:free",
+      "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "off",
       "cooldownHours": 2,
-      "contextWindow": 1000000
+      "contextWindow": 512000
     },
     {
-      "_comment": "Fallback 5: Nemotron 3.5 Lightning free (1252ms, 1M window).",
+      "_comment": "Dropper 5: Nemotron 3.5 Lightning free (1895ms, 1M window).",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-lightning:free",
       "thinking": "off",
@@ -202,20 +210,20 @@
       "contextWindow": 1000000
     },
     {
-      "_comment": "Fallback 6: Laguna S 2.1 free (1533ms, 262k window).",
-      "provider": "openrouter",
-      "id": "poolside/laguna-s-2.1:free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 262144
-    },
-    {
-      "_comment": "Fallback 7: Iceman Contributor free (opencode-go, 2502ms, 262k window).",
+      "_comment": "Dropper 6: Iceman Contributor free (opencode-go, 2768ms, 262k window).",
       "provider": "opencode-go",
       "id": "iceman-contributor-free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 262144
+    },
+    {
+      "_comment": "Dropper 7: Glyph Cluster free (commandcode, 3140ms, 256k window).",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
+      "thinking": "off",
+      "cooldownHours": 2,
+      "contextWindow": 256000
     }
   ]
 }
