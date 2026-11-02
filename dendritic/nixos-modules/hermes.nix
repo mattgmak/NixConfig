@@ -10,7 +10,13 @@
     { config, lib, pkgs, ... }:
     let
       localBaseUrl = "http://127.0.0.1:9292/v1";
-      agentPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      # The flake input pins the release tag. The builder still names the package
+      # after its own default, so stamp the tag on the derivation.
+      hermesVersion = "0.22.5+canary.20261102T065013Z";
+      agentPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+        (_: {
+          version = hermesVersion;
+        });
     in
     {
       imports = [
@@ -24,6 +30,7 @@
       };
       services.hermes-agent = {
         enable = true;
+        package = agentPackage;
         # pi for coding work, and the Hermes user skill that teaches it to call
         # pi as a subagent. See dendritic/packages/pi-local-hermes.nix.
         # ramsayDeploy holds the deploy scripts. See
