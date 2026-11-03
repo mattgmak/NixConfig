@@ -63,6 +63,7 @@
             "pi-commandcode-provider"
             "pi-cursor-sdk"
             "pi-cursor-usage"
+            "pi-grok-bot"
             "pi-interactive-subagents"
             "pi-lean-ctx"
             "pi-markdown-preview"
