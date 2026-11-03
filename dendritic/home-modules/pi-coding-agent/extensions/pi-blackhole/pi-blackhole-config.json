@@ -2,7 +2,7 @@
   "compaction": "auto",
   "compactionEngine": "blackhole",
   "compactionSummaryMode": "default",
-  "tailBehavior": "minimal",
+  "tailBehavior": "pi-default",
   "midRunCompaction": "off",
   "skipForProviders": [],
   "compactAfterPreset": "optimized",
