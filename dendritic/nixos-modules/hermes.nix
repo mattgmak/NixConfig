@@ -41,14 +41,22 @@
           pkgs.ramsayDeploy
           pkgs.git
         ];
-        # types.package takes only a top-level store path or a derivation, so the
-        # nested vendor path needs builtins.path to give it a name. Hermes links
-        # the result as plugins/nix-managed-hermes-lean-ctx.
+        # types.package takes a derivation or a top-level store path. The nested
+        # vendor path fails that check, and its builtins.path form trips
+        # parseDrvName on newer Nix, so the plugin dir ships as a small
+        # derivation. Hermes links it as plugins/nix-managed-<name>.
         extraPlugins = [
-          (builtins.path {
-            name = "hermes-lean-ctx";
-            path = ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx;
-            filter = p: _: baseNameOf p != "__pycache__" && baseNameOf p != ".git";
+          (pkgs.stdenv.mkDerivation {
+            pname = "hermes-lean-ctx";
+            version = "0.1.0";
+            src = ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx;
+            dontUnpack = true;
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out
+              cp -r --no-preserve=mode $src/. $out/
+              runHook postInstall
+            '';
           })
         ];
         hermesHomeFiles = {
