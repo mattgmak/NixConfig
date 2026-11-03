@@ -156,17 +156,6 @@ in
     publicKeys = piRecipients;
   };
 
-  # Grok Bot routine webhook URL and key for the pi-grok-bot extension.
-  "grok-bot-webhook-url.age" = {
-    armor = true;
-    publicKeys = piRecipients;
-  };
-
-  "grok-bot-webhook-key.age" = {
-    armor = true;
-    publicKeys = piRecipients;
-  };
-
   "cline-api-key.age" = {
     armor = true;
     publicKeys = piRecipients;

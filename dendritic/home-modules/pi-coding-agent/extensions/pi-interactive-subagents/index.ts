@@ -9,7 +9,6 @@ const webAccessPath = join(loaderDir, "pi-web-access/index.ts");
 // Sibling extension dir — the loader lives in extensions/pi-interactive-subagents/,
 // so the adapter is one level up, not inside this folder.
 const mcpAdapterPath = join(loaderDir, "..", "pi-mcp-adapter", "index.ts");
-const grokBotPath = join(loaderDir, "..", "pi-grok-bot", "index.ts");
 
 registerToolExtension("web_search", webAccessPath);
 registerToolExtension("fetch_content", webAccessPath);
@@ -20,6 +19,5 @@ registerToolExtension("fetch_content", webAccessPath);
 // adapter back via `-e`, e.g. `tools: …, mcp, mcp__argent`.
 registerToolExtension("mcp", mcpAdapterPath);
 registerToolExtension("mcp__argent", mcpAdapterPath);
-registerToolExtension("ask_grok_bot", grokBotPath);
 
 export default subagentsDefault;

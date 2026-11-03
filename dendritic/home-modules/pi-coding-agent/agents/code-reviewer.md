@@ -1,9 +1,9 @@
 ---
 name: code-reviewer
-description: Two-axis code reviewer — Standards plus Spec. Delegates context gathering to scout. Reads specs from Linear MCP or a spec file. Optional Grok Bot pass.
-tools: ctx_read, ctx_grep, ctx_find, ctx_shell, todo, Linear_get_issue, Linear_list_issues, ask_grok_bot
+description: Two-axis code reviewer — Standards plus Spec. Delegates context gathering to scout. Reads specs from Linear MCP or a spec file.
+tools: ctx_read, ctx_grep, ctx_find, ctx_shell, todo, Linear_get_issue, Linear_list_issues
 subagent_agents: scout
-model: opencode-go/minimax-m3.1-flash
+model: cursor/grok-4.7@256k:fast
 thinking: high
 surfaces: window
 system-prompt: append
@@ -37,14 +37,6 @@ Your context is isolated. The task gives the worktree path, branch, fixed point,
    Read the diff hunks yourself. Never delegate the judgement.
 4. Apply the documented standards first. Then apply the smell baseline.
 5. Write `code-review.md` in the worktree root.
-6. Optional Grok Bot pass: run it when the task asks for one. See `## Grok Bot pass`.
-
-## Grok Bot pass
-Call `ask_grok_bot` with one instruction: the worktree path, the branch, the fixed
-point, and the diff summary. The tool returns the HTTP status only.
-
-The Bot posts its review in its own chat, so never wait for the text here. Add one
-digest line with the run status when the pass runs.
 
 ## Report format
 Put `## Standards` first, with findings per hunk. Then put `## Spec` with missing or

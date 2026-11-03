@@ -16,8 +16,6 @@
         CONTEXT7_API_KEY = "context7-api-key";
         GITHUB_MCP_TOKEN = "github-mcp-token";
         CURSOR_API_KEY = "cursor-api-key";
-        GROK_BOT_WEBHOOK_URL = "grok-bot-webhook-url";
-        GROK_BOT_WEBHOOK_KEY = "grok-bot-webhook-key";
         CLINE_API_KEY = "cline-api-key";
         CURSOR_USAGE_SESSION_TOKEN = "cursor-usage-session-token";
         DEEPSEEK_API_KEY = "deepseek-api-key";
