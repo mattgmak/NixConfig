@@ -41,13 +41,16 @@
           pkgs.ramsayDeploy
           pkgs.git
         ];
-        # lean-ctx as the context engine. The plugin is a thin adapter over the
-        # lean-ctx /v1 API; its config comes from LEANCTX_* env vars, not
-        # config.yaml, because each engine owns its own config namespace.
-        # The vendored integration dir holds plugin.yaml and __init__.py at its
-        # root, so the path is a valid extraPlugins entry (Hermes links it as
-        # plugins/nix-managed-hermes-lean-ctx).
-        extraPlugins = [ ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx ];
+        # types.package takes only a top-level store path or a derivation, so the
+        # nested vendor path needs builtins.path to give it a name. Hermes links
+        # the result as plugins/nix-managed-hermes-lean-ctx.
+        extraPlugins = [
+          (builtins.path {
+            name = "hermes-lean-ctx";
+            path = ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx;
+            filter = p: _: baseNameOf p != "__pycache__" && baseNameOf p != ".git";
+          })
+        ];
         hermesHomeFiles = {
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
           "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
