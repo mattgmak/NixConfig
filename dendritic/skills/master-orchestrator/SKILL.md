@@ -91,6 +91,8 @@ subagent {
 
 `peer` lists `surfaces: window, session`. A pane fails. A window dies with the parent. Always pass a dedicated session: `surface: "new-session:<name>"`, where `<name>` is the lane name. The user then finds each lane in its own tmux session.
 
+Every lane uses `peer`. A lane on any other profile is a defect, because only `peer` holds the full tool set: Linear, shell and the tracker. `worker` drops the Linear tools, so the lane cannot read its own ticket. Respawn such a lane, and paste the ticket text into the new brief.
+
 Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrives as a steer message.
 
 ## 4. Lane brief
@@ -117,6 +119,8 @@ pnpm --filter <package> test
 
 Rules to state in every brief:
 
+- Paste the ticket text and its acceptance list into the brief. A lane reads the tracker with its own Linear tools, and the paste is the second source.
+- Name the branch your pull request targets, when the branch is stacked.
 - Commit with a subject only. No body, no trailers.
 - Push the branch. Open one pull request against the base. Merge nothing.
 - Run no simulator or device tooling.
@@ -146,10 +150,14 @@ subagent_message { name: "lane-1424", message: "<remaining steps + report shape>
 
 ## 7. Review
 
-Spawn `code-reviewer` on the branch when the lane lands. Point it at the worktree and the Linear ticket.
+Spawn `code-reviewer` on the branch when the lane lands. Point it at the worktree, the pull request and the ticket.
+
+A `peer` reviewer is a defect. `code-reviewer` alone reviews. Send the spec source and a report path in the task.
+
+`code-reviewer` allows one surface: `window`. A `new-session` call fails. Spawn it in a window.
 
 ```text
-subagent { agent: "code-reviewer", name: "review-1424", cwd: "<worktree>", surface: "window", task: "<branch, base, ticket id>" }
+subagent { agent: "code-reviewer", name: "rev-1424", cwd: "<worktree>", surface: "window", task: "<PR number, base, ticket id, spec = Linear ticket, report path>" }
 ```
 
 Send every fault back to the same lane with `subagent_message`. Name the file and the line. Repeat until the review passes.
@@ -196,7 +204,7 @@ gh api graphql -f query='{repository(owner:"DrPOM-Medical",name:"tcm"){pullReque
 | Result | Action |
 |---|---|
 | a check reads `fail` | run `gh run view <run-id> --log-failed`, name the failing job and test, send it to the lane |
-| `mergeable` reads CONFLICTING | send the rebase steps: fetch, rebase onto the base head, take the delete on a deleted file, force-push with `--force-with-lease` |
+| `mergeable` reads CONFLICTING | send the rebase steps: fetch, rebase onto the base head, take the delete on a deleted file, force-push with `--force-with-lease`. A stacked branch rebases onto its new base, not onto the old lower branch |
 | the thread count is above zero | run the CodeRabbit loop |
 | all pass, MERGEABLE, zero threads | report the gate |
 
@@ -214,11 +222,50 @@ Rules for a stale artifact or a moved base:
 
 ## 9. Keep moving
 
-Do not wait for the user's merge gate. While a gate waits, rebase and stack the next branch. Spawn the lanes that the merge unblocks in the same turn.
+Do not wait for the user's merge gate. While a gate waits, stack the next branch and spawn the lanes that the merge unblocks.
+
+### Stack a dependent branch
+
+A lower pull request waits at the gate. A higher ticket needs its code. Stack the higher branch on the lower branch head. Do not hold the higher lane.
+
+```bash
+git fetch origin <lower-branch>
+git -C <worktree> reset --hard origin/<lower-branch>
+gh pr create --base <lower-branch> --head <higher-branch> --title "<ticket id>: <title>"
+```
+
+Name the chain in Linear on both tickets. Write the chain bottom first, for example `#152 <- #160`.
+
+Rules:
+
+- One dependency level per stack. A three-deep chain waits for a user word.
+- A reviewer reads the diff against the lower branch. Call that verdict provisional.
+- Only the bottom pull request names `mattmak/meal-plan-agent` as its base.
+
+### Unstack after a merge
+
+The lower pull request lands. Retarget and rebase the higher branch in the same turn.
+
+```bash
+git fetch origin
+git -C <worktree> rebase origin/mattmak/meal-plan-agent
+git -C <worktree> push --force-with-lease
+gh pr edit <pr> --base mattmak/meal-plan-agent
+```
+
+Then run the lane gates, spawn a fresh review on the new diff, and read all three gate states. A provisional verdict does not carry.
+
+### Fix a conflict
+
+1. Read both sides. Name the fact each side adds.
+2. Keep the union. Never take one side blind, and never drop another ticket's work.
+3. Where the two sides disagree on a rule, stop and escalate. A conflict is not a licence to change a contract.
+4. Run the gates after the resolve.
+5. Force-push with `--force-with-lease`.
 
 ## 10. Unblock chain
 
-After each merge, list the tickets that merge unblocks. Start their lanes in the same turn.
+After each merge, list the tickets that merge unblocks. Start their lanes in the same turn. Unstack every pull request that sat above the merged one.
 
 Record the scope split in Linear when one ticket ships code and a second ticket ships data.
 
