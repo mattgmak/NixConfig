@@ -41,6 +41,13 @@
           pkgs.ramsayDeploy
           pkgs.git
         ];
+        # lean-ctx as the context engine. The plugin is a thin adapter over the
+        # lean-ctx /v1 API; its config comes from LEANCTX_* env vars, not
+        # config.yaml, because each engine owns its own config namespace.
+        # The vendored integration dir holds plugin.yaml and __init__.py at its
+        # root, so the path is a valid extraPlugins entry (Hermes links it as
+        # plugins/nix-managed-hermes-lean-ctx).
+        extraPlugins = [ ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx ];
         hermesHomeFiles = {
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
           "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
@@ -89,6 +96,33 @@
             base_url = localBaseUrl;
             context_length = 131072;
           };
+          # The active context engine. lean-ctx replaces the built-in
+          # ContextCompressor, so the compression.* keys below stay inert until
+          # this reverts to "compressor".
+          context.engine = "lean-ctx";
+          # Built-in compressor tuning. A sub-512K window floors threshold at
+          # 0.75, so compaction fires at 98304 tokens here. protect_first_n = 0
+          # keeps only the system prompt plus the rolling summary, and three real
+          # user turns stay verbatim so bulky tool output cannot evict them.
+          compression = {
+            enabled = true;
+            threshold = 0.75;
+            min_tail_user_messages = 3;
+            protect_first_n = 0;
+            hygiene_max_turn_hold_seconds = 300;
+            proactive_prune_tokens = 48000;
+          };
+          # The summariser inherits the resident model (provider "auto"), so
+          # llama-swap never swaps for a compaction call. context_length pins the
+          # real 131072 window instead of the 200000 default, which is what sizes
+          # the summary. The 300s timeout covers a local model's latency.
+          auxiliary.compression = {
+            provider = "auto";
+            model = "";
+            base_url = "";
+            context_length = 131072;
+            timeout = 300;
+          };
           # The webui reads this from the same config.yaml. Without it the
           # Dashboard link points at the loopback probe URL.
           webui.dashboard = {
@@ -131,6 +165,20 @@
           # The API server answers 403 to any request that carries an Origin
           # header while this list stays empty.
           API_SERVER_CORS_ORIGINS = "https://hermes-api.dab-octatonic.ts.net,https://ramsay.dab-octatonic.ts.net";
+          # lean-ctx engine settings. The plugin reads its whole config from this
+          # namespace (config.py), and the port is the `lean-ctx serve` tools API,
+          # not the LLM proxy. update_model() overrides the window on model
+          # switch, so the value here only covers the start of a session.
+          # CORE_COMPACTION and ENABLE_TOOLS stay off: both need the `leanctx`
+          # Python SDK in the sealed venv, and nixpkgs has no python3Packages
+          # entry for it. Add it through extraPythonPackages, then flip both to 1
+          # and point a `lean-ctx serve` instance at 8080 for the hermes user.
+          # With them off, the engine runs its own Python compaction.
+          LEANCTX_BASE_URL = "http://127.0.0.1:8080";
+          LEANCTX_CONTEXT_LENGTH = "131072";
+          LEANCTX_THRESHOLD_FRACTION = "0.75";
+          LEANCTX_CORE_COMPACTION = "0";
+          LEANCTX_ENABLE_TOOLS = "0";
         };
         environmentFiles = [ config.age.secrets."hermes-env".path ];
         # A non-loopback dashboard bind refuses to start without a registered
