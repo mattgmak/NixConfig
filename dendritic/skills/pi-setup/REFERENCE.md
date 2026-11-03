@@ -318,6 +318,7 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | `pi-nvim-bridge` (`vendor/mattgmak/pi-nvim-bridge`) | `mattgmak/pi-nvim-bridge` | `https://github.com/dabstractor/pi-nvim-bridge.git` | `main` |
 | `pi-autoname` (`vendor/mattgmak/pi-autoname`) | `mattgmak/pi-autoname` | `https://github.com/ssdiwu/pi-autoname.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
+| `pi-prompt-frecency` (`vendor/mattgmak/pi-prompt-frecency`) | `mattgmak/pi-prompt-frecency` | *(your repo — no separate upstream)* | `main` |
 
 Add new rows here when vendoring through a fork.
 
@@ -656,6 +657,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Subagent agent profiles | `dendritic/home-modules/pi-coding-agent/agents/*.md` |
 | Add/update extension | `vendor/<owner>/<name>/` + loader dir in `extensions/` (loader index.ts uses `../vendor/...`) |
 | Register submodule | `.gitmodules` + `git submodule add <url> vendor/<owner>/<name>` |
+| Extension shortcut conflict | `dendritic/home-modules/pi-coding-agent/keybindings.json`. `pi` keeps a reserved list of built-in actions in `runner.js`. A matching extension shortcut is skipped. Set the built-in to `[]` to free the key |
 | Bump pi package | `dendritic/packages/pi-bolt.nix` (version + both platform hashes) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes) |
 | Bump engram binary (keep in sync with ext) | `dendritic/packages/engram.nix` (see Engram ext/bin version sync) |
 | pi package overlay | `dendritic/overlays.nix` (pi-coding-agent = pi-bolt swap, `piCompiled` on x86_64-linux and aarch64-darwin) |
