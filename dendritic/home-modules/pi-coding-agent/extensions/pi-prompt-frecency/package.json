@@ -1,0 +1,10 @@
+{
+  "name": "pi-prompt-frecency",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Frecency-ranked prompt store and fuzzy picker (from mattgmak/pi-prompt-frecency)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

@@ -104,3 +104,6 @@
 [submodule "pasky/pi-ssh-image-clipboard"]
 	path = vendor/pasky/pi-ssh-image-clipboard
 	url = https://github.com/pasky/pi-ssh-image-clipboard
+[submodule "mattgmak/pi-prompt-frecency"]
+	path = vendor/mattgmak/pi-prompt-frecency
+	url = https://github.com/mattgmak/pi-prompt-frecency.git
