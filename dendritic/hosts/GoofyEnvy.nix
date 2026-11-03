@@ -33,7 +33,7 @@
       }
     );
 
-    homeConfigurations.GoofyEnvy = {
+    homeConfigurations.GoofyEnvy = { pkgs, ... }: {
       imports = with self.homeModules; [
         nixos-home
         atuin
@@ -84,11 +84,30 @@
         enable = true;
         asrBaseUrl = "https://asr.dab-octatonic.ts.net";
       };
+
+      # pi-clip server: ssh -R localhost:7779 lands here and gets one PNG back. With
+      # Accept set, systemd runs the template named after the socket once per
+      # connection and passes that connection in as fd 3. ExecStart needs bash for
+      # the >&3 redirect, and it picks the live Wayland socket by newest mtime
+      # because the user manager starts before Hyprland exports WAYLAND_DISPLAY.
+      systemd.user.sockets.pi-clip-serve = {
+        Unit.Description = "pi-clip clipboard server socket";
+        Socket.ListenStream = "127.0.0.1:7779";
+        Socket.Accept = true;
+        Install.WantedBy = [ "sockets.target" ];
+      };
+
+      systemd.user.services."pi-clip-serve@" = {
+        Unit.Description = "pi-clip clipboard server for one connection";
+        Service.ExecStart = "${pkgs.bash}/bin/bash -c 'export WAYLAND_DISPLAY=$(cd /run/user/$UID && ls -1t | grep -m1 ^wayland-) && exec ${pkgs.wl-clipboard}/bin/wl-paste -t image/png >&3'";
+        Service.Type = "oneshot";
+      };
     };
 
     nixosModules.GoofyEnvy =
       {
         pkgs,
+        lib,
         username,
         common-overlays,
         common-nixpkgs-config,
@@ -105,6 +124,20 @@
         ];
 
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
+
+        # The FQDN joins the pattern because ssh applies a Host block only when its
+        # pattern matches the name typed on the command line. common.nix already
+        # sets extraConfig, so append with mkAfter.
+        programs.ssh.extraConfig = lib.mkAfter ''
+          Host ramsay ramsay.dab-octatonic.ts.net
+            User agent
+            ControlMaster auto
+            ControlPath ~/.ssh/cm-%r@%h:%p
+            ControlPersist yes
+            ServerAliveInterval 30
+            RemoteForward /home/agent/.pi-clip/envy.sock localhost:7779
+            SetEnv LC_PI_CLIP=envy
+        '';
 
         environment.systemPackages = with pkgs; [
           inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.agenix

@@ -99,9 +99,9 @@
       # template named after the socket, pi-clip-serve@.service, once per
       # connection, and passes that connection in as fd 3.
       #
-      # The user manager starts before Hyprland, so the unit names the Wayland
-      # socket by hand. ExecStart needs bash because systemd runs it directly and
-      # cannot interpret the >&3 redirect on its own.
+      # ExecStart needs bash for the >&3 redirect, and it finds the Wayland socket
+      # by newest mtime because the user manager starts before Hyprland exports
+      # WAYLAND_DISPLAY.
       systemd.user.sockets.pi-clip-serve = {
         Unit.Description = "pi-clip clipboard server socket";
         Socket.ListenStream = "127.0.0.1:7779";
@@ -111,8 +111,7 @@
 
       systemd.user.services."pi-clip-serve@" = {
         Unit.Description = "pi-clip clipboard server for one connection";
-        Service.Environment = "WAYLAND_DISPLAY=wayland-1";
-        Service.ExecStart = "${pkgs.bash}/bin/bash -c 'exec ${pkgs.wl-clipboard}/bin/wl-paste -t image/png >&3'";
+        Service.ExecStart = "${pkgs.bash}/bin/bash -c 'export WAYLAND_DISPLAY=$(cd /run/user/$UID && ls -1t | grep -m1 ^wayland-) && exec ${pkgs.wl-clipboard}/bin/wl-paste -t image/png >&3'";
         Service.Type = "oneshot";
       };
     };
