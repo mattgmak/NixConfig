@@ -1,12 +1,14 @@
 ---
 name: master-orchestrator
-description: Run many Linear tickets in parallel through peer lanes, review, and merge. Use when user says "orchestrate", "run the wave", "master orchestrator", hands over a batch of tickets, or asks for parallel lanes with review and merge gates.
-argument-hint: "[ticket ids or wave name] — Linear tickets to run, e.g. TECH-1424 TECH-1431"
+description: Run many Linear tickets in parallel through peer lanes, review, and merge. Use when the user says "orchestrate", "run the wave", or hands over a batch of tickets. The `update` argument is a sub-command. It rewrites this skill and runs no wave.
+argument-hint: "[ticket ids or wave name] — Linear tickets to run, e.g. TECH-1424 TECH-1431 | update — rewrite this skill"
 ---
 
 # Master Orchestrator
 
 You plan, spawn, check, and merge. You read no source file. Every read, write, and test run goes to a lane. Your context stays small.
+
+The argument decides the mode. `update` is a sub-command: it updates this skill and starts no wave. Any other argument is a wave of tickets. No argument asks the user which mode to run.
 
 ## Session shape
 
@@ -123,7 +125,8 @@ Rules to state in every brief:
 - Name the branch your pull request targets, when the branch is stacked.
 - Commit with a subject only. No body, no trailers.
 - Push the branch. Open one pull request against the base. Merge nothing.
-- Run no simulator or device tooling.
+- Run no simulator or device tooling. The orchestrator owns the evidence step.
+- Name each surface the diff touches: a screen, a query, a mutation, or a schema table.
 - Report the head sha, the changed files, and the exit code of each gate.
 
 Completion criterion: the lane reports a head sha, a changed file list, and one exit code per gate.
@@ -207,6 +210,7 @@ gh api graphql -f query='{repository(owner:"DrPOM-Medical",name:"tcm"){pullReque
 | `mergeable` reads CONFLICTING | send the rebase steps: fetch, rebase onto the base head, take the delete on a deleted file, force-push with `--force-with-lease`. A stacked branch rebases onto its new base, not onto the old lower branch |
 | the thread count is above zero | run the CodeRabbit loop |
 | all pass, MERGEABLE, zero threads | report the gate |
+| the body holds no `## Evidence` or `## Verification` block, and the diff touches UI, Convex code, or app logic | send the evidence brief from section 16 |
 
 Rules for a red check:
 
@@ -322,7 +326,47 @@ Link the PR with `Fixes TECH-123` in the title only when the PR completes the ti
 
 After a merge, read the ticket back and confirm the state. A ticket that still sits at `In Progress` after its PR merged is a stale tracker.
 
-## 16. Escalate
+## 16. UI and sandbox evidence
+
+A pull request that changes app UI carries visual proof. A pull request that changes Convex backend code or app logic carries sandbox proof. Never open the review without it.
+
+| Change | Evidence |
+|---|---|
+| static element, layout, or copy | one screenshot per changed state |
+| dynamic or behaviour change | one clip of 20 seconds or less |
+| Convex schema, query, mutation, or action | one sandbox run that exercises the change, with its result |
+| app logic without a visible surface | one sandbox run that shows the new value or path |
+| both UI and logic | every artifact above |
+
+Steps for UI:
+
+1. Ask the user before the first simulator command. The repo forbids an automatic run.
+2. Start the sandbox and read the origin rule in `docs/agents/sandbox.md`.
+3. Lease a simulator from the manzanas fleet. Install the dev client. Launch the app.
+4. Drive the screens with `argent` on the leased device. Record the trigger twice: before and after.
+5. Save each artifact under `/tmp/agent-tmp/<project>/evidence/<ticket>/`.
+6. Commit a screenshot when it aids later review. GitHub holds no clip in a diff, so link the clip.
+7. Add an `## Evidence` block to the body. Name the artifact, the screen, and the proof it gives.
+
+Steps for backend and app logic:
+
+1. Start the sandbox on the lane branch: `pnpm sandbox:up`. Read the status output before you trust it.
+2. Seed a participant through the sandbox tools. Use the onboarding fixture, not a hand-made row.
+3. Run the changed path. Call the query, send the mutation, or open the screen that reads it.
+4. Capture the request, the response, and the stored document. Save the log or the screenshot under `/tmp/agent-tmp/<project>/evidence/<ticket>/`.
+5. Add a `## Verification` block to the body. State the command or tap path, the observed result, the sandbox id, and one exit code per gate.
+6. Stop the sandbox and say so in the report.
+
+Rules:
+
+- The proof shows the real app on a real simulator, against the real sandbox. A mock or a web build is a defect.
+- Replace every network identifier with a placeholder such as `sandbox-host` or `simulator-1`.
+- A clip keeps the dish, the value, or the state on screen long enough to read.
+- A pull request without proof waits at the gate. Name the missing artifact.
+- A green unit test does not replace the sandbox run. Say which claim the run settles.
+- Release the lease and stop the sandbox after the capture.
+
+## 17. Escalate
 
 Ask the user only for these:
 
@@ -334,16 +378,24 @@ Ask the user only for these:
 
 Everything else runs without a question.
 
-## 17. Voice
+## 18. Voice
 
 Reply terse. Use Simplified Technical English in every reply, comment, document, and commit message. A commit carries a subject only.
 
-## Keep this skill current
+## Sub-command: update
 
-The workflow changes. When the conversation shows a new step, a new gate, or a dead rule, this skill is stale.
+`/skill:master-orchestrator update` is a sub-command. It rewrites this file. It starts no lane, opens no pull request and touches no ticket.
 
-You may spawn a peer on `~/NixConfig` to update this skill.
+Steps:
 
-Ask the user first, every time. Show the proposed change before the peer writes it. Wait for approval.
+1. Read this file and the corrections from the last wave.
+2. Fold each correction into the section it belongs to. Keep the section order and the voice.
+3. Show the user the proposed change, section by section. Wait for approval.
+4. Write the file after approval. Report each section you changed.
+5. Leave a rule in place when the user rejects it, and say why it stays.
 
-Path: `dendritic/skills/master-orchestrator/SKILL.md`.
+A wave session learns a new step, a new gate or a dead rule. Fold it into the file in the same turn. Do not hold a correction for the next update.
+
+Ask the user first, every time.
+
+Path: `dendritic/skills/master-orchestrator/SKILL.md`. Spawn a peer on `~/NixConfig` when the edit touches more than two sections.
