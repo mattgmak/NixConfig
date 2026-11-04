@@ -57,6 +57,7 @@
             "pi-agent-sesh"
             "pi-autoname"
             "pi-away"
+            "pi-balance"
             "pi-blackhole"
             "pi-caveman"
             "pi-codegraph"

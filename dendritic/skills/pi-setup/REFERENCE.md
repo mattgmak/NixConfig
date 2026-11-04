@@ -180,6 +180,7 @@ No patch remains. 1.0.5 compile maps `@sinclair/typebox` and the other Pi module
 |----------|--------|
 | `pi-lean-ctx` compiled in, with a writable dir | its factory wants a schema cache beside its config |
 | `pi-clinepass-provider` re-added (jellydn 1.7.0) | ClinePass returns to the roster. d308592 dropped it for compile scoping, not for a defect ([selection](#clinepass-provider-selection-4-nov-2026)) |
+| `pi-balance` added (first-party) | Registers `balance/deepseek-v4.1-flash`, one model id that spreads usage over the three subscriptions ([details](#balance-virtual-model-4-nov-2026)) |
 | `mcp-nixos` loader removed, `nixos` MCP server added | the generated store path from nixpkgs `mcp-nixos` pins the server. `mcp.json` is the human-edited source |
 
 ### ClinePass provider selection (4 Nov 2026)
@@ -197,6 +198,25 @@ The earlier removal (d308592) came from compile scoping, not from a defect.
 Auth sources, tried in order: `CLINE_API_KEY`, `~/.cline/data/settings/providers.json` (WorkOS OAuth from the Cline CLI), then `~/.pi/agent/auth.json`. The repo secret is `secrets/cline-api-key.age`. `CLINE_API_BASE` overrides the endpoint, default `https://api.cline.bot`.
 
 Model ids sit under provider `clinepass` with a `cline-pass/` model prefix: `pi --model clinepass/cline-pass/deepseek-v4.1-flash-1017`.
+
+### Balance virtual model (4 Nov 2026)
+
+`pi-balance` is a first-party extension: the code sits in the loader dir, with no submodule. It registers the virtual model `balance/deepseek-v4.1-flash` through `pi.registerVirtualModel`. Its `route()` runs before each request and returns the physical model with the most headroom.
+
+| Route | Physical model | Quota probe |
+|-------|----------------|-------------|
+| Command Code GOAT | `commandcode/deepseek/deepseek-v4.1-flash` | `GET https://api.commandcode.ai/alpha/billing/credits` |
+| OpenCode Go | `opencode-go/deepseek-v4.1-flash` | `GET https://opencode.ai/zen/go/v1/usage` |
+| ClinePass | `clinepass/cline-pass/deepseek-v4.1-flash-1017` | `GET https://api.cline.bot/api/v1/users/me/plan/usage-limits` |
+
+Each probe returns the percentage used in the tightest window. Command Code also reports remaining credits, and a balance under `$0.01` marks that route exhausted. Probes run when the extension loads and refresh at most once per minute. `route()` reads the cache, so a slow API never blocks a request beyond the first one.
+
+Routing rules:
+
+- `retry`: drop the failed route and cool it down until its window resets, or ten minutes when the API reports no reset.
+- `continuation`: keep the previous route while it stays open. A switch costs one prompt-cache miss.
+- `user`: keep the previous route while it sits within 20 points of the best route, otherwise take the best one.
+- Every route exhausted: use any route with credentials, so the request still runs.
 
 ### Failure signatures
 

@@ -1,0 +1,10 @@
+{
+  "name": "pi-balance",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "First-party virtual model balance/deepseek-v4.1-flash that spreads usage over Command Code, OpenCode Go, and ClinePass",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
