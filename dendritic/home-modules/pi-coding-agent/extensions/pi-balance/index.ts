@@ -2,9 +2,10 @@
  * Balance provider: one model id that spreads usage over every subscription
  * that serves DeepSeek V4.1 Flash.
  *
- * Register `balance/deepseek-v4.1-flash` as a virtual model. `route` runs
- * before each request, reads cached quota snapshots, and returns the physical
- * model with the most headroom. Sticky routing keeps prompt caches warm.
+ * Register `balance/deepseek-v4.1-flash` as a virtual model. `route` picks the
+ * least used route on the first request and keeps it for the whole session. A
+ * route changes only when it exhausts or fails, because every switch costs a
+ * prompt-cache miss.
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -20,7 +21,6 @@ import {
 const CACHE_TTL_MS = 60_000;
 const FIRST_WAIT_MS = 4_000;
 const FALLBACK_COOLDOWN_MS = 600_000;
-const HYSTERESIS_PERCENT = 20;
 const UNKNOWN_PERCENT = 100.5;
 
 interface Route {
@@ -78,7 +78,8 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Order the routes best first. Closed routes (failed, cooling down, or
- * exhausted) drop out, and an empty result falls back to every other route.
+ * exhausted) drop out, and an empty result falls back to every other route. A
+ * session keeps its current route while that route stays open.
  */
 function rank(
   reason: string,
@@ -98,10 +99,7 @@ function rank(
   if (reason === "retry" || reason === "direct" || !previousKey) return open;
   const sticky = open.find((route) => route.key === previousKey);
   if (!sticky) return open;
-  const keep =
-    reason === "continuation" ||
-    percentOf(quotas, previousKey) <= percentOf(quotas, open[0].key) + HYSTERESIS_PERCENT;
-  return keep ? [sticky, ...open.filter((route) => route !== sticky)] : open;
+  return [sticky, ...open.filter((route) => route !== sticky)];
 }
 
 export default function (pi: ExtensionAPI) {
