@@ -95,7 +95,7 @@ Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at 
 
 `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux and aarch64-darwin. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it on both systems, and at `packages.pi` (plain 1.0.4) on the others.
 
-The package compiles 31 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
+The package compiles 35 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
 
 ### Package shape
 
@@ -179,8 +179,24 @@ No patch remains. 1.0.5 compile maps `@sinclair/typebox` and the other Pi module
 | Decision | Reason |
 |----------|--------|
 | `pi-lean-ctx` compiled in, with a writable dir | its factory wants a schema cache beside its config |
-| `pi-clinepass-provider` removed | no loader or `.gitmodules` entry remains, so the set holds no cline provider |
+| `pi-clinepass-provider` re-added (jellydn 1.7.0) | ClinePass returns to the roster. d308592 dropped it for compile scoping, not for a defect ([selection](#clinepass-provider-selection-4-nov-2026)) |
 | `mcp-nixos` loader removed, `nixos` MCP server added | the generated store path from nixpkgs `mcp-nixos` pins the server. `mcp.json` is the human-edited source |
+
+### ClinePass provider selection (4 Nov 2026)
+
+Cline has no first-party pi package. Three community packages register Cline as a pi provider. `pi-clinepass-provider` (jellydn) is the pick.
+
+| Package | Version | Weekly downloads | Verdict |
+|---------|---------|------------------|---------|
+| `pi-clinepass-provider` (jellydn) | 1.7.0, 2 Nov 2026 | 280 | Chosen: CI, per-module unit tests, `npm run test:e2e` against the live gateway, `npm run check:catalog` diff against Cline's `recommended-models` feed, 0 dependencies and 2 peers, explicit `cline-pass/deepseek-v4.1-flash-1017` id |
+| `@maxpaulus/pi-cline` | 0.9.1, 14 Aug 2026 | 47 | Also registers the `cline` provider and `/cline-org`. Reads the live `clinePass` list with a bundled fallback. Last publish sits three months before the pick |
+| `pi-clinepass` (fifidayone) | 0.1.7, 1 Oct 2026 | 47 | Reports the 5-hour, weekly, and monthly plan caps plus price calibration. README shows `npm test` and `npm run typecheck`, with no CI badge |
+
+The earlier removal (d308592) came from compile scoping, not from a defect.
+
+Auth sources, tried in order: `CLINE_API_KEY`, `~/.cline/data/settings/providers.json` (WorkOS OAuth from the Cline CLI), then `~/.pi/agent/auth.json`. The repo secret is `secrets/cline-api-key.age`. `CLINE_API_BASE` overrides the endpoint, default `https://api.cline.bot`.
+
+Model ids sit under provider `clinepass` with a `cline-pass/` model prefix: `pi --model clinepass/cline-pass/deepseek-v4.1-flash-1017`.
 
 ### Failure signatures
 

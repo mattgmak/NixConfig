@@ -60,6 +60,7 @@
             "pi-blackhole"
             "pi-caveman"
             "pi-codegraph"
+            "pi-clinepass-provider"
             "pi-commandcode-provider"
             "pi-cursor-sdk"
             "pi-cursor-usage"

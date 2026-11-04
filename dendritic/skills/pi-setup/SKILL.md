@@ -16,7 +16,7 @@ Pi runs via Home Manager + `coding-agents` flake module: extensions/skills live 
 
 ## Compiled host (`piCompiled`)
 
-On x86_64-linux and aarch64-darwin `pi` runs `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`), not the plain binary. That package compiles 31 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
+On x86_64-linux and aarch64-darwin `pi` runs `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`), not the plain binary. That package compiles 35 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
 
 **The rule that decides everything.**
 
@@ -24,7 +24,7 @@ The compiler records the absolute path of each extension and a fingerprint of fi
 
 | Command | Binary | Loaders |
 |---------|--------|---------|
-| `pi` | `packages.piCompiled` | 31 compiled names from the store tree |
+| `pi` | `packages.piCompiled` | 35 compiled names from the store tree |
 | `pi-stock` | `packages.pi`, plain 1.0.4 | every loader from the repo tree, for extension development |
 
 **Rebuild trigger.** Any edit to a compiled extension, its deps, or the extension list needs `nh`. Such an edit is not live after `/reload`. `pi-permission-system` and `pi-lean-ctx` stay writable, so their own log and cache files still land at run time.

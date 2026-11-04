@@ -107,3 +107,6 @@
 [submodule "mattgmak/pi-prompt-frecency"]
 	path = vendor/mattgmak/pi-prompt-frecency
 	url = https://github.com/mattgmak/pi-prompt-frecency.git
+[submodule "jellydn/pi-clinepass-provider"]
+	path = vendor/jellydn/pi-clinepass-provider
+	url = https://github.com/jellydn/pi-clinepass-provider
