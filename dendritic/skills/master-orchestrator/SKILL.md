@@ -38,21 +38,47 @@ Then the orchestrator starts the wave and treats those decisions as rulings.
 | pass the tickets and the open facts | ask the user for a fact a scout can find |
 | take the settled rulings into the wave | hold the wave until the grill ends |
 
-## CodeRabbit loop
+## Lane watch
 
-Run this loop after a lane opens a pull request.
+One `ctx_bg` job watches each open lane. Name the job `lane-watch #<pr>`.
 
-1. Start the watch with `ctx_bg`. The timeout is 20 minutes:
-
-```bash
-bash ~/NixConfig/dendritic/skills/master-orchestrator/watch-coderabbit.sh <pr> DrPOM-Medical/tcm 1200
+```text
+ctx_bg {
+  name:    "lane-watch #152",
+  command: "bash ~/NixConfig/dendritic/skills/master-orchestrator/watch-lane.sh 152 DrPOM-Medical/tcm 3000",
+  wake_on: "^(FOUND|CONFLICT|MERGED|CLOSED) ",
+  timeout_ms: 3300000
+}
 ```
 
-2. The script exits on one of four states: `FOUND` new unresolved threads, `RATE_LIMIT`, `TIMEOUT`, or `CLOSED`.
-3. On `FOUND`, send each thread to the lane: file, line, fault, and the fix. The lane fixes, gates, pushes, and resolves the thread. Start the watch again.
-4. On `RATE_LIMIT`, stop the loop. Report the limit to the user.
-5. On `TIMEOUT`, the pull request holds no new CodeRabbit thread. Report it at the gate.
-6. Never poll by hand. The script holds the loop.
+The script prints one state line first, then exits. Read the line and act.
+
+| Line | Meaning | Action |
+|---|---|---|
+| `STANDING n` | unresolved threads at start | sweep them before you trust a clean gate |
+| `FOUND n` | new unresolved CodeRabbit threads | send each thread to its lane: file, line, fault, fix |
+| `CONFLICT` | `mergeable` reads CONFLICTING | send the rebase steps |
+| `MERGED` | the pull request merged | unstack, sweep, set the ticket to Done |
+| `CLOSED` | closed with no merge | ask the user |
+| `RATE_LIMIT` | CodeRabbit reports a limit | note the limit. The watch keeps looking for `MERGED` and `CONFLICT`. The line does not wake you |
+| `TIMEOUT` | no new state inside the window | report the pull request at the gate |
+
+Every state exits 0, because a merge is the result and not a fault. Only an unreadable pull request exits 1 with an `ERROR` line.
+
+Rules:
+
+- Start one watch when the first lane opens a pull request, and add each later number to the list.
+- A merged pull request leaves the list. Start the job again with the rest.
+- Restart the watch after each lane push that resolves threads.
+- Read the three gate states by hand after a wake. The line is a trigger, not a verdict.
+- Never poll by hand, never sleep, never tail a log. The job holds the loop.
+- A `MERGED` line starts the cleanup turn. Unstack the pull requests above it, remove the worktree, kill the lane session, and set the ticket to Done.
+- The script window is 3000 s and `timeout_ms` is 3300000. The job limit of 60 minutes kills a longer window, so keep the window under it.
+- A job that exits 124 hit its job limit. Start the watch again with a fresh window.
+- A job id can expire and leave its process running. Before a restart, run `pkill -f watch-lane.sh` and check that `pgrep -af watch-lane.sh` shows only that command.
+- `ctx_bg` reuses the id of an identical command. So an expiry message can name an earlier instance. Run `status` on the id before a restart, and pass `unique: true` on a start so each watch holds its own id.
+
+`watch-coderabbit.sh` stays for a CodeRabbit-only watch. `watch-lane.sh <pr>` covers one pull request. `watch-lanes.sh` covers the whole wave with one job.
 
 ## 1. Plan the wave
 
@@ -249,6 +275,8 @@ Rules:
 ### Unstack after a merge
 
 The lower pull request lands. Retarget and rebase the higher branch in the same turn.
+
+The `MERGED` line from the lane watch starts this step. Do not wait for a lane report.
 
 ```bash
 git fetch origin
