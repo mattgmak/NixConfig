@@ -652,6 +652,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 **Conditional:**
 - `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
 - `pi-opencode-go-usage` for the `/opencode-go-usage` command. It reads the provider key from `ctx.modelRegistry`, so it works with the built-in `opencode-go` provider.
+- `pi-clinepass-usage` for the `/clinepass-usage` command. Same shape: the key comes from `ctx.modelRegistry` for `clinepass`/`cline`, then `CLINEPASS_API_KEY` or `CLINE_API_KEY`. It reads `GET <CLINE_API_BASE or https://api.cline.bot>/api/v1/users/me/plan/usage-limits`, the endpoint the Cline app itself calls.
 - The built-in `opencode-go` provider serves `opencode-go/*` models. Pi owns that catalog, so a live id missing there needs a `models.json` override.
 - `pi-opencode-provider` stays removed: third-party ext forced `supportsReasoningEffort: false`, so DeepSeek V4.1 thinking levels collapsed to on/off. The built-in provider sends the level map.
 

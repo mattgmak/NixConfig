@@ -62,6 +62,7 @@
             "pi-caveman"
             "pi-codegraph"
             "pi-clinepass-provider"
+            "pi-clinepass-usage"
             "pi-commandcode-provider"
             "pi-cursor-sdk"
             "pi-cursor-usage"

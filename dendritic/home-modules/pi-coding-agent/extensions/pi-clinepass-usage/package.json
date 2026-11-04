@@ -1,0 +1,10 @@
+{
+	"name": "pi-clinepass-usage",
+	"private": true,
+	"type": "module",
+	"keywords": ["pi-package"],
+	"description": "Slash command /clinepass-usage — ClinePass subscription usage windows",
+	"pi": {
+		"extensions": ["./index.ts"]
+	}
+}
