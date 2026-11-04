@@ -394,6 +394,16 @@ Rules:
 - A pull request without proof waits at the gate. Name the missing artifact.
 - A green unit test does not replace the sandbox run. Say which claim the run settles.
 - Release the lease and stop the sandbox after the capture.
+- When the app must run, build it on the mini and read `reference/macos-remote-build.md` first.
+
+## Remote iOS build
+
+The app builds on the Mac mini, never on this Linux host. Read `reference/macos-remote-build.md` before the first command.
+
+A lane needs two facts before it starts:
+
+- Run `pnpm install --ignore-scripts`. The `uniwind-pro` postinstall needs a token, so the scripted install fails.
+- Every path sits under `/Volumes/Kingston480GB/tcm-build/`: `repo`, `DerivedData`, `store`, `logs`, `artifacts`, `npm-global`.
 
 ## 17. Escalate
 
