@@ -98,6 +98,7 @@
             "fitchmultz/pi-cursor-sdk"
             "gotgenes/pi-packages"
             "gsanhueza/pi-token-speed"
+            "jellydn/pi-clinepass-provider"
             "juicesharp/rpiv-mono"
             "k0valik/pi-blackhole"
             "MattDevy/pi-extensions"
