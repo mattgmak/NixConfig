@@ -168,9 +168,9 @@ export default function (pi: ExtensionAPI) {
         if (!model) continue;
         if (debug) {
           const quota = values[route.key];
-          console.error(
+          process.stderr.write(
             `[pi-balance] ${request.reason} -> ${route.key} ` +
-              `${quota ? `${quota.usedPercent.toFixed(1)}% used` : "no quota"}`,
+              `${quota ? `${quota.usedPercent.toFixed(1)}% used` : "no quota"}\n`,
           );
         }
         if (request.reason === "direct") return { model, thinkingLevel };
