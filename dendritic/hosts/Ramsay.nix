@@ -792,12 +792,34 @@ SEED
           };
         };
 
+        # The nixpkgs services.tailscale.serve option runs `serve set-config --all`, which
+        # replaces the whole node config and drops the hermes and inference entries. Its
+        # file format also cannot pair an HTTPS front with a plain HTTP backend, so use the
+        # same incremental CLI form as hermes.nix and inference.nix.
         # Tailnet name from the named service: halogen-dashboard.dab-octatonic.ts.net
-        services.tailscale.serve = {
-          enable = true;
-          services.halogen-dashboard.endpoints = {
-            "tcp:443" = "http://localhost:8790";
+        systemd.services.tailscale-serve-halogen = lib.mkIf config.services.tailscale.enable {
+          description = "Tailscale serve for the Halogen Collector";
+          after = [ "tailscaled.service" "halogen-dashboard.service" ];
+          wants = [ "tailscaled.service" ];
+          wantedBy = [ "multi-user.target" ];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
           };
+          path = [
+            config.services.tailscale.package
+            pkgs.coreutils
+          ];
+          script = ''
+            for _ in $(seq 1 30); do
+              if tailscale status &>/dev/null; then
+                break
+              fi
+              sleep 2
+            done
+
+            tailscale serve --yes --service=svc:halogen-dashboard --https=443 127.0.0.1:8790
+          '';
         };
 
         home-manager.users.${username} = self.homeConfigurations.Ramsay;
