@@ -773,6 +773,33 @@ SEED
           conflicts = [ "podman-halogen-signal.service" ];
         };
 
+        # ADR 0001: the Collector is the only client allowed to read Halogen /metrics, so
+        # one Collector runs per stack and Prometheus reads the Collector instead of the
+        # engine. The stack is gated behind inference.target, so this unit only orders
+        # after podman-halogen-signal and never starts it. With the engine down the
+        # Collector serves history and marks the gap as an Outage.
+        systemd.services.halogen-dashboard = {
+          description = "Halogen dashboard Collector (signal stack)";
+          wantedBy = [ "multi-user.target" ];
+          after = [ "network-online.target" "podman-halogen-signal.service" ];
+          serviceConfig = {
+            ExecStart = "${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.halogen-dashboard} --halogen-url http://127.0.0.1:8731 --listen 127.0.0.1:8790 --db /var/lib/halogen-dashboard/halogen-dashboard.sqlite";
+            DynamicUser = true;
+            StateDirectory = "halogen-dashboard";
+            Restart = "always";
+            RestartSec = "5s";
+            Nice = "10";
+          };
+        };
+
+        # Tailnet name from the named service: halogen-dashboard.dab-octatonic.ts.net
+        services.tailscale.serve = {
+          enable = true;
+          services.halogen-dashboard.endpoints = {
+            "tcp:443" = "http://localhost:8790";
+          };
+        };
+
         home-manager.users.${username} = self.homeConfigurations.Ramsay;
         home-manager.users.agent = self.homeConfigurations.RamsayAgent;
 

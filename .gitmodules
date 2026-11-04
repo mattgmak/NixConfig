@@ -110,3 +110,6 @@
 [submodule "jellydn/pi-clinepass-provider"]
 	path = vendor/jellydn/pi-clinepass-provider
 	url = https://github.com/jellydn/pi-clinepass-provider
+[submodule "Quat3rnion/halogen-dashboard"]
+	path = vendor/Quat3rnion/halogen-dashboard
+	url = https://github.com/Quat3rnion/halogen-dashboard
