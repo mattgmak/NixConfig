@@ -139,13 +139,16 @@
           };
 
           # Peers list under peer/model. A pin selector gives the clean id.
+          # unlisted keeps that id off /v1/models, so each model shows once.
           selectors = {
             halogen-flash-next-signal-abliterated = {
               strategy = "pin";
+              unlisted = true;
               targets = [ "halogen-signal/halogen-flash-next-signal-abliterated" ];
             };
             halogen-flash-next-v2-abliterated = {
               strategy = "pin";
+              unlisted = true;
               targets = [ "halogen-abliter-v2/halogen-flash-next-v2-abliterated" ];
             };
           };
