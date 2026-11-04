@@ -57,6 +57,7 @@ The script prints one state line first, then exits. Read the line and act.
 |---|---|---|
 | `STANDING n` | unresolved threads at start | sweep them before you trust a clean gate |
 | `FOUND n` | new unresolved CodeRabbit threads | send each thread to its lane: file, line, fault, fix |
+| `CIFAIL` | a check turned to `fail`, or a watched pull request starts red | read the failing job, give its lane the error line |
 | `CONFLICT` | `mergeable` reads CONFLICTING | send the rebase steps |
 | `MERGED` | the pull request merged | unstack, sweep, set the ticket to Done |
 | `CLOSED` | closed with no merge | ask the user |

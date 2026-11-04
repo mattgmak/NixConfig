@@ -40,9 +40,23 @@ list_threads() {
           | @tsv'
 }
 
+list_checks() {
+  gh pr checks "$1" --repo "$REPO" --json name,bucket 2>/dev/null \
+    | jq -r '.[] | "\(.name)\t\(.bucket)"' | sort
+}
+
+at_start=()
 for pr in "${PRS[@]}"; do
   list_threads "$pr" | cut -f1 | sed '/^$/d' | sort >"$SEEN_DIR/$pr"
   echo "STANDING pr=$pr $(wc -l <"$SEEN_DIR/$pr" | tr -d ' ') unresolved thread(s)"
+  list_checks "$pr" >"$SEEN_DIR/checks-$pr"
+  if rg -q '\tfail$' "$SEEN_DIR/checks-$pr"; then
+    at_start+=("RED_AT_START pr=$pr $(awk -F'\t' '$2=="fail"{print $1}' "$SEEN_DIR/checks-$pr" | tr '\n' ' ')")
+  fi
+done
+
+for line in "${at_start[@]:-}"; do
+  [ -n "$line" ] && echo "$line"
 done
 
 limited=0
@@ -71,6 +85,17 @@ while [ "$(date +%s)" -lt "$deadline" ]; do
     if [ "$mergeable" = "CONFLICTING" ]; then
       echo "CONFLICT pr=$pr head=$head mergeable=CONFLICTING"
       exit 0
+    fi
+
+    current="$(list_checks "$pr")"
+    if printf '%s\n' "$current" | rg -q '\tfail$'; then
+      if ! cmp -s <(printf '%s\n' "$current") "$SEEN_DIR/checks-$pr"; then
+        printf '%s\n' "$current" >"$SEEN_DIR/checks-$pr"
+        echo "CIFAIL pr=$pr head=$head $(printf '%s\n' "$current" | awk -F'\t' '$2=="fail"{print $1}' | tr '\n' ' ')"
+        exit 0
+      fi
+    else
+      printf '%s\n' "$current" >"$SEEN_DIR/checks-$pr"
     fi
 
     current="$(list_threads "$pr")"
