@@ -1,9 +1,9 @@
 /**
  * Quota probes for the balance router.
  *
- * Each provider publishes usage in its own shape. Every probe reduces one
- * request to the percentage used in the tightest window, or undefined when the
- * response is unreadable.
+ * Each provider publishes usage in its own shape. Every probe reduces its
+ * responses to the percentage used in the tightest window, or undefined when
+ * the data is unreadable.
  */
 
 import { execSync } from "node:child_process";
@@ -22,6 +22,9 @@ export interface ProviderQuota {
 }
 
 const FETCH_TIMEOUT_MS = 5000;
+
+/** Below this dollar balance a route cannot serve a typical request. */
+const MIN_BALANCE = 0.25;
 
 type Json = Record<string, unknown>;
 
@@ -129,32 +132,48 @@ function windowOf(value: unknown): Window | undefined {
   return { used, cap, exceeded: entry.exceeded === true, reset: epochSeconds(entry.resetAt) };
 }
 
-/** Command Code: GET /alpha/billing/credits returns credits plus window caps. */
+/**
+ * Command Code: GET /alpha/billing/credits gives window caps and the leftover
+ * balance. The windows reset on their own clock, so the period spend from
+ * /alpha/usage/summary sets the pool total and the real used percentage.
+ */
 export async function commandCodeQuota(key: string): Promise<ProviderQuota | undefined> {
   const base = process.env.COMMAND_CODE_API_BASE ?? "https://api.commandcode.ai";
-  const json = await getJson(`${base}/alpha/billing/credits`, key);
-  if (!json) return undefined;
-  const limits = record(json.windowLimits);
+  const [json, summary] = await Promise.all([
+    getJson(`${base}/alpha/billing/credits`, key),
+    getJson(`${base}/alpha/usage/summary`, key),
+  ]);
+  if (!json && !summary) return undefined;
+  const limits = record(json?.windowLimits);
   const windows = [windowOf(limits?.fiveHour), windowOf(limits?.weekly)].filter(
     (entry): entry is Window => entry !== undefined,
   );
-  const credits = record(json.credits);
+  const credits = record(json?.credits);
   const remaining = credits
-    ? [count(credits.monthlyCredits), count(credits.purchasedCredits), count(credits.freeCredits)]
+    ? count(credits.remainingCredits) ??
+      [count(credits.monthlyCredits), count(credits.purchasedCredits), count(credits.freeCredits)]
         .map((value) => value ?? 0)
         .reduce((total, value) => total + value, 0)
     : undefined;
-  if (windows.length === 0 && remaining === undefined) return undefined;
+  const spent = count(summary?.totalCost);
+  let poolPercent: number | undefined;
+  if (spent !== undefined && remaining !== undefined && spent + remaining > 0) {
+    poolPercent = (spent / (spent + remaining)) * 100;
+  }
+  if (windows.length === 0 && poolPercent === undefined) return undefined;
   const resets = windows
     .map((entry) => entry.reset)
     .filter((value): value is number => value !== undefined);
+  const windowPercent = windows.length
+    ? Math.max(...windows.map((entry) => (entry.cap > 0 ? (entry.used / entry.cap) * 100 : 0)))
+    : 0;
   return {
-    usedPercent: windows.length
-      ? Math.max(...windows.map((entry) => (entry.cap > 0 ? (entry.used / entry.cap) * 100 : 0)))
-      : 0,
+    usedPercent: Math.max(windowPercent, poolPercent ?? 0),
     soonestReset: resets.length ? Math.min(...resets) : null,
     exhausted:
-      (remaining !== undefined && remaining <= 0.01) || windows.some((entry) => entry.exceeded),
+      windows.some((entry) => entry.exceeded) ||
+      (poolPercent !== undefined && poolPercent >= 99.5) ||
+      (remaining !== undefined && remaining <= MIN_BALANCE),
   };
 }
 
