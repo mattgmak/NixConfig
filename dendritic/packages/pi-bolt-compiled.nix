@@ -149,7 +149,24 @@
           missingLoaders = builtins.filter (
             name: !(builtins.pathExists "${extensionsRoot}/${name}")
           ) extensions;
-          vendorRoot = "${srcOf "vendor"}";
+          # The vendor cache key lists every path the compile reads, so a bump in an
+          # unlisted repo keeps the key and the ahead-of-time compile stays cached.
+          vendorPaths = vendorRepos ++ map (s: "${s.repo}/${s.subdir}") vendorSubdirs;
+          vendorDir = /. + builtins.unsafeDiscardStringContext "${self}/vendor";
+          vendorRoot = "${builtins.path {
+            name = "pi-vendor-src";
+            path = vendorDir;
+            filter = p: _:
+              let rel = lib.removePrefix "${toString vendorDir}/" (toString p);
+              in lib.any (
+                r: r == rel || lib.hasPrefix "${rel}/" r || lib.hasPrefix "${r}/" rel
+              ) vendorPaths;
+          }}";
+          # The filter drops an absent path in silence, so name it before the build
+          # fails on a bare `tar: Cannot stat`.
+          missingVendorPaths = builtins.filter (
+            p: !(builtins.pathExists "${vendorDir}/${p}")
+          ) vendorPaths;
           kitTree = "unpack/kit/tree";
 
           # Staged vendor contents that sit below a repo root. The whole repo would put
@@ -641,6 +658,10 @@
         in
         assert lib.assertMsg (missingLoaders == [ ])
           "pi-bolt-compiled: loader dir absent from the flake source: ${lib.concatStringsSep ", " missingLoaders}. Run git add -N on each.";
+        assert lib.assertMsg (missingVendorPaths == [ ])
+          "pi-bolt-compiled: vendor path absent from the flake source: ${
+            lib.concatStringsSep ", " missingVendorPaths
+          }. Run git add -N on each.";
         stdenv.mkDerivation {
           pname = "pi-compiled";
           inherit version appSrc runtimeSrc compileStage;
