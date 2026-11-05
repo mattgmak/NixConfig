@@ -8,10 +8,12 @@
   "tokenSpeed": {
     "label": ""
   },
+  "showLastPrompt": true,
   "powerline": {
     "preset": "full",
     "fixedEditor": false,
     "welcome": false,
+    "placement": "below",
     "separator": "dot",
     "customItems": [
       {

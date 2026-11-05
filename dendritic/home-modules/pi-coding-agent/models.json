@@ -154,6 +154,7 @@
       "models": [
         {
           "id": "halogen-flash-next-signal-abliterated",
+          "name": "Halogen Flash Signal AB",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
@@ -182,6 +183,7 @@
         },
         {
           "id": "halogen-flash-next-v2-abliterated",
+          "name": "Halogen Flash v2 AB",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
@@ -210,6 +212,7 @@
         },
         {
           "id": "gufo-flash-next",
+          "name": "Gufo Flash",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
@@ -238,6 +241,7 @@
         },
         {
           "id": "gufo-flash-next-uncensored-abliterated",
+          "name": "Gufo Flash Uncensored AB",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
@@ -266,6 +270,7 @@
         },
         {
           "id": "gufo-flash-next-swift",
+          "name": "Gufo Flash Swift",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
@@ -294,6 +299,7 @@
         },
         {
           "id": "gufo-flash-next-uncensored-abliterated-bench",
+          "name": "Gufo Flash Uncensored AB 32k",
           "input": ["text", "image"],
           "reasoning": true,
           "thinkingLevelMap": {
