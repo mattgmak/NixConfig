@@ -130,6 +130,8 @@
         rtpFilePath = "tmux-jump.tmux";
         postInstall = ''
           chmod +x $target/tmux-jump.tmux $target/tmux-jump.sh $target/install-wizard.sh
+          # Patched: copy-mode before capture-pane (pre-capture race)
+          ${pkgs.python3}/bin/python3 ${./tmux/jump/patches/apply.py} $target/tmux-jump.sh
           mkdir -p $target/bin
           ln -s ${tmuxJumpBin}/bin/tmux-jump $target/bin/tmux-jump
         '';
@@ -175,6 +177,7 @@
         pkgs.fd
         pkgs.bash
         pkgs.python3 # tmax sources scripts/remote.py through bare python3 on PATH
+        pkgs.piBridge # opens and copies on the ssh client, see packages/pi-bridge.nix
       ];
 
       home.file.".config/tmux-powerkit/themes/stylix.sh".source = tmuxPowerkitThemeFile;
@@ -243,8 +246,10 @@
           set-hook -g after-select-pane 'refresh-client -S'
 
           # Enable support for advanced keyboard shortcuts (like Ctrl+.)
+          # -s, not -as: -as appends a copy on every source-file reload, and the
+          # live server carried six duplicate extkeys entries.
           set -g extended-keys on
-          set -as terminal-features 'xterm*:extkeys'
+          set -s terminal-features 'xterm*:clipboard:ccolour:cstyle:focus:title:extkeys screen*:title rxvt*:ignorefkeys'
           set -g extended-keys-format csi-u
 
           # Must come after the settings above: tmax reads tmax.conf, then binds keys.
@@ -252,7 +257,12 @@
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible
-          yank
+          {
+            plugin = yank;
+            extraConfig = ''
+              set -g @override_copy_command "${lib.getExe pkgs.piBridge} copy"
+            '';
+          }
           {
             plugin = resurrect;
             extraConfig = ''
@@ -313,7 +323,12 @@
             '';
           }
           tmux-fzf
-          fzf-tmux-url
+          {
+            plugin = fzf-tmux-url;
+            extraConfig = ''
+              set -g @fzf-url-open "${lib.getExe pkgs.piBridge} open"
+            '';
+          }
           {
             plugin = fuzzback;
             extraConfig = ''

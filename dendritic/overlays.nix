@@ -52,6 +52,14 @@
           ramsayDeploy = self.packages.${system}.ramsayDeploy;
         };
 
+      # Routes open and copy to the ssh client that owns the clipboard.
+      # See dendritic/packages/pi-bridge.nix.
+      piBridgeOverlay =
+        _final: _prev:
+        {
+          piBridge = self.packages.${system}.piBridge;
+        };
+
       tmaxOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -122,6 +130,7 @@
         })
         nodeBinOverlay
         piLocalHermesOverlay
+        piBridgeOverlay
         ramsayDeployOverlay
         tmaxOverlay
         btopOverlay
