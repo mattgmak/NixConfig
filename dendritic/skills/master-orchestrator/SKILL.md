@@ -184,6 +184,8 @@ Spawn `code-reviewer` on the branch when the lane lands. Point it at the worktre
 
 A `peer` reviewer is a defect. `code-reviewer` alone reviews. Send the spec source and a report path in the task.
 
+A subagent that returns a provider error ends the wave. Report the error and start no replacement run. The user decides the next step.
+
 `code-reviewer` allows one surface: `window`. A `new-session` call fails. Spawn it in a window.
 
 ```text
@@ -359,6 +361,10 @@ After a merge, read the ticket back and confirm the state. A ticket that still s
 
 A pull request that changes app UI carries visual proof. A pull request that changes Convex backend code or app logic carries sandbox proof. Never open the review without it.
 
+Every app UI change carries evidence before the review opens. A small change takes no exception: a badge, a chip, or a copy line still needs one artifact per changed screen.
+
+Capture it from the real app on a leased simulator, built on the mini. Publish it on the pull request as a release asset shown inline. A pull request without that block waits at the gate, and the body names the missing artifact.
+
 | Change | Evidence |
 |---|---|
 | static element, layout, or copy | one screenshot per changed state |
@@ -396,6 +402,8 @@ Rules:
 - A green unit test does not replace the sandbox run. Say which claim the run settles.
 - Release the lease and stop the sandbox after the capture.
 - A reviewer reads the proof in the pull request, with no clone. An uploaded image renders inline, and a release asset opens on one click. A clip too large to upload gets a link beside its key frames.
+- Each changed screen gets its own artifact. One screenshot of a screen that did not change proves nothing.
+- Each changed screen gets its own artifact. One screenshot of a screen that did not change proves nothing.
 - An evidence file stays out of the repository. Commit one only when a ticket names it as a tracked artifact.
 - Keep each uploaded image small. Shrink a clip with `ffmpeg` before the upload, and keep the value or the dish name readable.
 - A GIF stays under 10 MB at about 420 pixels wide. Confirm the frame count, and confirm one frame shows the action. A frame the eye cannot read is no proof.
