@@ -392,7 +392,12 @@ in
           linger = true;
           # Second SSH factor. A password alone stays useless without the key.
           hashedPasswordFile = config.age.secrets."agent-password".path;
-          extraGroups = [ "networkmanager" ];
+          # render opens /dev/kfd and the render nodes, so the agent runs GPU
+          # benchmarks without root.
+          extraGroups = [
+            "networkmanager"
+            "render"
+          ];
           shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             GoofyDesky
@@ -545,6 +550,11 @@ in
             do
               want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
+
+            # 1.72 GB Q8_0. Q4 and NVFP4 builds exist upstream, but the LFM3
+            # backend opens Q8_0 and BF16 only.
+            lfm3=https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/b3f2ae5d73cd3c91bf40e8ba752c648aa05dffdf
+            want "$lfm3/LFM3-1.7B-Q8_0.gguf" "$root/lfm3/LFM3-1.7B-Q8_0.gguf"
 
             # Halogen packs. The engine needs tokenizer.json in tokenizer/ beside
             # the checkpoint, and the Signal repo ships only three tokenizer

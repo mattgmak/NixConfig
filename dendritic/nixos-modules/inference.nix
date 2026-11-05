@@ -25,6 +25,10 @@
 
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
 
+      # 1.72 GB Q8_0 text checkpoint. Weights plus an 8192-token FP32 KV cache
+      # cost about 3 GiB, which fits the pool beside halogen.
+      lfm3Model = "${modelsDir}/lfm3/LFM3-1.7B-Q8_0.gguf";
+
       # The Swift requant and its projector live in a subdir, because gufo picks
       # a sibling mmproj by base name.
       swiftModel = "${modelsDir}/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf";
@@ -121,6 +125,25 @@
               };
               useModelName = "gufo-flash-next-swift";
               ttl = 300;
+              checkEndpoint = "/ready";
+            };
+
+            # Autoname and blackhole OM calls are short and sporadic. Loading on
+            # demand keeps 3 GiB out of the pool between sessions, and a load
+            # costs about one second. It stays out of the gpu group, because a
+            # swap there would evict the 104 GiB set.
+            "lfm3-1.7b" = {
+              cmd = gufoServe {
+                modality = "llm";
+                model = lfm3Model;
+                port = "\${PORT}";
+                servedModelName = "lfm3-1.7b";
+                sessions = 2;
+                context = 8192;
+                think = "off";
+              };
+              useModelName = "lfm3-1.7b";
+              ttl = 1800;
               checkEndpoint = "/ready";
             };
           };

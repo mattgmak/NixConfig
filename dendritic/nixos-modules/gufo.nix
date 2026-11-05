@@ -7,7 +7,12 @@
     {
       nixpkgs.overlays = [
         (final: _prev: {
-          gufo = inputs.gufo.packages.${final.stdenv.hostPlatform.system}.default;
+          # LFM3 1.7B is a source extension: it compiles into the binary, so the
+          # ASR unit and every llama-swap model carry it too. The submodule sits
+          # inside the flake source, so the path survives a git-mode eval.
+          gufo = inputs.gufo.packages.${final.stdenv.hostPlatform.system}.default.override {
+            extensions = [ ../../vendor/gufo-org/lfm3-gufo-extension ];
+          };
         })
       ];
 

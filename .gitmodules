@@ -113,3 +113,6 @@
 [submodule "Quat3rnion/halogen-dashboard"]
 	path = vendor/Quat3rnion/halogen-dashboard
 	url = https://github.com/Quat3rnion/halogen-dashboard
+[submodule "gufo-org/lfm3-gufo-extension"]
+	path = vendor/gufo-org/lfm3-gufo-extension
+	url = https://github.com/gufo-org/lfm3-gufo-extension
