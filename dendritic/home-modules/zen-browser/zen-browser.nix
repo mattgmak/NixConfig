@@ -308,7 +308,9 @@
                 "wireframe.urlbar.position.top" = true;
                 "wireframe.radius_scale" = 100;
                 "wireframe.webview.radius_scale" = 100;
-                "wireframe.window.radius_scale" = 100;
+                # 9 x 2.25 x 0.5 = 10.125px, the macOS native window corner. A larger
+                # value draws the ring inside the window fill and leaves dark corners.
+                "wireframe.window.radius_scale" = 50;
                 "wireframe.tab.radius_scale" = 100;
                 "wireframe.essen.radius_scale" = 100;
                 "wireframe.urlbar.radius_scale" = 100;
