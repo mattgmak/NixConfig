@@ -5,6 +5,10 @@
   "shellTools": {
     "ctx_shell": {
       "commandArgument": "command"
+    },
+    "ctx_bg": {
+      "commandArgument": "command",
+      "workdirArgument": "cwd"
     }
   },
   "permission": {
@@ -19,6 +23,15 @@
     "bash": {
       "*": "allow",
       "rm -rf *": "deny",
+      "tmux kill-server*": {
+        "action": "deny",
+        "reason": "Kills the main tmux server and every agent pane in it. Kill one session with tmux kill-session -t <name>, or another server with tmux -S <socket> kill-server."
+      },
+      "tmux * kill-server*": "deny",
+      "tmux -S * kill-server*": "allow",
+      "tmux -S *default kill-server*": "deny",
+      "tmux -L * kill-server*": "allow",
+      "tmux -L default kill-server*": "deny",
       "xargs*": "deny",
       "env *": "deny",
       "time *": "deny",
@@ -76,6 +89,15 @@
     "ctx_shell": {
       "*": "allow",
       "rm -rf *": "deny",
+      "tmux kill-server*": {
+        "action": "deny",
+        "reason": "Kills the main tmux server and every agent pane in it. Kill one session with tmux kill-session -t <name>, or another server with tmux -S <socket> kill-server."
+      },
+      "tmux * kill-server*": "deny",
+      "tmux -S * kill-server*": "allow",
+      "tmux -S *default kill-server*": "deny",
+      "tmux -L * kill-server*": "allow",
+      "tmux -L default kill-server*": "deny",
       "xargs*": "deny",
       "env *": "deny",
       "time *": "deny",
