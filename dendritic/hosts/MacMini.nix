@@ -60,6 +60,9 @@ in
       nix-index-database
     ];
     stylix.targets.bat.enable = false;
+    # btop clips disks that do not fit the box, so the APFS system volumes push
+    # the external drive out of view. Filter takes full mountpoint paths only.
+    programs.btop.settings.disks_filter = "exclude=/System/Volumes/VM /System/Volumes/Preboot /System/Volumes/Update /System/Volumes/xarts /System/Volumes/iSCPreboot /System/Volumes/Hardware /private/var/run/agenix.d";
   };
 
   flake.darwinModules.${hostname} =
