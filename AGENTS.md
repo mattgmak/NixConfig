@@ -22,6 +22,7 @@ Rules:
 - **Skills**: symlink `dendritic/skills/<name>` → `../../vendor/<owner>/<repo>/…`.
 - `pi-ext-deps-install` installs vendor extension deps; skips non-extension repos (themes/skills/zen/tools) + special-cases `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk` (`npm ci --ignore-scripts` + `build.mjs` → `dist/`).
 - **System switch/rebuild**: always defer to user to manually do switch/rebuild via `nh` for the current machine.
+- **Change stays invisible until you bump the pin**: an eval reads a source through its pinned reference — a submodule pointer, a `flake.lock` input, a `url = "git+file:..."` entry. Fix every layer in order: commit and push the source repo, then `nix flake update <input>`, then commit `flake.lock`. Symptom: the new option or attribute "does not exist" while the file on disk shows the change.
 
 New vendored repo: `git submodule add <url> vendor/<owner>/<repo>`, rename `.gitmodules` name → `owner/repo` if git used path. Full workflow + fork handling: `dendritic/skills/pi-setup/REFERENCE.md`.
 
