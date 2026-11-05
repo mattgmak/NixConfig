@@ -556,6 +556,12 @@ in
             lfm3=https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/b3f2ae5d73cd3c91bf40e8ba752c648aa05dffdf
             want "$lfm3/LFM3-1.7B-Q8_0.gguf" "$root/lfm3/LFM3-1.7B-Q8_0.gguf"
 
+            # d1 answers decision questions over text, pictures and audio. The
+            # projector is optional for text, but the image path needs it.
+            d1=https://huggingface.co/LiquidAI/d1-Omni-2B-GGUF/resolve/c53ae0b1f92b17065e9158d34019c9ca1ea5bcf8
+            want "$d1/d1-Omni-2B-Q8_0.gguf" "$root/d1/d1-Omni-2B-Q8_0.gguf"
+            want "$d1/mmproj-d1-Omni-2B-BF16.gguf" "$root/d1/mmproj-d1-Omni-2B-BF16.gguf"
+
             # Halogen packs. The engine needs tokenizer.json in tokenizer/ beside
             # the checkpoint, and the Signal repo ships only three tokenizer
             # files, so tokenizer.json and the merges come from peonist-ai.

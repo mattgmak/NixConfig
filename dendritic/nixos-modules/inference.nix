@@ -29,6 +29,11 @@
       # cost about 3 GiB, which fits the pool beside halogen.
       lfm3Model = "${modelsDir}/lfm3/LFM3-1.7B-Q8_0.gguf";
 
+      # d1 answers packed decision questions and never generates text. The
+      # projector carries the vision tower, so text and image requests share it.
+      d1Model = "${modelsDir}/d1/d1-Omni-2B-Q8_0.gguf";
+      d1Mmproj = "${modelsDir}/d1/mmproj-d1-Omni-2B-BF16.gguf";
+
       # The Swift requant and its projector live in a subdir, because gufo picks
       # a sibling mmproj by base name.
       swiftModel = "${modelsDir}/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf";
@@ -223,6 +228,39 @@
             "video"
           ];
           LimitMEMLOCK = "infinity";
+        };
+      };
+
+      # mkGufoServe drops --mmproj and --context outside the llm modality, so
+      # this unit spells the command out. Only /v1/systemone is served.
+      systemd.services.gufo-decide = {
+        description = "gufo decision (d1-Omni-2B)";
+        wantedBy = [ "inference.target" ];
+        after = [
+          "network.target"
+          "gufo-models.service"
+        ];
+        wants = [ "gufo-models.service" ];
+        serviceConfig = {
+          Type = "exec";
+          ExecStart = "${pkgs.gufo}/bin/gufo serve --host 127.0.0.1 --port 8182 decision --model ${d1Model} --mmproj ${d1Mmproj} --context 8192 --served-model-name d1-omni-2b";
+          Restart = "on-failure";
+          RestartSec = 5;
+
+          DynamicUser = true;
+          CacheDirectory = "gufo-decide";
+          SupplementaryGroups = [
+            "render"
+            "video"
+          ];
+          LimitMEMLOCK = "infinity";
+          PrivateDevices = false;
+          PrivateUsers = false;
+          ProtectHome = true;
+          ProtectSystem = "strict";
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          WorkingDirectory = "/tmp";
         };
       };
 
