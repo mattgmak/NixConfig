@@ -1,6 +1,12 @@
 #!/bin/sh
-# Start the vendor submodule refresh in the background. Pull returns at once.
+# Clean submodules the merge removed, then start the vendor refresh in the background.
+# Pull returns at once.
 root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+if [ -x "$root/githooks/submodule-clean.sh" ]; then
+  "$root/githooks/submodule-clean.sh" || true
+fi
+
 [ -x "$root/githooks/submodule-refresh.sh" ] || exit 0
 
 log="${XDG_STATE_HOME:-$HOME/.local/state}/nixconfig/submodule-refresh.log"

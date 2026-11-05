@@ -322,6 +322,8 @@ git config --local core.hooksPath githooks
 
 `githooks/post-merge` starts `githooks/submodule-refresh.sh` in background. Pull returns at once, so the lazygit UI never blocks.
 
+Both hooks run `githooks/submodule-clean.sh` first. A commit that removes a submodule leaves its worktree on disk, and the script deletes it. It also drops the `.git/modules/<name>` gitdir, stale `submodule.<name>` config sections from renames, and empty owner directories. `-n` only reports.
+
 The refresh does three steps:
 
 1. `git submodule sync --recursive`

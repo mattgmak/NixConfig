@@ -1,7 +1,13 @@
 #!/bin/sh
 # A branch switch can record a vendor submodule that is not checked out yet.
-# Refresh only in that case, so file checkouts stay cheap.
+# Clean submodules the switch removed first, then refresh only in that case, so file
+# checkouts stay cheap.
 root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+
+if [ -x "$root/githooks/submodule-clean.sh" ]; then
+  "$root/githooks/submodule-clean.sh" || true
+fi
+
 [ -x "$root/githooks/submodule-refresh.sh" ] || exit 0
 git -C "$root" submodule status --recursive 2>/dev/null | grep -q '^-' || exit 0
 
