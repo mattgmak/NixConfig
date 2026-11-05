@@ -125,6 +125,13 @@
 
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
 
+        # common.nix sets no keys here. Ramsay's agent key is listed so
+        # tmux-bridge can ssh back and run xdg-open or wl-copy.
+        users.users.${username}.openssh.authorizedKeys.keys = with self.sshKeys; [
+          Ramsay
+          RamsayAgentSsh
+        ];
+
         # The FQDN joins the pattern because ssh applies a Host block only when its
         # pattern matches the name typed on the command line. common.nix already
         # sets extraConfig, so append with mkAfter.
