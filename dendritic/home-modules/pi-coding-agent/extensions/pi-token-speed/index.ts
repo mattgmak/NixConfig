@@ -1,1 +1,1 @@
-export { default } from "../vendor/gsanhueza/pi-token-speed/src/index.ts";
+export { default } from "../vendor/mattgmak/pi-token-speed/src/index.ts";

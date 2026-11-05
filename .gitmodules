@@ -98,9 +98,9 @@
 [submodule "mattgmak/pi-autoname"]
 	path = vendor/mattgmak/pi-autoname
 	url = https://github.com/mattgmak/pi-autoname.git
-[submodule "gsanhueza/pi-token-speed"]
-	path = vendor/gsanhueza/pi-token-speed
-	url = https://github.com/gsanhueza/pi-token-speed
+[submodule "mattgmak/pi-token-speed"]
+	path = vendor/mattgmak/pi-token-speed
+	url = https://github.com/mattgmak/pi-token-speed.git
 [submodule "pasky/pi-ssh-image-clipboard"]
 	path = vendor/pasky/pi-ssh-image-clipboard
 	url = https://github.com/pasky/pi-ssh-image-clipboard

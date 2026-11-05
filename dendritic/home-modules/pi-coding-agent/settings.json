@@ -5,10 +5,43 @@
   "defaultModel": "deepseek-v4.1-flash",
   "defaultThinkingLevel": "high",
   "theme": "stylix",
+  "tokenSpeed": {
+    "label": ""
+  },
   "powerline": {
     "preset": "full",
     "fixedEditor": false,
-    "welcome": false
+    "welcome": false,
+    "separator": "dot",
+    "customItems": [
+      {
+        "id": "tps",
+        "statusKey": "tokenSpeed",
+        "position": "left",
+        "selfColorize": true
+      }
+    ],
+    "layout": {
+      "left": [
+        "model",
+        "thinking",
+        "custom:tps",
+        "shell_mode",
+        "path",
+        "git",
+        "queue",
+        "subagents"
+      ],
+      "right": [
+        "token_in",
+        "token_out",
+        "cache_read",
+        "cost",
+        "context_pct",
+        "time_spent",
+        "extension_statuses"
+      ]
+    }
   },
   "extensions": [
     "-builtin:mcp"
