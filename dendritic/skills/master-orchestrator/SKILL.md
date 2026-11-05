@@ -375,6 +375,7 @@ Steps for UI:
 4. Drive the screens with `argent` on the leased device. Record the trigger twice: before and after.
 5. Keep a working copy under `/tmp/agent-tmp/<project>/evidence/<ticket>/` while you capture.
 6. Publish every artifact on the pull request. Never commit an evidence file into the repository unless the ticket asks for a tracked file. Upload it as a pull request attachment or a release asset, and link it from the body.
+7. Publish motion as an animated GIF. A body gives no player. The renderer strips a `<video>` tag, and an mp4 inside an image tag shows a broken image. A GIF plays inline and loops.
 7. Add an `## Evidence` block to the body. Name the artifact, the screen, and the proof it gives. The block holds no local path and no untracked file name.
 
 Steps for backend and app logic:
@@ -397,6 +398,9 @@ Rules:
 - A reviewer reads the proof in the pull request, with no clone. An uploaded image renders inline, and a release asset opens on one click. A clip too large to upload gets a link beside its key frames.
 - An evidence file stays out of the repository. Commit one only when a ticket names it as a tracked artifact.
 - Keep each uploaded image small. Shrink a clip with `ffmpeg` before the upload, and keep the value or the dish name readable.
+- A GIF stays under 10 MB at about 420 pixels wide. Confirm the frame count, and confirm one frame shows the action. A frame the eye cannot read is no proof.
+- A person can reach one route that code cannot: the web editor turns a dropped clip into an inline player. Probe `POST https://api.github.com/user-attachments/assets` and expect 404. No `gh api` call creates an attachment, and a release asset gives no player. Ask the user when a true player is needed.
+- The GIF is the default. It needs no session, no account, and no click. Offer the player route once, then ship the GIF.
 - When the app must run, build it on the mini and read `reference/macos-remote-build.md` first.
 
 ## Remote iOS build

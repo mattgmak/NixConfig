@@ -73,6 +73,7 @@ shell_allowlist_extra = [
     "wl-paste",
     "wl-copy",
     "pi-local",
+    "ffmpeg",
 ]
 
 [telemetry]
