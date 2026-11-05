@@ -72,6 +72,53 @@ xcodebuild -workspace app.xcworkspace -scheme app -sdk iphonesimulator \
 
 For a Release build, run the same command with `-configuration Release`. A Release build embeds `main.jsbundle`, so the app runs with no Metro.
 
+## Reuse the installed dev client
+
+Build only when the native layer changed. A JS-only change needs no build, because the dev client reads its bundle from Metro.
+
+Ask two questions first, on the mini:
+
+```bash
+xcrun simctl list devices booted
+xcrun simctl get_app_container <udid> net.drpom.easy-tcm app
+```
+
+A non-zero exit from the second command means no dev client. Both answers must hold. The simulator holds the app for the bundle id. The ledger fingerprint equals the current native fingerprint.
+
+Read the ledger for that simulator:
+
+```bash
+cat /Volumes/Kingston480GB/tcm-build/native/<udid>.json
+```
+
+Compute the current native fingerprint from the native inputs:
+
+```bash
+native_fingerprint() {
+  cd /Volumes/Kingston480GB/tcm-build/repo/apps/tcm-app
+  { shasum -a 256 ios/Podfile.lock ios/app.xcodeproj/project.pbxproj app.config.ts
+    sed -n '/"dependencies"/,/^  }/p' package.json | shasum -a 256
+  } | shasum -a 256 | cut -c1-16
+}
+```
+
+| Installed | Fingerprint equal | Action |
+|---|---|---|
+| no | any | build, install, write the ledger |
+| yes | no | build, install, write the ledger |
+| yes | yes | install nothing, start Metro, launch |
+
+Write the ledger after each build, for the simulator that holds the new app:
+
+```bash
+mkdir -p /Volumes/Kingston480GB/tcm-build/native
+printf '{"fingerprint":"%s","build_sha":"%s","stamp":"%s"}\n' \
+  "$(native_fingerprint)" "$(git -C /Volumes/Kingston480GB/tcm-build/repo rev-parse HEAD)" \
+  "$(date -u +%FT%TZ)" > /Volumes/Kingston480GB/tcm-build/native/<udid>.json
+```
+
+Report the fingerprint and the build sha in the evidence block. A later run then knows which native build a simulator holds.
+
 ## Install and launch
 
 The bundle id is `net.drpom.easy-tcm`.
@@ -108,3 +155,12 @@ tar czf - -C <dir> . | ssh mattgmak@macmini 'tar xzf - -C <target>'
 ```
 
 Read a frame with `ctx_read`. A peer reads a screenshot with its own `ctx_read`, mode `full`. Never report that no tool reads pixels.
+
+## Remote iOS build
+
+The app builds on the Mac mini, never on this Linux host. Read `reference/macos-remote-build.md` before the first command.
+
+A lane needs two facts before it starts:
+
+- Run `pnpm install --ignore-scripts`. The `uniwind-pro` postinstall needs a token, so the scripted install fails.
+- Every path sits under `/Volumes/Kingston480GB/tcm-build/`: `repo`, `DerivedData`, `store`, `logs`, `artifacts`, `npm-global`.
