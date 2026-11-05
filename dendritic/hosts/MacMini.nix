@@ -735,8 +735,10 @@ in
                 -axe ${self.packages.${system}.axe}/bin/axe \
                 -simbridge ${self.packages.${system}.manzanas}/bin/simbridge \
                 -pool-slim-profile qasafe \
-                -pool-max-running 6 \
-                -warm-max-targets 6
+                -pool-max-running 4 \
+                -warm-max-targets 4 \
+                -pool-footprint-cap-mb 12288 \
+                -pool-watchdog-interval 5m
             ''
           ];
           UserName = username;
