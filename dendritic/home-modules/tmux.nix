@@ -177,7 +177,7 @@
         pkgs.fd
         pkgs.bash
         pkgs.python3 # tmax sources scripts/remote.py through bare python3 on PATH
-        pkgs.piBridge # opens and copies on the ssh client, see packages/pi-bridge.nix
+        pkgs.tmuxBridge # opens and copies on the ssh client, see packages/tmux-bridge.nix
       ];
 
       home.file.".config/tmux-powerkit/themes/stylix.sh".source = tmuxPowerkitThemeFile;
@@ -260,7 +260,7 @@
           {
             plugin = yank;
             extraConfig = ''
-              set -g @override_copy_command "${lib.getExe pkgs.piBridge} copy"
+              set -g @override_copy_command "${lib.getExe pkgs.tmuxBridge} copy"
             '';
           }
           {
@@ -326,7 +326,7 @@
           {
             plugin = fzf-tmux-url;
             extraConfig = ''
-              set -g @fzf-url-open "${lib.getExe pkgs.piBridge} open"
+              set -g @fzf-url-open "${lib.getExe pkgs.tmuxBridge} open"
             '';
           }
           {

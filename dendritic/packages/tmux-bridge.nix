@@ -7,9 +7,9 @@
 # ~/.pi-clip/by-tty/<tty>.sock to that client's socket. The link names the
 # machine for any shell, including tmux panes that never see SSH_TTY.
 #
-#   pi-bridge open <target>   open a file or URL
-#   pi-bridge copy            read a selection from stdin
-#   pi-bridge client          print the resolved client, for debugging
+#   tmux-bridge open <target>   open a file or URL
+#   tmux-bridge copy            read a selection from stdin
+#   tmux-bridge client          print the resolved client, for debugging
 #
 # Precedence: PI_OPEN / PI_COPY / PI_CLIENT override, then the by-tty link,
 # then this host's own open, xdg-open, pbcopy, wl-copy, xsel or xclip.
@@ -56,8 +56,8 @@
         );
     in
     {
-      packages.piBridge = pkgs.writeShellApplication {
-        name = "pi-bridge";
+      packages.tmuxBridge = pkgs.writeShellApplication {
+        name = "tmux-bridge";
         text = ''
           set -u
 
@@ -97,7 +97,7 @@
           }
 
           fail() {
-            printf 'pi-bridge: %s\n' "$1" >&2
+            printf 'tmux-bridge: %s\n' "$1" >&2
             exit 1
           }
 
@@ -112,7 +112,7 @@
             if sh -c 'exec $0 "$@"' "$candidate" "$@" >/dev/null 2>&1; then
               return 0
             fi
-            printf 'pi-bridge: %s failed\n' "$candidate" >&2
+            printf 'tmux-bridge: %s failed\n' "$candidate" >&2
             return 1
           }
 
@@ -177,7 +177,7 @@
               session_client
               ;;
             *)
-              printf 'usage: pi-bridge {open <target>|copy|client}\n' >&2
+              printf 'usage: tmux-bridge {open <target>|copy|client}\n' >&2
               exit 64
               ;;
           esac

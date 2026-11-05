@@ -53,11 +53,11 @@
         };
 
       # Routes open and copy to the ssh client that owns the clipboard.
-      # See dendritic/packages/pi-bridge.nix.
-      piBridgeOverlay =
+      # See dendritic/packages/tmux-bridge.nix.
+      tmuxBridgeOverlay =
         _final: _prev:
         {
-          piBridge = self.packages.${system}.piBridge;
+          tmuxBridge = self.packages.${system}.tmuxBridge;
         };
 
       tmaxOverlay =
@@ -130,7 +130,7 @@
         })
         nodeBinOverlay
         piLocalHermesOverlay
-        piBridgeOverlay
+        tmuxBridgeOverlay
         ramsayDeployOverlay
         tmaxOverlay
         btopOverlay
