@@ -279,7 +279,12 @@
                 "zen.tab-unloader.timeout-minutes" = 90;
                 "zen.tabs.vertical.right-side" = true;
                 "zen.theme.accent-color" = config.lib.stylix.colors.withHashtag.base0E;
+                # Zen default -1 inherits the platform radius, and every wireframe radius
+                # scales this base. 9px matches the fallback the theme itself uses.
+                "zen.theme.border-radius" = 9;
                 "zen.theme.color-prefs.colorful" = true;
+                # The theme hardcodes --na-window-margin: 12px, Zen defaults to 8px.
+                "zen.theme.content-element-separation" = 12;
                 "zen.theme.pill-button" = true;
                 "zen.themes.disable-all" = false;
                 "zen.themes.updated-value-observer" = true;
