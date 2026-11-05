@@ -297,11 +297,21 @@
                 "zen.workspaces.indicator-position" = "top";
                 "zen.workspaces.show-workspace-indicator" = false;
 
+                # Wireframe v3 renamed <group>.border_radius to <group>.radius_scale,
+                # a percent of Zen's base radius. 100 on webview keeps the old 16px:
+                # 9px base x 1 x 1.75 ratio = 15.75px.
                 "wireframe.urlbar.position.top" = true;
-                "wireframe.webview.border_radius" = 16;
-                "wireframe.window.border_radius" = 16;
-                "wireframe.tab.border_radius" = 16;
-                "wireframe.essentials.border_radius" = 16;
+                "wireframe.radius_scale" = 100;
+                "wireframe.webview.radius_scale" = 100;
+                "wireframe.window.radius_scale" = 100;
+                "wireframe.tab.radius_scale" = 100;
+                "wireframe.essen.radius_scale" = 100;
+                "wireframe.urlbar.radius_scale" = 100;
+                # x10 code, 0 = platform default (1.3 on macOS/Linux, 2.3 on Windows).
+                # --zen-webview-border-radius multiplies by --zen-squircle-value with no
+                # fallback, so an unset pref makes every webview radius collapse to 0.
+                "wireframe.squircle" = 0;
+                "wireframe.window.border" = "wireframe";
                 "wireframe.pip.border_radius" = 10;
               };
 
