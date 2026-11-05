@@ -373,9 +373,9 @@ Steps for UI:
 2. Start the sandbox and read the origin rule in `docs/agents/sandbox.md`.
 3. Lease a simulator from the manzanas fleet. Install the dev client. Launch the app.
 4. Drive the screens with `argent` on the leased device. Record the trigger twice: before and after.
-5. Save each artifact under `/tmp/agent-tmp/<project>/evidence/<ticket>/`.
-6. Commit a screenshot when it aids later review. GitHub holds no clip in a diff, so link the clip.
-7. Add an `## Evidence` block to the body. Name the artifact, the screen, and the proof it gives.
+5. Keep a working copy under `/tmp/agent-tmp/<project>/evidence/<ticket>/` while you capture.
+6. Publish every artifact on the pull request. Never commit an evidence file into the repository unless the ticket asks for a tracked file. Upload it as a pull request attachment or a release asset, and link it from the body.
+7. Add an `## Evidence` block to the body. Name the artifact, the screen, and the proof it gives. The block holds no local path and no untracked file name.
 
 Steps for backend and app logic:
 
@@ -394,6 +394,9 @@ Rules:
 - A pull request without proof waits at the gate. Name the missing artifact.
 - A green unit test does not replace the sandbox run. Say which claim the run settles.
 - Release the lease and stop the sandbox after the capture.
+- A reviewer reads the proof in the pull request, with no clone. An uploaded image renders inline, and a release asset opens on one click. A clip too large to upload gets a link beside its key frames.
+- An evidence file stays out of the repository. Commit one only when a ticket names it as a tracked artifact.
+- Keep each uploaded image small. Shrink a clip with `ffmpeg` before the upload, and keep the value or the dish name readable.
 - When the app must run, build it on the mini and read `reference/macos-remote-build.md` first.
 
 ## Remote iOS build
