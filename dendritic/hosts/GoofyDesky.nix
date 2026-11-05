@@ -460,8 +460,12 @@
           memoryPercent = 50; # 16 GiB zram on 32 GiB RAM
         };
 
-        users.users.${username}.openssh.authorizedKeys.keys = [
-          self.sshKeys.Droid
+        # Ramsay's agent key needs an entry here or tmux-bridge on Ramsay gets
+        # `Permission denied (publickey)` when it ssh's back to run xdg-open.
+        users.users.${username}.openssh.authorizedKeys.keys = with self.sshKeys; [
+          Droid
+          Ramsay
+          RamsayAgentSsh
         ];
 
         # nixos-anywhere --target-host root@127.0.0.1 (local SSD install). Loopback only.
