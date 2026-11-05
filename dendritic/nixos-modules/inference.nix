@@ -128,19 +128,24 @@
               checkEndpoint = "/ready";
             };
 
-            # Autoname and blackhole OM calls are short and sporadic. Loading on
-            # demand keeps 3 GiB out of the pool between sessions, and a load
-            # costs about one second. It stays out of the gpu group, because a
-            # swap there would evict the 104 GiB set.
+            # Autoname and OM calls stay on the cloud or the halogen peer, so
+            # this model loads only on demand. A cold load costs 80 to 130 s
+            # under halogen load, and the ttl keeps the wait rare. The RAM
+            # checkpoint cache is capped, because the default takes half of free
+            # RAM at 4.7 GiB per process.
             "lfm3-1.7b" = {
               cmd = gufoServe {
                 modality = "llm";
                 model = lfm3Model;
                 port = "\${PORT}";
                 servedModelName = "lfm3-1.7b";
-                sessions = 2;
+                sessions = 1;
                 context = 8192;
                 think = "off";
+                extraArgs = [
+                  "--cache-ram-bytes"
+                  "536870912"
+                ];
               };
               useModelName = "lfm3-1.7b";
               ttl = 1800;
