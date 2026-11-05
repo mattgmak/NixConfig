@@ -124,7 +124,15 @@
               ln -sfn "$entry" "$dir/extensions/$name"
             fi
           done
-          exec ${piCompiled}/bin/pi --no-mcp "$@"
+          # bin/pi forces `exec -a pi`, so the wrapper execs the app and repeats the
+          # env bin/pi sets. The name keeps tmux, ps, and agent-sesh on pi-local.
+          export PIBOLT_NPM=1
+          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export PI_TELEMETRY=0
+          export ENGRAM_URL=http://127.0.0.1:7437
+          export PI_PACKAGE_DIR="${piCompiled}/libexec/pi"
+          export AGENT_SESH_AGENT_NAME=pi-local
+          exec -a pi-local "${piCompiled}/libexec/pi/pi" --no-mcp "$@"
         '';
       };
     in

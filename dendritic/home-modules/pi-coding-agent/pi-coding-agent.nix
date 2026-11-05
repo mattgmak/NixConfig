@@ -205,12 +205,19 @@
 
       # The fallback command. Extensions come from the repo tree, so every loader runs
       # from files; PI_CODING_AGENT_DIR keeps it off the default agent dir.
+      # Every loadout wrapper names its process: bin/pi forces `exec -a pi`, and tmux,
+      # ps, and agent-sesh all read argv[0]. The wrapper execs the app itself and repeats
+      # the env bin/pi sets with makeWrapper, so the name can differ from the package.
       piStockWrapper = pkgs.writeShellApplication {
         name = "pi-stock";
         text = ''
           export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-$HOME/.pi/agent-dev}"
           export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-          exec ${piStock}/bin/pi "$@"
+          export PIBOLT_NPM=1
+          export PI_TELEMETRY=0
+          export PI_PACKAGE_DIR="${piStock}/libexec/pi"
+          export AGENT_SESH_AGENT_NAME=pi-stock
+          exec -a pi-stock "${piStock}/libexec/pi/pi" "$@"
         '';
       };
 
@@ -311,17 +318,25 @@
 
       # Second binary on the same compiled package, same shape as pi-stock. The oauth key
       # block matches piOauthWrapper, so mcp-adapter keeps working off the shared agent dir.
+      # AGENT_SESH_AGENT_NAME names the loadout for the pi extension, which copies it into
+      # the registry record; the agent-sesh module must list the same name in its agents.
       piLocalWrapper = pkgs.writeShellApplication {
         name = "pi-local";
         runtimeInputs = [ pkgs.coreutils ];
         text = ''
           export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-${agentLocalDir}}"
+          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+          export PIBOLT_NPM=1
+          export PI_TELEMETRY=0
+          export ENGRAM_URL=http://127.0.0.1:7437
+          export PI_PACKAGE_DIR="${piCompiled}/libexec/pi"
+          export AGENT_SESH_AGENT_NAME=pi-local
           key="${piOauthKey}"
           if [ -r "$key" ]; then
             PI_MCP_ADAPTER_OAUTH_FILE_KEY="$(cat "$key")"
             export PI_MCP_ADAPTER_OAUTH_FILE_KEY
           fi
-          exec ${piCompiled}/bin/pi "$@"
+          exec -a pi-local "${piCompiled}/libexec/pi/pi" "$@"
         '';
       };
 

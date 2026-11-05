@@ -143,6 +143,9 @@
         tmuxKey = "a";
         popupWidth = "90%";
         popupHeight = "90%";
+        # Every loadout binary on the host, named as its wrapper runs it. The
+        # pi-coding-agent module names each process after its loadout.
+        agents = [ "pi" "pi-local" "pi-stock" ];
       };
 
       # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
