@@ -38,6 +38,25 @@ Set the ticket to In Progress and assign it to the user before the lane starts.
 
 Order the wave by dependency. Record it in a todo list, one entry per ticket.
 
+### Frontier board
+
+The todo list is the frontier board. It shows what runs, what waits, and what blocks.
+
+| Field | Content |
+|---|---|
+| subject | ticket id and title |
+| status | pending, in progress or completed |
+| blockedBy | the ticket ids that hold it |
+| metadata | pull request number and lane name |
+
+Update the board at four milestones: lane spawn, pull request open, review verdict, merge.
+
+Mark a ticket in progress before its lane starts. Mark it completed right after its merge. Never batch a status change.
+
+Refresh the board in the same turn as each merge, so the new frontier shows at once.
+
+A ticket that leaves the frontier for a blocker carries `Backlog` on the board and in Linear.
+
 ## 2. Cut a worktree per ticket
 
 Path: `/home/agent/drpom/tcm/tech-XXXX`. Branch: `gitBranchName` from Linear.
@@ -210,6 +229,8 @@ One dependency level per stack. A three-deep chain waits for a user word. Read `
 ## 10. Unblock chain
 
 After each merge, list the tickets that merge unblocks. Start their lanes in the same turn. Unstack every pull request that sat above the merged one.
+
+Refresh the frontier board in that same turn. Read it back before you report, so every line matches the tracker.
 
 Record the scope split in Linear when one ticket ships code and a second ticket ships data.
 
