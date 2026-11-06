@@ -16,6 +16,9 @@
       extensionsDir = "${piAgentRoot}/extensions";
       vendorRoot = "${nixConfigRoot}/vendor";
       leanCtx = self.packages.${system}.lean-ctx;
+      # pkgs.bun is nixpkgs 1.4.2, and its embedded store still trusts the revoked
+      # emSign ECC Root CA - G3. bunBin is 1.4.4, the fixed build.
+      bunBin = self.packages.${system}.bunBin;
 
       # mcp.json is the human-edited source. The `nixos` entry names the bare
       # binary; the store path below pins it.
@@ -538,7 +541,7 @@
           git
           node-bin
           pnpm
-          bun
+          bunBin
           gleam
           coreutils
           findutils
@@ -856,7 +859,7 @@
           git
           node-bin
           pnpm
-          bun
+          bunBin
           gleam
           coreutils
           findutils
@@ -950,7 +953,7 @@
             ffmpeg
             agent-browser
             uv
-            bun
+            bunBin
             mcpNixos
             argent
             codegraph
