@@ -2,7 +2,7 @@
 
 Advisory: 20 Oct 2026, <https://emudhra.we-have-a-problem.com/>. Eight eMudhra intermediate keys leaked. They chain to two roots that many trust stores still carry: `CN=AAA Certificate Services` and `CN=emSign ECC Root CA - G3`.
 
-Last checked: 27 Oct 2026, after the nixpkgs pin move, the Pi-Bolt 1.0.4 bump, the lean-ctx fork sync, and the node-bin unpatch. The MacMini repairs stay live and measured. No host runs the new pin yet, so every runtime measurement below predates it.
+Last checked: 6 Nov 2026, after the Pi-Bolt 1.1.0 bump, the lean-ctx 3.12.2 bump, and the bun repoint in `pi-coding-agent.nix`. Ramsay runs the new pin `3ec63636` from 29 Oct and sits at `system-85`. The MacMini numbers below stay as measured on 23 Oct.
 
 ## What covers MacMini
 
@@ -63,13 +63,13 @@ The runtime settles it. Point node at that file:
 | `/etc/ssl/cert.pem` | `SAFE UNABLE_TO_GET_ISSUER_CERT_LOCALLY` |
 | the `cacertFiltered` store path | `SAFE UNABLE_TO_GET_ISSUER_CERT_LOCALLY` |
 
-The counts of `/etc/ssl/certs/ca-certificates.crt` do not agree. A python ssl decode reports 284 blocks with 166 `aux` entries. A raw `BEGIN` count on the live symlink reports 118. Bun refuses under the file in both cases. The block arithmetic stays UNVERIFIED. The runtime verdict stands.
+The counts now agree. Verified 6 Nov on Ramsay: the file holds 287 PEM blocks, 118 plain `BEGIN CERTIFICATE` and 169 `BEGIN TRUSTED CERTIFICATE`. Of the 169 trusted blocks, 166 carry a `Trusted for:` line, one carries a `Rejected for:` line, and 51 carry a `Traditional PEM block omitted:` marker. The 284 figure from 23 Oct was wrong, and 118 was only the plain count.
 
 ## Affected: exposed now
 
 Measured with `https://dv-g3b-emudhra.we-have-a-problem.com/` on 23 Oct 2026. `200` means exposed. No package is exposed now, while `caEnv` holds.
 
-Pi-Bolt sits in the Cleared table. It reopens when `SSL_CERT_FILE` goes missing, see the gap map.
+Pi-Bolt sits in the Cleared table. Pi-Bolt 1.1.0 drops the embedded root, so a missing `SSL_CERT_FILE` no longer reopens it, see the Pi-Bolt section.
 
 Homebrew `python3` 3.14.9 is clean, but no `/opt/homebrew/bin/python3` symlink exists, only `python3.14`. Apple `python3` 3.9.6 cleared with the daemon repair, see the Cleared table.
 
@@ -77,11 +77,11 @@ Homebrew `python3` 3.14.9 is clean, but no `/opt/homebrew/bin/python3` symlink e
 
 | Package | Version | Why it clears |
 |---|---|---|
-| bun | 1.4.4 | `dendritic/packages/bun-bin.nix`. Probes returned `CERT_REVOKED` with and without `SSL_CERT_FILE` on 23 Oct. 27 Oct dropped `bunBinOverlay`, so no host installs bun any more. The package builds the pi-cursor-sdk bundle |
-| pi-bolt | 1.0.4 | `SSL_CERT_FILE` names the install bundle, see the Pi-Bolt measurement below. Reopens when the variable is unset |
+| bun | 1.4.4 | `dendritic/packages/bun-bin.nix`. Probes returned `CERT_REVOKED` on 23 Oct with and without `SSL_CERT_FILE`. 27 Oct dropped `bunBinOverlay`, which left `pkgs.bun` 1.4.2 in every profile through `pi-coding-agent.nix`. 6 Nov repointed all three `bun` references to `bunBin` |
+| pi-bolt | 1.1.0 | `SSL_CERT_FILE` names the install bundle. 1.1.0 embeds a store with no G3 root, so it refuses with the variable unset, see the Pi-Bolt measurement below |
 | node | 24.22.1 | `dendritic/packages/node-bin.nix` plus `nodeBinOverlay`. 118 embedded roots, the root absent, `CERT_REVOKED` in both modes |
 | node (nixpkgs) | 22.23.4 | nixpkgs `nodejs_22` at the new pin. Re-measured 26 Oct: 116 embedded roots, no emSign label in `bin/node` |
-| go | 1.27.3 | nixpkgs `go_1_27` at the new pin. The source carries the blocked-SPKI denylist. `go-bin.nix` and `goBinOverlay` are gone |
+| go | 1.27.3 | nixpkgs `go_1_27` at the new pin. The source carries the blocked-SPKI denylist. `go-bin.nix` and `goBinOverlay` are gone. The 6 Nov check on Ramsay finds `go` 1.26.10 in the user profile and no `go` in `/run/current-system/sw/bin` |
 | uv | 0.13.4 | nixpkgs `uv` at the new pin. Re-measured 26 Oct: no `emSign ECC Root CA - G3` and no `AAA Certificate Services` label in `bin/uv`. `uv-bin.nix` and `uvBinOverlay` are gone |
 | ruby (Homebrew) | 4.0.7_1 | Loads 188 CAs from the clean `openssl@4` keg. Refuses with the env deleted |
 | gem (Homebrew) | 4.0.20 | Same clean keg |
@@ -109,21 +109,17 @@ A JDK reinstall restores both aliases, so rerun the deletes after a Zulu update.
 
 ### Pi-Bolt: measured, not inferred
 
-`libexec/pi/pi` embeds bun 1.4.3-canary.1, commit `7f4574e90`. Pi-Bolt 1.0.3 and 1.0.4 carry the same runtime, as the 1.0.4 notes state. The literal `1.4.4` appears zero times in the 1.0.4 binary. `--version` under `BUN_BE_BUN=1` prints `1.4.3`. `bin/pi --version` prints `1.4.0 (Pi-Bolt 1.0.4, linux-x64, JIT off)`.
-
-The bolt-v0.9.9 release notes say the build takes three fixes from bun 1.4.4. Those are cherry-picked engine patches. They do not move the base runtime.
-
-Pi-Bolt 1.0.4 still prints `1.4.3` on `x86_64-linux`, so the gap stays open.
+`libexec/pi/pi` embeds bun 1.4.3-canary.1, commit `7f4574e90`, in Pi-Bolt 1.0.3 and 1.0.4. The literal `1.4.4` appears zero times in the 1.0.4 binary, and `--version` under `BUN_BE_BUN=1` prints `1.4.3`. The bolt-v0.9.9 notes claim three fixes from bun 1.4.4, but those are cherry-picked engine patches. Bun adds the env bundle to its own embedded store, so `cacertFiltered` cannot delete an embedded root. A reject-marked entry flips the verdict, and the install bundle holds one.
 
 Probe through `BUN_BE_BUN=1` on host A:
 
-| `SSL_CERT_FILE` | Result |
+| `SSL_CERT_FILE` | Result on 1.0.4, 23 Oct |
 |---|---|
 | unset | `TRUST`, status 200 |
 | the `cacertFiltered` store bundle | `TRUST`, status 200 |
 | `/etc/ssl/certs/ca-certificates.crt` | refuses |
 
-Bun adds the env bundle to its own embedded store. `cacertFiltered` deletes the revoked roots, so the embedded copies still trust them. A reject-marked entry flips the verdict, and the install bundle holds one.
+`8ed8c01` moved the tree to Pi-Bolt 1.1.0 on 6 Nov, and the gap closed. The 1.1.0 binary holds `emSign Root CA - G1` and neither `emSign ECC Root CA - G3` nor `AAA Certificate Services`. The runtime prints `certificate revoked` for both hosts with `SSL_CERT_FILE` unset, and gives the same verdict with the install bundle.
 
 Bun refuses under `/etc/ssl/certs/ca-certificates.crt`. A copy of that file at another path refuses too. So the behaviour follows content, not path.
 
@@ -157,8 +153,8 @@ Each tool refuses the chain while `caEnv` holds.
 
 | Package | On this host | First fixed | Declared | Status |
 |---|---|---|---|---|
-| git | 2.55.0 | n/a. Defers to OpenSSL | `home-modules/git.nix:5` | refuses under `GIT_SSL_CAINFO`. Fail-open path UNVERIFIED |
-| cargo | 1.97.0 | n/a. Defers to libcurl | UNVERIFIED. `drpom.nix:157` only builds Rust | refuses under `CARGO_HTTP_CAINFO`. Fail-open path UNVERIFIED |
+| git | 2.55.0 | n/a. Defers to OpenSSL | `home-modules/git.nix:5` | refuses under `GIT_SSL_CAINFO`. Verified 6 Nov on Ramsay: an empty `GIT_SSL_CAINFO` is a hard error, so git cannot fail open |
+| cargo | 1.97.0 | n/a. Defers to libcurl | `drpom.nix:157` only builds Rust | refuses under `CARGO_HTTP_CAINFO`. Verified 6 Nov on Ramsay with cargo 1.99.0: `cargo search` exits 0 with the variable set and with it unset, and a bogus path errors, so cargo honors the variable. The binary links `openssl-3.5.9` with no embedded roots |
 
 A runtime that keeps its own store still fails open. Node 24.18.0 held 120 embedded roots with `emSign ECC Root CA - G3` present. It returned `STATUS 200` with no CA variable, and `200` again with `SSL_CERT_FILE` at `nss-cacert-3.108`. Node now sits in the Cleared table.
 
@@ -169,7 +165,7 @@ Bun shows the same shape. It adds the env bundle to its own embedded store, so a
 | Package | On this host | First fixed | Declared | Status |
 |---|---|---|---|---|
 | tailscale | absent on this host | 1.104.2, merged to nixpkgs master 22 Oct | `nixos-modules/tailscale.nix` no longer sets `package` | nixpkgs `tailscale` is 1.104.2 at the new pin `3ec63636`, so the package needs no pin. `tailscale-bin.nix` and `tailscaleBinOverlay` are gone. One switch clears the four NixOS hosts |
-| webpki-roots | 1.0.9 | 1.0.10, 19 Oct 2026 | `dendritic/packages/lean-ctx.nix` pins v3.11.4, `vendor/mattgmak/lean-ctx` holds two lock files | pending an upstream release tag. Upstream `main` carries 1.0.11 since 23 Oct. The shipped asset inherits the tag lock |
+| webpki-roots | 1.0.11 | 1.0.10, 19 Oct 2026 | `dendritic/packages/lean-ctx.nix` pins v3.12.2, `vendor/mattgmak/lean-ctx` holds two lock files | Closed 6 Nov. The v3.12.2 tag lock carries 1.0.11, and the built binary holds no `emSign ECC Root CA - G3` |
 
 Tailscale bakes only Lets Encrypt ISRG roots into `net/bakedroots`. Its v1.104.2 changelog names Go 1.27.3 and TS-2026-013. The root pin `3ec63636` now carries 1.104.2.
 
@@ -177,15 +173,15 @@ Tailscale bakes only Lets Encrypt ISRG roots into `net/bakedroots`. Its v1.104.2
 
 The two lock files in `vendor/mattgmak/lean-ctx`, `rust/Cargo.lock` and `clients/rust/lean-ctx-client/Cargo.lock`, pinned `webpki-roots` 1.0.9 until 27 Oct. Upstream `main` moved both to 1.0.11 at commit `ef3b3bdf7` (23 Oct). The fork merged upstream `main` on 27 Oct and now sits at `415b59508`.
 
-`dendritic/packages/lean-ctx.nix` pins version 3.11.4. It fetches a prebuilt release asset from `https://github.com/yvgude/lean-ctx/releases/download/v3.11.4/`, sets `dontUnpack = true` and runs no compile step.
+`dendritic/packages/lean-ctx.nix` now pins version 3.12.2. It fetches a prebuilt release asset from `https://github.com/yvgude/lean-ctx/releases/download/v3.12.2/`, sets `dontUnpack = true` and runs no compile step.
 
 The package makes no reference to `vendor/mattgmak/lean-ctx`. A lock bump in the submodule cannot reach the shipped binary, so the vendored `Cargo.lock` governs nothing here.
 
-Upstream `.github/workflows/release.yml` builds each asset with `cargo build --release --locked`, so the asset inherits the lock of its tag. The tag lock holds `webpki-roots` 1.0.9 and `webpki-roots` 0.26.11. Version 1.0.9 holds all four emSign roots. Version 1.0.10 drops `emSign ECC Root CA - G3`.
+Upstream `.github/workflows/release.yml` builds each asset with `cargo build --release --locked`, so the asset inherits the lock of its tag. The v3.11.4 tag lock held `webpki-roots` 1.0.9 and `webpki-roots` 0.26.11, and version 1.0.9 holds all four emSign roots. Version 1.0.10 drops `emSign ECC Root CA - G3`, and version 1.0.11 also drops `emSign Root CA - C1` and `emSign ECC Root CA - C3`.
 
 The vendored HEAD lock now matches upstream `main`. It differs from the tag lock in `webpki-roots`, `quinn-proto` and `rustls`. Neither difference reaches the installed binary.
 
-The newest upstream tag is v3.11.4, published 2026-10-11. `rust/Cargo.toml` on `main` still reads 3.11.4, so no release closes the gap today.
+Upstream published v3.12.2 on 2026-11-05, and its `rust/Cargo.lock` carries `webpki-roots` 1.0.11. The 6 Nov bump moved the package to that tag and set both asset hashes.
 
 `main` runs 113 commits ahead of that tag. The lock changes since the tag also carry rustls 0.23.46 (RUSTSEC-2026-0346, -0348, -0349), quinn-proto 0.11.19 (RUSTSEC-2026-0338 to 0342), tokio 1.53.3 (RUSTSEC-2026-0386) and zstd 0.14.3. The installed binary shows the tag lock in force:
 
@@ -193,13 +189,13 @@ The newest upstream tag is v3.11.4, published 2026-10-11. `rust/Cargo.toml` on `
 rg -a -o 'emSign[ -~]{0,30}' "$(realpath "$(command -v lean-ctx)")" | sort -u
 ```
 
-Four emSign labels come back.
+The 3.11.4 binary returns four emSign labels, and the 3.12.2 binary returns only `emSign Root CA - G1`.
 
-The gap closes when upstream publishes a release whose lock carries `webpki-roots` 1.0.10 or later. The crate source diff proves the fix. Version 1.0.9 holds `emSign ECC Root CA - G3`, and version 1.0.10 does not. The other emSign roots stay in both versions.
+The measured diff matches the crate diff, so the fix sits in the shipped asset.
 
-The sibling root carries the same defect. `webpki-root-certs` 1.0.9 holds the revoked G3 root, and `rustls-platform-verifier` pulls that crate. Upstream `main` resolves that crate to 1.0.11. macOS uses security-framework and does not resolve it. That target detail is UNVERIFIED, because nobody retested it. Ramsay runs the same asset on `x86_64-linux`, and its binary shows the four root labels (measured 27 Oct).
+The sibling crate `webpki-root-certs` 1.0.9 held the same revoked root, and `rustls-platform-verifier` pulls it. Upstream resolves that crate to 1.0.11, and macOS keeps using security-framework, so that path stays untested.
 
-**Decision, 27 Oct: wait for the tag.** No local build replaces the prebuilt asset. When a tag lock carries `webpki-roots` 1.0.11 or later, bump `version` in `dendritic/packages/lean-ctx.nix`. Update both asset hashes, then re-run the `emSign` probe.
+**Decision, 27 Oct: wait for the tag. Closed 6 Nov** with the 3.12.2 bump and the probe re-run.
 
 ### Zen browser: OneCRL, not root removal
 
@@ -327,7 +323,7 @@ The release carries Pi 1.4.0. Its notes state that the runtimes are the 1.0.3 ru
 
 The Ramsay dry-run now reports 948 builds plus 1173 fetched paths, 4.2 GiB download, and 11.4 GiB unpacked. gleam left the build list. MacMini no longer rebuilds `nss-cacert-3.131.1`. The removed override cut the darwin build plan from 142 derivations to 12.
 
-No host runs the new pin yet, so every runtime measurement in this document predates the switch.
+Ramsay runs the new pin from 29 Oct and sits at `system-85`. The 6 Nov measurements below use that pin.
 
 ## 27 Oct: the MacMini switch failed on the cacert blocklist
 
@@ -342,6 +338,10 @@ The blocklist is gone from `dendritic/hosts/MacMini.nix`. `security.pki.installC
 `NIX_SSL_CERT_FILE`, `CURL_CA_BUNDLE`, `GIT_SSL_CAINFO`, `REQUESTS_CA_BUNDLE` and `CARGO_HTTP_CAINFO` point at the filtered bundle. `SSL_CERT_FILE` points at the install bundle.
 
 An override, a blocklist or a wrapper builds a new derivation. No binary cache can serve that derivation. A plain reference keeps the upstream derivation. The cache serves it.
+
+## 6 Nov: Pi-Bolt 1.1.0, lean-ctx 3.12.2 and the bun repoint
+
+`8ed8c01` moved Pi-Bolt to 1.1.0, and the embedded bun store lost both advisory roots. `dendritic/packages/lean-ctx.nix` moved to v3.12.2 with webpki-roots 1.0.11, and the built binary lost the G3 root. `dendritic/home-modules/pi-coding-agent/pi-coding-agent.nix` now points its three `bun` references at `bunBin` 1.4.4, because `pkgs.bun` 1.4.2 still trusts the compromised chain. `scripts/check-ca-trust.sh` gained python3 and ruby probes and a `CGO_ENABLED` fix for the go probe. The 6 Nov run on Ramsay reports 0 failures, 8 skips and 1 known gap, and the repoint closes that gap.
 
 ## News since 22 Oct
 
@@ -361,18 +361,16 @@ An override, a blocklist or a wrapper builds a new derivation. No binary cache c
 | Gap | Who closes it |
 |---|---|
 | `cacert` 3.125 on the Linux hosts | Closed 26 Oct by the pin move to `3ec63636`. cacert is 3.131.1 there |
-| lean-ctx `webpki-roots` 1.0.9 | An upstream `yvgude/lean-ctx` release tag. `dendritic/packages/lean-ctx.nix` ships a prebuilt v3.11.4 asset, so only a new tag moves the shipped lock. Decision 27 Oct: wait for that tag, see the note above |
-| fail-open path when the CA variable is unset | Each runtime that keeps its own store. This tree cannot close it. The `node-bin` overlay is the pattern |
-| Pi-Bolt embedded bun 1.4.3-canary.1 | Pi-Bolt upstream. A rebuild of the release asset |
+| lean-ctx `webpki-roots` 1.0.9 | Closed 6 Nov by the v3.12.2 bump in `dendritic/packages/lean-ctx.nix` |
+| fail-open path when the CA variable is unset | Each runtime that keeps its own store, and this tree cannot close it. The `node-bin` overlay is the pattern. Verified 6 Nov for `git` and `cargo` on Ramsay |
+| Pi-Bolt embedded bun 1.4.3-canary.1 | Closed 6 Nov by the 1.1.0 bump. The embedded store lost the G3 root, see the Pi-Bolt section |
 
 ## Unverified
 
-- The block arithmetic for `/etc/ssl/certs/ca-certificates.crt`. A python ssl decode reports 284 blocks and a raw `BEGIN` count reports 118. Bun refuses under the file in both cases.
-- `git` and `cargo` fail-open behaviour. An empty variable gives no verdict.
-- `bun-bin.nix` on darwin. The Linux build passed on 27 Oct inside `packages.x86_64-linux.piCompiled`.
-- `python3.14` (Homebrew) runtime probe. The binary name sits outside the shell allowlist.
-- Zulu 17 first fixed build. The store is clean by hand, so this no longer blocks.
-- `keytool` direct output. `cacerts` was read through the Java KeyStore API instead.
+- `bun-bin.nix` on darwin: the Linux build passed on 27 Oct inside `packages.x86_64-linux.piCompiled`.
+- Zulu 17 first fixed build: the store is clean by hand.
+- `keytool` direct output: `cacerts` was read through the Java KeyStore API.
+- The 6 Nov run on Ramsay skips the Homebrew python3 and ruby paths, because Linux has none of them.
 
 ## Verify
 
@@ -403,4 +401,4 @@ The measured state on 23 Oct, after the switch:
 
 `launchctl getenv` from a plain shell returns empty, because that shell is not in the `gui` bootstrap domain. Ask `launchctl print gui/$(id -u)` instead.
 
-`scripts/check-ca-trust.sh` probes the bundle, the Apple store, curl, bun, node, Apple `python3`, Java and go. The Java probe reads the JKS store by byte search, so it needs no `keytool`. The go probe runs a small program, because go resolves trust through the OS store. The script skips uv, because uv 0.13.4 has no plain HTTPS request subcommand. It still does not probe Homebrew ruby and python3. No host installs bun after 27 Oct, so the bun probe reports `SKIP` from the next switch on.
+`scripts/check-ca-trust.sh` probes the bundle, the Apple store, curl, bun, node, python3 and ruby at `/usr/bin`, `/opt/homebrew` and `/usr/local`, Java and go. The Java probe reads the JKS store by byte search, so it needs no `keytool`. The go probe sets `CGO_ENABLED` from the host, because `go run` needs a C compiler when cgo is on. The script skips uv, because uv 0.13.4 has no plain HTTPS request subcommand.

@@ -9,6 +9,102 @@ fails=0
 skips=0
 gaps=0
 
+tmp=$(mktemp -d)
+trap 'rm -rf "${tmp:-}"' EXIT
+
+cat > "$tmp/probe.py" <<'PY'
+import ssl
+import urllib.error
+import urllib.request
+
+HOSTS = [
+    "dv-g3b-emudhra.we-have-a-problem.com",
+    "dv-g3b-aaa-emudhra.we-have-a-problem.com",
+]
+
+for host in HOSTS:
+    try:
+        urllib.request.urlopen("https://" + host + "/", timeout=10)
+        print("TRUST " + host)
+    except urllib.error.URLError as exc:
+        print(("REFUSE " if isinstance(exc.reason, ssl.SSLError) else "OTHER ") + host)
+    except ssl.SSLError:
+        print("REFUSE " + host)
+    except Exception:
+        print("OTHER " + host)
+PY
+
+cat > "$tmp/probe.rb" <<'RB'
+require "net/http"
+require "openssl"
+require "uri"
+
+%w[
+  dv-g3b-emudhra.we-have-a-problem.com
+  dv-g3b-aaa-emudhra.we-have-a-problem.com
+].each do |host|
+  begin
+    http = Net::HTTP.new(host, 443)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    http.open_timeout = 10
+    http.read_timeout = 10
+    http.start { |h| h.request(Net::HTTP::Get.new("/")) }
+    puts "TRUST #{host}"
+  rescue OpenSSL::SSL::SSLError
+    puts "REFUSE #{host}"
+  rescue StandardError
+    puts "OTHER #{host}"
+  end
+end
+RB
+
+# probe_python and probe_ruby each print one line per host. Apple and Homebrew
+# binaries read different trust sources, so each binary needs its own run.
+probe_python() {
+  local bin="$1" out
+  if [[ ! -x "$bin" ]]; then
+    echo "SKIP online check: $bin not found"
+    skips=$((skips + 1))
+    return
+  fi
+  out=$("$bin" "$tmp/probe.py" 2>/dev/null) || true
+  if [[ -z "$out" ]]; then
+    echo "SKIP $bin probe gave no output"
+    skips=$((skips + 1))
+    return
+  fi
+  while read -r verdict host; do
+    case "$verdict" in
+      REFUSE) echo "PASS $bin rejects $host" ;;
+      TRUST)  echo "GAP $bin trusts $host"; gaps=$((gaps + 1)) ;;
+      *)      echo "SKIP $bin probe got $verdict"; skips=$((skips + 1)) ;;
+    esac
+  done <<< "$out"
+}
+
+probe_ruby() {
+  local bin="$1" out
+  if [[ ! -x "$bin" ]]; then
+    echo "SKIP online check: $bin not found"
+    skips=$((skips + 1))
+    return
+  fi
+  out=$("$bin" "$tmp/probe.rb" 2>/dev/null) || true
+  if [[ -z "$out" ]]; then
+    echo "SKIP $bin probe gave no output"
+    skips=$((skips + 1))
+    return
+  fi
+  while read -r verdict host; do
+    case "$verdict" in
+      REFUSE) echo "PASS $bin rejects $host" ;;
+      TRUST)  echo "GAP $bin trusts $host"; gaps=$((gaps + 1)) ;;
+      *)      echo "SKIP $bin probe got $verdict"; skips=$((skips + 1)) ;;
+    esac
+  done <<< "$out"
+}
+
 # The bundle keeps the alias line and marks trust in the text below it.
 check_name() {
   local name="$1" out
@@ -90,8 +186,6 @@ if ! command -v bun >/dev/null 2>&1; then
   echo "SKIP online check: bun not found"
   skips=$((skips + 1))
 else
-  tmp=$(mktemp -d)
-  trap 'rm -rf "${tmp:-}"' EXIT
   cat > "$tmp/probe.mjs" <<'JS'
 const hosts = [
   "dv-g3b-emudhra.we-have-a-problem.com",
@@ -126,8 +220,6 @@ if ! command -v node >/dev/null 2>&1; then
   echo "SKIP online check: node not found"
   skips=$((skips + 1))
 else
-  tmp=${tmp:-$(mktemp -d)}
-  trap 'rm -rf "${tmp:-}"' EXIT
   cat > "$tmp/probe.js" <<'JS'
 const hosts = [
   "dv-g3b-emudhra.we-have-a-problem.com",
@@ -175,48 +267,15 @@ else
 fi
 
 # The Apple python3 reads the Apple store. It has no CA flag, so it is the
-# only probe that shows what /etc/ssl/cert.pem does on the wire.
-if [[ ! -x /usr/bin/python3 ]]; then
-  echo "SKIP online check: /usr/bin/python3 not found"
-  skips=$((skips + 1))
-else
-  tmp=${tmp:-$(mktemp -d)}
-  trap 'rm -rf "${tmp:-}"' EXIT
-  cat > "$tmp/probe.py" <<'PY'
-import ssl
-import urllib.error
-import urllib.request
+# only probe that shows what /etc/ssl/cert.pem does on the wire. The Homebrew
+# formulae read their own bundle, so they need separate runs.
+for py in /usr/bin/python3 /opt/homebrew/bin/python3 /usr/local/bin/python3; do
+  probe_python "$py"
+done
 
-HOSTS = [
-    "dv-g3b-emudhra.we-have-a-problem.com",
-    "dv-g3b-aaa-emudhra.we-have-a-problem.com",
-]
-
-for host in HOSTS:
-    try:
-        urllib.request.urlopen("https://" + host + "/", timeout=10)
-        print("TRUST " + host)
-    except urllib.error.URLError as exc:
-        print(("REFUSE " if isinstance(exc.reason, ssl.SSLError) else "OTHER ") + host)
-    except ssl.SSLError:
-        print("REFUSE " + host)
-    except Exception:
-        print("OTHER " + host)
-PY
-  out=$(/usr/bin/python3 "$tmp/probe.py" 2>/dev/null) || true
-  if [[ -z "$out" ]]; then
-    echo "SKIP python probe gave no output"
-    skips=$((skips + 1))
-  else
-    while read -r verdict host; do
-      case "$verdict" in
-        REFUSE) echo "PASS python rejects $host" ;;
-        TRUST)  echo "GAP python trusts $host"; gaps=$((gaps + 1)) ;;
-        *)      echo "SKIP python probe got $verdict"; skips=$((skips + 1)) ;;
-      esac
-    done <<< "$out"
-  fi
-fi
+for rb in /usr/bin/ruby /opt/homebrew/bin/ruby /usr/local/bin/ruby; do
+  probe_ruby "$rb"
+done
 
 # The JKS store keeps alias names and subject strings as UTF-8, so a byte
 # search is enough and keytool is not needed.
@@ -256,9 +315,13 @@ if ! command -v go >/dev/null 2>&1; then
   skips=$((skips + 1))
 else
   go_version=$(go version 2>/dev/null) || go_version="go version unknown"
-  tmp=${tmp:-$(mktemp -d)}
-  trap 'rm -rf "${tmp:-}"' EXIT
   mkdir -p "$tmp/go-cache" "$tmp/go-path"
+  # cgo picks the trust source: the Apple keychain on darwin, the plain Go reader
+  # for the bundle on Linux. go run fails when no C compiler exists, so detect it.
+  cgo=0
+  if command -v cc >/dev/null 2>&1; then
+    cgo=1
+  fi
   cat > "$tmp/main.go" <<'GO'
 package main
 
@@ -292,18 +355,18 @@ func main() {
 	}
 }
 GO
-  out=$(cd "$tmp" && GOTOOLCHAIN=local GOFLAGS=-mod=mod \
+  out=$(cd "$tmp" && GOTOOLCHAIN=local GOFLAGS=-mod=mod CGO_ENABLED=$cgo \
     GOCACHE="$tmp/go-cache" GOPATH="$tmp/go-path" \
     go run main.go 2>/dev/null) || true
   if [[ -z "$out" ]]; then
-    echo "SKIP go probe gave no output ($go_version)"
+    echo "SKIP go probe gave no output ($go_version cgo=$cgo)"
     skips=$((skips + 1))
   else
     while read -r verdict host; do
       case "$verdict" in
-        REFUSE) echo "PASS go rejects $host ($go_version)" ;;
-        TRUST)  echo "GAP go trusts $host ($go_version)"; gaps=$((gaps + 1)) ;;
-        *)      echo "SKIP go probe got $verdict ($go_version)"; skips=$((skips + 1)) ;;
+        REFUSE) echo "PASS go rejects $host ($go_version cgo=$cgo)" ;;
+        TRUST)  echo "GAP go trusts $host ($go_version cgo=$cgo)"; gaps=$((gaps + 1)) ;;
+        *)      echo "SKIP go probe got $verdict ($go_version cgo=$cgo)"; skips=$((skips + 1)) ;;
       esac
     done <<< "$out"
   fi
