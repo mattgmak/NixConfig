@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for pi-powerline-footer (vendored nicobailon/pi-powerline-footer submodule)",
+  "description": "Pi loader for pi-powerline-footer (vendored mattgmak/pi-powerline-footer submodule)",
   "pi": {
     "extensions": ["./index.ts"]
   }

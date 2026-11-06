@@ -49,9 +49,9 @@
 [submodule "Gentleman-Programming/engram"]
 	path = vendor/Gentleman-Programming/engram
 	url = https://github.com/Gentleman-Programming/engram.git
-[submodule "nicobailon/pi-powerline-footer"]
-	path = vendor/nicobailon/pi-powerline-footer
-	url = https://github.com/nicobailon/pi-powerline-footer.git
+[submodule "mattgmak/pi-powerline-footer"]
+	path = vendor/mattgmak/pi-powerline-footer
+	url = https://github.com/mattgmak/pi-powerline-footer.git
 	ignore = untracked
 [submodule "arpagon/pi-rewind"]
 	path = vendor/arpagon/pi-rewind

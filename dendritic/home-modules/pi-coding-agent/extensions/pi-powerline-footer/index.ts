@@ -1,1 +1,1 @@
-export { default } from "../vendor/nicobailon/pi-powerline-footer/index.ts";
+export { default } from "../vendor/mattgmak/pi-powerline-footer/index.ts";

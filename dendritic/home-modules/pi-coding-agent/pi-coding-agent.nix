@@ -577,7 +577,7 @@
           link_powerline_theme() {
             local theme=${lib.escapeShellArg piPowerlineThemeFile}
             local loader="$EXTENSIONS/pi-powerline-footer/theme.json"
-            local vendor="$VENDOR_ROOT/nicobailon/pi-powerline-footer"
+            local vendor="$VENDOR_ROOT/mattgmak/pi-powerline-footer"
             mkdir -p "$(dirname "$loader")"
             ln -sfn "$theme" "$loader"
             if [ -d "$vendor" ]; then
@@ -1050,8 +1050,8 @@
             ''
               mkdir -p ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer"}
               ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${extensionsDir}/pi-powerline-footer/theme.json"}
-              if [ -d ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer"} ]; then
-                ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/nicobailon/pi-powerline-footer/theme.json"}
+              if [ -d ${lib.escapeShellArg "${vendorRoot}/mattgmak/pi-powerline-footer"} ]; then
+                ln -sfn ${lib.escapeShellArg piPowerlineThemeFile} ${lib.escapeShellArg "${vendorRoot}/mattgmak/pi-powerline-footer/theme.json"}
               fi
             '';
 
