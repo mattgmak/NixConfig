@@ -3,7 +3,7 @@ name: scout
 description: Fast codebase recon — explores files, finds patterns, maps architecture
 tools: ctx_read, ctx_search, ctx_grep, ctx_find, ctx_ls, ctx_shell, todo
 model: balance/deepseek-v4.1-flash
-thinking: medium
+thinking: low
 session-mode: lineage-only
 permission:
   bash:
