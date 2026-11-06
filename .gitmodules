@@ -116,3 +116,6 @@
 [submodule "gufo-org/lfm3-gufo-extension"]
 	path = vendor/gufo-org/lfm3-gufo-extension
 	url = https://github.com/gufo-org/lfm3-gufo-extension
+[submodule "aristanetworks/nix-serve-ng"]
+	path = vendor/aristanetworks/nix-serve-ng
+	url = https://github.com/aristanetworks/nix-serve-ng

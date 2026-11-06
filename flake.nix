@@ -117,6 +117,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-serve-ng = {
+      url = "git+file:./vendor/aristanetworks/nix-serve-ng";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # tree-sitter flake removed — neovim uses pkgs.tree-sitter (nixpkgs, hydra-cached)
 
     nix-index-database = {
