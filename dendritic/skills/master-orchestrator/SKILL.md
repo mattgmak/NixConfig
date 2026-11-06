@@ -69,9 +69,31 @@ subagent {
 
 `peer` lists `surfaces: window, session`. A pane fails. A window dies with the parent. Always pass a dedicated session: `surface: "new-session:<name>"`, where `<name>` is the lane name. The user then finds each lane in its own tmux session.
 
-Every lane uses `peer`. A lane on any other profile is a defect, because only `peer` holds the full tool set: Linear, shell and the tracker. `worker` drops the Linear tools, so the lane cannot read its own ticket. Respawn such a lane, and paste the ticket text into the new brief.
+The default profile is `peer`, in its own session. Only `peer` holds the full tool set: Linear, shell, the tracker and `ask_user_question`.
+
+Use `worker` only for small work that opens no pull request. A `worker` lane loses the Linear tools, so paste the ticket text into its brief. Name the profile in every brief.
+
+A `worker` lane that needs a pull request stops at once. Respawn it as `peer`.
 
 Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrives as a steer message.
+
+### Model
+
+Pass `model: "deepseek/deepseek-v4.1-flash-1017"` in every spawn, for lanes and reviewers alike. The model comes from OpenRouter. Do not rely on profile inheritance, because `~/.pi/agent/agents` is a read-only link into the Nix store. A model line written there is lost when home-manager runs.
+
+This rule cascades. A lane passes the same model in each subagent it spawns. A lane also writes that rule into the brief of each child it spawns.
+
+Add one line to every lane brief: `Pass model: "deepseek/deepseek-v4.1-flash-1017" in every subagent call you make.`
+
+No lane limit applies. Spawn the next lane as soon as a ticket needs it.
+
+### Peer decisions
+
+A `peer` asks the user directly when a decision blocks the work. Call `ask_user_question` with two to four options, then wait for the answer.
+
+The lane does not route that question through the orchestrator. It reports the answer, one line per decision.
+
+A question names a decision, not a fact. Send a fact to a scout instead.
 
 ## 4. Lane brief
 
@@ -79,6 +101,7 @@ Every brief carries these fields:
 
 | Field | Content |
 |---|---|
+| Profile | `peer`, or `worker` for small work with no pull request |
 | Ticket | id, title, acceptance criteria |
 | Base | base head sha |
 | Worktree | path, branch, state |

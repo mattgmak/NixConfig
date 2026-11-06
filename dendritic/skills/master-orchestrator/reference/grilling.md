@@ -13,3 +13,16 @@ Then the orchestrator starts the wave and treats those decisions as rulings.
 | spawn `peer` for the grill | ask a numbered question round here |
 | pass the tickets and the open facts | ask the user for a fact a scout can find |
 | take the settled rulings into the wave | hold the wave until the grill ends |
+
+## A lane asks the user
+
+A `peer` lane calls `ask_user_question` when a decision blocks its ticket. It does not wait for the orchestrator to relay the question.
+
+| Case | Who asks |
+|---|---|
+| work cannot continue on two readings of the ticket | the lane |
+| a contract band, cap or gate would change | the lane, then the orchestrator records the ruling |
+| a costly or irreversible step is next | the lane, then it stops until the answer arrives |
+| a fact sits in the code | nobody asks. A scout reads it |
+
+The skill keeps one shape: the orchestrator never grills in its own session. It spawns a `peer` for a grill round, and a running lane may grill on its own.
