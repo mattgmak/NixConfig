@@ -393,10 +393,12 @@ in
           # Second SSH factor. A password alone stays useless without the key.
           hashedPasswordFile = config.age.secrets."agent-password".path;
           # render opens /dev/kfd and the render nodes, so the agent runs GPU
-          # benchmarks without root.
+          # benchmarks without root. systemd-journal grants the system journal,
+          # so crash triage needs no sudo.
           extraGroups = [
             "networkmanager"
             "render"
+            "systemd-journal"
           ];
           shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
@@ -900,6 +902,7 @@ SEED
         config,
         lib,
         modulesPath,
+        pkgs,
         ...
       }:
       {
@@ -917,6 +920,9 @@ SEED
           "r8169"
         ];
         boot.initrd.kernelModules = [ ];
+        # Ramsay-only kernel bump for the reset triage. The default set gives
+        # 6.18.58, and 6.19 is removed upstream, so use 7.2.12.
+        boot.kernelPackages = pkgs.linuxPackages_7_2;
         # GTT caps the RAM the GPU may map. 29400781 pages = 112.15 GiB of
         # 124.9 GiB, which left 12.75 GiB for the kernel and all userspace. The
         # 2026-10-30 hang peaked at 95.5 GiB mapped, so 108 GiB keeps the
