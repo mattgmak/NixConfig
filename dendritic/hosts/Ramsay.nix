@@ -289,12 +289,33 @@ in
           mode = "0400";
         };
 
+        age.secrets.nix-builder-key = {
+          file = ../../secrets/nix-builder-ramsay.age;
+          owner = "root";
+          group = "root";
+          mode = "0400";
+        };
+
         nix.settings.trusted-users = lib.mkAfter [
           "root"
           "goofy"
           "agent"
           "@wheel"
         ];
+        nix.settings.secret-key-files = [ config.age.secrets.nix-builder-key.path ];
+        nix.settings.max-jobs = 10;
+
+        # Serves the paths Ramsay builds so Envy and Droid download them. Port 8181
+        # belongs to inference, so the cache listens on the module default port.
+        services.nix-serve = {
+          enable = true;
+          package = pkgs.haskellPackages.nix-serve-ng;
+          port = 5000;
+          openFirewall = true;
+          secretKeyFile = config.age.secrets.nix-builder-key.path;
+        };
+
+        boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         nixpkgs.overlays = common-overlays;
         nixpkgs.config = common-nixpkgs-config;

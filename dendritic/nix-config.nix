@@ -6,6 +6,8 @@
         settings = {
           substituters = [
             "https://cache.nixos.org"
+            # Ramsay's nix-serve-ng cache, signed with the ramsay builder key.
+            "http://ramsay.dab-octatonic.ts.net:5000"
             # Only source for the cross-built proot-static paths nix-on-droid
             # release-24.05 hardcodes (upstream #545): Droid eval needs them.
             "https://nix-on-droid.cachix.org"

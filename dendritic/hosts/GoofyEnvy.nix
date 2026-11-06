@@ -117,6 +117,15 @@
         nixpkgs.overlays = common-overlays;
         nixpkgs.config = common-nixpkgs-config;
 
+        nix = {
+          distributedBuilds = true;
+          buildMachines = [
+            (self.mkBuilder self.builderSites.ramsay {
+              sshKey = "/home/${username}/.ssh/id_ed25519";
+            })
+          ];
+        };
+
         # Bootloader
         imports = [
           self.nixosModules.inputRemapper

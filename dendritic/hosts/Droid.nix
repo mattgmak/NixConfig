@@ -168,15 +168,19 @@
       # Read the changelog before changing this value
       system.stateVersion = "24.05";
 
-      # Flakes only. Remote builders (ssh-ng) break HM profile activation on Termux:
-      # "getting pseudoterminal attributes: Permission denied" building user-environment.
-      # Re-enable builders after ssh-ng verified from nix-on-droid proot env.
+      # Flakes only. The old "getting pseudoterminal attributes: Permission denied"
+      # failure came from the proot TCGETS2 bug, fixed upstream, not from the
+      # builders line. builders-use-substitutes pulls outputs from the cache
+      # instead of copying them back over ssh.
       nix.extraOptions = ''
         experimental-features = nix-command flakes
+        builders-use-substitutes = true
+        builders = ssh-ng://root@ramsay.dab-octatonic.ts.net aarch64-linux 5 1
       '';
       nix = {
         substituters = [
           "https://cache.nixos.org"
+          "http://ramsay.dab-octatonic.ts.net:5000"
           "https://nix-on-droid.cachix.org"
           "https://nix-community.cachix.org"
           "https://yazi.cachix.org"
