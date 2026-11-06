@@ -193,6 +193,14 @@ in
     publicKeys = piRecipients;
   };
 
+  # Credentials for the alt Hermes tenant. The file starts as a copy of
+  # hermes-env.age; replace it with the private profile's own tokens and
+  # HERMES_WEBUI_PASSWORD.
+  "hermes-env-alt.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [
@@ -206,6 +214,17 @@ in
     publicKeys = [
       Goofeus
       GoofyDesky
+    ];
+  };
+
+  # Nix signing key for ramsay.dab-octatonic.ts.net. Generated on Ramsay with
+  # `nix key generate-secret --key-name ramsay.dab-octatonic.ts.net`; public half
+  # is flake.builderSites.ramsay.nixPublicKey.
+  "nix-builder-ramsay.age" = {
+    armor = true;
+    publicKeys = [
+      Ramsay
+      GoofyDeskyRoot
     ];
   };
 }

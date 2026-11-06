@@ -3,7 +3,9 @@
 # tailscale0, so every port here is tailnet-only. The Gateway API binds 8642
 # for REST and the backend binds 9119 for the dashboard routes and the
 # /api/ws JSON-RPC transport. The webui binds loopback. Tailscale serve
-# publishes the webui and the API on 443 and the dashboard on 8443.
+# publishes the webui and the API on 443 and the dashboard on 8443. A second
+# tenant — user hermes-alt, root /var/lib/hermes-alt, gateway plus webui on
+# 127.0.0.1:8788 — serves the private profile as svc:hermes-webui-alt.
 { inputs, ... }:
 {
   flake.nixosModules.hermes =
@@ -17,6 +19,40 @@
         (_: {
           version = hermesVersion;
         });
+
+      # The alt tenant. A second user owns a second root, so the main hermes user
+      # has no path into the private profile. The module holds one option set, so
+      # these units copy the native unit shape by hand.
+      altStateDir = "/var/lib/hermes-alt";
+      altProfileHome = "${altStateDir}/.hermes/profiles/private";
+      # The module's own renderers, so the alt config.yaml and .env match the
+      # shape the package expects, including the _config_version stamp.
+      altCommon = import (inputs.hermes-agent + "/nix/moduleCommon.nix") {
+        inherit lib;
+      };
+      altAgentCfg = {
+        inherit (config.services.hermes-agent) environment;
+        package = agentPackage;
+        # gateway.standalone keeps the alt gateway out of the main gateway's
+        # multiplexer, which is the one rule host_attach.py allows a second
+        # gateway to break.
+        settings = lib.recursiveUpdate config.services.hermes-agent.settings {
+          gateway.standalone = true;
+        };
+        configFile = null;
+        extraPythonPackages = [ ];
+        extraDependencyGroups = [ ];
+        environmentFiles = [ config.age.secrets."hermes-env-alt".path ];
+      };
+      altConfigFiles = altCommon.mkConfigFiles {
+        inherit pkgs;
+        cfg = altAgentCfg;
+        workingDirectory = "${altStateDir}/workspace";
+      };
+      altEnvScript = altCommon.mkEnvScript {
+        inherit pkgs;
+        environment = config.services.hermes-agent.environment;
+      };
     in
     {
       imports = [
@@ -26,6 +62,12 @@
 
       age.secrets."hermes-env" = {
         file = ../../secrets/hermes-env.age;
+        mode = "0400";
+      };
+      # The alt tenant reads its own credentials, so the two gateways never hold
+      # one bot token at the same time.
+      age.secrets."hermes-env-alt" = {
+        file = ../../secrets/hermes-env-alt.age;
         mode = "0400";
       };
       services.hermes-agent = {
@@ -282,12 +324,136 @@
         environmentFiles = [ config.age.secrets."hermes-env".path ];
       };
 
+      # The alt tenant owns its own user and root. The main hermes user holds
+      # /var/lib/hermes at 0700, so a file there stays unreadable for hermes-alt,
+      # and a file here stays unreadable for hermes.
+      users.groups.hermes-alt = { };
+      users.users.hermes-alt = {
+        isSystemUser = true;
+        group = "hermes-alt";
+        home = altStateDir;
+        createHome = true;
+        homeMode = "0700";
+        shell = pkgs.bashInteractive;
+        # The gateway dispatches cron through `systemd-run --user`, which needs a
+        # user manager for this uid.
+        linger = true;
+      };
+
+      # The module builds config.yaml and .env only for the single stateDir, so
+      # this unit seeds the alt profile home from the same Nix sources.
+      systemd.services.hermes-alt-home = {
+        description = "Seed the alt Hermes profile home";
+        wantedBy = [ "multi-user.target" ];
+        before = [ "hermes-agent-alt.service" "hermes-webui-alt.service" ];
+        path = [ pkgs.coreutils ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script = ''
+          root=${altStateDir}
+          home=${altProfileHome}
+          mkdir -p "$root" "$root/.hermes" "$home" "$root/workspace" "$root/webui"
+          for d in cron sessions logs memories plugins; do
+            mkdir -p "$home/$d"
+          done
+          # The alt config selects context.engine = "lean-ctx", which the plugin
+          # provides. The main agent links the same set as nix-managed-<name>.
+          for p in ${toString config.services.hermes-agent.extraPlugins}; do
+            ln -sfn "$p" "$home/plugins/nix-managed-$(basename "$p")"
+          done
+          chown -R hermes-alt:hermes-alt "$root"
+          chmod 700 "$root" "$root/.hermes" "$home"
+          install -o hermes-alt -g hermes-alt -m 0640 -D \
+            ${altConfigFiles.effective} "$home/config.yaml"
+          ${altEnvScript} "$home/.env" 0640 ${config.age.secrets."hermes-env-alt".path}
+          chown hermes-alt:hermes-alt "$home/.env"
+        '';
+      };
+
+      # The alt gateway. The profile marks itself standalone, so host_attach.py
+      # lets it coexist with the multiplexing gateway on the main user.
+      systemd.services.hermes-agent-alt = {
+        description = "Hermes Agent Gateway (alt profile)";
+        wantedBy = [ "multi-user.target" ];
+        after = [
+          "network-online.target"
+          "linger-users.service"
+          "hermes-alt-home.service"
+        ];
+        wants = [ "network-online.target" "linger-users.service" ];
+        unitConfig.Requires = [ "hermes-alt-home.service" ];
+        path = [ agentPackage pkgs.bash pkgs.coreutils pkgs.git ];
+        environment = {
+          HOME = altStateDir;
+          HERMES_HOME = altProfileHome;
+          HERMES_MANAGED = "true";
+        };
+        # loginctl returns before user@<uid>.service finishes, and the gateway
+        # resolves the user bus once at startup. Bounded and non-fatal.
+        preStart = ''
+          for _ in $(seq 1 50); do
+            [ -S "/run/user/$(id -u)/bus" ] && break
+            sleep 0.2
+          done
+        '';
+        serviceConfig = {
+          User = "hermes-alt";
+          Group = "hermes-alt";
+          WorkingDirectory = "${altStateDir}/workspace";
+          ExecStart = "${agentPackage}/bin/hermes gateway";
+          Restart = "always";
+          RestartSec = 5;
+          UMask = "0007";
+          NoNewPrivileges = true;
+          ProtectSystem = "strict";
+          ProtectHome = false;
+          ReadWritePaths = [ altStateDir "${altStateDir}/workspace" ];
+          PrivateTmp = true;
+        };
+      };
+
+      # The alt webui. HERMES_HOME points at the profile home and
+      # ISOLATED_PROFILE pins it, so this instance never offers the main profile.
+      # Cookie names differ from the first instance because browsers key cookies
+      # by host, not port, so both ports on one host share a cookie jar.
+      systemd.services.hermes-webui-alt = {
+        description = "Hermes Web UI (alt profile)";
+        after = [ "network-online.target" "hermes-agent-alt.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        unitConfig.Requires = [ "hermes-agent-alt.service" ];
+        serviceConfig = {
+          Type = "simple";
+          User = "hermes-alt";
+          Group = "hermes-alt";
+          ExecStart = "${config.services.hermes-webui.package}/bin/hermes-webui";
+          Restart = "on-failure";
+          Environment = [
+            "HERMES_WEBUI_HOST=127.0.0.1"
+            "HERMES_WEBUI_PORT=8788"
+            "HERMES_WEBUI_STATE_DIR=${altStateDir}/webui"
+            "HERMES_HOME=${altProfileHome}"
+            "HERMES_WEBUI_ISOLATED_PROFILE=private"
+            "HERMES_WEBUI_DEFAULT_WORKSPACE=${altStateDir}/workspace"
+            "HERMES_WEBUI_COOKIE_NAME=hermes_webui_alt_session"
+            "HERMES_WEBUI_PROFILE_COOKIE_NAME=hermes_profile_alt"
+            "HERMES_WEBUI_PYTHON=${agentPackage.passthru.hermesVenv}/bin/python3"
+          ];
+          EnvironmentFile = [ config.age.secrets."hermes-env-alt".path ];
+          UMask = "0077";
+        };
+      };
+
       systemd.services.tailscale-serve-hermes = lib.mkIf config.services.tailscale.enable {
         description = "Tailscale serve for the Hermes web UI and API";
         after = [
           "tailscaled.service"
           "hermes-webui.service"
+          "hermes-webui-alt.service"
           "hermes-agent.service"
+          "hermes-agent-alt.service"
           "hermes-backend.service"
         ];
         wants = [ "tailscaled.service" ];
@@ -310,6 +476,7 @@
           done
 
           tailscale serve --yes --service=svc:hermes-webui --https=443 127.0.0.1:8787
+          tailscale serve --yes --service=svc:hermes-webui-alt --https=443 127.0.0.1:8788
           tailscale serve --yes --service=svc:hermes-api --https=443 127.0.0.1:8642
           # The app builds the dashboard URL from its one host field and a port.
           # Over HTTPS it reuses the gateway port, so the dashboard needs a
