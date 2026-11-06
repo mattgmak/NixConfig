@@ -148,6 +148,10 @@
         # preview rows at the column width.
         popupWidth = "100%";
         popupHeight = "90%";
+        # bg=default lets tmux pick the pane background, and it picks base01
+        # (#22273d) while the terminal itself paints base00 (#171726). Name the
+        # Stylix pair so the popup matches the terminal.
+        popupStyle = "bg=${hexOr "base00" "#171726"},fg=${hexOr "base05" "#ffffff"}";
         # Every loadout binary on the host, named as its wrapper runs it. The
         # pi-coding-agent module names each process after its loadout.
         agents = [ "pi" "pi-local" "pi-stock" ];
