@@ -143,7 +143,10 @@
       programs.agent-sesh = {
         enable = true;
         tmuxKey = "a";
-        popupWidth = "90%";
+        # The picker sizes its preview column to the pane it shows, so the popup
+        # gives it every column the list does not use. A narrower popup truncates
+        # preview rows at the column width.
+        popupWidth = "100%";
         popupHeight = "90%";
         # Every loadout binary on the host, named as its wrapper runs it. The
         # pi-coding-agent module names each process after its loadout.
