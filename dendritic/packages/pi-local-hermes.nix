@@ -92,6 +92,23 @@
         done
       '';
 
+      # dendritic/skills mixes real folders with symlinks into ../../vendor, and a
+      # store copy keeps those symlinks unresolved, so the vendored names break there.
+      # The farm lists every skill from both sources and points each name at a folder
+      # that exists in the store. Local folders win, so a forked copy shadows the
+      # vendored one.
+      skills =
+        let
+          fromDir = dir: builtins.mapAttrs (name: _: dir + "/${name}") (
+            pkgs.lib.filterAttrs (_: type: type == "directory") (builtins.readDir dir)
+          );
+        in
+        pkgs.linkFarm "pi-local-hermes-skills" (
+          pkgs.lib.mapAttrsToList (
+            name: path: { inherit name path; }
+          ) ((fromDir ../../vendor/mattpocock/skills/skills/productivity) // (fromDir ../skills))
+        );
+
       # bin/pi plus the agent dir mirrored into $HOME/.pi/agent. The mirror holds
       # symlinks only, so pi still writes sessions and cache in a writable dir.
       # extensions gets real directories with linked files: an extension that
@@ -112,6 +129,7 @@
           ln -sfn ${piModule + "/web-search.json"} "$dir/web-search.json"
           ln -sfn ${piModule + "/themes"} "$dir/themes"
           ln -sfn ${piModule + "/prompts"} "$dir/prompts"
+          ln -sfn ${skills} "$dir/skills"
           mkdir -p "$dir/extensions"
           for entry in ${extensions}/*; do
             name="$(basename "$entry")"

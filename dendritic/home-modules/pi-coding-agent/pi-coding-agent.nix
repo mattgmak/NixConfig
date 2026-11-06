@@ -164,6 +164,7 @@
         "pi-blackhole"
         "prompts"
         "settings.json"
+        "skills"
         "themes"
         "web-search.json"
       ];
