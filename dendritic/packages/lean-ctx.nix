@@ -14,17 +14,17 @@
           onnxruntime,
         }:
         let
-          version = "3.11.4";
+          version = "3.12.2";
           baseUrl = "https://github.com/yvgude/lean-ctx/releases/download/v${version}";
 
           platformAttrs = {
             "aarch64-darwin" = {
               asset = "lean-ctx-aarch64-apple-darwin.tar.gz";
-              hash = "sha256-0LxLG5FxVDbmtADe29+x6uup2vpXXR1smi8yltBAJF8=";
+              hash = "sha256-dP33B+yod2HIGMLKrigFuZDIOl+0Wdfn3lQeUlsq+tw=";
             };
             "x86_64-linux" = {
               asset = "lean-ctx-x86_64-unknown-linux-gnu.tar.gz";
-              hash = "sha256-UETQOT97Ubu4YUNb2dmGlDOWeLT4J6aQIW2HC2cZ1Wo=";
+              hash = "sha256-UBpMIJ6S5uI0Xvh1RAlEqgRthrFqjC8t+AmfI0p1oHg=";
             };
           };
 
