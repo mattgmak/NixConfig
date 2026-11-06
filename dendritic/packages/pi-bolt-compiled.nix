@@ -463,7 +463,7 @@
           pnpmDepRepos = [
             {
               repo = "gotgenes/pi-packages";
-              hash = "sha256-0Hrtwjpu3uh9pV/dLYNpIUy3kaUeljk+vTQayjD/UAI=";
+              hash = "sha256-4Y1toGVK2MSKaaZuUGDCf/hIwqXSgcPojFoBSRTjHLg=";
               workspaces = [
                 "@gotgenes/pi-permission-system"
                 "@gotgenes/pi-session-tools"
