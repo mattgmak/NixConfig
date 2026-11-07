@@ -168,6 +168,12 @@
       # Read the changelog before changing this value
       system.stateVersion = "24.05";
 
+      # MagicDNS answers AAAA for the ts.net names and the v6 path fails from the
+      # phone, so pin Ramsay to its tailnet IPv4 for ssh and HTTP alike.
+      networking.extraHosts = ''
+        100.76.193.66 ramsay.dab-octatonic.ts.net ramsay
+      '';
+
       # Flakes only. The old "getting pseudoterminal attributes: Permission denied"
       # failure came from the proot TCGETS2 bug, fixed upstream, not from the
       # builders line. builders-use-substitutes pulls outputs from the cache
