@@ -361,6 +361,10 @@
         hermesHome = "${config.services.hermes-agent.stateDir}/.hermes";
         agent.package = agentPackage;
         environmentFiles = [ config.age.secrets."hermes-env".path ];
+        # The webui venv ships no `gateway` Python package, so its agent health
+        # probe finds no local signal and shows "Gateway not configured". An
+        # explicit API URL switches the probe to HTTP against this gateway.
+        extraEnvironment = { HERMES_API_URL = "http://127.0.0.1:8642"; };
       };
 
       # The alt tenant owns its own user and root. The main hermes user holds
@@ -527,6 +531,7 @@
             "HERMES_WEBUI_COOKIE_NAME=hermes_webui_alt_session"
             "HERMES_WEBUI_PROFILE_COOKIE_NAME=hermes_profile_alt"
             "HERMES_WEBUI_PYTHON=${agentPackage.passthru.hermesVenv}/bin/python3"
+            "HERMES_API_URL=http://127.0.0.1:8643"
           ];
           EnvironmentFile = [ config.age.secrets."hermes-env-alt".path ];
           UMask = "0077";
