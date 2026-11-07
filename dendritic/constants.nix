@@ -22,7 +22,7 @@ let
     goofeus = {
       hostName = "goofeus.dab-octatonic.ts.net";
       sshUser = "root";
-      nixPublicKey = "goofeus.dab-octatonic.ts.net:ZsXB0M4jMo4KhUwLw9UoT6YcmKXuEiv6nMczc5jM+I=";
+      nixPublicKey = "goofeus.dab-octatonic.ts.net:ZsXB0M4jMo4KhUQwLw9UoT6YcmKXuEiv6nMczc5jM+I=";
       sshPublicKey = "AAAAC3NzaC1lZDI1NTE5AAAAIJeW872aIf7gEz8mS6MOLOaheMNpJghqVppQlUYSqq4x";
       systems = [ "x86_64-linux" ];
       maxJobs = 8;
