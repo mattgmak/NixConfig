@@ -43,10 +43,6 @@
     action = hl.dsp.exec_cmd("caelestia shell drawers toggle launcher"),
   })
   hl.plugin.hyprgrass.bind({
-    pattern = { kind = "tap", fingers = 4 },
-    action = hl.dsp.exec_cmd("rofi -show drun"),
-  })
-  hl.plugin.hyprgrass.bind({
     pattern = { kind = "tap", fingers = 5 },
     action = hl.dsp.exec_cmd("~/.config/hypr/scripts/window-switcher.nu"),
   })

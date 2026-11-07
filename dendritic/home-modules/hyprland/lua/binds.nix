@@ -39,7 +39,6 @@ let
 
   binds = [
     (bind "ALT + m" "hl.dsp.exec_cmd(\"caelestia shell drawers toggle launcher\")" null)
-    (bind "ALT + SHIFT + m" "hl.dsp.exec_cmd(\"rofi -show drun\")" null)
     (bind "ALT + h" "hl.dsp.focus({ direction = \"left\" })" null)
     (bind "ALT + j" "hl.dsp.focus({ direction = \"down\" })" null)
     (bind "ALT + k" "hl.dsp.focus({ direction = \"up\" })" null)

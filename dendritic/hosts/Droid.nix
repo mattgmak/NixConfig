@@ -110,6 +110,8 @@
         stylix.targets.gnome.enable = lib.mkForce false;
         stylix.targets.gtk.enable = lib.mkForce false;
         stylix.targets.kde.enable = lib.mkForce false;
+      # Rofi is not installed; Stylix still writes the renamed programs.rofi.font option.
+      stylix.targets.rofi.enable = false;
         # HM defaults dconf on for Linux; dbus is not available in this environment.
         dconf.enable = false;
         # agenix's HM module only decrypts from a systemd user service, which does
