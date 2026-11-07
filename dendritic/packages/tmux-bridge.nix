@@ -14,6 +14,10 @@
 # Precedence: PI_OPEN / PI_COPY / PI_CLIENT override, then the by-tty link,
 # then this host's own open, xdg-open, pbcopy, wl-copy, xsel or xclip.
 #
+# A plain ssh login shell on a Linux client carries no display, so its entries
+# name the Wayland socket of the running compositor. Without it, the
+# `xdg-open` there exits 1 and fzf-tmux-url reports the failure.
+#
 # TODO: fold the table into the pi-clip protocol once it gains open and write
 # verbs. The socket is read-only today, so ssh carries these two calls.
 { ... }:
@@ -23,12 +27,23 @@
     let
       inherit (pkgs.lib) concatStringsSep mapAttrsToList;
 
-      # Reuse one connection per target, the same way the client ssh blocks do.
-      sshCmd = "ssh -o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -o ControlMaster=auto -o ControlPath=~/.ssh/cm-%r@%h:%p -o ControlPersist=yes";
+      # Options for every ssh call. ControlPath spells out $HOME: a tilde never
+      # expands after `=`, so the old `ControlPath=~/.ssh/...` pointed at a path
+      # under the current directory and no call ever reused a connection.
+      sshOpts = "-o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new -o ControlMaster=auto -o \"ControlPath=$HOME/.ssh/cm-%r@%h:%p\" -o ControlPersist=yes";
 
-      # name -> ssh target plus the opener and the copier on that machine.
-      # macmini is verified live; desky and envy take their user from
-      # dendritic/constants.nix.
+      # The Wayland socket of a Linux client as one `env` argument. The quotes
+      # and the backslashes keep the substitution away from the local shell, so
+      # only the client shell runs it.
+      waylandEnv = "\"WAYLAND_DISPLAY=\\$(cd /run/user/\\$UID 2>/dev/null && ls -1t | grep -m1 ^wayland-)\"";
+
+      # name -> the ssh target plus the opener and the copier on that machine.
+      # Entries are complete argument lists, so a value with spaces needs its own
+      # quotes. macmini is verified live; desky and envy take their user from
+      # dendritic/constants.nix. The wl-copy entries quote their redirect so it
+      # survives the join into one remote command line: wl-copy forks a child that
+      # holds the ssh channel open, so ssh waits forever unless the remote output
+      # is not a pipe.
       clients = {
         macmini = {
           target = "mattgmak@macmini.dab-octatonic.ts.net";
@@ -37,23 +52,28 @@
         };
         desky = {
           target = "goofy@goofydesky.dab-octatonic.ts.net";
-          open = "xdg-open";
-          copy = "wl-copy";
+          open = "env ${waylandEnv} xdg-open";
+          copy = "env ${waylandEnv} wl-copy '>' '/dev/null' '2>&1'";
         };
         envy = {
           target = "goofy@goofyenvy.dab-octatonic.ts.net";
-          open = "xdg-open";
-          copy = "wl-copy";
+          open = "env ${waylandEnv} xdg-open";
+          copy = "env ${waylandEnv} wl-copy '>' '/dev/null' '2>&1'";
         };
       };
 
-      # Each verb gets one case body: name -> "ssh <opts> <target> <program>".
-      branch =
-        verb: concatStringsSep "\n" (
-          mapAttrsToList (
-            name: client: "    ${name}) echo '${sshCmd} ${client.target} ${client.${verb}}' ;;"
-          ) clients
-        );
+      # One arm per verb and client. The arm holds the text of an array
+      # assignment, so bash parses the quotes in it instead of receiving them
+      # from an expansion, where they would turn into literal characters.
+      arm =
+        verb: name: client:
+        "    ${verb}:${name}) CMD=(ssh ${sshOpts} ${client.target} ${client.${verb}}) ;;";
+
+      arms = concatStringsSep "\n" (
+        mapAttrsToList (
+          name: client: "${arm "open" name client}\n${arm "copy" name client}"
+        ) clients
+      );
     in
     {
       packages.tmuxBridge = pkgs.writeShellApplication {
@@ -61,18 +81,31 @@
         text = ''
           set -u
 
-          # remote_open and remote_copy print the command for a client name, or
-          # nothing when the name is unknown.
-          remote_open() {
-            case "$1" in
-          ${branch "open"}
+          # set_client loads the table entry for one verb and one client into CMD.
+          # An unknown name leaves CMD empty.
+          set_client() {
+            CMD=()
+            case "$1:$2" in
+          ${arms}
             esac
           }
 
-          remote_copy() {
-            case "$1" in
-          ${branch "copy"}
-            esac
+          # set_string loads a command string into CMD. Callers pass strings from
+          # the environment only, never a target.
+          set_string() {
+            CMD=()
+            [ -n "$1" ] || return 0
+            read -r -a CMD <<<"$1"
+          }
+
+          # run_cmd runs CMD with the extra arguments appended and names the
+          # command on failure.
+          run_cmd() {
+            [ "''${#CMD[@]}" -gt 0 ] || return 1
+            if ! "''${CMD[@]}" "$@" >/dev/null 2>&1; then
+              printf 'tmux-bridge: %s failed\n' "''${CMD[*]}" >&2
+              return 1
+            fi
           }
 
           # session_client prints the machine this shell belongs to. It checks the
@@ -101,38 +134,27 @@
             exit 1
           }
 
-          # try_command runs one candidate and reports the command on failure. sh -c
-          # splits the string into argv, and $0 carries the command so the caller's
-          # arguments stay quoted. The strings come from the tables, never from the
-          # caller, so the split is safe.
-          try_command() {
-            local candidate="$1"
-            shift
-            [ -n "$candidate" ] || return 1
-            if sh -c 'exec $0 "$@"' "$candidate" "$@" >/dev/null 2>&1; then
-              return 0
-            fi
-            printf 'tmux-bridge: %s failed\n' "$candidate" >&2
-            return 1
-          }
-
           do_open() {
-            local client cmd
+            local client value
 
             [ "$#" -gt 0 ] || fail "open needs a target"
             client="$(session_client)"
-            for cmd in "''${PI_OPEN:-}" "''${LC_PI_OPEN:-}" "$(remote_open "$client")"; do
-              try_command "$cmd" "$@" && return 0
+            for value in "''${PI_OPEN:-}" "''${LC_PI_OPEN:-}"; do
+              set_string "$value"
+              run_cmd "$@" && return 0
             done
-            for cmd in open xdg-open; do
-              command -v "$cmd" >/dev/null 2>&1 || continue
-              try_command "$cmd" "$@" && return 0
+            set_client open "$client"
+            run_cmd "$@" && return 0
+            for value in open xdg-open; do
+              command -v "$value" >/dev/null 2>&1 || continue
+              set_string "$value"
+              run_cmd "$@" && return 0
             done
             fail "no opener for $*"
           }
 
           do_copy() {
-            local buf client cmd
+            local buf client value
 
             if [ -t 0 ]; then
               fail "copy needs the selection on stdin"
@@ -143,22 +165,29 @@
             trap "rm -f '$buf'" EXIT
             cat >"$buf"
             client="$(session_client)"
-            for cmd in "''${PI_COPY:-}" "''${LC_PI_COPY:-}" "$(remote_copy "$client")"; do
-              try_command "$cmd" <"$buf" && return 0
+            for value in "''${PI_COPY:-}" "''${LC_PI_COPY:-}"; do
+              set_string "$value"
+              run_cmd <"$buf" && return 0
             done
+            set_client copy "$client"
+            run_cmd <"$buf" && return 0
             # Local providers, each gated on the display server it needs.
             if [ "$(uname -s)" = Darwin ] && command -v pbcopy >/dev/null 2>&1; then
-              try_command pbcopy <"$buf" && return 0
+              set_string pbcopy
+              run_cmd <"$buf" && return 0
             fi
             if [ -n "''${WAYLAND_DISPLAY:-}" ] && command -v wl-copy >/dev/null 2>&1; then
-              try_command wl-copy <"$buf" && return 0
+              set_string wl-copy
+              run_cmd <"$buf" && return 0
             fi
             if [ -n "''${DISPLAY:-}" ]; then
               if command -v xsel >/dev/null 2>&1; then
-                try_command "xsel -i --clipboard" <"$buf" && return 0
+                set_string "xsel -i --clipboard"
+                run_cmd <"$buf" && return 0
               fi
               if command -v xclip >/dev/null 2>&1; then
-                try_command "xclip -selection clipboard" <"$buf" && return 0
+                set_string "xclip -selection clipboard"
+                run_cmd <"$buf" && return 0
               fi
             fi
             fail "no clipboard provider"
