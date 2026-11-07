@@ -4,8 +4,8 @@
 # for REST and the backend binds 9119 for the dashboard routes and the
 # /api/ws JSON-RPC transport. The webui binds loopback. Tailscale serve
 # publishes the webui and the API on 443 and the dashboard on 8443. A second
-# tenant — user hermes-alt, root /var/lib/hermes-alt, gateway plus webui on
-# 127.0.0.1:8788 — serves the private profile as svc:hermes-webui-alt.
+# tenant — user hermes-alt, root /var/lib/hermes-alt — mirrors the first on
+# 8643, 9120 and 8788 as svc:hermes-api-alt and svc:hermes-webui-alt.
 { inputs, ... }:
 {
   flake.nixosModules.hermes =
@@ -30,14 +30,27 @@
       altCommon = import (inputs.hermes-agent + "/nix/moduleCommon.nix") {
         inherit lib;
       };
+      # The main gateway holds 8642, and api_server.py reads extra.port before
+      # the API_SERVER_PORT env var, so both sources carry 8643 here. The CORS
+      # list names the alt origins because the main list rejects them.
+      altEnvironment = builtins.removeAttrs config.services.hermes-agent.environment [
+        "API_SERVER_CORS_ORIGINS"
+      ] // {
+        API_SERVER_PORT = "8643";
+        API_SERVER_CORS_ORIGINS = "https://hermes-api-alt.dab-octatonic.ts.net,https://hermes-webui-alt.dab-octatonic.ts.net";
+      };
       altAgentCfg = {
-        inherit (config.services.hermes-agent) environment;
+        environment = altEnvironment;
         package = agentPackage;
         # gateway.standalone keeps the alt gateway out of the main gateway's
         # multiplexer, which is the one rule host_attach.py allows a second
         # gateway to break.
         settings = lib.recursiveUpdate config.services.hermes-agent.settings {
           gateway.standalone = true;
+          platforms.api_server.extra.port = 8643;
+          # The main config points the Dashboard link at the main dashboard, so
+          # the alt config needs its own URL.
+          webui.dashboard.url = "https://hermes-api-alt.dab-octatonic.ts.net:8443";
         };
         configFile = null;
         extraPythonPackages = [ ];
@@ -51,8 +64,14 @@
       };
       altEnvScript = altCommon.mkEnvScript {
         inherit pkgs;
-        environment = config.services.hermes-agent.environment;
+        environment = altEnvironment;
       };
+      # comma resolves a bare command name from the nix-index database at
+      # ~/.cache/nix-index/files. Neither hermes user has home-manager, so link
+      # the database file into both homes. `packages.<system>.default` is the
+      # nix-index binary; `nix-index-database` is the index itself.
+      nixIndexDb =
+        inputs.nix-index-database.packages.${pkgs.stdenv.hostPlatform.system}.nix-index-database;
     in
     {
       imports = [
@@ -70,6 +89,16 @@
         file = ../../secrets/hermes-env-alt.age;
         mode = "0400";
       };
+
+      systemd.tmpfiles.rules = [
+        "d /var/lib/hermes/.cache 0700 hermes hermes - -"
+        "d /var/lib/hermes/.cache/nix-index 0700 hermes hermes - -"
+        "L+ /var/lib/hermes/.cache/nix-index/files - - - - ${nixIndexDb}"
+        "d /var/lib/hermes-alt/.cache 0700 hermes-alt hermes-alt - -"
+        "d /var/lib/hermes-alt/.cache/nix-index 0700 hermes-alt hermes-alt - -"
+        "L+ /var/lib/hermes-alt/.cache/nix-index/files - - - - ${nixIndexDb}"
+      ];
+
       services.hermes-agent = {
         enable = true;
         package = agentPackage;
@@ -78,10 +107,16 @@
         # ramsayDeploy holds the deploy scripts. See
         # dendritic/packages/ramsay-deploy.nix. git is on the PATH because the
         # deploy skill inspects the clone with plain git commands.
+        # nix and comma reach any nixpkgs tool: `nix run nixpkgs#<pkg>` and
+        # `comma <cmd>`. nix-daemon.socket is 0666, so an unprivileged unit can
+        # use the daemon. lean-ctx is the CLI behind the context engine plugin.
         extraPackages = [
           pkgs.piLocalHermes
           pkgs.ramsayDeploy
           pkgs.git
+          pkgs.nix
+          pkgs.comma
+          pkgs.lean-ctx
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
@@ -153,6 +188,10 @@
           # ContextCompressor, so the compression.* keys below stay inert until
           # this reverts to "compressor".
           context.engine = "lean-ctx";
+          # extraPlugins installs the plugin dir, and the webui shows it Disabled
+          # until its name joins this list. `hermes plugins enable` writes the same
+          # key into config.yaml.
+          plugins.enabled = [ "hermes-lean-ctx" ];
           # Built-in compressor tuning. A sub-512K window floors threshold at
           # 0.75, so compaction fires at 98304 tokens here. protect_first_n = 0
           # keeps only the system prompt plus the rolling summary, and three real
@@ -384,7 +423,15 @@
         ];
         wants = [ "network-online.target" "linger-users.service" ];
         unitConfig.Requires = [ "hermes-alt-home.service" ];
-        path = [ agentPackage pkgs.bash pkgs.coreutils pkgs.git ];
+        path = [
+          agentPackage
+          pkgs.bash
+          pkgs.coreutils
+          pkgs.git
+          pkgs.nix
+          pkgs.comma
+          pkgs.lean-ctx
+        ];
         environment = {
           HOME = altStateDir;
           HERMES_HOME = altProfileHome;
@@ -403,6 +450,46 @@
           Group = "hermes-alt";
           WorkingDirectory = "${altStateDir}/workspace";
           ExecStart = "${agentPackage}/bin/hermes gateway";
+          Restart = "always";
+          RestartSec = 5;
+          UMask = "0007";
+          NoNewPrivileges = true;
+          ProtectSystem = "strict";
+          ProtectHome = false;
+          ReadWritePaths = [ altStateDir "${altStateDir}/workspace" ];
+          PrivateTmp = true;
+        };
+      };
+
+      # The alt backend. The module builds one backend unit, so this unit copies
+      # the generated shape with the alt user, the alt home, and port 9120. The
+      # 0.0.0.0 bind keeps the Host guard open for the MagicDNS name, the same
+      # reason the main backend binds 0.0.0.0.
+      systemd.services.hermes-backend-alt = {
+        description = "Hermes Agent web dashboard and desktop backend (alt profile)";
+        after = [ "network-online.target" "hermes-agent-alt.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        unitConfig.Requires = [ "hermes-agent-alt.service" ];
+        path = [
+          agentPackage
+          pkgs.bash
+          pkgs.coreutils
+          pkgs.git
+          pkgs.nix
+          pkgs.comma
+          pkgs.lean-ctx
+        ];
+        environment = {
+          HOME = altStateDir;
+          HERMES_HOME = altProfileHome;
+          HERMES_MANAGED = "true";
+        };
+        serviceConfig = {
+          User = "hermes-alt";
+          Group = "hermes-alt";
+          WorkingDirectory = "${altStateDir}/workspace";
+          ExecStart = "${agentPackage}/bin/hermes dashboard --host 0.0.0.0 --port 9120 --no-open";
           Restart = "always";
           RestartSec = 5;
           UMask = "0007";
@@ -455,6 +542,7 @@
           "hermes-agent.service"
           "hermes-agent-alt.service"
           "hermes-backend.service"
+          "hermes-backend-alt.service"
         ];
         wants = [ "tailscaled.service" ];
         wantedBy = [ "multi-user.target" ];
@@ -482,6 +570,8 @@
           # Over HTTPS it reuses the gateway port, so the dashboard needs a
           # second HTTPS port on the same service. Set Dashboard Port to 8443.
           tailscale serve --yes --service=svc:hermes-api --https=8443 127.0.0.1:9119
+          tailscale serve --yes --service=svc:hermes-api-alt --https=443 127.0.0.1:8643
+          tailscale serve --yes --service=svc:hermes-api-alt --https=8443 127.0.0.1:9120
         '';
       };
     };
