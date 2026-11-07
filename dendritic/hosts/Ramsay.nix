@@ -139,7 +139,12 @@ in
 
         # pi's X11 clipboard backend for the ssh -X route. wl-clipboard needs a
         # live compositor, so it cannot serve a headless host.
-        home.packages = with pkgs; [ xclip ];
+        # android-tools gives adb. pi drives the phone with `adb connect` against
+        # its tailnet address, so no USB attach and no udev rule is involved.
+        home.packages = with pkgs; [
+          android-tools
+          xclip
+        ];
 
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
