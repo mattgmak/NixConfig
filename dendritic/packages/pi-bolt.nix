@@ -12,18 +12,18 @@
           makeWrapper,
         }:
         let
-          version = "1.1.1";
+          version = "1.1.4";
 
           # Asset names are stable across releases (scripts/package-release.sh).
           # linux-x64 = AVX2 build; -baseline (SSE4.2) and -jit variants exist too.
           platformAttrs = {
             "aarch64-darwin" = {
               variant = "darwin-arm64";
-              hash = "sha256-+TCdpj+GmfOs0DcH9wmyouNKcU7sKDpMXieKdIk9ZIo=";
+              hash = "sha256-Celf5elnwEiIkhPOmAdyXLrjxHMd5+eRmXHfUkHSv4k=";
             };
             "x86_64-linux" = {
               variant = "linux-x64";
-              hash = "sha256-J0/7Lh3e6V1S8UyeIvDlREYYyy1aMQ77T/dYi335VsM=";
+              hash = "sha256-yrD3hRt/FR/e0jZb023DO3j9NRPU4S8I5wpK1VWrdZs=";
             };
           };
 

@@ -18,7 +18,7 @@
           coreutils,
         }:
         let
-          version = "1.1.1";
+          version = "1.1.4";
 
           # Three assets per system, all from this base:
           #   pi-bolt-<variant>.tar.xz            release app tree
@@ -31,15 +31,15 @@
           platformAttrs = {
             "x86_64-linux" = {
               variant = "linux-x64";
-              appHash = "sha256-J0/7Lh3e6V1S8UyeIvDlREYYyy1aMQ77T/dYi335VsM=";
-              runtimeHash = "sha256-jWeEeqSObiyDqoAbbADy2FYeZjIs2f5IoW0x0KdxVME=";
-              kitHash = "sha256-BfVXqXBPIx+F9fJ/gg1ywJTIcp9AgDVXZx5lY3bRtqk=";
+              appHash = "sha256-yrD3hRt/FR/e0jZb023DO3j9NRPU4S8I5wpK1VWrdZs=";
+              runtimeHash = "sha256-Z79HShxuIGWeAxLMiN0vW9qf1Ja6RLWHTinjRQZv+x0=";
+              kitHash = "sha256-6JCb3+2Uo20OxLJ7PTYnsGznSQB16YWl2HFTRLvrTQ0=";
             };
             "aarch64-darwin" = {
               variant = "darwin-arm64";
-              appHash = "sha256-+TCdpj+GmfOs0DcH9wmyouNKcU7sKDpMXieKdIk9ZIo=";
-              runtimeHash = "sha256-JfHLrVJ/PjWa3kaDUmv1nxmuIdAphXevGHvnGC4zsH8=";
-              kitHash = "sha256-kvmphVUkIaJ8HQiulDCMCkRBL6ov88wpbVXY0AhvCb4=";
+              appHash = "sha256-Celf5elnwEiIkhPOmAdyXLrjxHMd5+eRmXHfUkHSv4k=";
+              runtimeHash = "sha256-NuKHvFs9Vsj6wr6ieFJwWZb293awzuZ6arYT0tt9xcg=";
+              kitHash = "sha256-WdziIA58Z01LgJSrHfXG6/GmLB+fCnKzTpwfrKHMHZA=";
             };
           };
 
