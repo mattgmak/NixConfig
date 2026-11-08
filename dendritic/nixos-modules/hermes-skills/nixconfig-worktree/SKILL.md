@@ -113,12 +113,13 @@ Pass `--no-kill`: the session belongs to the owner, so the script must keep the 
 
 Two layers gate the agent tmux server, and the skill needs both:
 
-1. The directories. `logind` makes `/run/user/1000` mode `0700`, so `hermes` cannot traverse it. The rule `A+ /run/user/1000 - - - - u:hermes:r-x` in `dendritic/hosts/Ramsay.nix` puts a POSIX ACL on the runtime dir and everything under it, including `tmux-1000`.
-2. The socket. `agent` runs `tmux -S /run/user/1000/tmux-1000/default server-access -a hermes`. It changes the socket from `srw-------` to `srwxrwx---`. Only the server owner or root can run it, so the agent runs it, never `hermes`.
+1. The directories. `logind` makes `/run/user/1000` mode `0700`, so `hermes` cannot traverse it. Two `a+` rules in `dendritic/hosts/Ramsay.nix` put `u:hermes:r-x` on `/run/user/1000` and on `tmux-1000`. They stay non-recursive. A recursive `A+` rule also writes the entry onto the socket, and `r-x` there kills the write bit.
+2. The socket. `agent` runs `tmux -S /run/user/1000/tmux-1000/default server-access -a hermes`. It grants `hermes` access and changes the mode from `srw-------` to `srwxrwx---`. Only the server owner or root can run it, so the agent runs it, never `hermes`. After every tmux server restart, or after a switch sets the ACL, the agent must run it again.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `error connecting ... (Permission denied)` | No ACL on the runtime dir | Wait for the switch, or ask the agent to run `server-access` |
+| `error connecting ... (Permission denied)` | No ACL on the runtime dir, or an `r-x` entry on the socket | Wait for the switch, then ask the agent to run `server-access` |
+| Connect fails after a switch with the ACL in place | A recursive `A+` rule put `r-x` on the socket | Use the two `a+` rules, then run `server-access` |
 | `error connecting ... (No such file or directory)` | No tmux server: `agent` never logged in | Ask the owner. Never start a server as `hermes` |
 | `ambiguous target` on `server-access` | The `-S` socket was missing from the command | Always pass `-S <path>`, not `$TMUX` |
 

@@ -810,10 +810,11 @@ SEED
           "L+ /root/NixConfig - - - - /home/agent/NixConfig"
           "L+ /var/lib/hermes/NixConfig - - - - /home/agent/NixConfig"
           # logind makes /run/user/1000 mode 0700, so hermes cannot reach the
-          # agent tmux socket inside it. The recursive ACL grants traversal to
-          # hermes and to every socket dir under it without widening the mode.
-          # tmux `server-access -a hermes` then opens the socket itself.
-          "A+ /run/user/1000 - - - - u:hermes:r-x"
+          # agent tmux socket inside it. One A+ rule covered both paths and put
+          # r-x on the socket, and a socket needs w, so hermes got permission
+          # denied. Keep the rules separate: r-x on the dirs, rw on the socket.
+          "a+ /run/user/1000 - - - - u:hermes:r-x"
+          "a+ /run/user/1000/tmux-1000 - - - - u:hermes:r-x"
         ];
 
         # One Halogen stack runs at a time: each maps a whole pack into graphics
