@@ -8,7 +8,8 @@
     { pkgs, ... }:
     let
       hostPlatform = pkgs.stdenv.hostPlatform;
-      axe = self.packages.${hostPlatform.system}.axe;
+      # axe ships for aarch64-darwin only; the simbridge wrapper uses it there.
+      axe = self.packages.${hostPlatform.system}.axe or null;
 
       # Release assets are named GOOS_GOARCH. The client is a thin Go binary,
       # so Linux hosts reach the daemon on a Mac over the network.

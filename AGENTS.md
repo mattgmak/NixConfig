@@ -88,7 +88,10 @@ Shell integration is off on this host, so `wt switch` cannot change your working
 wt switch --create fix-ramsay-agenix   # branch + worktree, based on the default branch
 wt list --format json | jq -r '.[] | select(.branch=="fix-ramsay-agenix") | .path'
 cd <path>
+git submodule update --init            # the flake fetches every submodule
 ```
+
+A fresh worktree has empty submodule directories, so every nix eval fails until you run `git submodule update --init` there. The main checkout holds the submodule git dirs, so the update needs no download.
 
 A worktree is a separate flake ref. Nix copies its tree once and reuses that copy for every eval in the branch. Sandbox logs stay per session. Two agents work at the same time without touching each other's tree. `main` moves only when the approval script merges, so the shared checkout never holds a half-finished commit.
 
@@ -132,6 +135,7 @@ bash scripts/host-sandbox.sh ramsay --tier vm     # build the QEMU image; --vm-b
 | `eval` | Nix eval errors, option warnings, undeclared option names | 38 s for the first host of a tree, then cached |
 | `build` | Every compile error in the closure `nh os switch` installs | instant when cached, else the full build |
 | `vm` | Activation and boot failures a build cannot see | image build, then a headless QEMU boot with `--vm-boot` |
+| `checks` | `nix flake check` on `dendritic/checks.nix`: host toplevels, VM images, the Ramsay VM test | seconds when cached, else the full eval |
 
 Rules:
 

@@ -50,6 +50,8 @@
       ) { };
     in
     {
-      packages.simslim = simslim;
+      packages = pkgs.lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") {
+        inherit simslim;
+      };
     };
 }

@@ -52,6 +52,8 @@
       ) { };
     in
     {
-      packages.launchk = launchk;
+      packages = pkgs.lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") {
+        inherit launchk;
+      };
     };
 }

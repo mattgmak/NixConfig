@@ -61,6 +61,9 @@
       ) { };
     in
     {
-      packages.axe = axe;
+      # The prebuilt is Mach-O, so nix refuses to evaluate it on other systems.
+      packages = pkgs.lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "aarch64-darwin") {
+        inherit axe;
+      };
     };
 }

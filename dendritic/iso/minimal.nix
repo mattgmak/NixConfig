@@ -20,6 +20,11 @@
       };
       modules = [
         inputs.home-manager.nixosModules.home-manager
+        # home-modules/home.nix sets stylix.* targets. Stylix only exposes its
+        # Home Manager module through home-manager.sharedModules when
+        # stylix.enable is true, so the ISO needs stylixCommon too.
+        self.stylixCommon
+        inputs.stylix.nixosModules.stylix
         self.nixConfig
         self.nixosModules.minimalIso
         self.nixosModules.caTrust
