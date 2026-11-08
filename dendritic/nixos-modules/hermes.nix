@@ -139,6 +139,7 @@
         hermesHomeFiles = {
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
           "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
+          "skills/nixconfig-worktree/SKILL.md" = ./hermes-skills/nixconfig-worktree/SKILL.md;
         };
         settings = {
           # The deploy gate. `manual` asks the owner on every flagged call, and

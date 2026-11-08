@@ -20,6 +20,7 @@ Rules:
 - **Pi extensions**: thin loader dir `dendritic/home-modules/pi-coding-agent/extensions/<name>/` — `package.json` (`pi.extensions: ["./index.ts"]`, optional `pi.skills`) + `index.ts` re-export `../vendor/<Owner>/<repo>/…`. Pi resolves loader imports against live `~/.pi/agent/extensions/<name>/` — depth fixed at 1 up, lands on `extensions/vendor` compat symlink → repo root `vendor/`. Submodule never inside `extensions/`.
 - **Themes**: symlink `…/themes/<name>.json` → `../../../../vendor/<Owner>/<repo>/…`.
 - **Skills**: symlink `dendritic/skills/<name>` → `../../vendor/<owner>/<repo>/…`.
+- **Hermes skills**: plain file `dendritic/nixos-modules/hermes-skills/<name>/SKILL.md`, registered in `hermes.nix` `hermesHomeFiles`. Never a symlink, never under `dendritic/skills/`.
 - `pi-ext-deps-install` installs vendor extension deps; skips non-extension repos (themes/skills/zen/tools) + special-cases `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk` (`npm ci --ignore-scripts` + `build.mjs` → `dist/`).
 - **System switch/rebuild**: always defer to user to manually do switch/rebuild via `nh` for the current machine.
 - **Change stays invisible until you bump the pin**: an eval reads a source through its pinned reference — a submodule pointer, a `flake.lock` input, a `url = "git+file:..."` entry. Fix every layer in order: commit and push the source repo, then `nix flake update <input>`, then commit `flake.lock`. Symptom: the new option or attribute "does not exist" while the file on disk shows the change.
