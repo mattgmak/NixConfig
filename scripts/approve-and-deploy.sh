@@ -98,6 +98,7 @@ log=${LOG:-${TMPDIR:-/tmp}/agent-tmp/NixConfig/approve-and-deploy-${branch}.log}
 [ "$dry" = 1 ] || mkdir -p "$(dirname "$log")"
 
 main() {
+  local start_dir=$PWD
   printf 'branch  %s (%s)\nmain    %s\nhosts   %s\nlog     %s\n' \
     "$branch" "$wt_path" "$main_path" "$hosts" "$log"
 
@@ -106,6 +107,11 @@ main() {
   local sha
   sha=$(git -C "$main_path" rev-parse --short HEAD)
   printf '  main is now %s\n' "$sha"
+
+  # wt merge moves the worktree to its trash, so the shell cwd disappears here.
+  # Later steps run nix, which dies on a missing cwd: `cannot get cwd: No such
+  # file or directory`.
+  cd "$start_dir" 2>/dev/null || cd "$main_path" || return 1
 
   say 'push'
   run git -C "$main_path" push origin main
@@ -116,8 +122,8 @@ main() {
     case ",$hosts," in
       *,ramsay,*)
         say 'deploy ramsay'
-        run sudo ramsay-deploy-approve
-        run sudo ramsay-deploy-switch
+        run sudo /run/current-system/sw/bin/ramsay-deploy-approve
+        run sudo /run/current-system/sw/bin/ramsay-deploy-switch
         ;;
     esac
     case ",$hosts," in

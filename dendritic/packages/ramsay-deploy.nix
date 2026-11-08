@@ -143,7 +143,7 @@
             exec 9>/run/lock/ramsay-deploy.lock
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
             # Root git leaves root-owned objects and an index. Every exit path gives the clone back.
-            trap 'chown -R "$(stat -c "%U:%G" "$repo")" "$repo/.git"' EXIT
+            trap 'chown -R "$(stat -L -c "%U:%G" "$repo")" "$repo/.git"' EXIT
             src=/home/agent/NixConfig
             mirror=/var/lib/hermes/NixConfig.git
             # Publish here, never inside the switch. A publish after the clone synced moves
@@ -151,7 +151,7 @@
             if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
               git -C "$src" -c safe.directory="$src" push --quiet --force \
                 "$mirror" HEAD:refs/heads/main
-              chgrp -R "$(stat -c '%G' "$repo")" "$mirror"
+              chgrp -R "$(stat -L -c '%G' "$repo")" "$mirror"
               chmod -R g+rX "$mirror"
             fi
             git -C "$repo" ${gitCommon} fetch --quiet origin main || true
@@ -179,7 +179,7 @@
               "$tree" "$now" "$((now + ${toString approvalSeconds}))" > "$token"
             chmod 0644 "$token"
             # Root git leaves root-owned objects and an index. Give the clone back.
-            chown -R "$(stat -c '%U:%G' "$repo")" "$repo/.git"
+            chown -R "$(stat -L -c '%U:%G' "$repo")" "$repo/.git"
             echo
             echo "approved tree $tree for ${toString approvalSeconds} seconds"
             echo "next: sudo /run/current-system/sw/bin/ramsay-deploy-switch"
@@ -205,7 +205,7 @@
             exec 9>/run/lock/ramsay-deploy.lock
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
             # Root git leaves root-owned objects and an index. Every exit path gives the clone back.
-            trap 'chown -R "$(stat -c "%U:%G" "$repo")" "$repo/.git"' EXIT
+            trap 'chown -R "$(stat -L -c "%U:%G" "$repo")" "$repo/.git"' EXIT
             # Answer the token first. A call without one leaves the clone untouched.
             if [ ! -r "$token" ]; then
               echo "no approval token: ask the owner to run sudo /run/current-system/sw/bin/ramsay-deploy-approve" >&2
@@ -255,7 +255,7 @@
             fi
             rev=$(git -C "$repo" rev-parse --short HEAD)
             # Root git leaves root-owned files behind. Give the clone back to its owner.
-            chown -R "$(stat -c '%U:%G' "$repo")" "$repo/.git"
+            chown -R "$(stat -L -c '%U:%G' "$repo")" "$repo/.git"
             echo "deploy $rev" | tee -a "$log"
             exec nh os switch -e none "$repo#Ramsay"
           '')
