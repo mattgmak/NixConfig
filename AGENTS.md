@@ -58,6 +58,90 @@ A git-mode flake sees tracked files only. An untracked file stays invisible, so 
 
 Four path-flake evals cost 21 GB of store space on 2026-10-22.
 
+## Repo locations
+
+`/home/agent/NixConfig` is the source of truth on Ramsay. Other paths reach it, and none hold a second copy.
+
+| Path | Form | Owner |
+| --- | --- | --- |
+| `/home/agent/NixConfig` | the checkout | `agent:users`, group-writable, setgid, `core.sharedRepository = group` |
+| `/root/NixConfig` | symlink | tmpfiles |
+| `/var/lib/hermes/NixConfig` | symlink | tmpfiles |
+| Goofeus `/root/NixConfig` | symlink to the built source store path | `scripts/deploy-goofeus.sh` |
+| MacMini `/Users/mattgmak/NixConfig` | own checkout | macOS, separate |
+
+`NH_OS_FLAKE=/root/NixConfig` now resolves to the agent checkout, so `nh` as root and `nh` as agent build the same tree.
+
+1. One working directory holds one branch. Two people or two agents need two worktrees. One index serves the whole checkout, so `git add -N` by one user changes what another user builds.
+2. The old root and hermes clones must go before the switch: `systemd.tmpfiles` cannot replace a directory with a symlink.
+3. `hermes` joins group `users` for traversal. `programs.git.config.safe.directory = "*"` replaces the per-script `-c safe.directory=` flags.
+
+## Worktree workflow
+
+The user starts every pi session, either `pi` or `pi-local`. The agent never starts a session. Every new implementation runs in a fresh worktree. Run `wt switch --create <branch>` from the repo root. Use worktrunk (`wt`) only, never raw `git worktree`. Do not edit the `main` checkout in place.
+
+The agent manages worktrees only: create one per task, keep the branch clean, and remove it after the merge. `wt` names each worktree `<repo>.<branch>` beside the repo, so every worktree inherits the shared group of `/home/agent`.
+
+Shell integration is off on this host, so `wt switch` cannot change your working directory. Read the path, then `cd`:
+
+```sh
+wt switch --create fix-ramsay-agenix   # branch + worktree, based on the default branch
+wt list --format json | jq -r '.[] | select(.branch=="fix-ramsay-agenix") | .path'
+cd <path>
+```
+
+A worktree is a separate flake ref. Nix copies its tree once and reuses that copy for every eval in the branch. Sandbox logs stay per session. Two agents work at the same time without touching each other's tree. `main` moves only when the approval script merges, so the shared checkout never holds a half-finished commit.
+
+`scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout.
+
+### Change workflow
+
+No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves only in step 9.
+
+| Step | Owner | Command |
+| --- | --- | --- |
+| 1. Create worktree | agent | `wt switch --create <branch>` |
+| 2. Edit the config | agent | — |
+| 3. Track new files | agent | `git add -N <file>` |
+| 4. Verify | agent | `bash scripts/host-sandbox.sh <host> --tier build` |
+| 5. Fix and repeat | agent | rerun until exit 0 |
+| 6. Commit | agent | `git commit -m "<subject>"` |
+| 7. Open the approval pane | agent | `tmux split-window -h -P -F '#{pane_id}'`, then `send-keys` the command with no Enter |
+| 8. Approve | user | press Enter in the pane |
+| 9. Merge and push | script | `wt -C <worktree> merge main`, then `git push origin main` |
+| 10. Deploy | script | `sudo ramsay-deploy-approve`, `sudo ramsay-deploy-switch`, then `scripts/deploy-goofeus.sh` for Goofeus |
+| 11. Verify the live host | agent | pi gets the prompt the script sends into its pane |
+| 12. Close | script | `tmux kill-pane` on its own pane |
+
+`scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. Test it with `--dry-run`.
+
+## Sandbox verification
+
+Verify a host config before `nh` installs it. Never verify by switching the machine you are on.
+
+```sh
+bash scripts/host-sandbox.sh ramsay --tier eval   # eval errors and option warnings
+bash scripts/host-sandbox.sh ramsay               # eval, then build the closure nh installs
+bash scripts/host-sandbox.sh --all --tier eval    # every host in one pass
+bash scripts/host-sandbox.sh macmini              # darwin from Linux: module check only
+bash scripts/host-sandbox.sh ramsay --tier vm     # build the QEMU image; --vm-boot boots it
+```
+
+| Tier | What it checks | Cost |
+| --- | --- | --- |
+| `eval` | Nix eval errors, option warnings, undeclared option names | 38 s for the first host of a tree, then cached |
+| `build` | Every compile error in the closure `nh os switch` installs | instant when cached, else the full build |
+| `vm` | Activation and boot failures a build cannot see | image build, then a headless QEMU boot with `--vm-boot` |
+
+Rules:
+
+1. After any `.nix` edit, run the `eval` tier for the host you changed. Run `git add -N <file>` on new files first, because a git-mode flake hides untracked files.
+2. Run the `build` tier before you propose a switch.
+3. Run the `vm` tier when the change touches services, units, or activation scripts.
+4. Exit code 0 means every check passed. `--json` prints one object per check. Logs stay in `${TMPDIR:-/tmp}/agent-tmp/NixConfig/<host>.<tier>.log`.
+5. The script never activates a config and never runs `nh`. The user runs the switch (System switch/rebuild).
+6. An off-platform host gets a weaker check. `macmini` on Linux checks the module set only, because nix cannot build `aarch64-darwin` there.
+
 ## Commit convention
 
 - **Subject only** — one line, no body, no trailers (`Co-authored-by`, `Signed-off-by`, etc.) unless user explicitly requests one

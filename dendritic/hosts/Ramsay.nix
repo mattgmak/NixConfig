@@ -62,6 +62,12 @@ in
           inference
           strixHaloMemory
           hermes
+          # qemu-vm.nix forces swapDevices = [], so zswap's swap-device assertion fails in the VM variant.
+          {
+            virtualisation.vmVariant = {
+              boot.zswap.enable = inputs.nixpkgs.lib.mkForce false;
+            };
+          }
         ];
       }
     );
@@ -356,6 +362,12 @@ in
         # nixpkgs defaults this to `ls -alh` in /etc/zshrc and /etc/bashrc, and an
         # alias shadows the lazygit shell function of the same name.
         environment.shellAliases.l = null;
+        # Per-user profiles give root and hermes no git config, and a shared repo
+        # needs one entry per path. /etc/gitconfig covers every user at once.
+        programs.git = {
+          enable = true;
+          config.safe.directory = "*";
+        };
         programs.zsh.enable = true;
 
         time.timeZone = "Asia/Hong_Kong";
@@ -372,6 +384,16 @@ in
             {
               users = [ "agent" ];
               commands = [
+                # The approval pane runs these two without a password, so a phone
+                # approval needs no typed secret.
+                {
+                  command = "/run/current-system/sw/bin/ramsay-deploy-approve";
+                  options = [ "NOPASSWD" ];
+                }
+                {
+                  command = "/run/current-system/sw/bin/ramsay-deploy-switch";
+                  options = [ "NOPASSWD" ];
+                }
                 {
                   command = "ALL";
                   options = [ "PASSWD" ];
@@ -413,6 +435,9 @@ in
         # Agent coding workspace user (AFK / phone-driven pi).
         users.users.agent = {
           isNormalUser = true;
+          # Group members traverse here to reach the shared repo. Never group-writable:
+          # sshd StrictModes rejects keys from a group-writable home.
+          homeMode = "0750";
           # Home Manager user activation needs a live user manager. Without linger,
           # user@1000 dies on logout and /run/user/1000/bus goes stale.
           linger = true;
@@ -438,6 +463,10 @@ in
         # isNormalUser alone does not create a same-named group, and agenix
         # chowns the agent key to agent:agent.
         users.groups.agent = { };
+
+        # The agent checkout is the shared source of truth. hermes needs the group
+        # to read it through /home/agent.
+        users.groups.users.members = [ "hermes" ];
 
         # Key only across the tailnet. The Match block sits in extraConfig,
         # which NixOS appends after its own keys.
@@ -775,6 +804,11 @@ SEED
           "d ${halogenCacheRoot}/abliter-v2 0750 root root -"
           "d ${halogenRecordRoot}/signal 0750 root root -"
           "d ${halogenRecordRoot}/abliter-v2 0750 root root -"
+          # One repo, three paths. NH_OS_FLAKE and the hermes scripts keep their
+          # hardcoded paths, which now resolve to the agent checkout. Remove the old
+          # directories first: tmpfiles cannot replace a directory with a link.
+          "L+ /root/NixConfig - - - - /home/agent/NixConfig"
+          "L+ /var/lib/hermes/NixConfig - - - - /home/agent/NixConfig"
         ];
 
         # One Halogen stack runs at a time: each maps a whole pack into graphics
