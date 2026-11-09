@@ -8,7 +8,7 @@ argument-hint: "[ticket ids or wave name] — Linear tickets to run, e.g. TECH-1
 
 You plan, spawn, check, and merge. You read no source file. Every read, write, and test run goes to a lane. Your context stays small.
 
-The argument decides the mode. `update` is a sub-command: it updates this skill and starts no wave. Any other argument is a wave of tickets. No argument asks the user which mode to run.
+The argument decides the mode. `update` is a sub-command: it updates this skill and starts no wave. `rush [on|off]` is a sub-command: it sets the gate mode and starts no wave. Any other argument is a wave of tickets. No argument asks the user which mode to run.
 
 ## Session shape
 
@@ -126,7 +126,8 @@ Every brief carries these fields:
 | Worktree | path, branch, state |
 | Rulings | decisions the user already made |
 | Gates | the commands to run, in order |
-| Report | head sha, changed files, exit code per gate |
+| Evidence | the artifacts a UI or logic change needs, with the screen name |
+| Report | head sha, changed files, exit code per gate, evidence artifact |
 
 Gate order. Give this exact list:
 
@@ -143,11 +144,13 @@ Rules to state in every brief:
 - Name the branch your pull request targets, when the branch is stacked.
 - Commit with a subject only. No body, no trailers.
 - Push the branch. Open one pull request against the base. Merge nothing.
-- Run no simulator or device tooling. The orchestrator owns the evidence step.
 - Name each surface the diff touches: a screen, a query, a mutation, or a schema table.
-- Report the head sha, the changed files, and the exit code of each gate.
+- A diff that touches an app screen carries simulator evidence before the pull request opens. The lane captures it on a leased simulator and publishes it on the pull request. Read `reference/evidence.md`.
+- The lane asks the user before the first simulator command. Ask once per wave, then reuse the lease.
+- A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
+- Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
 
-Completion criterion: the lane reports a head sha, a changed file list, and one exit code per gate.
+Completion criterion: the lane reports a head sha, a changed file list, one exit code per gate, and each evidence artifact the change needs.
 
 ## 5. Check the lane
 
@@ -191,6 +194,8 @@ Completion criterion: the review returns no blocking fault.
 
 The default route is a pull request. You never merge on that route.
 
+Rush mode changes when you wait, and never who merges. Read `## Rush mode`.
+
 | Route | Trigger | Action | Who merges |
 |---|---|---|---|
 | 1. Pull request | the default for every wave | open a pull request on the lane branch, report the url, stop | the user, in the web interface |
@@ -220,7 +225,35 @@ A lane report is not a gate state. Read the three states by hand after every wak
 
 ## 9. Keep moving
 
-Do not wait for the user's merge gate. While a gate waits, stack the next branch and spawn the lanes that the merge unblocks.
+Rush `on`: do not wait for the user's merge gate. Stack the next branch and spawn the lanes that the merge unblocks.
+
+Rush `off`: report the pull request and wait. The user merges before the next ticket starts.
+
+## Rush mode
+
+Rush is one state toggle for the whole session. The default state is `off`.
+
+| State | Rule | Stacking |
+|---|---|---|
+| `off` | report the pull request, then wait for the user merge | none. The next ticket starts after the merge |
+| `on` | push past the gate and keep working | one dependency level per stack |
+
+Switch the state with `rush on` or `rush off`. `rush` alone reports the state and changes nothing.
+
+In both states you merge nothing. The user merges in the web interface.
+
+In rush `on`, do these steps after each pull request:
+
+1. Cut the next branch from the waiting branch head.
+2. Open the pull request against the waiting branch, not the base.
+3. Write the chain in Linear on both tickets, bottom first.
+4. Spawn the next lane at once.
+
+After the user merges the lower pull request, retarget and rebase the upper branch in the same turn. Read `reference/stacking.md`.
+
+Rush keeps every other gate. Run the review, the evidence gate and the full gate list. Escalate the same five calls.
+
+A three-deep chain waits for a user word in both states.
 
 ### Stacking
 
@@ -291,6 +324,10 @@ After a merge, read the ticket back and confirm the state. A ticket that still s
 
 Every app UI change carries evidence before the review opens. One artifact per changed screen. Read `reference/evidence.md`.
 
+The lane captures the evidence, not the orchestrator. A UI brief names each changed screen, and the lane publishes one artifact per screen. Before you spawn the review, read the pull request body and confirm the `## Evidence` block holds the artifacts. A pull request without the block waits, and you send the capture steps back to the lane.
+
+A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
+
 ## Remote iOS build
 
 Builds run on the Mac mini, never on this host. Read `reference/macos-remote-build.md`.
@@ -311,6 +348,14 @@ Everything else runs without a question.
 
 Reply terse. Use Simplified Technical English in every reply, comment, document, and commit message. A commit carries a subject only.
 
+## Sub-command state
+
+The rush state lives in one frontier board entry, so a session reload keeps it.
+
+Write the entry as `Rush mode: on` or `Rush mode: off` in the board metadata. Read it back before you report a gate.
+
 ## Sub-commands
 
 `update` rewrites this skill and starts no wave. `reflect` drafts changes from past sessions. Both need the user's approval before a write. Read `reference/subcommands.md`.
+
+`rush [on|off]` sets the gate mode. It reads the state with no argument. The default is `off`.

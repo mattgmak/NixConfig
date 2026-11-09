@@ -112,14 +112,16 @@ B=NixConfig-fix-ramsay-agenix
 W=/home/agent/NixConfig.fix-ramsay-agenix
 Z=/run/current-system/sw/bin/zsh
 
-tmux -S $S new-session -d -s $B -c $W -n review "$Z -i -c 'lazygit; exec $Z -i'"
-tmux -S $S new-window -d -t $B -n work -c $W "$Z -i -c 'pi-local; exec $Z -i'"
+tmux -S $S new-session -d -s "$B" -c $W -n review "$Z -i -c 'lazygit; exec $Z -i'"
+tmux -S $S new-window -d -t "$B:" -n work -c $W "$Z -i -c 'pi-local; exec $Z -i'"
 pi_pane=$(tmux -S $S list-panes -t "$B:work" -F '#{pane_id}' | head -1)
 approve_pane=$(tmux -S $S split-window -h -p 45 -P -F '#{pane_id}' -t "$B:work" -c $W \
   "$Z -i")
 tmux -S $S send-keys -t "$approve_pane" -l \
   "cd $W && scripts/approve-and-deploy.sh fix-ramsay-agenix --caller $pi_pane --no-kill"
 ```
+
+Every `-t` target needs the colon form `"$B:"`. A branch like `bump-pi-1.1.7` puts dots in the session name, and tmux then reads `NixConfig-bump-pi-1.1.7` as session `NixConfig-bump-pi-1` plus pane `1.7`. The error is `can't specify pane here` or `can't find pane: 1.7`.
 
 | Window | Pane | Content |
 | --- | --- | --- |
@@ -143,6 +145,7 @@ Two layers gate the agent tmux server, and the skill needs both:
 | `error connecting ... (No such file or directory)` | No tmux server: `agent` never logged in | Ask the owner. Never start a server as `hermes` |
 | `ambiguous target` on `server-access` | The `-S` socket was missing from the command | Always pass `-S <path>`, not `$TMUX` |
 | `fatal: error opening '<worktree>/.git': Permission denied` | hermes created the worktree, so the files are `0600` and `agent` cannot read them | Owner runs `chown -R agent:users <worktree>` as root, then step 5 reruns |
+| `sudo: a password is required` on `sudo -n -u agent ...` | hermes sudoers lists only `ramsay-deploy-switch`, so no other command runs without a password | agent runs the tmux commands. hermes never uses `sudo -u agent`. |
 
 - The owner attaches as `agent`: `tmux attach -t NixConfig-fix-ramsay-agenix`.
 - The approval command uses the absolute sudo paths written in the `deploy` skill. A bare `sudo ramsay-deploy-switch` misses the sudoers rule and stalls on a password prompt.
