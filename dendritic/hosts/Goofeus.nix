@@ -264,6 +264,7 @@
             GoofyDesky
             GoofyEnvy
             Droid
+            RamsayAgentSsh
           ];
         };
 
