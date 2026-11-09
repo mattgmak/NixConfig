@@ -380,8 +380,20 @@ in
             {
               users = [ "agent" ];
               commands = [
-                # The approval pane runs these two without a password, so a phone
-                # approval needs no typed secret.
+                {
+                  command = "ALL";
+                  options = [ "PASSWD" ];
+                }
+              ];
+            }
+            # The approval pane runs these two without a password, so a phone
+            # approval needs no typed secret. Keep them in a rule of their own,
+            # after the ALL rule. sudo emits one line per rule and sorts the
+            # command specs by option, so a NOPASSWD spec listed before
+            # "PASSWD: ALL" loses to it.
+            {
+              users = [ "agent" ];
+              commands = [
                 {
                   command = "/run/current-system/sw/bin/ramsay-deploy-approve";
                   options = [ "NOPASSWD" ];
@@ -389,10 +401,6 @@ in
                 {
                   command = "/run/current-system/sw/bin/ramsay-deploy-switch";
                   options = [ "NOPASSWD" ];
-                }
-                {
-                  command = "ALL";
-                  options = [ "PASSWD" ];
                 }
               ];
             }
