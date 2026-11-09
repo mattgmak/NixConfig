@@ -164,6 +164,13 @@
           ];
         };
 
+        nix.distributedBuilds = true;
+        nix.buildMachines = [
+          (self.mkBuilder self.builderSites.ramsay {
+            sshKey = "/root/.ssh/id_ed25519";
+          })
+        ];
+
         nixpkgs.overlays = common-overlays;
         nixpkgs.config = common-nixpkgs-config;
 

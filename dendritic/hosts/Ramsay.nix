@@ -429,6 +429,7 @@ in
         users.users.${username} = {
           shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
+            Goofeus
             GoofyDesky
             GoofyEnvy
             Droid
