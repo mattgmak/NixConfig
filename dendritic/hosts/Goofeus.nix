@@ -289,11 +289,11 @@
         # publicHostKey, but plain ssh from this host reads this file instead.
         programs.ssh.knownHosts = with self.sshKeys; {
           ramsay = {
-            hostname = "ramsay.dab-octatonic.ts.net";
+            hostNames = [ "ramsay.dab-octatonic.ts.net" ];
             publicKey = Ramsay;
           };
           ramsay-ip = {
-            hostname = "100.76.193.66";
+            hostNames = [ "100.76.193.66" ];
             publicKey = Ramsay;
           };
         };
