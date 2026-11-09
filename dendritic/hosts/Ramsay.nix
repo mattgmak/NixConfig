@@ -33,7 +33,6 @@ in
   flake = {
     nixosConfigurations.Ramsay = withSystem "x86_64-linux" (
       {
-        self',
         config,
         inputs',
         ...
@@ -43,7 +42,6 @@ in
           inherit inputs inputs';
           inherit (config) packages common-overlays common-nixpkgs-config;
           username = "root";
-          mv = self'.legacyPackages.mv;
           inherit hostname;
         };
         modules = with self.nixosModules; [
@@ -207,7 +205,6 @@ in
         pkgs,
         username,
         hostname,
-        mv,
         common-overlays,
         common-nixpkgs-config,
         ...
@@ -338,7 +335,6 @@ in
             inherit
               hostname
               username
-              mv
               ;
           };
           backupFileExtension = "hm-backup-1";

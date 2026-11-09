@@ -1,12 +1,16 @@
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.nextcloud =
+  flake.nixosModules.nextcloud = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       lib,
       pkgs,
-      mv,
       ...
     }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       services.nextcloud = {
         enable = true;
@@ -106,5 +110,6 @@
           fi
         '';
       };
-    };
+    }
+  );
 }

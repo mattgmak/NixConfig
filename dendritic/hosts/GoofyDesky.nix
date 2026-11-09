@@ -8,7 +8,6 @@
   flake = {
     nixosConfigurations.GoofyDesky = withSystem "x86_64-linux" (
       {
-        self',
         config,
         inputs',
         ...
@@ -18,7 +17,6 @@
           inherit inputs inputs';
           inherit (config) packages common-overlays common-nixpkgs-config;
           inherit (self.constants) username;
-          mv = self'.legacyPackages.mv;
           hostname = self.constants.desktopName;
         };
         modules = with self.nixosModules; [

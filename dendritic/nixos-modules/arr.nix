@@ -13,18 +13,19 @@
 # - Spotlight feature files (spotlight.html, spotlight.css, home-html chunk) are deployed
 # - Home sections should be arranged manually: Settings > Home > Continue Watching,
 #   Next Up, My Media, Recently Added (recommended by the theme)
-{ ... }:
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.arr =
+  flake.nixosModules.arr = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       options,
       lib,
       pkgs,
-      mv,
       ...
     }:
     let
+      mv = perSystem.self'.legacyPackages.mv;
       mediaMount = "/mnt/2TBSeagateHDD";
       servarrRoot = "${mediaMount}/servarr";
       sonarrRoot = "${servarrRoot}/sonarr";
@@ -204,5 +205,6 @@
               rpc-host-whitelist-enabled = false;
             };
           };
-    };
+    }
+  );
 }

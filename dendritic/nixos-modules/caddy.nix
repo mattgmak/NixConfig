@@ -1,13 +1,15 @@
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.caddy =
+  flake.nixosModules.caddy = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       options,
-      mv,
       lib,
       ...
     }:
     let
+      mv = perSystem.self'.legacyPackages.mv;
       copypartyPort =
         let
           p = config.services.copyparty.settings.p or 3923;
@@ -344,5 +346,6 @@
               '';
             }
           );
-    };
+    }
+  );
 }

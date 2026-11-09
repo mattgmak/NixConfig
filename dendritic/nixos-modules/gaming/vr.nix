@@ -1,6 +1,11 @@
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.vr =
-    { mv, ... }:
+  flake.nixosModules.vr = moduleWithSystem (
+    perSystem@{ self' }:
+    { ... }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       services.wivrn = {
         enable = true;
@@ -13,5 +18,6 @@
         bs-manager
         sidequest
       ];
-    };
+    }
+  );
 }

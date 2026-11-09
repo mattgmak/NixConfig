@@ -1,14 +1,17 @@
-{ inputs, self, ... }:
+{ inputs, self, moduleWithSystem, ... }:
 {
-  flake.nixosModules.common =
+  flake.nixosModules.common = moduleWithSystem (
+    perSystem@{ self' }:
     {
       lib,
       pkgs,
       hostname,
       username,
-      mv,
       ...
     }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       imports = [
         self.fonts
@@ -335,6 +338,6 @@
       };
       # Add flatpak support
       services.flatpak.enable = true;
-    };
-
+    }
+  );
 }

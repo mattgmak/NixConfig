@@ -10,13 +10,12 @@ let
 in
 {
   flake.darwinConfigurations.${hostname} = withSystem system (
-    { self', config, ... }:
+    { config, ... }:
     inputs.nix-darwin.lib.darwinSystem {
       specialArgs = rec {
         inherit system;
         inherit inputs hostname;
         inherit (config) common-overlays common-nixpkgs-config;
-        mv = self'.legacyPackages.mv;
         username = "mattgmak";
       };
       modules = [
@@ -72,7 +71,6 @@ in
       config,
       hostname,
       username,
-      mv,
       common-overlays,
       common-nixpkgs-config,
       ...
@@ -832,7 +830,6 @@ in
             inputs
             hostname
             username
-            mv
             ;
         };
         backupFileExtension = "hm-backup";

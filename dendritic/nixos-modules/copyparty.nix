@@ -1,9 +1,13 @@
 # copyparty: https://github.com/9001/copyparty#nixos-module
 # Wire upstream module + overlay; defaults are conservative (disabled + localhost).
-{ inputs, ... }:
+{ inputs, moduleWithSystem, ... }:
 {
-  flake.nixosModules.copyparty =
-    { config, mv, ... }:
+  flake.nixosModules.copyparty = moduleWithSystem (
+    perSystem@{ self' }:
+    { config, ... }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       imports = [ inputs.copyparty.nixosModules.default ];
 
@@ -47,7 +51,8 @@
         group = config.services.copyparty.group;
         mode = "0400";
       };
-    };
+    }
+  );
 
   # On-demand rclone WebDAV mount for copyparty (see copyparty/docs/rclone.md).
   flake.nixosModules.copyparty-client =

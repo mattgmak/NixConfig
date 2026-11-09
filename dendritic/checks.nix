@@ -50,7 +50,6 @@
           inherit inputs inputs' self';
           inherit (config) packages common-overlays common-nixpkgs-config;
           username = "root";
-          mv = self'.legacyPackages.mv;
           hostname = self.constants.ramsayName;
         };
         nodes.machine = {

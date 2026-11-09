@@ -8,7 +8,6 @@
   flake = {
     nixosConfigurations.GoofyEnvy = withSystem "x86_64-linux" (
       {
-        self',
         config,
         inputs',
         ...
@@ -18,7 +17,6 @@
           inherit inputs inputs';
           inherit (self.constants) username;
           inherit (config) packages common-overlays common-nixpkgs-config;
-          mv = self'.legacyPackages.mv;
           hostname = self.constants.laptopName;
         };
         modules = with self.nixosModules; [

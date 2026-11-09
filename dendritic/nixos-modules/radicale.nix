@@ -1,14 +1,16 @@
 # Radicale CalDAV/CardDAV — localhost + Caddy (public) + Tailscale serve.
 # Replace the htpasswd secret: agenix -e secrets/radicale-htpasswd.age (see `man htpasswd` / htpasswd -nbBC 10 user).
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.radicale =
+  flake.nixosModules.radicale = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       pkgs,
-      mv,
       ...
     }:
     let
+      mv = perSystem.self'.legacyPackages.mv;
       dataDir = "/mnt/2TBSeagateHDD/radicale";
     in
     {
@@ -74,5 +76,6 @@
         after = [ "radicale-data-dir.service" ];
         requires = [ "radicale-data-dir.service" ];
       };
-    };
+    }
+  );
 }

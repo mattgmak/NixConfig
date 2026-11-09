@@ -1,7 +1,10 @@
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.homepage-dashboard =
-    { config, mv, ... }:
+  flake.nixosModules.homepage-dashboard = moduleWithSystem (
+    perSystem@{ self' }:
+    { config, ... }:
     let
+      mv = perSystem.self'.legacyPackages.mv;
       port = config.services.homepage-dashboard.listenPort;
       immichPort = config.services.immich.port;
     in
@@ -31,5 +34,6 @@
         environmentFile = "/etc/homepage-dashboard/environment";
       };
       networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ port ];
-    };
+    }
+  );
 }

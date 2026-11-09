@@ -1,13 +1,16 @@
-{ self, ... }:
+{ self, moduleWithSystem, ... }:
 {
-  flake.homeModules.cursor =
+  flake.homeModules.cursor = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       hostname,
       pkgs,
-      mv,
       ...
     }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       imports = [ self.homeModules.cursorInjection ];
       home.file = {
@@ -131,5 +134,6 @@
         };
       };
 
-    };
+    }
+  );
 }

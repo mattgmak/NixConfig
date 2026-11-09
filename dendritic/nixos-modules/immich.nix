@@ -1,10 +1,14 @@
+{ moduleWithSystem, ... }:
 {
-  flake.nixosModules.immich =
+  flake.nixosModules.immich = moduleWithSystem (
+    perSystem@{ self' }:
     {
       pkgs,
-      mv,
       ...
     }:
+    let
+      mv = perSystem.self'.legacyPackages.mv;
+    in
     {
       services.immich = {
         enable = true;
@@ -28,5 +32,6 @@
           fi
         '';
       };
-    };
+    }
+  );
 }

@@ -1,13 +1,14 @@
-{ self, ... }:
+{ self, moduleWithSystem, ... }:
 {
-  flake.nixosModules.glance =
+  flake.nixosModules.glance = moduleWithSystem (
+    perSystem@{ self' }:
     {
       config,
       lib,
-      mv,
       ...
     }:
     let
+      mv = perSystem.self'.legacyPackages.mv;
       immichPort = config.services.immich.port;
       piholeWebPort = config.services.pihole.webPort;
     in
@@ -101,5 +102,6 @@
         mode = "0400";
       };
 
-    };
+    }
+  );
 }

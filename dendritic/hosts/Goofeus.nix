@@ -8,7 +8,6 @@
   flake = {
     nixosConfigurations.Goofeus = withSystem "x86_64-linux" (
       {
-        self',
         config,
         inputs',
         ...
@@ -18,7 +17,6 @@
           inherit inputs inputs';
           inherit (config) packages common-overlays common-nixpkgs-config;
           username = "root";
-          mv = self'.legacyPackages.mv;
           hostname = self.constants.serverName;
         };
         modules = with self.nixosModules; [
@@ -136,7 +134,6 @@
         pkgs,
         username,
         hostname,
-        mv,
         common-overlays,
         common-nixpkgs-config,
         ...
@@ -177,7 +174,6 @@
             inherit
               hostname
               username
-              mv
               ;
           };
           backupFileExtension = "hm-backup-1";
