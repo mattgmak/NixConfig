@@ -3,9 +3,10 @@
 # The session must belong to the agent tmux server, because tmux copies the
 # environment of the creating process into every pane it makes. A hermes shell
 # that runs tmux itself gets the hermes environment, so its panes lose pi-local,
-# delta, and lazygit. This script names the environment instead of inheriting it:
-# a root invocation re-executes itself as agent with runuser, and `new-session`
-# passes PATH, HOME, USER, and ZDOTDIR explicitly.
+# delta, and lazygit. Only agent ever creates a session. A root invocation
+# re-executes itself through an agent login shell, so the environment comes from
+# agent, and `new-session` passes PATH, HOME, USER, and ZDOTDIR explicitly. Any
+# other account gets an error instead of a session.
 #
 #   sudo spawn-approval-session bump-pi-1.1.7 --grant hermes
 #   sudo spawn-approval-session bump-pi-1.1.7 \
@@ -49,12 +50,19 @@
             exit 64
           }
 
-          # The agent account owns the server the panes must run in. A root
-          # invocation, the sudoers path, hands the work to that account and reruns
-          # itself, so every tmux call comes from the account the server belongs to.
+          # The agent account owns the server, so only agent may create a session.
+          # A root invocation, the sudoers path, reruns itself through an agent login
+          # shell: the login shell sets agent's PATH, HOME, and USER, so nothing from
+          # the sudo wrapper or the calling account survives. Any other account is
+          # refused, because a session made by hermes belongs to hermes.
           run_as="''${SPAWN_RUN_AS:-agent}"
-          if [ "$(id -u)" -eq 0 ] && [ "$(id -un)" != "$run_as" ]; then
-            exec runuser -u "$run_as" -- "$0" "$@"
+          if [ "$(id -un)" != "$run_as" ]; then
+            if [ "$(id -u)" -ne 0 ]; then
+              printf 'spawn-approval-session: only %s may create a session on the agent server. Run the command through sudo.\n' "$run_as" >&2
+              exit 1
+            fi
+            args="$(printf '%q ' "$@")"
+            exec runuser -l "$run_as" -c "exec $0 $args"
           fi
 
           branch=""
@@ -130,30 +138,33 @@
             tmux server-access -a "$grant" || true
           fi
 
-          # tmux stores this environment in the session record, and every later
-          # window and pane inherits it, so only new-session needs the flags.
-          # The caller's PATH is wrong here: a sudo or hermes call carries its own
-          # profile dirs, so a pane finds the wrong pi-local. Name the login PATH of
-          # the account that owns the server instead.
+          # tmux keeps an environment table per session, and `new-session -e` fills
+          # it. A pane process copies the server's environment instead, so the flags
+          # alone leave the wrong PATH in every pane. Put `env` in front of each pane
+          # command: that sets the environment of the process the pane runs.
+          # The caller's PATH is wrong here, because a sudo or hermes call carries its
+          # own profile dirs, so a pane finds the wrong pi-local. Name the login PATH
+          # of the account that owns the server.
           user="$(id -un)"
+          shell="''${SPAWN_SHELL:-/run/current-system/sw/bin/zsh}"
           session_path="''${SPAWN_PATH:-/run/wrappers/bin:$HOME/.nix-profile/bin:/nix/profile/bin:$HOME/.local/state/nix/profile/bin:/etc/profiles/per-user/$user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin}"
-          envargs=(-e "PATH=$session_path" -e "HOME=$HOME" -e "USER=$user")
+          envstr="PATH=$session_path HOME=$HOME USER=$user"
           if [ -d "$HOME/.config/zsh" ]; then
-            envargs+=(-e "ZDOTDIR=$HOME/.config/zsh")
+            envstr="$envstr ZDOTDIR=$HOME/.config/zsh"
           fi
 
-          shell="''${SPAWN_SHELL:-/run/current-system/sw/bin/zsh}"
-          review="$shell -i -c 'lazygit; exec $shell -i'"
-          workcmd="$shell -i -c 'pi-local; exec $shell -i'"
+          review="env $envstr $shell -i -c 'lazygit; exec $shell -i'"
+          workcmd="env $envstr $shell -i -c 'pi-local; exec $shell -i'"
+          shellcmd="env $envstr $shell -i"
 
-          tmux new-session -d -s "$session" -c "$worktree" -n review "''${envargs[@]}" "$review"
+          tmux new-session -d -s "$session" -c "$worktree" -n review "$review"
 
           if [ "$work" -eq 1 ]; then
             pi_pane="$(tmux new-window -d -P -F '#{pane_id}' -t "$session:" -n work -c "$worktree" "$workcmd")"
             if [ -z "$approve" ]; then
               approve="cd $worktree && scripts/approve-and-deploy.sh $branch --caller $pi_pane --no-kill"
             fi
-            ap_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$session:work" -c "$worktree" "$shell -i")"
+            ap_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$session:work" -c "$worktree" "$shellcmd")"
             # The owner presses Enter, so the command goes in without a newline.
             tmux send-keys -t "$ap_pane" -l "$approve"
           fi
