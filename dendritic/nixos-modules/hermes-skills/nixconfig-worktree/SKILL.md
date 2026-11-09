@@ -36,6 +36,25 @@ wt -C /home/agent/NixConfig list --format json |
 
 `wt` names the directory `/home/agent/NixConfig.<branch>`. A fresh worktree has empty submodule directories, so every nix eval fails until `git submodule update --init` runs there. The main checkout holds the submodule git dirs, so the update needs no download.
 
+### Ownership
+
+`/home/agent` has no setgid bit, so a new directory takes the primary group of its creator. `agent` makes `agent:users 2775`. `hermes` makes `hermes:hermes 2770` with `0600` files, and the agent tmux server cannot enter it.
+
+Only agent may create the worktree. `AGENTS.md` gives worktree management to agent, and hermes cannot undo its own mode:
+
+- The hermes sudoers rule allows one command, `/run/current-system/sw/bin/ramsay-deploy-switch` (`dendritic/nixos-modules/hermes.nix`). `sudo chown` asks for a password hermes does not have.
+- The agent rule allows `ALL` with `PASSWD`, so `sudo chown` prompts there too.
+- A non-root user cannot change files another user owns.
+
+When a hermes-created worktree already exists, the owner runs these commands as root:
+
+```sh
+chown -R agent:users /home/agent/NixConfig.<branch>
+chmod g+rwx /home/agent/NixConfig/.git/worktrees/NixConfig.<branch>
+```
+
+`wt` makes the admin directory mode `0700`, so `git worktree list` stays broken until the `chmod` runs. Check the result with `stat -c '%U:%G %a' <worktree>` and `test -r <worktree>/.git`.
+
 Never edit `/home/agent/NixConfig` itself, and never edit a worktree another task owns.
 
 ## Delegate
@@ -122,6 +141,7 @@ Two layers gate the agent tmux server, and the skill needs both:
 | Connect fails after a switch with the ACL in place | A recursive `A+` rule put `r-x` on the socket | Use the two `a+` rules, then run `server-access` |
 | `error connecting ... (No such file or directory)` | No tmux server: `agent` never logged in | Ask the owner. Never start a server as `hermes` |
 | `ambiguous target` on `server-access` | The `-S` socket was missing from the command | Always pass `-S <path>`, not `$TMUX` |
+| `fatal: error opening '<worktree>/.git': Permission denied` | hermes created the worktree, so the files are `0600` and `agent` cannot read them | Owner runs `chown -R agent:users <worktree>` as root, then step 5 reruns |
 
 - The owner attaches as `agent`: `tmux attach -t NixConfig-fix-ramsay-agenix`.
 - The approval command uses the absolute sudo paths written in the `deploy` skill. A bare `sudo ramsay-deploy-switch` misses the sudoers rule and stalls on a password prompt.
@@ -146,3 +166,4 @@ tmux -S $S send-keys -t "$pi_pane" -l \
 - Reuse a worktree for a second task. One branch, one worktree, one session.
 - Delete a worktree that still holds an unapproved commit.
 - Start a pi session as root or as `hermes` for review work. The review pi runs as `agent`.
+- Run step 1 as `hermes`. The tree comes out `hermes:hermes 0700`, and only root can undo it.
