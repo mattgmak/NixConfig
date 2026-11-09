@@ -19,8 +19,8 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 | 2 | Materialize submodules | `git -C <worktree> submodule update --init` |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
 | 4 | Write the handoff doc | `<worktree>/HANDOFF.md` |
-| 5 | Open the review session | `tmux -S /run/user/1000/tmux-1000/default new-session -d -s NixConfig-<branch>` |
-| 6 | Fill the session | one window for lazygit, one window split between pi-local and the approval pane |
+| 5 | Open the review session, as agent | `tmux -S /run/user/1000/tmux-1000/default new-session -d -s NixConfig-<branch>` |
+| 6 | Fill the session, as agent | one window for lazygit, one window split between pi-local and the approval pane |
 | 7 | Hand over | reply with the session name and the command waiting in the approval pane |
 | 8 | After the deploy | resume the pi-local pane with the result, then update `HANDOFF.md` |
 
@@ -102,31 +102,32 @@ Keep the file in the worktree, so it merges into `main` with the change and the 
 
 The session lives on the agent tmux server, so the owner sees it in the same list as the `NixConfig` and `agents` sessions.
 
+agent runs every command in this section. tmux copies the environment of the creating process into the session record, and every pane inherits that copy. A session created from a hermes shell gives its panes the hermes PATH. That PATH has no `delta` and no `lazygit`, and its `pi-local` is the hermes wrapper from `pkgs.piLocalHermes`, not the agent one.
+
+Every pane runs its program through an interactive zsh, so `/home/agent/.config/zsh` loads. A bare `tmux new-session ... lazygit` execs the program with no shell, so no rc file loads. The `exec` at the end of each command keeps the pane open after the program exits.
+
 ```sh
 S=/run/user/1000/tmux-1000/default
-tmux -S $S new-session -d -s NixConfig-fix-ramsay-agenix -c <worktree> -n lazygit lazygit
-pi_pane=$(tmux -S $S list-panes -t NixConfig-fix-ramsay-agenix:lazygit -F '#{pane_id}' | head -1)
-```
+B=NixConfig-fix-ramsay-agenix
+W=/home/agent/NixConfig.fix-ramsay-agenix
+Z=/run/current-system/sw/bin/zsh
 
-The first window holds `lazygit` on the worktree. Rename it, then build the second window with two panes:
-
-```sh
-tmux -S $S rename-window -t NixConfig-fix-ramsay-agenix:0 review
-tmux -S $S new-window -d -t NixConfig-fix-ramsay-agenix -n work -c <worktree>
-approve_pane=$(tmux -S $S split-window -h -p 45 -P -F '#{pane_id}' \
-  -t NixConfig-fix-ramsay-agenix:work -c <worktree>)
-```
-
-Window `work` pane 1 runs pi. Pane 2 holds the approval command. Prefill both with `send-keys -l` and no `Enter`, so nothing runs until the owner presses it:
-
-```sh
-tmux -S $S send-keys -t "$pi_pane" -l \
-  'pi-local -p "Read HANDOFF.md and give me the change summary for this worktree."'
+tmux -S $S new-session -d -s $B -c $W -n review "$Z -i -c 'lazygit; exec $Z -i'"
+tmux -S $S new-window -d -t $B -n work -c $W "$Z -i -c 'pi-local; exec $Z -i'"
+pi_pane=$(tmux -S $S list-panes -t "$B:work" -F '#{pane_id}' | head -1)
+approve_pane=$(tmux -S $S split-window -h -p 45 -P -F '#{pane_id}' -t "$B:work" -c $W \
+  "$Z -i")
 tmux -S $S send-keys -t "$approve_pane" -l \
-  'cd <worktree> && scripts/approve-and-deploy.sh fix-ramsay-agenix --caller '"$pi_pane"' --no-kill'
+  "cd $W && scripts/approve-and-deploy.sh fix-ramsay-agenix --caller $pi_pane --no-kill"
 ```
 
-Pass `--no-kill`: the session belongs to the owner, so the script must keep the pane. The `pi` pane is the `--caller`, so the verification prompt lands in the session, not in a Hermes window.
+| Window | Pane | Content |
+| --- | --- | --- |
+| `review` | 1 | `lazygit` on the worktree, running at open |
+| `work` | 1 | `pi-local` interactive session, running at open |
+| `work` | 2 | interactive zsh with the approval command prefilled, no `Enter` |
+
+Only the approval pane waits for the owner. The other two start at open, so the owner sees the diff and the pi session with no key press. Pass `--no-kill`: the session belongs to the owner, so the script must keep the pane. The `pi` pane is the `--caller`, so the verification prompt lands in the session, not in a Hermes window.
 
 ## Owner access
 
@@ -167,3 +168,4 @@ tmux -S $S send-keys -t "$pi_pane" -l \
 - Delete a worktree that still holds an unapproved commit.
 - Start a pi session as root or as `hermes` for review work. The review pi runs as `agent`.
 - Run step 1 as `hermes`. The tree comes out `hermes:hermes 0700`, and only root can undo it.
+- Run step 5 or 6 as `hermes`. The panes inherit the creator environment, so a hermes-built session has no agent `delta`, no agent `lazygit`, and no agent `pi-local`.
