@@ -109,7 +109,7 @@ itself with `runuser -u agent`, so the session comes from the agent account even
 when hermes runs it through `sudo`. It passes `PATH`, `HOME`, `USER`, and
 `ZDOTDIR` to `new-session`, so every pane gets the agent environment. A session
 made straight from a hermes shell takes the hermes `PATH`: no `delta`, no
-`lazygit`, and the `pi-local` from `pkgs.piLocalHermes`.
+`lazygit`, and the `pi-local` from `pkgs.piLocal`.
 
 ```sh
 sudo -n /run/current-system/sw/bin/spawn-approval-session fix-ramsay-agenix --grant hermes

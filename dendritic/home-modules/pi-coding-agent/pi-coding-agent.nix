@@ -320,29 +320,12 @@
         )
       );
 
-      # Second binary on the same compiled package, same shape as pi-stock. The oauth key
-      # block matches piOauthWrapper, so mcp-adapter keeps working off the shared agent dir.
-      # AGENT_SESH_AGENT_NAME names the loadout for the pi extension, which copies it into
+      # Second binary on the same compiled package, same shape as pi-stock. The
+      # derivation now lives in dendritic/packages/pi-local.nix as piLocal, so the
+      # agent profile and the hermes user install one identical pi-local. The AGENT_SESH_AGENT_NAME
+      # inside it names the loadout for the pi extension, which copies it into
       # the registry record; the agent-sesh module must list the same name in its agents.
-      piLocalWrapper = pkgs.writeShellApplication {
-        name = "pi-local";
-        runtimeInputs = [ pkgs.coreutils ];
-        text = ''
-          export PI_CODING_AGENT_DIR="''${PI_CODING_AGENT_DIR:-${agentLocalDir}}"
-          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-          export PIBOLT_NPM=1
-          export PI_TELEMETRY=0
-          export ENGRAM_URL=http://127.0.0.1:7437
-          export PI_PACKAGE_DIR="${piCompiled}/libexec/pi"
-          export AGENT_SESH_AGENT_NAME=pi-local
-          key="${piOauthKey}"
-          if [ -r "$key" ]; then
-            PI_MCP_ADAPTER_OAUTH_FILE_KEY="$(cat "$key")"
-            export PI_MCP_ADAPTER_OAUTH_FILE_KEY
-          fi
-          exec -a pi-local "${piCompiled}/libexec/pi/pi" "$@"
-        '';
-      };
+      piLocalWrapper = self.packages.${system}.piLocal;
 
       mkPiPowerlineTheme = self.piThemes.mkPiPowerlineTheme;
 

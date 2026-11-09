@@ -132,7 +132,12 @@
 
           # tmux stores this environment in the session record, and every later
           # window and pane inherits it, so only new-session needs the flags.
-          envargs=(-e "PATH=$PATH" -e "HOME=$HOME" -e "USER=$(id -un)")
+          # The caller's PATH is wrong here: a sudo or hermes call carries its own
+          # profile dirs, so a pane finds the wrong pi-local. Name the login PATH of
+          # the account that owns the server instead.
+          user="$(id -un)"
+          session_path="''${SPAWN_PATH:-/run/wrappers/bin:$HOME/.nix-profile/bin:/nix/profile/bin:$HOME/.local/state/nix/profile/bin:/etc/profiles/per-user/$user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin}"
+          envargs=(-e "PATH=$session_path" -e "HOME=$HOME" -e "USER=$user")
           if [ -d "$HOME/.config/zsh" ]; then
             envargs+=(-e "ZDOTDIR=$HOME/.config/zsh")
           fi

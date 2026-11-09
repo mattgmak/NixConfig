@@ -37,11 +37,11 @@
         };
 
       # pi for the hermes user, built from the same compiled derivation as the
-      # agent user's pi. See dendritic/nixos-modules/hermes.nix.
-      piLocalHermesOverlay =
+      # agent user's pi. See dendritic/packages/pi-local.nix.
+      piLocalOverlay =
         _final: _prev:
         {
-          piLocalHermes = self.packages.${system}.piLocalHermes;
+          piLocal = self.packages.${system}.piLocal;
         };
 
       # The lean-ctx CLI behind the hermes context engine plugin. See
@@ -149,7 +149,7 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         nodeBinOverlay
-        piLocalHermesOverlay
+        piLocalOverlay
         leanCtxOverlay
         tmuxBridgeOverlay
         ramsayDeployOverlay

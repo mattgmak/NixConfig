@@ -103,7 +103,7 @@
         enable = true;
         package = agentPackage;
         # pi for coding work, and the Hermes user skill that teaches it to call
-        # pi as a subagent. See dendritic/packages/pi-local-hermes.nix.
+        # pi as a subagent. See dendritic/packages/pi-local.nix.
         # ramsayDeploy holds the deploy scripts. See
         # dendritic/packages/ramsay-deploy.nix. git is on the PATH because the
         # deploy skill inspects the clone with plain git commands.
@@ -111,7 +111,7 @@
         # `comma <cmd>`. nix-daemon.socket is 0666, so an unprivileged unit can
         # use the daemon. lean-ctx is the CLI behind the context engine plugin.
         extraPackages = [
-          pkgs.piLocalHermes
+          pkgs.piLocal
           pkgs.ramsayDeploy
           pkgs.git
           pkgs.nix

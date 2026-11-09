@@ -1,4 +1,5 @@
 result
+result-*
 
 # pi-ext-deps-install runtime artifacts (recreated on each run; never commit)
 /vendor/.engram-deps/
