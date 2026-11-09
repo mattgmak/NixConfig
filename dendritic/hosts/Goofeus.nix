@@ -284,6 +284,20 @@
         # agent:agent; isNormalUser alone does not create a same-named group).
         users.groups.agent = { };
 
+        # ssh matches known_hosts entries by the name on the command line, so the
+        # FQDN and the tailnet IP each need one. nix buildMachines passes
+        # publicHostKey, but plain ssh from this host reads this file instead.
+        programs.ssh.knownHosts = with self.sshKeys; {
+          ramsay = {
+            hostname = "ramsay.dab-octatonic.ts.net";
+            publicKey = Ramsay;
+          };
+          ramsay-ip = {
+            hostname = "100.76.193.66";
+            publicKey = Ramsay;
+          };
+        };
+
         # Enable the OpenSSH daemon.
         services.openssh = {
           enable = true;

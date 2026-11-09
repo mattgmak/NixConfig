@@ -183,7 +183,7 @@
       nix.extraOptions = ''
         experimental-features = nix-command flakes
         builders-use-substitutes = true
-        builders = ssh-ng://root@ramsay.dab-octatonic.ts.net aarch64-linux 5 1
+        builders = ssh-ng://root@ramsay.dab-octatonic.ts.net aarch64-linux - 5 1 - - AAAAC3NzaC1lZDI1NTE5AAAAII1zk63+hPq2dUA/6MUgLW3ryisp/dZQ8GuiPDYpyiFK
       '';
       nix = {
         substituters = [
