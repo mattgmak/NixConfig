@@ -126,7 +126,8 @@
           fi
 
           if [ -n "$grant" ]; then
-            tmux server-access -a "$grant"
+            # tmux exits 1 when the user already has socket access, so ignore the result.
+            tmux server-access -a "$grant" || true
           fi
 
           # tmux stores this environment in the session record, and every later
