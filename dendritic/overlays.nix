@@ -60,6 +60,15 @@
           ramsayDeploy = self.packages.${system}.ramsayDeploy;
         };
 
+      # Opens the agent tmux review session for a branch. One no-password sudo
+      # command replaces the inline tmux recipe hermes used to run itself.
+      # See dendritic/packages/spawn-approval-session.nix.
+      spawnApprovalSessionOverlay =
+        _final: _prev:
+        {
+          spawnApprovalSession = self.packages.${system}.spawnApprovalSession;
+        };
+
       # Routes open and copy to the ssh client that owns the clipboard.
       # See dendritic/packages/tmux-bridge.nix.
       tmuxBridgeOverlay =
@@ -141,6 +150,7 @@
         leanCtxOverlay
         tmuxBridgeOverlay
         ramsayDeployOverlay
+        spawnApprovalSessionOverlay
         tmaxOverlay
         btopOverlay
         self.agentBrowserOverlay

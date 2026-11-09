@@ -19,8 +19,8 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 | 2 | Materialize submodules | `git -C <worktree> submodule update --init` |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
 | 4 | Write the handoff doc | `<worktree>/HANDOFF.md` |
-| 5 | Open the review session, as agent | `tmux -S /run/user/1000/tmux-1000/default new-session -d -s NixConfig-<branch>` |
-| 6 | Fill the session, as agent | one window for lazygit, one window split between pi-local and the approval pane |
+| 5 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes` |
+| 6 | Fill the session | the same command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
 | 7 | Hand over | reply with the session name and the command waiting in the approval pane |
 | 8 | After the deploy | resume the pi-local pane with the result, then update `HANDOFF.md` |
 
@@ -102,26 +102,34 @@ Keep the file in the worktree, so it merges into `main` with the change and the 
 
 The session lives on the agent tmux server, so the owner sees it in the same list as the `NixConfig` and `agents` sessions.
 
-agent runs every command in this section. tmux copies the environment of the creating process into the session record, and every pane inherits that copy. A session created from a hermes shell gives its panes the hermes PATH. That PATH has no `delta` and no `lazygit`, and its `pi-local` is the hermes wrapper from `pkgs.piLocalHermes`, not the agent one.
-
-Every pane runs its program through an interactive zsh, so `/home/agent/.config/zsh` loads. A bare `tmux new-session ... lazygit` execs the program with no shell, so no rc file loads. The `exec` at the end of each command keeps the pane open after the program exits.
+`spawn-approval-session` builds the session. The package lives in
+`dendritic/packages/spawn-approval-session.nix`, and hermes has one `NOPASSWD`
+rule for it in `dendritic/nixos-modules/hermes.nix`. The script re-executes
+itself with `runuser -u agent`, so the session comes from the agent account even
+when hermes runs it through `sudo`. It passes `PATH`, `HOME`, `USER`, and
+`ZDOTDIR` to `new-session`, so every pane gets the agent environment. A session
+made straight from a hermes shell takes the hermes `PATH`: no `delta`, no
+`lazygit`, and the `pi-local` from `pkgs.piLocalHermes`.
 
 ```sh
-S=/run/user/1000/tmux-1000/default
-B=NixConfig-fix-ramsay-agenix
-W=/home/agent/NixConfig.fix-ramsay-agenix
-Z=/run/current-system/sw/bin/zsh
-
-tmux -S $S new-session -d -s "$B" -c $W -n review "$Z -i -c 'lazygit; exec $Z -i'"
-tmux -S $S new-window -d -t "$B:" -n work -c $W "$Z -i -c 'pi-local; exec $Z -i'"
-pi_pane=$(tmux -S $S list-panes -t "$B:work" -F '#{pane_id}' | head -1)
-approve_pane=$(tmux -S $S split-window -h -p 45 -P -F '#{pane_id}' -t "$B:work" -c $W \
-  "$Z -i")
-tmux -S $S send-keys -t "$approve_pane" -l \
-  "cd $W && scripts/approve-and-deploy.sh fix-ramsay-agenix --caller $pi_pane --no-kill"
+sudo -n /run/current-system/sw/bin/spawn-approval-session fix-ramsay-agenix --grant hermes
 ```
 
-Every `-t` target needs the colon form `"$B:"`. A branch like `bump-pi-1.1.7` puts dots in the session name, and tmux then reads `NixConfig-bump-pi-1.1.7` as session `NixConfig-bump-pi-1` plus pane `1.7`. The error is `can't specify pane here` or `can't find pane: 1.7`.
+Pass `--worktree` when the directory name differs from the branch, and `--force`
+to replace a session that already exists:
+
+```sh
+sudo -n /run/current-system/sw/bin/spawn-approval-session bump-pi-1.1.7 \
+  --worktree /home/agent/NixConfig.bump-pi-1.1.5 --force --grant hermes
+```
+
+Every pane runs its program through an interactive zsh, so
+`/home/agent/.config/zsh` loads. A bare `tmux new-session ... lazygit` execs the
+program with no shell, so no rc file loads. The `exec` at the end of each command
+keeps the pane open after the program exits. The script names every target with
+the colon form `"$session:"`. The dots in `NixConfig-bump-pi-1.1.7` otherwise
+make tmux read session `NixConfig-bump-pi-1` plus pane `1.7`, and the error is
+`can't specify pane here`.
 
 | Window | Pane | Content |
 | --- | --- | --- |
@@ -135,12 +143,12 @@ Only the approval pane waits for the owner. The other two start at open, so the 
 
 Two layers gate the agent tmux server, and the skill needs both:
 
-1. The directories. `logind` makes `/run/user/1000` mode `0700`, so `hermes` cannot traverse it. Two `a+` rules in `dendritic/hosts/Ramsay.nix` put `u:hermes:r-x` on `/run/user/1000` and on `tmux-1000`. They stay non-recursive. A recursive `A+` rule also writes the entry onto the socket, and `r-x` there kills the write bit.
-2. The socket. `agent` runs `tmux -S /run/user/1000/tmux-1000/default server-access -a hermes`. It grants `hermes` access and changes the mode from `srw-------` to `srwxrwx---`. Only the server owner or root can run it, so the agent runs it, never `hermes`. After every tmux server restart, or after a switch sets the ACL, the agent must run it again.
+1. The directories. `logind` makes `/run/user/1000` mode `0700`, so `hermes` cannot traverse it. Two `a+` rules in `dendritic/hosts/Ramsay.nix` put `u:hermes:r-x` on `/run/user/1000` and on `tmux-1000`, and they stay non-recursive. A recursive `A+` rule also writes the entry onto the socket, and `r-x` there kills the write bit.
+2. The socket. `agent` runs `tmux -S /run/user/1000/tmux-1000/default server-access -a hermes`. It grants `hermes` access and changes the mode from `srw-------` to `srwxrwx---`. Only the server owner or root can run it, so the agent runs it, never `hermes`. The agent must run it again after every server restart or switch, and `spawn-approval-session --grant hermes` runs it on every call.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| `error connecting ... (Permission denied)` | No ACL on the runtime dir, or an `r-x` entry on the socket | Wait for the switch, then ask the agent to run `server-access` |
+| `error connecting ... (Permission denied)` | No ACL on the runtime dir, or an `r-x` entry on the socket | Run `spawn-approval-session --grant hermes`, which runs the client as agent, or ask the agent to run `server-access` |
 | Connect fails after a switch with the ACL in place | A recursive `A+` rule put `r-x` on the socket | Use the two `a+` rules, then run `server-access` |
 | `error connecting ... (No such file or directory)` | No tmux server: `agent` never logged in | Ask the owner. Never start a server as `hermes` |
 | `ambiguous target` on `server-access` | The `-S` socket was missing from the command | Always pass `-S <path>`, not `$TMUX` |
@@ -171,4 +179,5 @@ tmux -S $S send-keys -t "$pi_pane" -l \
 - Delete a worktree that still holds an unapproved commit.
 - Start a pi session as root or as `hermes` for review work. The review pi runs as `agent`.
 - Run step 1 as `hermes`. The tree comes out `hermes:hermes 0700`, and only root can undo it.
+- Write the tmux recipe by hand for steps 5 and 6. `spawn-approval-session` owns the session layout.
 - Run step 5 or 6 as `hermes`. The panes inherit the creator environment, so a hermes-built session has no agent `delta`, no agent `lazygit`, and no agent `pi-local`.
