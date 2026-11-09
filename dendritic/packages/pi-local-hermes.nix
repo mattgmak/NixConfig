@@ -119,29 +119,36 @@
         runtimeInputs = [ pkgs.coreutils ];
         text = ''
           dir="''${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}"
-          mkdir -p "$dir"
-          ln -sfn ${settings} "$dir/settings.json"
-          ln -sfn ${piModule + "/models.json"} "$dir/models.json"
-          ln -sfn ${autoname} "$dir/pi-autoname.json"
-          mkdir -p "$dir/pi-blackhole"
-          ln -sfn ${blackholeConfig} "$dir/pi-blackhole/pi-blackhole-config.json"
-          ln -sfn ${piModule + "/keybindings.json"} "$dir/keybindings.json"
-          ln -sfn ${piModule + "/web-search.json"} "$dir/web-search.json"
-          ln -sfn ${piModule + "/themes"} "$dir/themes"
-          ln -sfn ${piModule + "/prompts"} "$dir/prompts"
-          ln -sfn ${skills} "$dir/skills"
-          mkdir -p "$dir/extensions"
-          for entry in ${extensions}/*; do
-            name="$(basename "$entry")"
-            if [ -d "$entry" ]; then
-              mkdir -p "$dir/extensions/$name"
-              for file in "$entry"/*; do
-                ln -sfn "$file" "$dir/extensions/$name/$(basename "$file")"
-              done
-            else
-              ln -sfn "$entry" "$dir/extensions/$name"
-            fi
-          done
+          marker="$dir/.pi-local-hermes"
+          # An agent dir that home-manager owns holds its own links. Relinking
+          # there replaces them, so take a dir only when it is empty or already
+          # carries the marker this wrapper leaves behind.
+          if [ ! -d "$dir" ] || [ -e "$marker" ] || [ -z "$(ls -A "$dir" 2>/dev/null)" ]; then
+            mkdir -p "$dir"
+            : > "$marker"
+            ln -sfn ${settings} "$dir/settings.json"
+            ln -sfn ${piModule + "/models.json"} "$dir/models.json"
+            ln -sfn ${autoname} "$dir/pi-autoname.json"
+            mkdir -p "$dir/pi-blackhole"
+            ln -sfn ${blackholeConfig} "$dir/pi-blackhole/pi-blackhole-config.json"
+            ln -sfn ${piModule + "/keybindings.json"} "$dir/keybindings.json"
+            ln -sfn ${piModule + "/web-search.json"} "$dir/web-search.json"
+            ln -sfn ${self.packages.${system}.piAgentThemes} "$dir/themes"
+            ln -sfn ${piModule + "/prompts"} "$dir/prompts"
+            ln -sfn ${skills} "$dir/skills"
+            mkdir -p "$dir/extensions"
+            for entry in ${extensions}/*; do
+              name="$(basename "$entry")"
+              if [ -d "$entry" ]; then
+                mkdir -p "$dir/extensions/$name"
+                for file in "$entry"/*; do
+                  ln -sfn "$file" "$dir/extensions/$name/$(basename "$file")"
+                done
+              else
+                ln -sfn "$entry" "$dir/extensions/$name"
+              fi
+            done
+          fi
           # bin/pi forces `exec -a pi`, so the wrapper execs the app and repeats the
           # env bin/pi sets. The name keeps tmux, ps, and agent-sesh on pi-local.
           export PIBOLT_NPM=1
