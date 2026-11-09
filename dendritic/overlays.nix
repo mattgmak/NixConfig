@@ -136,6 +136,9 @@
         in
         {
           inherit (hyprPkgs) hyprland xdg-desktop-portal-hyprland;
+          # The system mesa needs a newer glibc than the flake's Hyprland links, so that
+          # binary cannot dlopen it. Hosts on the flake need this matching provider.
+          mesaForHyprland = hyprPkgs.mesa;
           hyprlandPlugins = pluginPkgs.hyprlandPlugins or { };
         };
     in

@@ -261,7 +261,10 @@
           openFirewall = true;
         };
 
-        hardware.graphics.enable = true;
+        hardware.graphics = {
+          enable = true;
+          package = pkgs.mesaForHyprland;
+        };
         hardware.bluetooth = {
           enable = true;
           powerOnBoot = true;
