@@ -55,6 +55,9 @@ Mark a ticket in progress before its lane starts. Mark it completed right after 
 
 Refresh the board in the same turn as each merge, so the new frontier shows at once.
 
+A merged ticket leaves the board. Show open work only: pending, in progress, and blocked.
+A report may name a merge in one line. The board holds no completed row.
+
 A ticket that leaves the frontier for a blocker carries `Backlog` on the board and in Linear.
 
 ## 2. Cut a worktree per ticket
