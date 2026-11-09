@@ -809,6 +809,10 @@ SEED
           # directories first: tmpfiles cannot replace a directory with a link.
           "L+ /root/NixConfig - - - - /home/agent/NixConfig"
           "L+ /var/lib/hermes/NixConfig - - - - /home/agent/NixConfig"
+          # hermes needs w on the home dir to create `wt` worktrees beside the repo.
+          # An ACL entry grants it and leaves the mode at 0750, so sshd StrictModes
+          # still accepts the agent key. chmod 0770 would break that login.
+          "a+ /home/agent - - - - u:hermes:wx"
           # logind makes /run/user/1000 mode 0700, so hermes cannot reach the
           # agent tmux socket inside it. One A+ rule covered both paths and put
           # r-x on the socket, and a socket needs w, so hermes got permission
