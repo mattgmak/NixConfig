@@ -430,6 +430,7 @@ in
           shell = pkgs.zsh;
           openssh.authorizedKeys.keys = with self.sshKeys; [
             Goofeus
+            GoofeusRoot
             GoofyDesky
             GoofyEnvy
             Droid
