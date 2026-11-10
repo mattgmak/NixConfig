@@ -357,6 +357,7 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | `pi-autoname` (`vendor/mattgmak/pi-autoname`) | `mattgmak/pi-autoname` | `https://github.com/ssdiwu/pi-autoname.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
 | `pi-prompt-frecency` (`vendor/mattgmak/pi-prompt-frecency`) | `mattgmak/pi-prompt-frecency` | *(your repo — no separate upstream)* | `main` |
+| `pi-copy-mode`, `pi-libtui`, `pi-xsettings` (`vendor/mattgmak/agents`) | `mattgmak/agents` | `https://github.com/luan/agents.git` | `main` |
 
 Add new rows here when vendoring through a fork.
 

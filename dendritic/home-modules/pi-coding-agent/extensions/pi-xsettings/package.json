@@ -1,0 +1,14 @@
+{
+  "name": "pi-xsettings",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "pi-package"
+  ],
+  "description": "Pi loader for pi-xsettings (vendored mattgmak/agents submodule)",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

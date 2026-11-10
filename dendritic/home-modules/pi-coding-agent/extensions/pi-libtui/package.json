@@ -1,0 +1,14 @@
+{
+  "name": "pi-libtui",
+  "private": true,
+  "type": "module",
+  "keywords": [
+    "pi-package"
+  ],
+  "description": "Pi loader for pi-libtui (vendored mattgmak/agents submodule)",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

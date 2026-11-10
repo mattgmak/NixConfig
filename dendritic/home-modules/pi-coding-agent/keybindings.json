@@ -11,5 +11,13 @@
 
   "tui.editor.deleteToLineEnd": [],
   "tui.altScreen.halfPageUp": "ctrl+u",
-  "tui.altScreen.halfPageDown": "ctrl+d"
+  "tui.altScreen.halfPageDown": "ctrl+d",
+
+  "copy-mode.enter": "alt+z",
+  "copy-mode.searchForward": "/",
+  "copy-mode.searchBackward": "?",
+  "copy-mode.repeatSearch": "n",
+  "copy-mode.reverseSearch": "shift+n",
+  "copy-mode.clearSelection": "escape",
+  "copy-mode.copy": "y"
 }
