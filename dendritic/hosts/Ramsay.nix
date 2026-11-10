@@ -327,6 +327,10 @@ in
         # gnome-keyring-daemon on demand. libsecret clients fail with no provider.
         services.gnome.gnome-keyring.enable = true;
 
+        # common.nix covers login, gdm, and hyprlock only, so an SSH session leaves
+        # the keyring locked. This adds pam_gnome_keyring.so to /etc/pam.d/sshd.
+        security.pam.services.sshd.enableGnomeKeyring = true;
+
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         nixpkgs.overlays = common-overlays;
