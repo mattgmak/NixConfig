@@ -1,30 +1,49 @@
 ## Lane watch
 
-One `ctx_bg` job watches each open lane. Name the job `lane-watch #<pr>`.
+One `ctx_bg` job watches the whole wave, by branch name. Start it in the same turn as the first lane spawn, not when the first pull request opens. A branch with no pull request yet prints `PR_OPEN` when the request appears, so the watch covers the wait before it.
 
 ```text
 ctx_bg {
-  name:    "lane-watch #152",
-  command: "bash ~/NixConfig/dendritic/skills/master-orchestrator/watch-lane.sh 152 DrPOM-Medical/tcm 3000",
-  wake_on: "^(FOUND|CONFLICT|MERGED|CLOSED) ",
+  name:      "watch wave",
+  command:   "bash ~/.pi/agent/skills/master-orchestrator/scripts/watch-wave.sh <branch> [<branch> ...] --window 3000",
+  wake_on:   "^(PR_OPEN|CLEAN|STATE|CIFAIL|MERGED|CLOSED) ",
   timeout_ms: 3300000
 }
 ```
 
-The script prints one state line first, then exits. Read the line and act.
+The script owns its own deadline, so it exits before the job limit. A window of 3000 s ends the loop at 2880 s and prints `TIMEOUT`. Pass a window below `timeout_ms` minus a 120 s margin.
 
 | Line | Meaning | Action |
 |---|---|---|
-| `STANDING n` | unresolved threads at start | sweep them before you trust a clean gate |
-| `FOUND n` | new unresolved CodeRabbit threads | send each thread to its lane: file, line, fault, fix |
-| `CIFAIL` | a check turned to `fail`, or a watched pull request starts red | read the failing job, give its lane the error line |
-| `CONFLICT` | `mergeable` reads CONFLICTING | send the rebase steps |
-| `MERGED` | the pull request merged | unstack, sweep, set the ticket to Done |
-| `CLOSED` | closed with no merge | ask the user |
-| `RATE_LIMIT` | CodeRabbit reports a limit | note the limit. The watch keeps looking for `MERGED` and `CONFLICT`. The line does not wake you |
-| `TIMEOUT` | no new state inside the window | report the pull request at the gate |
+| `PR_OPEN n` | the lane opened the pull request, or the watch restarted | read the three gate states |
+| `CLEAN n` | `mergeable` reads CLEAN | read the checks by hand before you trust it |
+| `STATE n DIRTY` | a conflict, a behind branch, or branch protection | give the lane the rebase steps |
+| `CIFAIL n` | a check reads `fail` | give the lane the error line |
+| `MERGED n` | the user merged | clean up, then unstack the requests above it |
+| `CLOSED n` | closed with no merge | ask the user |
+| `TIMEOUT` | no change inside the window | report the pull request at the gate |
 
-Every state exits 0, because a merge is the result and not a fault. Only an unreadable pull request exits 1 with an `ERROR` line.
+### One job per pull request
+
+The default is one job per branch, because the jobs widget then shows each pull request on its own row. Each job carries one branch name.
+
+| Case | Jobs |
+|---|---|
+| one pull request | one job, named `watch <ticket> #<pr>` |
+| three requests from one wave | three jobs, one branch each |
+| a short wave you watch by hand | one job with a branch list |
+
+The job ends itself with `DONE every branch merged or closed` when `--all-merged` is set. Cancel a job whose request closed with no merge, then ask the user.
+
+Give each start its own `unique: true`, and pass `cwd`. A start that takes the session cwd fails once its worktree leaves the disk.
+
+Rules:
+
+- One job per branch. Never run two jobs for one branch.
+- Restart the watch in the same turn as any lane push, with `unique: true`.
+- Never poll by hand, never sleep, never tail a log.
+- A job that dies at exit 124 outran its limit. The script now cannot, so an exit 124 means an older script ran.
+- Read the three gate states by hand after a wake. The line is a trigger, not a verdict.
 
 Rules:
 
