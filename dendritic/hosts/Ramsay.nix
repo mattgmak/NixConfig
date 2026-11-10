@@ -323,6 +323,10 @@ in
           secretKeyFile = config.age.secrets.nix-builder-key.path;
         };
 
+        # Installs org.freedesktop.secrets.service, so the session bus can start
+        # gnome-keyring-daemon on demand. libsecret clients fail with no provider.
+        services.gnome.gnome-keyring.enable = true;
+
         boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
         nixpkgs.overlays = common-overlays;
