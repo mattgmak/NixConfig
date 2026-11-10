@@ -3,23 +3,6 @@
   perSystem =
     { system, ... }:
     let
-      # Hyprland v0.56.2 requires glaze 7.x; nixpkgs-unstable ships glaze 9.0.0.
-      glazeForHyprlandOverlay =
-        _final: prev:
-        prev.glaze.overrideAttrs (_old: {
-          version = "7.9.1";
-          src = prev.fetchFromGitHub {
-            owner = "stephenberry";
-            repo = "glaze";
-            tag = "v7.9.1";
-            hash = "sha256-NRRq5MGF2f5PW0teYnq58ELzson+U6KHVPaY6r30KLA=";
-          };
-        });
-
-      glazeOverlay = final: prev: {
-        glaze = glazeForHyprlandOverlay final prev;
-      };
-
       # TODO: drop once nixpkgs ships node 24.22.1 in the binary cache.
       # nixpkgs nodejs_24 is 24.21.0 and embeds the revoked emSign ECC Root CA - G3,
       # so use the upstream build. nixpkgs nodejs_22 is 22.23.4, the first fixed 22.x
@@ -108,11 +91,8 @@
           });
         };
 
-      # Shared overlay stack: glaze 7.x + Hyprland packages (gcc16Stdenv).
-      hyprlandBaseOverlays = [
-        glazeOverlay
-        inputs.hyprland.overlays.hyprland-packages
-      ];
+      # Shared overlay stack: Hyprland packages (gcc16Stdenv).
+      hyprlandBaseOverlays = [inputs.hyprland.overlays.hyprland-packages];
 
       hyprlandPackagesOverlay =
         _final: _prev:
@@ -136,9 +116,6 @@
         in
         {
           inherit (hyprPkgs) hyprland xdg-desktop-portal-hyprland;
-          # The system mesa needs a newer glibc than the flake's Hyprland links, so that
-          # binary cannot dlopen it. Hosts on the flake need this matching provider.
-          mesaForHyprland = hyprPkgs.mesa;
           hyprlandPlugins = pluginPkgs.hyprlandPlugins or { };
         };
     in

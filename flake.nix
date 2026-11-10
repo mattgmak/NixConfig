@@ -19,13 +19,13 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
 
-    hyprland.url = "github:hyprwm/Hyprland?ref=v0.56.2";
+    hyprland.url = "github:hyprwm/Hyprland?ref=v0.57.1";
     hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins?rev=81516add9b432b6ffc9f0906b92c9302c479c236";
+      url = "github:hyprwm/hyprland-plugins?ref=v0.57.0";
       inputs.hyprland.follows = "hyprland";
     };
     hyprgrass = {
-      url = "github:horriblename/hyprgrass?ref=hl-0.56.1";
+      url = "github:horriblename/hyprgrass?ref=hl-0.57.1";
       inputs.hyprland.follows = "hyprland";
     };
 
