@@ -110,6 +110,8 @@
         # nix and comma reach any nixpkgs tool: `nix run nixpkgs#<pkg>` and
         # `comma <cmd>`. nix-daemon.socket is 0666, so an unprivileged unit can
         # use the daemon. lean-ctx is the CLI behind the context engine plugin.
+        # The agent's install check names ripgrep, node, npm, and ffmpeg.
+        # Without them every start warns "install out of sync".
         extraPackages = [
           pkgs.piLocal
           pkgs.ramsayDeploy
@@ -117,6 +119,9 @@
           pkgs.nix
           pkgs.comma
           pkgs.lean-ctx
+          pkgs.ripgrep
+          pkgs.nodejs
+          pkgs.ffmpeg
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
