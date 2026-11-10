@@ -102,10 +102,12 @@ A worktree is a separate flake ref. Nix copies its tree once and reuses that cop
 
 Both the approval workflow and the hermes review session use one layout. One window holds everything: the pi session on the left, and the right side split into two stacked panes. The top-right pane runs `l` (the zsh lazygit wrapper) in the worktree under an interactive zsh. The bottom-right pane holds the approval command, typed but not entered.
 
+Pass `-t "$TMUX_PANE"` on the first split. Without it, tmux picks the session's active window. pi moves that window whenever it spawns a new one, so the ambient target is rarely the pi pane.
+
 From the pi pane, build the layout with two splits:
 
 ```sh
-lg=$(tmux split-window -h -P -F '#{pane_id}')
+lg=$(tmux split-window -h -t "$TMUX_PANE" -P -F '#{pane_id}')
 ap=$(tmux split-window -v -P -F '#{pane_id}' -t "$lg")
 tmux send-keys -t "$lg" "cd <worktree> && l"
 tmux send-keys -t "$ap" "cd <worktree> && scripts/approve-and-deploy.sh <branch> --caller $TMUX_PANE"
