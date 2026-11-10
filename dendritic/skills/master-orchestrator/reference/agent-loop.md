@@ -71,6 +71,19 @@ Two lanes hit the 120-minute exit limit in one wave. A lane that runs past 60 mi
 
 A `worker` cannot take `new-session`, so a call with it fails before the lane starts.
 
+### Linear status
+
+The ticket status must match the work. Do not leave a stale status on the board.
+
+| Event | Action |
+|---|---|
+| the user picks a ticket for a lane | set it `In Progress` before the lane starts |
+| a lane hits a blocked gate | keep `In Progress`, and add one comment with the blocker and its file |
+| a pull request opens | keep `In Progress`, and add the pull request link in one comment |
+| the merge lands | set it `Done`, and comment the merge commit with the gate exits |
+| the user cancels the ticket | set it `Canceled`, and name the ruling that canceled it |
+| a design ruling lands | comment it on the ticket the same turn, so the ticket holds the decision |
+
 ### Failure protocol
 
 | Fault | Action |
