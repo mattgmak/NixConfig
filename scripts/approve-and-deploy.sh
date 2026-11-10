@@ -7,21 +7,22 @@
 #   scripts/approve-and-deploy.sh fix-ramsay-agenix --caller %4
 #
 # You read it and press Enter. The script merges the branch into main, pushes,
-# deploys through the ramsay-deploy gate, prompts the agent pane to verify the
-# running system, then closes its own pane. Only the pi session stays open.
+# deploys through the ramsay-deploy gate, sends the handoff to the pi pane, then
+# closes its own pane. Only the pi session stays open.
 #
 #   scripts/approve-and-deploy.sh <branch>                  ramsay only
 #   scripts/approve-and-deploy.sh <branch> --hosts ramsay,goofeus
 #   scripts/approve-and-deploy.sh <branch> --dry-run        print every step
 #   scripts/approve-and-deploy.sh <branch> --no-deploy      merge and push only
 #   scripts/approve-and-deploy.sh <branch> --no-kill        keep the pane open
+#   scripts/approve-and-deploy.sh <branch> --handoff <file> replace the handoff text
 #
 # Run it as the agent user. The two sudo calls need the NOPASSWD rules in
 # dendritic/hosts/Ramsay.nix, so no password is typed on a phone session.
 # A failed step stops the run and leaves the pane open with the log on screen.
 set -euo pipefail
 
-usage() { sed -n '3,21p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 say() { printf '\n== %s\n' "$*"; }
 run() {
   if [ "$dry" = 1 ]; then printf '  dry: %s\n' "$*"; return 0; fi
@@ -37,6 +38,7 @@ no_kill=0
 allow_dirty=0
 caller=${APPROVE_CALLER:-}
 msg=${APPROVE_MSG:-}
+handoff=${APPROVE_HANDOFF:-}
 host_required=${HOST_REQUIRED:-Ramsay}
 
 while [ $# -gt 0 ]; do
@@ -47,6 +49,7 @@ while [ $# -gt 0 ]; do
     --no-kill)     no_kill=1; shift ;;
     --caller)      caller=${2:?--caller needs a value}; shift 2 ;;
     --msg)         msg=${2:?--msg needs a value}; shift 2 ;;
+    --handoff)     handoff=${2:?--handoff needs a value}; shift 2 ;;
     --allow-dirty) allow_dirty=1; shift ;;
     -h|--help)     usage; exit 0 ;;
     -*)            printf 'unknown flag: %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -134,10 +137,21 @@ main() {
     esac
   fi
 
-  [ -n "$msg" ] || msg="Deploy of $sha finished. Check journalctl for the units you changed, then report the result."
-  say 'prompt the agent pane'
+  # The pi session is the worktree memory. The handoff line replaces the old
+  # HANDOFF.md file: the session keeps the context, and git keeps the change.
+  local msg=''
+  if [ -n "$handoff" ] && [ -f "$handoff" ]; then
+    msg=$(tr '\n' ' ' < "$handoff")
+  elif [ -n "$msg" ]; then
+    :
+  elif [ "$no_deploy" = 1 ]; then
+    msg="Branch $branch merged as $sha, deploy skipped. Report the result."
+  else
+    msg="Deploy of $sha finished. Read the log at $log, check journalctl, then report the result."
+  fi
+  say 'handoff to the pi pane'
   printf '  -> %s: %s\n' "$caller" "$msg"
-  if [ "$dry" != 1 ]; then
+  if [ "$dry" != 1 ] && [ -n "$caller" ]; then
     tmux send-keys -t "$caller" -l "$msg"
     tmux send-keys -t "$caller" Enter
   fi

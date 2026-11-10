@@ -18,11 +18,10 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 | 1 | Create the worktree | `wt -C /home/agent/NixConfig switch --create <branch>` |
 | 2 | Materialize submodules | `git -C <worktree> submodule update --init` |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
-| 4 | Write the handoff doc | `<worktree>/HANDOFF.md` |
-| 5 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes` |
-| 6 | Fill the session | the same command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
-| 7 | Hand over | reply with the session name and the command waiting in the approval pane |
-| 8 | After the deploy | resume the pi-local pane with the result, then update `HANDOFF.md` |
+| 4 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes` |
+| 5 | Fill the session | the same command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
+| 6 | Hand over | reply with the session name and the command waiting in the approval pane |
+| 7 | After the deploy | the script sends the handoff into the pi pane. The session keeps the context. |
 
 ## Worktree
 
@@ -61,42 +60,19 @@ Never edit `/home/agent/NixConfig` itself, and never edit a worktree another tas
 
 Write the brief with the rules in the `pi` skill: one task, the full context, no follow-up questions in print mode. The brief names the worktree path, the files in scope, and the check to run.
 
-Ask for two deliverables in the brief:
-
-1. The change summary the owner reads, in the reply body.
-2. The handoff doc content: state, next steps, and the exact deploy command.
+Ask for one deliverable in the brief: the change summary the owner reads, in the reply body.
 
 pi-local writes files with its own tools. When it cannot write, Hermes saves the summary to `<worktree>/PI-SUMMARY.md`.
 
-## Handoff doc
+## Handoff
 
-Write `<worktree>/HANDOFF.md` after every pi-local run, before the approval pane opens. The file is the memory of the worktree: the next pi-local run reads it instead of guessing.
+The pi session is the context carrier. `approve-and-deploy.sh` sends a one-line handoff into the `--caller` pane after every run:
 
-```markdown
-# HANDOFF fix-ramsay-agenix
-Owner: hermes   Worker: pi-local   Branch: fix-ramsay-agenix
-Worktree: /home/agent/NixConfig.fix-ramsay-agenix
-
-## Brief
-<the exact brief text>
-
-## State
-<summary from pi-local, plus git status --porcelain>
-
-## Run log
-| When | Action | Result |
-| --- | --- | --- |
-| 2026-11-08T21:04 | pi-local run 1 | exit 0, 2 files changed |
-| 2026-11-08T21:31 | approve-and-deploy | exit 0, main now 0acb3d8 |
-
-## Next
-<what the next run must do, or "nothing: waiting for owner approval">
-
-## Deploy command
-scripts/approve-and-deploy.sh fix-ramsay-agenix --caller <pi-pane-id> --no-kill
+```text
+Deploy of 0acb3d8 finished. Read the log at <log path>, check journalctl, then report the result.
 ```
 
-Keep the file in the worktree, so it merges into `main` with the change and the history keeps it.
+The session history carries the context, so the worktree holds no `HANDOFF.md` and `main` never gains one. The approval pane from step 4 is the `--caller`, so the handoff always reaches the live pi session.
 
 ## Review session
 
@@ -137,7 +113,7 @@ make tmux read session `NixConfig-bump-pi-1` plus pane `1.7`, and the error is
 | `work` | 1 | `pi-local` interactive session, running at open |
 | `work` | 2 | interactive zsh with the approval command prefilled, no `Enter` |
 
-Only the approval pane waits for the owner. The other two start at open, so the owner sees the diff and the pi session with no key press. Pass `--no-kill`: the session belongs to the owner, so the script must keep the pane. The `pi` pane is the `--caller`, so the verification prompt lands in the session, not in a Hermes window.
+Only the approval pane waits for the owner. The other two start at open, so the owner sees the diff and the pi session with no key press. Pass `--no-kill`: the session belongs to the owner, so the script must keep the pane. The `pi` pane is the `--caller`, so the handoff lands in the session, not in a Hermes window.
 
 ## Owner access
 
@@ -152,7 +128,7 @@ Two layers gate the agent tmux server, and the skill needs both:
 | Connect fails after a switch with the ACL in place | A recursive `A+` rule put `r-x` on the socket | Use the two `a+` rules, then run `server-access` |
 | `error connecting ... (No such file or directory)` | No tmux server: `agent` never logged in | Ask the owner. Never start a server as `hermes` |
 | `ambiguous target` on `server-access` | The `-S` socket was missing from the command | Always pass `-S <path>`, not `$TMUX` |
-| `fatal: error opening '<worktree>/.git': Permission denied` | hermes created the worktree, so the files are `0600` and `agent` cannot read them | Owner runs `chown -R agent:users <worktree>` as root, then step 5 reruns |
+| `fatal: error opening '<worktree>/.git': Permission denied` | hermes created the worktree, so the files are `0600` and `agent` cannot read them | Owner runs `chown -R agent:users <worktree>` as root, then step 4 reruns |
 | `sudo: a password is required` on `sudo -n -u agent ...` | hermes sudoers lists only `ramsay-deploy-switch`, so no other command runs without a password | agent runs the tmux commands. hermes never uses `sudo -u agent`. |
 
 - The owner attaches as `agent`: `tmux attach -t NixConfig-fix-ramsay-agenix`.
@@ -162,13 +138,13 @@ Two layers gate the agent tmux server, and the skill needs both:
 
 | Result | Hermes action |
 | --- | --- |
-| Deploy passed | The script sends the verify prompt into the pi pane. Add the result row to `HANDOFF.md`. Kill the session only when the owner asks. |
+| Deploy passed | The script sends the handoff into the pi pane. Kill the session only when the owner asks. |
 | Deploy failed | The script stops and keeps its output on screen. Resume the pi pane with the failure text and the log path, so pi-local continues the fix in the same worktree. |
 | Owner wants changes | Send the new brief into the pi pane. The worktree stays until the next approval. |
 
 ```sh
 tmux -S $S send-keys -t "$pi_pane" -l \
-  'Deploy failed. Read HANDOFF.md and <log path>, fix the cause, then update HANDOFF.md.'
+  'Deploy failed. Read <log path>, fix the cause, then report the result.'
 ```
 
 ## Never
@@ -179,5 +155,6 @@ tmux -S $S send-keys -t "$pi_pane" -l \
 - Delete a worktree that still holds an unapproved commit.
 - Start a pi session as root or as `hermes` for review work. The review pi runs as `agent`.
 - Run step 1 as `hermes`. The tree comes out `hermes:hermes 0700`, and only root can undo it.
-- Write the tmux recipe by hand for steps 5 and 6. `spawn-approval-session` owns the session layout.
-- Run step 5 or 6 as `hermes`. The panes inherit the creator environment, so a hermes-built session has no agent `delta`, no agent `lazygit`, and no agent `pi-local`.
+- Write the tmux recipe by hand for steps 4 and 5. `spawn-approval-session` owns the session layout.
+- Run step 4 or 5 as `hermes`. The panes inherit the creator environment, so a hermes-built session has no agent `delta`, no agent `lazygit`, and no agent `pi-local`.
+- Write a `HANDOFF.md`. The pi session and the script handoff carry the context.
