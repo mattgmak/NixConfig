@@ -195,6 +195,12 @@
         # Configure network connections interactively with nmcli or nmtui.
         networking.networkmanager.enable = true;
 
+        # unbound answers queries for Goofeus and does not serve the ts.net zone,
+        # so pin Ramsay to its tailnet IPv4 for ssh and HTTP alike.
+        networking.extraHosts = ''
+          100.76.193.66 ramsay.dab-octatonic.ts.net ramsay
+        '';
+
         environment.sessionVariables =
           let
             homeDir = if username == "root" then "/root" else "/home/${username}";
