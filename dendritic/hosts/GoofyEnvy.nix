@@ -119,7 +119,7 @@
           distributedBuilds = true;
           buildMachines = [
             (self.mkBuilder self.builderSites.ramsay {
-              sshKey = "/home/${username}/.ssh/id_ed25519";
+              sshKey = "/root/.ssh/id_ed25519_nix";
             })
           ];
         };

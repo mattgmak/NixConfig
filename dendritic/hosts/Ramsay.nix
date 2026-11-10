@@ -434,6 +434,7 @@ in
             GoofeusNix
             GoofyDesky
             GoofyEnvy
+            GoofyEnvyNix
             Droid
             MacMini
           ];
