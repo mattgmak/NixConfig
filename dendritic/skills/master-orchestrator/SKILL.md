@@ -93,7 +93,7 @@ subagent {
 
 The default profile is `peer`, in its own session. Only `peer` holds the full tool set: Linear, shell, the tracker and `ask_user_question`.
 
-Use `worker` only for small work that opens no pull request. A `worker` lane loses the Linear tools, so paste the ticket text into its brief. Name the profile in every brief.
+Use `worker` only for small work that opens no pull request. A `worker` allows the `pane` and `window` surfaces only, so a `new-session` call fails before the lane starts. A `worker` lane loses the Linear tools, so paste the ticket text into its brief. Name the profile in every brief.
 
 A `worker` lane that needs a pull request stops at once. Respawn it as `peer`.
 
@@ -152,6 +152,8 @@ Rules to state in every brief:
 - The lane asks the user before the first simulator command. Ask once per wave, then reuse the lease.
 - A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
+- Run `scripts/gate-cache.sh` once per head, and read the cache in every later turn. Read `reference/agent-loop.md`.
+- Reply once per phase in three lines, and put the six report fields in the file from `scripts/lane-report.sh`. A command result inside a phase earns no reply.
 
 Completion criterion: the lane reports a head sha, a changed file list, one exit code per gate, and each evidence artifact the change needs.
 
@@ -174,6 +176,10 @@ A lane that says "gates running", "waiting", or "in progress" has not finished. 
 ```text
 subagent_message { name: "lane-1424", message: "<remaining steps + report shape>" }
 ```
+
+One steer per phase. A second miss means the lane is wrong for the work. Stop it, save the tree, and spawn a fresh lane with a narrower brief. A lane that runs past 60 minutes gets a narrowed brief, not a nudge. Read `reference/agent-loop.md`.
+
+A lane that idles on a background job gets one foreground command that blocks, and no reply before it returns.
 
 ## 7. Review
 
@@ -328,6 +334,8 @@ After a merge, read the ticket back and confirm the state. A ticket that still s
 Every app UI change carries evidence before the review opens. One artifact per changed screen. Read `reference/evidence.md`.
 
 The lane captures the evidence, not the orchestrator. A UI brief names each changed screen, and the lane publishes one artifact per screen. Before you spawn the review, read the pull request body and confirm the `## Evidence` block holds the artifacts. A pull request without the block waits, and you send the capture steps back to the lane.
+
+A lane runs `scripts/preflight-evidence.sh` before the first capture, and pastes its four checks. A `FOREIGN` line names another checkout, so the device proves nothing.
 
 A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
 

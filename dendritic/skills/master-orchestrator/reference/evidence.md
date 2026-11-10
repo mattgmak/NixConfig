@@ -16,6 +16,34 @@ Capture it from the real app on a leased simulator, built on the mini. Publish i
 
 An evidence run reuses the dev client already on the simulator when its native fingerprint matches the tree. Build only on a mismatch. The method sits in `reference/macos-remote-build.md`.
 
+### Preflight, before any capture
+
+Run `scripts/preflight-evidence.sh` in the worktree. It prints the head, the branch, and the Metro that serves this worktree. A `FOREIGN` line names another checkout, and the device then proves nothing.
+
+Paste these four lines in the report before the first capture:
+
+| Check | Pass condition |
+|---|---|
+| lease | id, TTL left, device, and the client installed from this head |
+| bundle | one visible word drawn from this head, then reverted |
+| tools | dev Tools button off, or the gear bubble clear of the header |
+| tap | the a11y tree reports points, so a pixel tap is 3x |
+
+A Metro from another checkout cost one lane a whole session. The dev bubble cost another lane a false fault, one code change and one revert. Neither trap costs more than one command to check.
+
+### Capture the whole set in one turn
+
+One still per turn took 6 h 39 min for 5 frames. Work the set instead:
+
+1. Keep one lease for the whole set, and drive the app from state to state without a restart.
+2. Capture each frame and name it `<ticket>-<n>-<state>.png` as you go.
+3. Publish every file with `scripts/publish-evidence.sh <folder>`. It uploads each file and prints the body rows.
+4. Release the lease only after the script prints its count and the body holds the images.
+
+Reuse one lease per wave. Do not erase a simulator unless the client fingerprint mismatches. A TTL of 3600 s covers one set of frames.
+
+A still proves the change only when the changed surface works. An error screen is no proof. Recapture it, or name the gap in the body and file a ticket for it.
+
 Steps for UI:
 
 1. Ask the user before the first simulator command. The repo forbids an automatic run.

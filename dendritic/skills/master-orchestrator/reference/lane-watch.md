@@ -34,7 +34,7 @@ Rules:
 - Read the three gate states by hand after a wake. The line is a trigger, not a verdict.
 - Never poll by hand, never sleep, never tail a log. The job holds the loop.
 - A `MERGED` line starts the cleanup turn. Unstack the pull requests above it, remove the worktree, kill the lane session, and set the ticket to Done.
-- The script window is 3000 s and `timeout_ms` is 3300000. The job limit of 60 minutes kills a longer window, so keep the window under it.
+- The script window is 3000 s and `timeout_ms` is 3300000. The job limit of 60 minutes kills a longer window, so keep the window under it. Keep a 60 s margin between the loop and `timeout_ms`. A loop of 120 ticks at 60 s runs 7200 s, so the job dies at the limit with exit 124. A job that exits 124 ran its loop past `timeout_ms`, so shorten the loop, not the margin.
 - A job that exits 124 hit its job limit. Start the watch again with a fresh window.
 - A job id can expire and leave its process running. Before a restart, clear the process and check the count.
 - Clear a watcher with a bracket pattern: `pkill -f 'watch-lanes[.]sh'`. A plain pattern matches the command line of the shell that runs it, and the shell then kills itself with exit 143.
