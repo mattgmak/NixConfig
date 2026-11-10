@@ -25,6 +25,14 @@
       availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
       secretNames = builtins.attrValues availableSecrets;
       secretPathOf = name: config.age.secrets.${name}.path;
+
+      # Waiting only helps while agenix is still decrypting. The service state
+      # says so on systemd hosts; elsewhere the file check alone decides.
+      waitGate =
+        if pkgs.stdenv.hostPlatform.isLinux then
+          ''[[ -r "$__agenix_first" || "$(systemctl --user is-active agenix.service 2>/dev/null)" == activating ]]''
+        else
+          ''[[ -r "$__agenix_first" || -n "''${__agenix_wait_always:-1}" ]]'';
     in
     {
       imports = [ inputs.agenix.homeManagerModules.default ];
@@ -86,18 +94,20 @@
         # once-guard, so a shell that started before agenix finished mounting
         # exported empty values and every descendant (tmux server, panes, nu)
         # inherited them for good. .zshenv is unguarded and runs for every zsh.
-        # The poll covers the async launchd mount: agenix only flips the
-        # generation symlink after decrypting every secret. A sleep forks a
-        # process and costs 17 ms, so 300 x 0.01 s takes 4.4 s; 30 x 0.1 s
-        # keeps the same 3 s window with a twentieth of the forks.
+        # agenix flips the generation symlink only after it decrypts every
+        # secret, so waitGate gates the poll on that state. A working setup pays
+        # one file test, and a failed service skips the wait instead of paying
+        # 30 x 100 ms for a file that will never appear.
         envExtra =
           lib.optionalString (secretNames != [ ]) ''
             if [[ -o interactive ]]; then
               __agenix_first="${secretPathOf (builtins.head secretNames)}"
-              for __i in {1..30}; do
-                if [[ -r "$__agenix_first" ]]; then break; fi
-                sleep 0.1
-              done
+              if ${waitGate}; then
+                for __i in {1..30}; do
+                  if [[ -r "$__agenix_first" ]]; then break; fi
+                  sleep 0.1
+                done
+              fi
               unset __agenix_first __i
             fi
           ''

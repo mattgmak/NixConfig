@@ -77,9 +77,11 @@
         bash
       ];
 
-      # agenix defaults to ~/.ssh/id_rsa, which this host has no copy of, so
-      # agenix.service fails and every secret path stays missing.
-      age.identityPaths = [ "/home/goofy/.ssh/id_ed25519" ];
+      # agenix defaults to ~/.ssh/id_rsa, which this host has no copy of. The
+      # private key here holds a passphrase, and a systemd user service has no
+      # tty, so age cannot unlock it. The public identity makes age ask the ssh
+      # agent at SSH_AUTH_SOCK, which the user manager already exports.
+      age.identityPaths = [ "/home/goofy/.ssh/id_ed25519.pub" ];
 
       # whisper-dictation defines no enable option. Dropping it from the
       # imports list is the disable path.
