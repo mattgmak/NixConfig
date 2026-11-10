@@ -18,10 +18,10 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 | 1 | Create the worktree | `wt -C /home/agent/NixConfig switch --create <branch>` |
 | 2 | Materialize submodules | `git -C <worktree> submodule update --init` |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
-| 4 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes` |
-| 5 | Fill the session | the same command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
+| 4 | Commit | `git -c user.name=mattgmak -c user.email=u3592095@connect.hku.hk commit -m "<subject>"` |
+| 5 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes`. The command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
 | 6 | Hand over | reply with the session name and the command waiting in the approval pane |
-| 7 | After the deploy | the script sends the handoff into the pi pane. The session keeps the context. |
+| 7 | After the deploy | the script sends the result into the pi pane, on success and on failure. The session keeps the context. |
 
 ## Worktree
 
@@ -64,6 +64,16 @@ Ask for one deliverable in the brief: the change summary the owner reads, in the
 
 pi-local writes files with its own tools. When it cannot write, Hermes saves the summary to `<worktree>/PI-SUMMARY.md`.
 
+### Git identity
+
+Every commit in a NixConfig worktree is `mattgmak <u3592095@connect.hku.hk>`, the owner's identity. The agent account gets it from `/home/agent/.config/git/config`. A commit made outside that account needs the identity on the command line:
+
+```sh
+git -c user.name=mattgmak -c user.email=u3592095@connect.hku.hk commit -m "<subject>"
+```
+
+Never let a commit land as `hermes@ramsay` in a NixConfig branch. That identity belongs to `ramsay-deploy.nix`, which builds the deploy commit in the mirror clone, not the review branch.
+
 ## Handoff
 
 The pi session is the context carrier. `approve-and-deploy.sh` sends a one-line handoff into the `--caller` pane after every run:
@@ -100,18 +110,18 @@ sudo -n /run/current-system/sw/bin/spawn-approval-session bump-pi-1.1.7 \
 ```
 
 Every pane runs its program through an interactive zsh, so
-`/home/agent/.config/zsh` loads. A bare `tmux new-session ... lazygit` execs the
-program with no shell, so no rc file loads. The `exec` at the end of each command
-keeps the pane open after the program exits. The script names every target with
-the colon form `"$session:"`. The dots in `NixConfig-bump-pi-1.1.7` otherwise
-make tmux read session `NixConfig-bump-pi-1` plus pane `1.7`, and the error is
-`can't specify pane here`.
+`/home/agent/.config/zsh` loads. A bare `tmux new-session ... l` execs the
+function with no shell, so no rc file loads. The `exec` at the end of each command
+keeps the pane open after the program exits.
 
 | Window | Pane | Content |
 | --- | --- | --- |
-| `review` | 1 | `lazygit` on the worktree, running at open |
 | `work` | 1 | `pi-local` interactive session, running at open |
-| `work` | 2 | interactive zsh with the approval command prefilled, no `Enter` |
+| `work` | 2 | `l` (lazygit) on the worktree, running at open |
+| `work` | 3 | interactive zsh with the approval command prefilled, no `Enter` |
+
+One window holds all three panes. The layout matches the agent layout in
+`AGENTS.md`.
 
 Only the approval pane waits for the owner. The other two start at open, so the owner sees the diff and the pi session with no key press. Pass `--no-kill`: the session belongs to the owner, so the script must keep the pane. The `pi` pane is the `--caller`, so the handoff lands in the session, not in a Hermes window.
 

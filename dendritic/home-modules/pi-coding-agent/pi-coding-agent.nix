@@ -771,7 +771,7 @@
         coding-agents = {
           skillsDir = lib.mkDefault "${repoRoot}/skills";
           agentsMdPath = lib.mkDefault "${piAgentRoot}/AGENTS.md";
-          pi-coding-agent = {
+          pi = {
             enable = lib.mkDefault true;
             extensionsDir = lib.mkDefault "${piAgentRoot}/extensions";
             promptsDir = lib.mkDefault "${piAgentRoot}/prompts";

@@ -98,6 +98,21 @@ A worktree is a separate flake ref. Nix copies its tree once and reuses that cop
 
 `scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout.
 
+### Pane layout
+
+Both the approval workflow and the hermes review session use one layout. One window holds everything: the pi session on the left, and the right side split into two stacked panes. The top-right pane runs `l` (the zsh lazygit wrapper) in the worktree under an interactive zsh. The bottom-right pane holds the approval command, typed but not entered.
+
+From the pi pane, build the layout with two splits:
+
+```sh
+lg=$(tmux split-window -h -P -F '#{pane_id}')
+ap=$(tmux split-window -v -P -F '#{pane_id}' -t "$lg")
+tmux send-keys -t "$lg" "cd <worktree> && l"
+tmux send-keys -t "$ap" "cd <worktree> && scripts/approve-and-deploy.sh <branch> --caller $TMUX_PANE"
+```
+
+Never add a second window, and never kill the pi pane. `spawn-approval-session` builds the same layout for hermes.
+
 ### Change workflow
 
 No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves only in step 9.
@@ -110,7 +125,7 @@ No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
 | 4. Verify | agent | `bash scripts/host-sandbox.sh <host> --tier build` |
 | 5. Fix and repeat | agent | rerun until exit 0 |
 | 6. Commit | agent | `git commit -m "<subject>"` |
-| 7. Open the approval pane | agent | `tmux split-window -h -P -F '#{pane_id}'`, then `send-keys` the command with no Enter |
+| 7. Open the approval panes | agent | split the pi pane per [Pane layout](#pane-layout), then `send-keys` the command with no Enter |
 | 8. Approve | user | press Enter in the pane |
 | 9. Merge and push | script | `wt -C <worktree> merge main`, then `git push origin main` |
 | 10. Deploy | script | `sudo ramsay-deploy-approve`, `sudo ramsay-deploy-switch`, then `scripts/deploy-goofeus.sh` for Goofeus |

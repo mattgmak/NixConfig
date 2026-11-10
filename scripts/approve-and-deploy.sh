@@ -7,8 +7,8 @@
 #   scripts/approve-and-deploy.sh fix-ramsay-agenix --caller %4
 #
 # You read it and press Enter. The script merges the branch into main, pushes,
-# deploys through the ramsay-deploy gate, sends the handoff to the pi pane, then
-# closes its own pane. Only the pi session stays open.
+# deploys through the ramsay-deploy gate, then sends the handoff to the pi pane.
+# A failed step sends the failure to the same pane and keeps the pane open.
 #
 #   scripts/approve-and-deploy.sh <branch>                  ramsay only
 #   scripts/approve-and-deploy.sh <branch> --hosts ramsay,goofeus
@@ -23,6 +23,11 @@
 set -euo pipefail
 
 usage() { sed -n '3,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+send_to_caller() {
+  if [ "$dry" = 1 ] || [ -z "$caller" ]; then printf '  -> %s: %s\n' "$caller" "$1"; return 0; fi
+  tmux send-keys -t "$caller" -l "$1"
+  tmux send-keys -t "$caller" Enter
+}
 say() { printf '\n== %s\n' "$*"; }
 run() {
   if [ "$dry" = 1 ]; then printf '  dry: %s\n' "$*"; return 0; fi
@@ -139,7 +144,7 @@ main() {
 
   # The pi session is the worktree memory. The handoff line replaces the old
   # HANDOFF.md file: the session keeps the context, and git keeps the change.
-  local msg=''
+  local msg=${msg:-}
   if [ -n "$handoff" ] && [ -f "$handoff" ]; then
     msg=$(tr '\n' ' ' < "$handoff")
   elif [ -n "$msg" ]; then
@@ -149,12 +154,7 @@ main() {
   else
     msg="Deploy of $sha finished. Read the log at $log, check journalctl, then report the result."
   fi
-  say 'handoff to the pi pane'
-  printf '  -> %s: %s\n' "$caller" "$msg"
-  if [ "$dry" != 1 ] && [ -n "$caller" ]; then
-    tmux send-keys -t "$caller" -l "$msg"
-    tmux send-keys -t "$caller" Enter
-  fi
+  send_to_caller "$msg"
 
   if [ "$no_kill" = 1 ] || [ "$dry" = 1 ]; then
     say 'pane kept open'
@@ -165,10 +165,16 @@ main() {
 }
 
 on_err() {
-  printf '\nFAILED at line %s -- pane stays open, log at %s\n' "$1" "$log" >&2
+  local where=${2:-main} err
+  printf '\nFAILED at line %s in %s -- pane stays open, log at %s\n' "$1" "$where" "$log" >&2
+  err=${msg:-}
+  if [ -z "$err" ]; then
+    err="Deploy failed in $where at line $1. Read the log at $log, fix it, then report the result."
+  fi
+  send_to_caller "$err" || true
   exit 1
 }
-trap 'on_err $LINENO' ERR
+trap 'on_err "$LINENO" "${FUNCNAME[0]:-top}"' ERR
 
 if [ "$dry" = 1 ]; then
   main

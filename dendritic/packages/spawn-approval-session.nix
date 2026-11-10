@@ -16,11 +16,11 @@
 # password. See dendritic/nixos-modules/hermes.nix and the skill
 # dendritic/nixos-modules/hermes-skills/nixconfig-worktree/SKILL.md.
 #
-# The session holds three panes:
+# The session is one window with three panes:
 #
-#   review   lazygit on the worktree
-#   work     pi-local, the session that wrote the change
-#   work     interactive shell with the approve command prefilled, no Enter
+#   pi-local on the left, the session that wrote the change
+#   lazygit on the worktree in the top-right
+#   an interactive shell with the approve command prefilled in the bottom-right
 { ... }:
 {
   perSystem =
@@ -153,20 +153,24 @@
             envstr="$envstr ZDOTDIR=$HOME/.config/zsh"
           fi
 
-          review="env $envstr $shell -i -c 'lazygit; exec $shell -i'"
+          review="env $envstr $shell -i -c 'l; exec $shell -i'"
           workcmd="env $envstr $shell -i -c 'pi-local; exec $shell -i'"
           shellcmd="env $envstr $shell -i"
 
-          tmux new-session -d -s "$session" -c "$worktree" -n review "$review"
-
+          # One window holds every pane, so the owner sees the pi session, the
+          # diff, and the approval command together. The layout is fixed: pi on
+          # the left, lazygit top-right, the approval shell bottom-right.
           if [ "$work" -eq 1 ]; then
-            pi_pane="$(tmux new-window -d -P -F '#{pane_id}' -t "$session:" -n work -c "$worktree" "$workcmd")"
+            pi_pane="$(tmux new-session -d -P -F '#{pane_id}' -s "$session" -c "$worktree" -n work "$workcmd")"
+            lg_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$pi_pane" -c "$worktree" "$review")"
+            ap_pane="$(tmux split-window -v -P -F '#{pane_id}' -t "$lg_pane" -c "$worktree" "$shellcmd")"
             if [ -z "$approve" ]; then
               approve="cd $worktree && scripts/approve-and-deploy.sh $branch --caller $pi_pane --no-kill"
             fi
-            ap_pane="$(tmux split-window -h -P -F '#{pane_id}' -t "$session:work" -c "$worktree" "$shellcmd")"
             # The owner presses Enter, so the command goes in without a newline.
             tmux send-keys -t "$ap_pane" -l "$approve"
+          else
+            tmux new-session -d -s "$session" -c "$worktree" -n review "$review"
           fi
 
           tmux list-panes -s -t "$session:" -F '#{window_name} #{pane_id} #{pane_start_command}'
