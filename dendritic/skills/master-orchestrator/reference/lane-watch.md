@@ -20,6 +20,8 @@ The script owns its own deadline, so it exits before the job limit. A window of 
 | `BEHIND n` | the branch sits behind the base, with no conflict yet | rebase before the next push |
 | `BLOCKED n` | branch protection holds the request | name the missing check to the lane |
 | `CIFAIL n` | a check reads fail, timeout or cancelled | give the lane the error line |
+| `FOUND n` | a new unresolved review thread, naming the first `path:line` | read the thread, send the finding to the lane, ask for the reply and the resolve |
+| `REVIEW n` | a review asks for changes | read the review, send each finding back with its file and line |
 | `CLEAN n` | `mergeable` reads CLEAN | read the checks by hand before you trust it |
 | `PENDING n` | `mergeStateStatus` reads UNSTABLE | wait, then read the checks |
 | `MERGED n` | the user merged | clean up, then unstack the requests above it |
@@ -29,7 +31,7 @@ The script owns its own deadline, so it exits before the job limit. A window of 
 
 Every run prints a baseline, so a conflict that already exists wakes you at start. A state file belongs to one run, and a run that dies leaves none behind.
 
-The job ends the moment a line needs you: `CONFLICT`, `BEHIND`, `BLOCKED`, `CIFAIL`, `MERGED`, `CLOSED`, or `DONE`. A finished job always wakes the orchestrator. A `wake_on` match on the first line does not, so the script never holds a fault in a running job. Restart the job after you act on the line.
+The job ends the moment a line needs you: `CONFLICT`, `BEHIND`, `BLOCKED`, `CIFAIL`, `FOUND`, `REVIEW`, `MERGED`, `CLOSED`, or `DONE`. A finished job always wakes the orchestrator. A `wake_on` match on the first line does not, so the script never holds a fault in a running job. Restart the job after you act on the line.
 
 Restart on the same fault and the job exits again at once, so wait for the fault to clear first. A lane push is the clear signal.
 

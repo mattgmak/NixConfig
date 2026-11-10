@@ -44,6 +44,16 @@ Reuse one lease per wave. Do not erase a simulator unless the client fingerprint
 
 A still proves the change only when the changed surface works. An error screen is no proof. Recapture it, or name the gap in the body and file a ticket for it.
 
+### Bundle reach
+
+iOS App Transport Security refuses plain `http` to a tailnet name. The client then never reaches Metro, and every still shows a stale bundle.
+
+| Route | Command |
+|---|---|
+| tunnel | `ssh -R 42757:localhost:42757 macmini` and open `http://localhost:42757` |
+| check | the dev menu prints `Connected to <url>`, and `/proc/<pid>/cwd` names this worktree |
+| tap | a point tap misses a switch or a pill, so use the element tap from the a11y tree |
+
 Steps for UI:
 
 1. Ask the user before the first simulator command. The repo forbids an automatic run.
