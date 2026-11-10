@@ -76,6 +76,11 @@
         voxtype
         bash
       ];
+
+      # agenix defaults to ~/.ssh/id_rsa, which this host has no copy of, so
+      # agenix.service fails and every secret path stays missing.
+      age.identityPaths = [ "/home/goofy/.ssh/id_ed25519" ];
+
       # whisper-dictation defines no enable option. Dropping it from the
       # imports list is the disable path.
       voxtype = {

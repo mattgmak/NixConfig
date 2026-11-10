@@ -87,14 +87,16 @@
         # exported empty values and every descendant (tmux server, panes, nu)
         # inherited them for good. .zshenv is unguarded and runs for every zsh.
         # The poll covers the async launchd mount: agenix only flips the
-        # generation symlink after decrypting every secret.
+        # generation symlink after decrypting every secret. A sleep forks a
+        # process and costs 17 ms, so 300 x 0.01 s takes 4.4 s; 30 x 0.1 s
+        # keeps the same 3 s window with a twentieth of the forks.
         envExtra =
           lib.optionalString (secretNames != [ ]) ''
             if [[ -o interactive ]]; then
               __agenix_first="${secretPathOf (builtins.head secretNames)}"
-              for __i in {1..300}; do
+              for __i in {1..30}; do
                 if [[ -r "$__agenix_first" ]]; then break; fi
-                sleep 0.01
+                sleep 0.1
               done
               unset __agenix_first __i
             fi
