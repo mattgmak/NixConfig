@@ -1,24 +1,25 @@
 #!/usr/bin/env bash
-# Watch a wave by branch name, not by pull request number (reference/lane-watch.md).
+# Watch a pull request by branch name (reference/lane-watch.md).
 #
-# Start it in the same turn as the first lane spawn. A branch with no pull
-# request yet prints PR_OPEN when the request appears, so the watch starts
-# before the work needs it.
+# Start it on lane spawn, before the pull request exists. A branch with no
+# request yet prints nothing until the request appears, then PR_OPEN.
 #
-# The script owns its own deadline, so it exits before the ctx_bg job limit.
-# A job that dies at exit 124 means the loop outran timeout_ms: pass a window
-# below the job limit minus a 120 s margin.
+# Every run reads a baseline and prints it. A conflict or a red check that
+# already exists then wakes you at start, not one interval later.
 #
 # Usage:
 #   watch-wave.sh <branch> [branch ...] [--window <sec>] [--interval <sec>]
-#   watch-wave.sh <branch> --all-merged    stop once every branch merged
+#   watch-wave.sh <branch> --all-merged    stop once every branch landed
 # Default: window 3000 s, interval 45 s.
 #
-# Lines: PR_OPEN, CLEAN, STATE, CIFAIL, MERGED, CLOSED, DONE, TIMEOUT, ERROR.
-# Every state exits 0, because a merge is a result and not a fault.
+# Lines: PR_OPEN, CONFLICT, BEHIND, BLOCKED, CIFAIL, CLEAN, MERGED, CLOSED,
+# DONE, TIMEOUT, ERROR. Every state exits 0, because a merge is a result.
 #
-# One job per wave is the default. Split into one job per pull request when the
-# requests live in different phases. Read reference/lane-watch.md.
+# The job ends as soon as a line needs you: a conflict, a red check, a merge, a
+# close, or DONE. A finished job always wakes the orchestrator, so a fault that
+# exists before the start still reaches it. Restart the job after you act.
+#
+# One job per branch is the default, so the jobs widget shows one row each.
 
 set -uo pipefail
 
@@ -58,77 +59,119 @@ command -v gh >/dev/null || {
   exit 1
 }
 
+# A state file holds this run alone, so every start prints its baseline.
 STATE_DIR="/tmp/agent-tmp/watch-wave"
 mkdir -p "$STATE_DIR"
-STATE="$STATE_DIR/state"
+STATE="$STATE_DIR/state-$$"
 : >"$STATE"
+trap 'rm -f "$STATE"' EXIT
 
-# The loop stops 120 s before the window, so the job never reaches its limit.
-# A short window keeps at least 5 s, so a test run still reads once.
 SPAN=$((WINDOW - 120))
 [ "$SPAN" -lt 5 ] && SPAN=5
 END=$((SECONDS + SPAN))
 
+# One line per branch: branch, number, state, mergeable, mergeStateStatus, bad checks.
 probe() {
   local branch="$1"
-  gh pr list --head "$branch" --state all --json number,state,mergeStateStatus,statusCheckRollup 2>/dev/null |
+  gh pr list --head "$branch" --state all \
+    --json number,state,mergeable,mergeStateStatus,statusCheckRollup 2>/dev/null |
     jq -r --arg b "$branch" '
-      if length == 0 then "\($b) NOPR - -"
+      if length == 0 then "\($b)|-|-|-|-|-"
       else
         (.[0]) as $p |
-        ($p.statusCheckRollup // [] | map(select(.conclusion == "FAILURE" or .conclusion == "TIMED_OUT" or .conclusion == "CANCELLED")) | length) as $bad |
-        "\($b) \($p.number) \($p.state) \($p.mergeStateStatus) \($bad)"
+        ($p.statusCheckRollup // []
+          | map(select(.conclusion == "FAILURE" or .conclusion == "TIMED_OUT"
+                       or .conclusion == "CANCELLED" or .conclusion == "ACTION_REQUIRED"))
+          | length) as $bad |
+        "\($b)|\($p.number)|\($p.state)|\($p.mergeable // "-")|\($p.mergeStateStatus // "-")|\($bad)"
       end'
 }
 
+FOUND_FAULT=0
+
+report() {
+  local line="$1"
+  local branch number state mergeable merge bad
+  branch=$(printf '%s' "$line" | cut -d'|' -f1)
+  number=$(printf '%s' "$line" | cut -d'|' -f2)
+  state=$(printf '%s' "$line" | cut -d'|' -f3)
+  mergeable=$(printf '%s' "$line" | cut -d'|' -f4)
+  merge=$(printf '%s' "$line" | cut -d'|' -f5)
+  bad=$(printf '%s' "$line" | cut -d'|' -f6)
+
+  local key prev now
+  key=$(printf '%s' "$branch" | tr '/' '_')
+  prev=$(grep -F "$key|" "$STATE" 2>/dev/null | tail -1)
+  now="$key|$number|$state|$mergeable|$merge|$bad"
+  [ "$prev" = "$now" ] && return 0
+  grep -vF "$key|" "$STATE" >"$STATE.tmp" 2>/dev/null
+  mv "$STATE.tmp" "$STATE"
+  printf '%s\n' "$now" >>"$STATE"
+
+  # No request yet: say nothing, and keep watching.
+  [ "$number" = "-" ] && return 0
+
+  if [ -z "$prev" ]; then
+    echo "PR_OPEN $number $branch"
+  fi
+
+  case "$state" in
+    MERGED)
+      echo "MERGED $number $branch"
+      FOUND_FAULT=1
+      return 0
+      ;;
+    CLOSED)
+      echo "CLOSED $number $branch"
+      FOUND_FAULT=1
+      return 0
+      ;;
+  esac
+
+  # A conflict reads DIRTY on mergeStateStatus, or CONFLICTING on mergeable.
+  if [ "$mergeable" = "CONFLICTING" ] || [ "$merge" = "DIRTY" ]; then
+    echo "CONFLICT $number $branch ($mergeable/$merge)"
+    FOUND_FAULT=1
+  elif [ "$merge" = "BEHIND" ]; then
+    echo "BEHIND $number $branch"
+    FOUND_FAULT=1
+  elif [ "$merge" = "BLOCKED" ]; then
+    echo "BLOCKED $number $branch"
+    FOUND_FAULT=1
+  fi
+
+  if [ "$bad" != "0" ] && [ "$bad" != "-" ]; then
+    echo "CIFAIL $number $branch ($bad checks)"
+    FOUND_FAULT=1
+  fi
+
+  if [ "$merge" = "CLEAN" ]; then
+    echo "CLEAN $number $branch"
+  elif [ "$merge" = "UNSTABLE" ]; then
+    echo "PENDING $number $branch"
+  fi
+}
+
 while [ "$SECONDS" -lt "$END" ]; do
+  FOUND_FAULT=0
   for branch in "${BRANCHES[@]}"; do
     line=$(probe "$branch")
-    [ -z "$line" ] && {
+    if [ -z "$line" ]; then
       echo "ERROR cannot read $branch"
       exit 1
-    }
-    key=$(printf '%s' "$line" | awk '{print $1}')
-    number=$(printf '%s' "$line" | awk '{print $2}')
-    state=$(printf '%s' "$line" | awk '{print $3}')
-    merge=$(printf '%s' "$line" | awk '{print $4}')
-    bad=$(printf '%s' "$line" | awk '{print $5}')
-
-    prev=$(grep -F "$key " "$STATE" 2>/dev/null | tail -1 | awk '{print $2, $3, $4, $5}')
-    if [ "$prev" != "$number $state $merge $bad" ]; then
-      grep -vF "$key " "$STATE" >"$STATE.tmp" 2>/dev/null
-      mv "$STATE.tmp" "$STATE"
-      printf '%s %s %s %s %s\n' "$key" "$number" "$state" "$merge" "$bad" >>"$STATE"
-
-      if [ "$number" = "-" ] || [ "$number" = "NOPR" ]; then
-        :
-      elif [ "$prev" = "" ] || [ "$(printf '%s' "$prev" | awk '{print $1}')" = "-" ]; then
-        echo "PR_OPEN $number $key"
-      fi
-
-      case "$state" in
-        MERGED) echo "MERGED $number $key" ;;
-        CLOSED) echo "CLOSED $number $key" ;;
-      esac
-
-      if [ "$bad" != "0" ] && [ "$bad" != "-" ]; then
-        echo "CIFAIL $number $key"
-      fi
-
-      case "$merge" in
-        CLEAN) echo "CLEAN $number $key" ;;
-        DIRTY | BEHIND | BLOCKED) echo "STATE $number $key $merge" ;;
-      esac
     fi
+    report "$line"
   done
+
+  # A line that needs you ends the job, so the wake is never lost.
+  [ "$FOUND_FAULT" -eq 1 ] && exit 0
 
   if [ "$ALL_MERGED" -eq 1 ]; then
     open=0
     for branch in "${BRANCHES[@]}"; do
-      line=$(probe "$branch")
-      state=$(printf '%s' "$line" | awk '{print $3}')
+      state=$(probe "$branch" | cut -d'|' -f3)
       case "$state" in
-        MERGED | CLOSED | -) ;;
+        MERGED | CLOSED | -) ;;\
         *) open=$((open + 1)) ;;
       esac
     done
