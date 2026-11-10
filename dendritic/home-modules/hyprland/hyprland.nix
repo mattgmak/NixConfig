@@ -183,12 +183,24 @@
 
       # Upstream unit waits for graphical-session.target, but session units that
       # need the portal block on that same target — start the backend with the
-      # main portal service instead.
+      # main portal service instead. Home-manager writes a whole unit file, it
+      # does not merge with the unit in the system profile, so the override has
+      # to repeat Unit and Service.
       systemd.user.services.xdg-desktop-portal-hyprland = {
-        unitConfig.After = lib.mkForce [
-          "dbus.socket"
-          "xdg-desktop-portal.service"
-        ];
+        Unit = {
+          Description = "Portal service (Hyprland implementation)";
+          After = lib.mkForce [
+            "dbus.socket"
+            "xdg-desktop-portal.service"
+          ];
+        };
+        Service = {
+          Type = "dbus";
+          BusName = "org.freedesktop.impl.portal.desktop.hyprland";
+          ExecStart = "${pkgs.xdg-desktop-portal-hyprland}/libexec/xdg-desktop-portal-hyprland";
+          Restart = "on-failure";
+          Slice = "session.slice";
+        };
       };
     };
 }
