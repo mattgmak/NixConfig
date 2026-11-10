@@ -167,7 +167,7 @@
         nix.distributedBuilds = true;
         nix.buildMachines = [
           (self.mkBuilder self.builderSites.ramsay {
-            sshKey = "/root/.ssh/id_ed25519";
+            sshKey = "/root/.ssh/id_ed25519_nix";
           })
         ];
 

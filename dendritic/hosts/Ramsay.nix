@@ -431,6 +431,7 @@ in
           openssh.authorizedKeys.keys = with self.sshKeys; [
             Goofeus
             GoofeusRoot
+            GoofeusNix
             GoofyDesky
             GoofyEnvy
             Droid
