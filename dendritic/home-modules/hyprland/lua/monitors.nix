@@ -38,8 +38,8 @@ if hostname == "GoofyDesky" then
 else
   ''
     hl.monitor({ output = "${envyMonitors.internal}", mode = "highres", position = "0x0", scale = 1 })
-    -- EDID prefers 60 Hz. The panel supports 74.97 Hz, so name the mode instead of preferred.
-    hl.monitor({ output = "${envyMonitors.external}", mode = "1920x1080@74.97", position = "auto-up", scale = 1 })
+    -- EDID prefers 60 Hz. highres picks 1920x1080@74.97 here and the best mode on any other panel.
+    hl.monitor({ output = "${envyMonitors.external}", mode = "highres", position = "auto-up", scale = 1 })
     hl.monitor({ output = "", mode = "preferred", position = "auto-up", scale = 1 })
 
     -- A numbered workspace takes a bare number: "name:1" is an invalid filter in Hyprland 0.57.
