@@ -15,8 +15,8 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 
 | # | Step | Command |
 | --- | --- | --- |
-| 1 | Create the worktree | `wt -C /home/agent/NixConfig switch --create <branch>` |
-| 2 | Materialize submodules | `git -C <worktree> submodule update --init` |
+| 1 | Create the worktree | `sudo -n /run/current-system/sw/bin/create-worktree <branch>`, which prints the worktree path. `wt switch --create` needs the agent account, so hermes never runs it directly |
+| 2 | Materialize submodules | `git -C <worktree> submodule update --init`. Run it only when the worktree needs a checkout. Pass `--submodules` in step 1 to do it there. Skip it for a nix-only change |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
 | 4 | Commit | `git -c user.name=mattgmak -c user.email=u3592095@connect.hku.hk commit -m "<subject>"` |
 | 5 | Open the review session | `sudo -n /run/current-system/sw/bin/spawn-approval-session <branch> --grant hermes`. The command builds all three panes. Pass `--worktree <path>` when the directory name differs from the branch |
@@ -25,7 +25,13 @@ Hermes writes nothing in the main checkout. pi-local edits, the owner approves, 
 
 ## Worktree
 
-The branch name comes from the task: `fix-ramsay-agenix`. The worktree path comes from `wt`:
+The branch name comes from the task: `fix-ramsay-agenix`. hermes gets the path from `create-worktree`:
+
+```sh
+sudo -n /run/current-system/sw/bin/create-worktree fix-ramsay-agenix
+```
+
+The command wraps the agent form, so hermes needs no `wt` on PATH:
 
 ```sh
 wt -C /home/agent/NixConfig switch --create fix-ramsay-agenix
@@ -33,15 +39,15 @@ wt -C /home/agent/NixConfig list --format json |
   jq -r '.[] | select(.branch=="fix-ramsay-agenix") | .path'
 ```
 
-`wt` names the directory `/home/agent/NixConfig.<branch>`. A fresh worktree has empty submodule directories, so every nix eval fails until `git submodule update --init` runs there. The main checkout holds the submodule git dirs, so the update needs no download.
+`wt` names the directory `/home/agent/NixConfig.<branch>`. A fresh worktree has empty submodule directories, so every nix eval of its path fails until they exist. `git submodule update --init` clones every submodule from its URL, because git does not reuse the main checkout's git dirs. One dead URL stops the whole update, and the clones can land on commits that differ from the index. Then `wt merge` commits that dirt into main. For a nix-only change, verify with `--flake "git+file:///home/agent/NixConfig?ref=refs/heads/<branch>"` instead.
 
 ### Ownership
 
 `/home/agent` has no setgid bit, so a new directory takes the primary group of its creator. `agent` makes `agent:users 2775`. `hermes` makes `hermes:hermes 2770` with `0600` files, and the agent tmux server cannot enter it.
 
-Only agent may create the worktree. `AGENTS.md` gives worktree management to agent, and hermes cannot undo its own mode:
+Only agent may create the worktree. `AGENTS.md` gives worktree management to agent, and hermes cannot undo its own mode. `create-worktree` closes the gap: hermes runs it with sudo, and the script re-executes itself as agent. Before it, hermes edited `/home/agent/NixConfig` directly, because that checkout is group-writable and `/home/agent` is not:
 
-- The hermes sudoers rule allows one command, `/run/current-system/sw/bin/ramsay-deploy-switch` (`dendritic/nixos-modules/hermes.nix`). `sudo chown` asks for a password hermes does not have.
+- The hermes sudoers rules allow three commands, `create-worktree`, `ramsay-deploy-switch`, and `spawn-approval-session` (`dendritic/nixos-modules/hermes.nix`). `sudo chown` asks for a password hermes does not have.
 - The agent rule allows `ALL` with `PASSWD`, so `sudo chown` prompts there too.
 - A non-root user cannot change files another user owns.
 
@@ -164,7 +170,7 @@ tmux -S $S send-keys -t "$pi_pane" -l \
 - Reuse a worktree for a second task. One branch, one worktree, one session.
 - Delete a worktree that still holds an unapproved commit.
 - Start a pi session as root or as `hermes` for review work. The review pi runs as `agent`.
-- Run step 1 as `hermes`. The tree comes out `hermes:hermes 0700`, and only root can undo it.
+- Run step 1 as `hermes` without `create-worktree`. `wt` exists only in the agent profile, and `/home/agent` is `0750`, so a bare hermes `mkdir` fails. A tree hermes makes alone comes out `hermes:hermes 0700`, and only root can undo it.
 - Write the tmux recipe by hand for steps 4 and 5. `spawn-approval-session` owns the session layout.
 - Run step 4 or 5 as `hermes`. The panes inherit the creator environment, so a hermes-built session has no agent `delta`, no agent `lazygit`, and no agent `pi-local`.
 - Write a `HANDOFF.md`. The pi session and the script handoff carry the context.

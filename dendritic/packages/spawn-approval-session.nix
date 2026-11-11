@@ -95,8 +95,8 @@
           [ -n "$session" ] || session="NixConfig-$branch"
 
           if [ ! -d "$worktree" ]; then
-            printf 'spawn-approval-session: no directory at %s. Create the worktree as agent with wt switch --create %s.\n' \
-              "$worktree" "$branch" >&2
+            printf 'spawn-approval-session: no directory at %s. Run sudo -n /run/current-system/sw/bin/create-worktree %s, or run wt switch --create %s as agent.\n' \
+              "$worktree" "$branch" "$branch" >&2
             exit 1
           fi
 

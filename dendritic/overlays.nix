@@ -19,6 +19,14 @@
           node-bin = self.packages.${system}.node-bin;
         };
 
+      # Makes a branch worktree as agent, so hermes can run step 1 of the
+      # nixconfig-worktree flow. See dendritic/packages/create-worktree.nix.
+      createWorktreeOverlay =
+        _final: _prev:
+        {
+          createWorktree = self.packages.${system}.createWorktree;
+        };
+
       # pi for the hermes user, built from the same compiled derivation as the
       # agent user's pi. See dendritic/packages/pi-local.nix.
       piLocalOverlay =
@@ -126,6 +134,7 @@
           ghostty = inputs.ghostty.packages.${system}.default;
         })
         nodeBinOverlay
+        createWorktreeOverlay
         piLocalOverlay
         leanCtxOverlay
         tmuxBridgeOverlay

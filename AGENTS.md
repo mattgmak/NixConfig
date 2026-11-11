@@ -92,11 +92,11 @@ cd <path>
 git submodule update --init            # the flake fetches every submodule
 ```
 
-A fresh worktree has empty submodule directories, so every nix eval fails until you run `git submodule update --init` there. The main checkout holds the submodule git dirs, so the update needs no download.
+A fresh worktree has empty submodule directories, so every nix eval of its path fails until they exist. `git submodule update --init` clones every submodule from its URL, because git does not reuse the main checkout's git dirs. One dead URL stops the whole update. The clones can also land on commits that differ from the index, so the worktree stays dirty. Then `wt merge` commits that dirt into main. For a nix-only change, skip the update and name the branch in `--flake` instead.
 
 A worktree is a separate flake ref. Nix copies its tree once and reuses that copy for every eval in the branch. Sandbox logs stay per session. Two agents work at the same time without touching each other's tree. `main` moves only when the approval script merges, so the shared checkout never holds a half-finished commit.
 
-`scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout.
+`scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout. On a worktree with empty submodules, pass `--flake "git+file:///home/agent/NixConfig?ref=refs/heads/<branch>"`. That form reads the branch through the main repo and needs no submodule checkout.
 
 ### Pane layout
 
@@ -124,9 +124,9 @@ No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
 | 1. Create worktree | agent | `wt switch --create <branch>` |
 | 2. Edit the config | agent | — |
 | 3. Track new files | agent | `git add -N <file>` |
-| 4. Verify | agent | `bash scripts/host-sandbox.sh <host> --tier build` |
-| 5. Fix and repeat | agent | rerun until exit 0 |
-| 6. Commit | agent | `git commit -m "<subject>"` |
+| 4. Commit | agent | `git commit -m "<subject>"` |
+| 5. Verify | agent | `bash scripts/host-sandbox.sh <host> --tier build` |
+| 6. Fix and repeat | agent | commit each fix, then rerun until exit 0 |
 | 7. Open the approval panes | agent | split the pi pane per [Pane layout](#pane-layout), then `send-keys` the command with no Enter |
 | 8. Approve | user | press Enter in the pane |
 | 9. Merge and push | script | `wt -C <worktree> merge main`, then `git push origin main` |
@@ -157,7 +157,7 @@ bash scripts/host-sandbox.sh ramsay --tier vm     # build the QEMU image; --vm-b
 
 Rules:
 
-1. After any `.nix` edit, run the `eval` tier for the host you changed. Run `git add -N <file>` on new files first, because a git-mode flake hides untracked files.
+1. After any `.nix` edit, run the `eval` tier for the host you changed. Run `git add -N <file>` on new files first, because a git-mode flake hides untracked files. Commit first, because the script evaluates the committed tree. Pass `--allow-dirty` to skip the check.
 2. Run the `build` tier before you propose a switch.
 3. Run the `vm` tier when the change touches services, units, or activation scripts.
 4. Exit code 0 means every check passed. `--json` prints one object per check. Logs stay in `${TMPDIR:-/tmp}/agent-tmp/NixConfig/<host>.<tier>.log`.

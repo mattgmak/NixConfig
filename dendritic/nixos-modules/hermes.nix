@@ -293,14 +293,23 @@
         };
       };
 
-      # The sudoers rule needs a fixed argv, so the switch wrapper sits at the
-      # one stable name. The rule allows that name, with no arguments.
-      environment.systemPackages = [ pkgs.ramsayDeploy pkgs.spawnApprovalSession ];
+      # The sudoers rule needs a fixed argv, so each wrapper sits at the one
+      # stable name. Every wrapper re-executes itself as agent, so agent owns
+      # what it writes.
+      environment.systemPackages = [
+        pkgs.createWorktree
+        pkgs.ramsayDeploy
+        pkgs.spawnApprovalSession
+      ];
 
       security.sudo.extraRules = [
         {
           users = [ "hermes" ];
           commands = [
+            {
+              command = "/run/current-system/sw/bin/create-worktree";
+              options = [ "NOPASSWD" ];
+            }
             {
               command = "/run/current-system/sw/bin/ramsay-deploy-switch";
               options = [ "NOPASSWD" ];
