@@ -64,12 +64,11 @@
             "pi-clinepass-provider"
             "pi-clinepass-usage"
             "pi-commandcode-provider"
-            "pi-copy-mode"
+            "pi-copy"
             "pi-cursor-sdk"
             "pi-cursor-usage"
             "pi-interactive-subagents"
             "pi-lean-ctx"
-            "pi-libtui"
             "pi-markdown-preview"
             "pi-mcp-adapter"
             "pi-model-pick"
@@ -83,8 +82,8 @@
             "pi-simplify"
             "pi-ssh-image-clipboard"
             "pi-token-speed"
+            "pi-vim"
             "pi-web-access"
-            "pi-xsettings"
             "prompt-snippets"
             "rpiv-ask-user-question"
             "rpiv-todo"
@@ -103,10 +102,10 @@
             "gotgenes/pi-packages"
             "jellydn/pi-clinepass-provider"
             "juicesharp/rpiv-mono"
+            "justmytwospence/pi-plugins"
             "k0valik/pi-blackhole"
             "MattDevy/pi-extensions"
             "mattgmak/agent-sesh"
-            "mattgmak/agents"
             "mattgmak/pi-autoname"
             "mattgmak/pi-interactive-subagents"
             "mattgmak/pi-nvim-bridge"
@@ -604,14 +603,6 @@
               ${lib.concatMapStrings (repo: ''
                 cp -a ${npmNodeModules { inherit repo; }}/node_modules $stage/vendor/${repo}/node_modules
               '') npmDepRepos}
-              # The agents monorepo locks with bun, so `npmDepRepos` cannot read its root
-              # manifest. `nix/npm-deps` repeats the registry deps in an npm manifest, and
-              # its node_modules goes at the workspace root, where bun puts it and where the
-              # packages resolve their bare `@luan.sh/*` imports.
-              cp -a ${npmNodeModules {
-                repo = "mattgmak/agents/nix/npm-deps";
-              }}/node_modules \
-                $stage/vendor/mattgmak/agents/harnesses/pi/agent/node_modules
               ${lib.concatMapStrings (dep: ''
                 cp -a ${pnpmNodeModules dep}/. $stage/vendor/${dep.repo}/
               '') pnpmDepRepos}

@@ -1,0 +1,9 @@
+{
+  "name": "pi-copy",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

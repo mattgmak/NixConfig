@@ -116,6 +116,6 @@
 [submodule "gufo-org/lfm3-gufo-extension"]
 	path = vendor/gufo-org/lfm3-gufo-extension
 	url = https://github.com/gufo-org/lfm3-gufo-extension
-[submodule "mattgmak/agents"]
-	path = vendor/mattgmak/agents
-	url = https://github.com/mattgmak/agents.git
+[submodule "justmytwospence/pi-plugins"]
+	path = vendor/justmytwospence/pi-plugins
+	url = https://github.com/justmytwospence/pi-plugins.git

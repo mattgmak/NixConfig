@@ -158,6 +158,7 @@
         "AGENTS.md"
         "agents"
         "auth.json"
+        "copy.json"
         "extensions"
         "keybindings.json"
         "mcp-adapter.json"
@@ -942,6 +943,8 @@
           source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/mcp-adapter.json";
           force = true;
         };
+        home.file.".pi/agent/copy.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/copy.json";
         home.file.".pi/agent/settings.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
         home.file.".pi/agent/keybindings.json".source =
