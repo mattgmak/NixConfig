@@ -13,7 +13,7 @@
   "tui.altScreen.halfPageUp": "ctrl+u",
   "tui.altScreen.halfPageDown": "ctrl+d",
 
-  "copy-mode.enter": "alt+z",
+  "copy-mode.enter": "ctrl+q",
   "copy-mode.searchForward": "/",
   "copy-mode.searchBackward": "?",
   "copy-mode.repeatSearch": "n",
