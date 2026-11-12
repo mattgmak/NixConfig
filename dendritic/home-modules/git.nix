@@ -36,8 +36,6 @@
           push.recurseSubmodules = "on-demand";
           # Pull must not block on submodules. githooks/post-merge refreshes them in background.
           submodule.recurse = false;
-          # Clone new vendor submodules on pull/ff without manual --init.
-          submodule.autoInit = true;
         }
         // (
           if hostname == "GoofyWSL" then
