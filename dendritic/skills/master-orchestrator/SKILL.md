@@ -32,6 +32,14 @@ The peer grills, never the master session. Read `reference/grilling.md`.
 
 Never poll, never sleep, never tail a log. The job holds the loop. Read `reference/lane-watch.md`.
 
+## Review threads
+
+Every reviewer thread needs an answer before a pull request merges. CodeRabbit leaves inline comments. A lane replies to each thread it addresses, in the same pull request, and names the commit that closes it. A thread that needs no change gets one line saying why it stays.
+
+Add one line to every lane brief: `Reply to each CodeRabbit inline comment you address, in the same pull request, and name the commit that closes it.`
+
+The orchestrator checks the open threads before it reports a ticket at the gate. Run `gh api` on the review comments, list the unresolved ones, and chase them by lane.
+
 ## 1. Plan the wave
 
 Read each ticket with the Linear MCP tool (`get_issue`). Take the id, title, state, and `gitBranchName`.
