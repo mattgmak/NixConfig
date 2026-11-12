@@ -8,6 +8,9 @@ ya pack -a KKV9/compress
 ya pack -a Reledia/glow
 scoop install glow
 
+# mermaid.yazi
+ya pack -a passion0102/mermaid
+
 # starship.yazi
 ya pack -a Rolv-Apneseth/starship
 

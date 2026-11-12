@@ -25,6 +25,22 @@ on = ["<C-y>"]
 run = "plugin system-clipboard"
 desc = "Copy selected files to the system clipboard"
 
+# Mermaid preview controls
+[[mgr.prepend_keymap]]
+on = ["<A-m>"]
+run = "plugin mermaid -- toggle-mode"
+desc = "Toggle the mermaid preview mode (split / image / text)"
+
+[[mgr.prepend_keymap]]
+on = ["<A-=>"]
+run = "plugin mermaid -- zoom-in"
+desc = "Enlarge the mermaid preview image"
+
+[[mgr.prepend_keymap]]
+on = ["<A-->"]
+run = "plugin mermaid -- zoom-out"
+desc = "Shrink the mermaid preview image"
+
 [[mgr.prepend_keymap]]
 on = ["<Backspace>"]
 run = "plugin searchjump"

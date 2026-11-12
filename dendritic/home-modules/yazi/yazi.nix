@@ -14,6 +14,7 @@
           inherit git yatline-created-time;
 
           yatline = pkgs.callPackage self.yaziPluginYatline { };
+          mermaid = pkgs.callPackage self.yaziPluginMermaid { };
           system-clipboard = pkgs.callPackage self.yaziPluginSystemClipboard { };
           yatline-modified-time = pkgs.callPackage self.yaziPluginYatlineModifiedTime { };
           yatline-page-counter = pkgs.callPackage self.yaziPluginYatlinePageCounter { };

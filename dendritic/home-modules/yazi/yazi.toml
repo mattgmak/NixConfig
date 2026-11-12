@@ -127,7 +127,9 @@ suppress_preload = false
 
 prepend_previewers = [
 	{ url = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
-	{ url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s=dark "$1"' },
+	{ url = "*.md", run = "mermaid" },
+	{ url = "*.mmd", run = "mermaid" },
+	{ url = "*.mermaid", run = "mermaid" },
 	{ url = "*/", run = 'piper -- eza -TL=3 --color=always --icons=always --group-directories-first --no-quotes "$1"' },
 ]
 

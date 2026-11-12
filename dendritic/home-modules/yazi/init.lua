@@ -110,3 +110,9 @@ require('yatline-created-time'):setup()
 require('yatline-page-counter'):setup({
   show_icon = false,
 })
+
+-- Renders mermaid blocks in Markdown previews. yazi.toml maps *.md to this plugin.
+require('mermaid'):setup({
+  backend = 'auto',
+  format = 'png',
+})
