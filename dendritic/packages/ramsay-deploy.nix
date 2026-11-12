@@ -135,6 +135,11 @@
             #!${pkgs.runtimeShell}
             set -euo pipefail
             export PATH=${pkgs.lib.makeBinPath [ pkgs.git pkgs.coreutils pkgs.gnused pkgs.util-linux ]}
+            # Root reads no git config from /home/agent, so it finds no credential
+            # helper for the https origin. Git then asks "Username for
+            # 'https://github.com'" on the tty and waits for an answer. The push is
+            # best-effort, so fail at once and take the warning path instead.
+            export GIT_TERMINAL_PROMPT=0
             repo=${repo}
             token=${approvalFile}
             if [ "$(id -u)" -ne 0 ]; then
