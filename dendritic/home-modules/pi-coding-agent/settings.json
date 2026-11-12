@@ -1,8 +1,9 @@
 {
   "externalEditor": "nvim",
   "piVim": {
-    "labelSide": "left",
-    "changeWritesRegister": false
+    "labelSide": "right",
+    "changeWritesRegister": false,
+    "promptMarker": true
   },
   "lastChangelogVersion": "1.5.2",
   "defaultProvider": "balance",
