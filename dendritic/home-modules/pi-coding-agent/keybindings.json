@@ -10,6 +10,7 @@
   "app.models.reorderDown": "ctrl+shift+alt+down",
 
   "tui.editor.deleteToLineEnd": [],
+  "tui.altScreen.bottom": ["ctrl+end", "ctrl+shift+j"],
   "tui.altScreen.halfPageUp": "ctrl+u",
   "tui.altScreen.halfPageDown": "ctrl+d"
 }

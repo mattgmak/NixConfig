@@ -357,7 +357,8 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | `pi-autoname` (`vendor/mattgmak/pi-autoname`) | `mattgmak/pi-autoname` | `https://github.com/ssdiwu/pi-autoname.git` | `main` |
 | `pi-simplify` (`vendor/MattDevy/pi-extensions`) | `MattDevy/pi-extensions` | *(your repo — no separate upstream)* | `main` |
 | `pi-prompt-frecency` (`vendor/mattgmak/pi-prompt-frecency`) | `mattgmak/pi-prompt-frecency` | *(your repo — no separate upstream)* | `main` |
-| `pi-copy`, `pi-vim` (`vendor/justmytwospence/pi-plugins`) | *(direct upstream)* | `https://github.com/justmytwospence/pi-plugins.git` | `main` |
+| `pi-vim` (`vendor/mattgmak/pi-vim`) | `mattgmak/pi-vim` | `https://github.com/justmytwospence/pi-plugins.git` | `main` — single-package fork of `packages/pi-vim` at `e5e6270d` |
+| `pi-copy` (`vendor/justmytwospence/pi-plugins`) | *(direct upstream)* | `https://github.com/justmytwospence/pi-plugins.git` | `main` |
 
 Add new rows here when vendoring through a fork.
 

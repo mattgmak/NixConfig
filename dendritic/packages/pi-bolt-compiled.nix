@@ -111,6 +111,7 @@
             "mattgmak/pi-nvim-bridge"
             "mattgmak/pi-powerline-footer"
             "mattgmak/pi-token-speed"
+            "mattgmak/pi-vim"
             "michalvavra/agents"
             "nicobailon/pi-mcp-adapter"
             "nicobailon/pi-web-access"

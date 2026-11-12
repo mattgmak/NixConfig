@@ -1,1 +1,1 @@
-export { default } from "../vendor/justmytwospence/pi-plugins/packages/pi-vim/src/index.ts";
+export { default } from "../vendor/mattgmak/pi-vim/src/index.ts";

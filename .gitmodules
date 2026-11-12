@@ -119,3 +119,6 @@
 [submodule "justmytwospence/pi-plugins"]
 	path = vendor/justmytwospence/pi-plugins
 	url = https://github.com/justmytwospence/pi-plugins.git
+[submodule "mattgmak/pi-vim"]
+	path = vendor/mattgmak/pi-vim
+	url = https://github.com/mattgmak/pi-vim.git

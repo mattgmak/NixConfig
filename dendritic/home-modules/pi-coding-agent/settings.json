@@ -1,5 +1,9 @@
 {
   "externalEditor": "nvim",
+  "piVim": {
+    "labelSide": "left",
+    "changeWritesRegister": false
+  },
   "lastChangelogVersion": "1.5.2",
   "defaultProvider": "balance",
   "defaultModel": "deepseek-v4.1-flash",
