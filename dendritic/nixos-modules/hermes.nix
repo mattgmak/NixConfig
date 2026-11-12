@@ -8,7 +8,7 @@
 # publishes the webui and the API on 443 and the dashboard on 8443. A second
 # tenant — user hermes-alt, root /var/lib/hermes-alt — mirrors the first on
 # 8643, 9120 and 8788 as svc:hermes-api-alt and svc:hermes-webui-alt. The HUI+
-# bridges bind 8790 (main) and 8791 (alt) on loopback and publish as
+# bridges bind 8792 (main) and 8791 (alt) on loopback and publish as
 # svc:hermes-bridge and svc:hermes-bridge-alt on 443.
 { inputs, ... }:
 {
@@ -549,11 +549,12 @@
           UMask = "0077";
           Environment = [
             "HERMES_BASE_URL=http://127.0.0.1:8642"
+            "HERMES_HOME=/home/agent/hermes/.hermes"
             "BRIDGE_PUBLIC_URL=https://hermes-bridge.dab-octatonic.ts.net"
             "BRIDGE_STATE_DIR=/home/agent/.local/state/hermes-ui-bridge"
           ];
           EnvironmentFile = [ config.age.secrets."hermes-env".path ];
-          ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8790'";
+          ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8792'";
         };
       };
 
@@ -574,6 +575,7 @@
           UMask = "0077";
           Environment = [
             "HERMES_BASE_URL=http://127.0.0.1:8643"
+            "HERMES_HOME=/var/lib/hermes-alt/.hermes/profiles/private"
             "BRIDGE_PUBLIC_URL=https://hermes-bridge-alt.dab-octatonic.ts.net"
             "BRIDGE_STATE_DIR=/var/lib/hermes-alt/.local/state/hermes-ui-bridge"
           ];
@@ -623,7 +625,7 @@
           tailscale serve --yes --service=svc:hermes-api --https=8443 127.0.0.1:9119
           tailscale serve --yes --service=svc:hermes-api-alt --https=443 127.0.0.1:8643
           tailscale serve --yes --service=svc:hermes-api-alt --https=8443 127.0.0.1:9120
-          tailscale serve --yes --service=svc:hermes-bridge --https=443 127.0.0.1:8790
+          tailscale serve --yes --service=svc:hermes-bridge --https=443 127.0.0.1:8792
           tailscale serve --yes --service=svc:hermes-bridge-alt --https=443 127.0.0.1:8791
         '';
       };
