@@ -74,6 +74,7 @@ shell_allowlist_extra = [
     "wl-copy",
     "pi-local",
     "ffmpeg",
+    "lua",
 ]
 
 [telemetry]
