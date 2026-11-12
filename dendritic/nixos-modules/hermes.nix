@@ -7,7 +7,9 @@
 # /api/ws JSON-RPC transport. The webui binds loopback. Tailscale serve
 # publishes the webui and the API on 443 and the dashboard on 8443. A second
 # tenant — user hermes-alt, root /var/lib/hermes-alt — mirrors the first on
-# 8643, 9120 and 8788 as svc:hermes-api-alt and svc:hermes-webui-alt.
+# 8643, 9120 and 8788 as svc:hermes-api-alt and svc:hermes-webui-alt. The HUI+
+# bridges bind 8790 (main) and 8791 (alt) on loopback and publish as
+# svc:hermes-bridge and svc:hermes-bridge-alt on 443.
 { inputs, ... }:
 {
   flake.nixosModules.hermes =
@@ -21,6 +23,30 @@
         (_: {
           version = hermesVersion;
         });
+
+      # The npm package ships the HUI+ skill next to the CLI. hermesHomeFiles takes
+      # one entry per file, so list every regular file of the skill dir: SKILL.md
+      # plus the references/ level. The alt seed script links the same dir.
+      hermesUiSkillDir =
+        "${pkgs.hermesUiPlusBridge}/lib/node_modules/hermes-ui-plus-bridge/skill/hermes-ui";
+      hermesUiSkillFiles =
+        let
+          regularFiles =
+            dir: builtins.attrNames (
+              lib.filterAttrs (_: type: type == "file") (builtins.readDir dir)
+            );
+          refFiles = lib.optionals (builtins.pathExists "${hermesUiSkillDir}/references") (
+            map (name: "references/${name}") (regularFiles "${hermesUiSkillDir}/references")
+          );
+        in
+        lib.listToAttrs (
+          map (
+            name: {
+              name = "skills/hermes-ui/${name}";
+              value = "${hermesUiSkillDir}/${name}";
+            }
+          ) ((regularFiles hermesUiSkillDir) ++ refFiles)
+        );
 
       # The alt tenant. A second user owns a second root, so the agent account
       # has no path into the private profile. The module holds one option set, so
@@ -155,7 +181,7 @@
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
           "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
           "skills/nixconfig-worktree/SKILL.md" = ./hermes-skills/nixconfig-worktree/SKILL.md;
-        };
+        } // hermesUiSkillFiles;
         settings = {
           # The deploy gate. `manual` asks the owner on every flagged call, and
           # the mode stays here so the agent cannot reach the bypass keys.
@@ -368,6 +394,9 @@
           for p in ${toString config.services.hermes-agent.extraPlugins}; do
             ln -sfn "$p" "$home/plugins/nix-managed-$(basename "$p")"
           done
+          # The HUI+ skill ships inside the bridge package, so link the store dir.
+          mkdir -p "$home/skills"
+          ln -sfn ${hermesUiSkillDir} "$home/skills/hermes-ui"
           chown -R hermes-alt:hermes-alt "$root"
           chmod 700 "$root" "$root/.hermes" "$home"
           install -o hermes-alt -g hermes-alt -m 0640 -D \
@@ -500,6 +529,59 @@
         };
       };
 
+      # The HUI+ bridge is the companion of the Hermes UI+ app. It proxies the
+      # Hermes API, so the API key never leaves the host, serves the web bundle,
+      # and keeps its own token and state in BRIDGE_STATE_DIR. The bridge reads
+      # HERMES_API_KEY, while the secret exports API_SERVER_KEY, so ExecStart
+      # copies the value into the name the bridge reads.
+      systemd.services.hermes-ui-bridge = {
+        description = "Hermes UI+ bridge (main)";
+        after = [ "network-online.target" "hermes-agent.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        unitConfig.Requires = [ "hermes-agent.service" ];
+        serviceConfig = {
+          Type = "simple";
+          User = "agent";
+          Group = "agent";
+          Restart = "on-failure";
+          RestartSec = 5;
+          UMask = "0077";
+          Environment = [
+            "HERMES_BASE_URL=http://127.0.0.1:8642"
+            "BRIDGE_PUBLIC_URL=https://hermes-bridge.dab-octatonic.ts.net"
+            "BRIDGE_STATE_DIR=/home/agent/.local/state/hermes-ui-bridge"
+          ];
+          EnvironmentFile = [ config.age.secrets."hermes-env".path ];
+          ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8790'";
+        };
+      };
+
+      # The alt tenant runs its own bridge on 8791 against the alt API, so the two
+      # HUI+ sessions stay separate. The alt secret holds its own API_SERVER_KEY.
+      systemd.services.hermes-ui-bridge-alt = {
+        description = "Hermes UI+ bridge (alt profile)";
+        after = [ "network-online.target" "hermes-agent-alt.service" ];
+        wants = [ "network-online.target" ];
+        wantedBy = [ "multi-user.target" ];
+        unitConfig.Requires = [ "hermes-agent-alt.service" ];
+        serviceConfig = {
+          Type = "simple";
+          User = "hermes-alt";
+          Group = "hermes-alt";
+          Restart = "on-failure";
+          RestartSec = 5;
+          UMask = "0077";
+          Environment = [
+            "HERMES_BASE_URL=http://127.0.0.1:8643"
+            "BRIDGE_PUBLIC_URL=https://hermes-bridge-alt.dab-octatonic.ts.net"
+            "BRIDGE_STATE_DIR=/var/lib/hermes-alt/.local/state/hermes-ui-bridge"
+          ];
+          EnvironmentFile = [ config.age.secrets."hermes-env-alt".path ];
+          ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8791'";
+        };
+      };
+
       systemd.services.tailscale-serve-hermes = lib.mkIf config.services.tailscale.enable {
         description = "Tailscale serve for the Hermes web UI and API";
         after = [
@@ -510,6 +592,8 @@
           "hermes-agent-alt.service"
           "hermes-backend.service"
           "hermes-backend-alt.service"
+          "hermes-ui-bridge.service"
+          "hermes-ui-bridge-alt.service"
         ];
         wants = [ "tailscaled.service" ];
         wantedBy = [ "multi-user.target" ];
@@ -539,6 +623,8 @@
           tailscale serve --yes --service=svc:hermes-api --https=8443 127.0.0.1:9119
           tailscale serve --yes --service=svc:hermes-api-alt --https=443 127.0.0.1:8643
           tailscale serve --yes --service=svc:hermes-api-alt --https=8443 127.0.0.1:9120
+          tailscale serve --yes --service=svc:hermes-bridge --https=443 127.0.0.1:8790
+          tailscale serve --yes --service=svc:hermes-bridge-alt --https=443 127.0.0.1:8791
         '';
       };
     };

@@ -35,6 +35,14 @@
           piLocal = self.packages.${system}.piLocal;
         };
 
+      # The Hermes UI+ bridge for both Hermes tenants. See
+      # dendritic/packages/hermes-ui-plus-bridge.nix.
+      hermesUiPlusBridgeOverlay =
+        _final: _prev:
+        {
+          hermesUiPlusBridge = self.packages.${system}.hermesUiPlusBridge;
+        };
+
       # The lean-ctx CLI behind the hermes context engine plugin. See
       # dendritic/packages/lean-ctx.nix.
       leanCtxOverlay =
@@ -136,6 +144,7 @@
         nodeBinOverlay
         createWorktreeOverlay
         piLocalOverlay
+        hermesUiPlusBridgeOverlay
         leanCtxOverlay
         tmuxBridgeOverlay
         ramsayDeployOverlay
