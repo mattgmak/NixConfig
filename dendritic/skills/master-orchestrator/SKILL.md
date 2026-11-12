@@ -44,6 +44,18 @@ Add one line to every lane brief: `Reply to each CodeRabbit inline comment in on
 
 The orchestrator checks the open threads before it reports a ticket at the gate. Run `gh api` on the review comments, list the unresolved ones, and chase them by lane.
 
+A pull request reaches the gate with no open thread. After a lane answers a thread and the fix lands, resolve that thread.
+
+```bash
+gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<id>"}) { thread { isResolved } } }'
+```
+
+A thread that needs no change gets a reply that gives the reason. Leave that thread open only
+when the user ruling is the record, and name it in the gate report.
+
+Read the open thread count before you report a ticket at the gate. A non-zero count holds the
+pull request.
+
 ## 1. Plan the wave
 
 Read each ticket with the Linear MCP tool (`get_issue`). Take the id, title, state, and `gitBranchName`.
@@ -223,6 +235,17 @@ The default route is a pull request. You never merge on that route.
 
 Rush mode changes when you wait, and never who merges. Read `## Rush mode`.
 
+### Gate waiver
+
+The user can rule out the wait at the gate. The words are "no need to wait for my gate".
+Then rush mode reads on, and you keep working.
+
+The route stays the same. The pull request waits at the gate for the user. You cut the next
+branch from the waiting branch head. You open its pull request against that branch. You spawn
+its lane at once. You merge nothing.
+
+After the user merges, retarget the branch above it and rebase it in the same turn.
+
 | Route | Trigger | Action | Who merges |
 |---|---|---|---|
 | 1. Pull request | the default for every wave | open a pull request on the lane branch, report the url, stop | the user, in the web interface |
@@ -379,14 +402,28 @@ Everything else runs without a question.
 
 Reply terse. Use Simplified Technical English in every reply, comment, document, and commit message. A commit carries a subject only.
 
-## Sub-command state
+## State flags
 
-The rush state lives in one frontier board entry, so a session reload keeps it.
+Two flags live in one file: `rush` and `code-review`. The path is
+`/tmp/agent-tmp/tcm/master-orchestrator-state-flag`. Each line reads `name=on` or `name=off`.
 
-Write the entry as `Rush mode: on` or `Rush mode: off` in the board metadata. Read it back before you report a gate.
+Read the file at session start, before a gate report, and after each wake. A missing file means
+both flags read off.
+
+Use `scripts/state-flag.sh`. No argument prints every flag. `get <name>` prints one value.
+`set <name> <on|off>` writes one value. The `MASTER_ORCHESTRATOR_FLAG` variable overrides the path.
+
+The `rush` flag decides the wait at the gate. `on` keeps the wave moving and stacks the next
+branch. `off` stops at the reported pull request.
+
+The `code-review` flag decides the review spawn. `off` means a lane reports its own gate exits,
+and the user reviews in the web interface.
 
 ## Sub-commands
 
 `update` rewrites this skill and starts no wave. `reflect` drafts changes from past sessions. Both need the user's approval before a write. Read `reference/subcommands.md`.
 
-`rush [on|off]` sets the gate mode. It reads the state with no argument. The default is `off`.
+`rush [on|off]` sets the `rush` flag. It reads the state with no argument. The default is `off`.
+
+`code-review [on|off]` sets the `code-review` flag. It reads the state with no argument. The
+default is `off`, by user ruling on 2026-11-12.
