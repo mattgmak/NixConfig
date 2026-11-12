@@ -16,7 +16,7 @@ The argument decides the mode. `update` is a sub-command: it updates this skill 
 |---|---|---|
 | Orchestrator | you | plan, spawn, check facts, merge, report |
 | Lane | `peer` subagent | one ticket: explore, write, gate, commit, push |
-| Reviewer | `code-reviewer` subagent | one branch: standards plus spec |
+| Reviewer | `code-reviewer` subagent | off by user ruling on 2026-11-12. Read section 7 |
 
 A lane is always `peer`. No exception covers work with no pull request. A lane runs verification, a device check, or a one-off test as `peer` too. `worker` is not a lane.
 
@@ -34,9 +34,13 @@ Never poll, never sleep, never tail a log. The job holds the loop. Read `referen
 
 ## Review threads
 
-Every reviewer thread needs an answer before a pull request merges. CodeRabbit leaves inline comments. A lane replies to each thread it addresses, in the same pull request, and names the commit that closes it. A thread that needs no change gets one line saying why it stays.
+Every reviewer thread needs an answer before a pull request merges. CodeRabbit leaves inline comments. A lane replies to each thread it addresses, in the same pull request.
 
-Add one line to every lane brief: `Reply to each CodeRabbit inline comment you address, in the same pull request, and name the commit that closes it.`
+Reply shape: one or two sentences. Name the fix and the commit sha. Never restate the comment. Never paste a diff. A thread that needs no change gets one line that gives the reason.
+
+Example reply: "Addressed in f1583e73. `bout_seconds_of` rejects a non-digit, a zero, and an empty list before the builder writes a row."
+
+Add one line to every lane brief: `Reply to each CodeRabbit inline comment in one short reply. Name the fix and the commit sha.`
 
 The orchestrator checks the open threads before it reports a ticket at the gate. Run `gh api` on the review comments, list the unresolved ones, and chase them by lane.
 
@@ -191,6 +195,10 @@ A lane that idles on a background job gets one foreground command that blocks, a
 
 ## 7. Review
 
+Review spawn is off by user ruling on 2026-11-12. Do not spawn `code-reviewer`. A lane reports its own gate exits. The user reviews in the web interface. Restore the block below when the user asks.
+
+<!-- Review flow, off by user ruling on 2026-11-12.
+
 Spawn `code-reviewer` on the branch when the lane lands. Point it at the worktree, the pull request and the ticket.
 
 A `peer` reviewer is a defect. `code-reviewer` alone reviews. Send the spec source and a report path in the task.
@@ -206,6 +214,8 @@ subagent { agent: "code-reviewer", name: "rev-1424", cwd: "<worktree>", surface:
 Send every fault back to the same lane with `subagent_message`. Name the file and the line. Repeat until the review passes.
 
 Completion criterion: the review returns no blocking fault.
+
+-->
 
 ## 8. Merge
 
