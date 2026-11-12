@@ -18,6 +18,8 @@ The argument decides the mode. `update` is a sub-command: it updates this skill 
 | Lane | `peer` subagent | one ticket: explore, write, gate, commit, push |
 | Reviewer | `code-reviewer` subagent | one branch: standards plus spec |
 
+A lane is always `peer`. No exception covers work with no pull request. A lane runs verification, a device check, or a one-off test as `peer` too. `worker` is not a lane.
+
 One lane per ticket. A lane owns its worktree and its branch. You own the base branch and the merge order.
 
 Completion criterion: you merge, block, or escalate every ticket in the wave with a reason.
@@ -91,11 +93,9 @@ subagent {
 
 `peer` lists `surfaces: window, session`. A pane fails. A window dies with the parent. Always pass a dedicated session: `surface: "new-session:<name>"`, where `<name>` is the lane name. The user then finds each lane in its own tmux session.
 
-The default profile is `peer`, in its own session. Only `peer` holds the full tool set: Linear, shell, the tracker and `ask_user_question`.
+The default profile is `peer`, in its own session. `peer` holds the full tool set: Linear, shell, the tracker and `ask_user_question`.
 
-Use `worker` only for small work that opens no pull request. A `worker` allows the `pane` and `window` surfaces only, so a `new-session` call fails before the lane starts. A `worker` lane loses the Linear tools, so paste the ticket text into its brief. Name the profile in every brief.
-
-A `worker` lane that needs a pull request stops at once. Respawn it as `peer`.
+`worker` is never a lane. A `worker` allows the `pane` and `window` surfaces only, so a `new-session` call fails before the lane starts. A `worker` lane also loses the Linear tools. Reserve `worker` for a child a lane spawns for small work. Name the profile in every brief.
 
 Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrives as a steer message.
 
@@ -123,7 +123,7 @@ Every brief carries these fields:
 
 | Field | Content |
 |---|---|
-| Profile | `peer`, or `worker` for small work with no pull request |
+| Profile | `peer` always. A lane never runs as `worker`. |
 | Ticket | id, title, acceptance criteria |
 | Base | base head sha |
 | Worktree | path, branch, state |
