@@ -1,9 +1,9 @@
 # One command that opens the review session for a NixConfig branch.
 #
 # The session must belong to the agent tmux server, because tmux copies the
-# environment of the creating process into every pane it makes. A hermes shell
-# that runs tmux itself gets the hermes environment, so its panes lose pi-local,
-# delta, and lazygit. Only agent ever creates a session. A root invocation
+# environment of the creating process into every pane it makes. A shell from
+# another account that runs tmux itself gets that account's environment, so its
+# panes lose pi-local, delta, and lazygit. Only agent ever creates a session. A root invocation
 # re-executes itself through an agent login shell, so the environment comes from
 # agent, and `new-session` passes PATH, HOME, USER, and ZDOTDIR explicitly. Any
 # other account gets an error instead of a session.
@@ -12,8 +12,9 @@
 #   sudo spawn-approval-session bump-pi-1.1.7 \
 #     --worktree /home/agent/NixConfig.bump-pi-1.1.5 --force
 #
-# Hermes gets one NOPASSWD rule for this path, so the fixed argv needs no
-# password. See dendritic/nixos-modules/hermes.nix and the skill
+# The main hermes agent is agent, so it runs this path directly. The old
+# hermes NOPASSWD rule lived in dendritic/nixos-modules/hermes.nix and is gone;
+# hosts/Ramsay.nix keeps the agent rules. See the skill
 # dendritic/nixos-modules/hermes-skills/nixconfig-worktree/SKILL.md.
 #
 # The session is one window with three panes:

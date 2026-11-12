@@ -2,10 +2,10 @@
 #
 # Step 1 of the nixconfig-worktree flow needs `wt`, and `wt` exists only in the
 # agent profile at /etc/profiles/per-user/agent/bin. `/home/agent` is 0750
-# agent:users, so hermes holds r-x there and cannot create a directory. A
-# worktree hermes makes alone comes out hermes:hermes 0700, and only root can
-# undo that. Before this command, hermes edited /home/agent/NixConfig directly,
-# because that checkout is group-writable and its parent is not.
+# agent:users, so only agent and members of `users` can create a directory
+# there. A worktree another account makes alone comes out 0700, and only root
+# can undo that. The main hermes agent now runs as agent, so it calls this
+# command without sudo; the re-exec path stays for root and other accounts.
 #
 # The script copies the root pattern from spawn-approval-session. A root
 # invocation re-executes itself through an agent login shell, so `wt` and the

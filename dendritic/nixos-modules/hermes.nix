@@ -1,5 +1,7 @@
-# Hermes Agent on Ramsay. Native mode, dedicated hermes user, local models
-# through llama-swap on 127.0.0.1:9292. The firewall drops the LAN and trusts
+# Hermes Agent on Ramsay. Native mode, no dedicated hermes user. The main
+# tenant runs as user agent with root /home/agent/hermes, so it reaches the
+# NixConfig checkout and every worktree without a sudo wrapper. Local models
+# run through llama-swap on 127.0.0.1:9292. The firewall drops the LAN and trusts
 # tailscale0, so every port here is tailnet-only. The Gateway API binds 8642
 # for REST and the backend binds 9119 for the dashboard routes and the
 # /api/ws JSON-RPC transport. The webui binds loopback. Tailscale serve
@@ -20,7 +22,7 @@
           version = hermesVersion;
         });
 
-      # The alt tenant. A second user owns a second root, so the main hermes user
+      # The alt tenant. A second user owns a second root, so the agent account
       # has no path into the private profile. The module holds one option set, so
       # these units copy the native unit shape by hand.
       altStateDir = "/var/lib/hermes-alt";
@@ -67,9 +69,9 @@
         environment = altEnvironment;
       };
       # comma resolves a bare command name from the nix-index database at
-      # ~/.cache/nix-index/files. Neither hermes user has home-manager, so link
-      # the database file into both homes. `packages.<system>.default` is the
-      # nix-index binary; `nix-index-database` is the index itself.
+      # ~/.cache/nix-index/files. Each gateway sets HOME to its own state dir, so
+      # link the database file into both state dirs. `packages.<system>.default`
+      # is the nix-index binary; `nix-index-database` is the index itself.
       nixIndexDb =
         inputs.nix-index-database.packages.${pkgs.stdenv.hostPlatform.system}.nix-index-database;
     in
@@ -91,9 +93,11 @@
       };
 
       systemd.tmpfiles.rules = [
-        "d /var/lib/hermes/.cache 0700 hermes hermes - -"
-        "d /var/lib/hermes/.cache/nix-index 0700 hermes hermes - -"
-        "L+ /var/lib/hermes/.cache/nix-index/files - - - - ${nixIndexDb}"
+        # /var/lib/hermes stays reachable as a symlink to the new state dir.
+        "L+ /var/lib/hermes - - - - /home/agent/hermes"
+        "d /home/agent/hermes/.cache 0700 agent agent - -"
+        "d /home/agent/hermes/.cache/nix-index 0700 agent agent - -"
+        "L+ /home/agent/hermes/.cache/nix-index/files - - - - ${nixIndexDb}"
         "d /var/lib/hermes-alt/.cache 0700 hermes-alt hermes-alt - -"
         "d /var/lib/hermes-alt/.cache/nix-index 0700 hermes-alt hermes-alt - -"
         "L+ /var/lib/hermes-alt/.cache/nix-index/files - - - - ${nixIndexDb}"
@@ -102,6 +106,12 @@
       services.hermes-agent = {
         enable = true;
         package = agentPackage;
+        # The agent account owns /home/agent and the NixConfig checkout, so the
+        # gateway needs no ACL grant and no sudo wrapper to open a worktree.
+        user = "agent";
+        group = "agent";
+        createUser = false;
+        stateDir = "/home/agent/hermes";
         # pi for coding work, and the Hermes user skill that teaches it to call
         # pi as a subagent. See dendritic/packages/pi-local.nix.
         # ramsayDeploy holds the deploy scripts. See
@@ -270,7 +280,7 @@
           # CORE_COMPACTION and ENABLE_TOOLS stay off: both need the `leanctx`
           # Python SDK in the sealed venv, and nixpkgs has no python3Packages
           # entry for it. Add it through extraPythonPackages, then flip both to 1
-          # and point a `lean-ctx serve` instance at 8080 for the hermes user.
+          # and point a `lean-ctx serve` instance at 8080 for the agent account.
           # With them off, the engine runs its own Python compaction.
           LEANCTX_BASE_URL = "http://127.0.0.1:8080";
           LEANCTX_CONTEXT_LENGTH = "131072";
@@ -293,89 +303,22 @@
         };
       };
 
-      # The sudoers rule needs a fixed argv, so each wrapper sits at the one
-      # stable name. Every wrapper re-executes itself as agent, so agent owns
-      # what it writes.
+      # The agent account runs these wrappers directly, so the fixed-argv sudo
+      # rules for user hermes are gone. The agent's own rules in
+      # hosts/Ramsay.nix still cover `ramsay-deploy-approve` and
+      # `ramsay-deploy-switch`, and the root-owned token keeps the gate honest.
+      # The NixConfig mirror and clone go away with the hermes user: the deploy
+      # scripts now read /home/agent/NixConfig, the one checkout.
       environment.systemPackages = [
         pkgs.createWorktree
         pkgs.ramsayDeploy
         pkgs.spawnApprovalSession
       ];
 
-      security.sudo.extraRules = [
-        {
-          users = [ "hermes" ];
-          commands = [
-            {
-              command = "/run/current-system/sw/bin/create-worktree";
-              options = [ "NOPASSWD" ];
-            }
-            {
-              command = "/run/current-system/sw/bin/ramsay-deploy-switch";
-              options = [ "NOPASSWD" ];
-            }
-            {
-              command = "/run/current-system/sw/bin/spawn-approval-session";
-              options = [ "NOPASSWD" ];
-            }
-          ];
-        }
-      ];
-
-      # Hermes needs a writable clone. /root/NixConfig stays root-owned, and
-      # /home/agent is 0700. A root-owned bare mirror carries the tree that was
-      # last switched, and the clone takes its origin from the mirror. Without
-      # the mirror, a deploy from a stale clone would roll the machine back.
-      systemd.services.hermes-nixconfig = {
-        description = "Mirror NixConfig and clone it for the Hermes deploy path";
-        wantedBy = [ "multi-user.target" ];
-        wants = [ "network-online.target" ];
-        after = [ "network-online.target" ];
-        before = [ "hermes-agent.service" ];
-        path = [
-          pkgs.git
-          pkgs.coreutils
-        ];
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
-        script = ''
-          src=/home/agent/NixConfig
-          mirror=${config.services.hermes-agent.stateDir}/NixConfig.git
-          target=${config.services.hermes-agent.stateDir}/NixConfig
-          if [ ! -d "$src/.git" ]; then
-            echo "hermes-nixconfig: no git tree at $src" >&2
-            exit 1
-          fi
-          [ -d "$mirror" ] || git init --bare --quiet --shared=group "$mirror"
-          # The clone tracks the mirror. Do not hide a failed push: a stale
-          # origin here lets a later deploy roll the machine back.
-          if ! git -C "$src" -c safe.directory="$src" push --quiet --force \
-            "$mirror" HEAD:refs/heads/main; then
-            echo "hermes-nixconfig: push of $src to $mirror failed" >&2
-            exit 1
-          fi
-          chgrp -R ${config.services.hermes-agent.group} "$mirror"
-          chmod -R g+rX "$mirror"
-          if [ -d "$target/.git" ]; then
-            # The first clone took /root/NixConfig as origin. Move it here.
-            git -C "$target" -c safe.directory="$target" remote set-url origin "$mirror"
-            echo "hermes-nixconfig: origin of $target set to $mirror"
-            exit 0
-          fi
-          rm -rf "$target.partial"
-          git clone --recurse-submodules --quiet "$mirror" "$target.partial"
-          mv "$target.partial" "$target"
-          chown -R ${config.services.hermes-agent.user}:${config.services.hermes-agent.group} "$target"
-          echo "hermes-nixconfig: cloned $target from $mirror"
-        '';
-      };
-
       services.hermes-webui = {
         enable = true;
-        user = "hermes";
-        group = "hermes";
+        user = "agent";
+        group = "agent";
         host = "127.0.0.1";
         hermesHome = "${config.services.hermes-agent.stateDir}/.hermes";
         agent.package = agentPackage;
@@ -386,9 +329,9 @@
         extraEnvironment = { HERMES_API_URL = "http://127.0.0.1:8642"; };
       };
 
-      # The alt tenant owns its own user and root. The main hermes user holds
-      # /var/lib/hermes at 0700, so a file there stays unreadable for hermes-alt,
-      # and a file here stays unreadable for hermes.
+      # The alt tenant owns its own user and root. The agent account holds
+      # /home/agent/hermes at 2770, so a file there stays unreadable for
+      # hermes-alt, and a file in /var/lib/hermes-alt stays unreadable for agent.
       users.groups.hermes-alt = { };
       users.users.hermes-alt = {
         isSystemUser = true;

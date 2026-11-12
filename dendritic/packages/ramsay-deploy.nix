@@ -1,5 +1,6 @@
-# The autonomous deploy path for the hermes user. Hermes edits
-# /var/lib/hermes/NixConfig and asks to switch. The scripts split the job:
+# The autonomous deploy path for the agent account. Hermes runs as agent, so it
+# works on /home/agent/NixConfig: the same checkout pi works in. The scripts
+# split the job:
 #
 #   ramsay-deploy-sync      unprivileged. Fetches origin/main and rebases onto it.
 #   ramsay-deploy-diff      unprivileged. Prints the review diff.
@@ -13,21 +14,21 @@
 #
 # The gate does not ask Hermes for permission. Hermes drops the `approve`
 # directive in the exec worker, so the gate returns `block` and reads a token
-# that only a root-owned file can supply. The hermes user can read that file and
-# cannot write it. See docs/hermes-deploy-gate.md.
+# that only a root-owned file can supply. The agent account can read that file
+# and cannot write it. See docs/hermes-deploy-gate.md.
 { ... }:
 {
   perSystem =
     { pkgs, ... }:
     let
-      repo = "/var/lib/hermes/NixConfig";
+      repo = "/home/agent/NixConfig";
       # Root-owned, world-readable: the gate reads it, and no agent writes it.
       approvalDir = "/var/lib/ramsay-deploy";
       approvalFile = "${approvalDir}/approval";
       approvalSeconds = 300;
       gitCommon = "-c safe.directory=${repo}";
-      # The scripts run as hermes and as root, so neither reads the owner's git
-      # config from home-modules/git.nix. Name the owner on the commits they make.
+      # The scripts also run as root, and root reads no git config from home.
+      # Name the owner on the commits they make.
       gitOwner = "-c user.name=mattgmak -c user.email=u3592095@connect.hku.hk";
       commitMessage = "Commit unstaged changes.";
 
@@ -58,7 +59,7 @@
               git -C "$repo" ${gitOwner} \
                 commit -q -m "${commitMessage}"
             fi
-            # origin is the root-owned mirror, so this fetch stays local and cheap.
+            # origin is GitHub, so this fetch runs with the agent SSH key.
             git -C "$repo" fetch --quiet origin main
             if git -C "$repo" merge-base --is-ancestor origin/main HEAD; then
               echo "clone is current with origin/main"
@@ -66,7 +67,7 @@
               git -C "$repo" ${gitOwner} \
                 rebase origin/main
             fi
-            # The mirror carries main-repo objects only. Materialize the submodule
+            # A fetch moves the main repo only. Materialize the submodule
             # commits the new HEAD records, or the switch builds a mixed tree.
             git -C "$repo" submodule update --init --recursive --quiet
             echo "submodules at their recorded commits"
@@ -114,7 +115,7 @@
             # Record every call. A silent gate hides its own failure.
             { printf '%s %s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
               "$(printf '%s' "$payload" | jq -r '.tool_name // "?"' 2>/dev/null || true)" \
-              "$(printf '%s' "$cmd" | head -c 200 | tr '\n' ' ')" >> /var/lib/hermes/ramsay-gate.log; } \
+              "$(printf '%s' "$cmd" | head -c 200 | tr '\n' ' ')" >> /home/agent/hermes/ramsay-gate.log; } \
               2>/dev/null || true
             case "$cmd" in
               *ramsay-deploy-switch*)
@@ -146,24 +147,20 @@
             fi
             exec 9>/run/lock/ramsay-deploy.lock
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
-            # Root git leaves root-owned objects and an index. Every exit path gives the clone back.
+            # Root git leaves root-owned objects and an index. Every exit path gives the checkout back.
             trap 'chown -R "$(stat -L -c "%U:%G" "$repo")" "$repo/.git"' EXIT
-            src=/home/agent/NixConfig
-            mirror=/var/lib/hermes/NixConfig.git
-            # Publish here, never inside the switch. A publish after the clone synced moves
-            # origin/main past it, and the switch then refuses its own push.
-            if [ -d "$src/.git" ] && [ -d "$mirror" ]; then
-              git -C "$src" -c safe.directory="$src" push --quiet --force \
-                "$mirror" HEAD:refs/heads/main
-              chgrp -R "$(stat -L -c '%G' "$repo")" "$mirror"
-              chmod -R g+rX "$mirror"
-            fi
+            # Publish here, never inside the switch. The push is best-effort: the
+            # caller normally pushes as agent, and root holds no GitHub credentials.
+            # A plain push keeps a rewritten history safe: it fails instead of
+            # clobbering origin/main.
+            git -C "$repo" ${gitCommon} push --quiet origin HEAD:refs/heads/main \
+              || echo "warning: push to origin failed; the switch uses the local tree" >&2
             git -C "$repo" ${gitCommon} fetch --quiet origin main || true
             # A revert of a published commit is a silent rollback. Refuse it.
-            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
-            if [ -n "$mirror_head" ] && ! git -C "$repo" ${gitCommon} \
-              merge-base --is-ancestor "$mirror_head" HEAD; then
-              echo "clone is behind origin/main: run ramsay-deploy-sync first, then approve again" >&2
+            origin_main=$(git -C "$repo" ${gitCommon} rev-parse --verify -q refs/remotes/origin/main || true)
+            if [ -n "$origin_main" ] && ! git -C "$repo" ${gitCommon} \
+              merge-base --is-ancestor "$origin_main" HEAD; then
+              echo "checkout is behind origin/main: run ramsay-deploy-sync first, then approve again" >&2
               exit 1
             fi
             echo "== diffstat against origin/main =="
@@ -227,20 +224,20 @@
               echo "approval expired: ask the owner to approve again" >&2
               exit 1
             fi
-            # A revert of the published commit is a silent rollback. Refuse it. This reads
-            # the mirror only: a fetch here writes root-owned objects into the clone.
-            mirror=/var/lib/hermes/NixConfig.git
-            mirror_head=$(git -C "$mirror" rev-parse --verify -q refs/heads/main || true)
-            if [ -n "$mirror_head" ] && ! git -C "$repo" ${gitCommon} \
-              merge-base --is-ancestor "$mirror_head" HEAD; then
-              echo "clone is behind origin/main: run ramsay-deploy-sync first" >&2
+            # A revert of the published commit is a silent rollback. Refuse it. This
+            # reads the remote-tracking ref only: a fetch here writes root-owned
+            # objects into the checkout.
+            origin_main=$(git -C "$repo" ${gitCommon} rev-parse --verify -q refs/remotes/origin/main || true)
+            if [ -n "$origin_main" ] && ! git -C "$repo" ${gitCommon} \
+              merge-base --is-ancestor "$origin_main" HEAD; then
+              echo "checkout is behind origin/main: run ramsay-deploy-sync first" >&2
               exit 1
             fi
             # A git-mode flake sees tracked files only, so stage first.
             git -C "$repo" ${gitCommon} add -A
             # A stale submodule checkout builds a tree that no commit describes.
             if git -C "$repo" ${gitCommon} submodule status | grep -q '^[+-]'; then
-              echo "clone has unmaterialized submodules: run ramsay-deploy-sync first" >&2
+              echo "checkout has unmaterialized submodules: run ramsay-deploy-sync first" >&2
               exit 1
             fi
             have=$(git -C "$repo" ${gitCommon} write-tree)
@@ -257,7 +254,7 @@
                 commit -q -m "${commitMessage}"
             fi
             rev=$(git -C "$repo" rev-parse --short HEAD)
-            # Root git leaves root-owned files behind. Give the clone back to its owner.
+            # Root git leaves root-owned files behind. Give the checkout back to its owner.
             chown -R "$(stat -L -c '%U:%G' "$repo")" "$repo/.git"
             echo "deploy $rev" | tee -a "$log"
             exec nh os switch -e none "$repo#Ramsay"

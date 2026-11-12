@@ -1,6 +1,6 @@
 # Hermes deploy gate: autonomous `nh os switch` with hard approval
 
-Hermes edits a private clone of NixConfig on Ramsay. It runs the switch itself. A code-level gate
+Hermes works in the agent checkout of NixConfig on Ramsay. It runs the switch itself. A code-level gate
 stops the switch until the owner approves it on a phone or in the web UI.
 
 Checked against `hermes-agent` pin `ef75bc708867e3884cb40a91363be6dc6fddc034` and
@@ -21,20 +21,34 @@ approval can release it.
 
 ## Layer 1: the OS path
 
-Hermes runs as `hermes`, with no `wheel` membership and no `sudo` right. Add one rule.
+Hermes runs as `agent`. The account holds one `PASSWD` rule for `ALL` and two
+`NOPASSWD` rules, one for `ramsay-deploy-approve` and one for
+`ramsay-deploy-switch`. The approval pane uses the second pair, so a phone
+approval needs no typed secret.
 
 ```nix
 security.sudo.extraRules = [
   {
-    users = [ "hermes" ];
+    users = [ "agent" ];
     commands = [
-      # Fixed path, no arguments. sudoers cannot match a stored wrapper that
-      # takes a caller-supplied argv.
+      { command = "ALL"; options = [ "PASSWD" ]; }
+    ];
+  }
+  # Keep the NOPASSWD specs in a rule of their own, after the ALL rule.
+  # sudo sorts specs by option, so a NOPASSWD listed before PASSWD loses.
+  {
+    users = [ "agent" ];
+    commands = [
+      { command = "/run/current-system/sw/bin/ramsay-deploy-approve"; options = [ "NOPASSWD" ]; }
       { command = "/run/current-system/sw/bin/ramsay-deploy-switch"; options = [ "NOPASSWD" ]; }
     ];
   }
 ];
 ```
+
+The merge costs one property. The `hermes` account once lacked the approve rule,
+so it could not approve its own change. The `agent` account holds the rule, so
+the `pre_tool_call` hook and the skill now carry that rule, not sudoers.
 
 `ramsay-deploy-switch` takes no arguments. It reads one fixed directory. That makes argument
 injection impossible.
@@ -42,7 +56,7 @@ injection impossible.
 ```sh
 #!/usr/bin/env bash
 set -euo pipefail
-repo=/var/lib/hermes/NixConfig
+repo=/home/agent/NixConfig
 exec 9>/run/lock/ramsay-deploy.lock
 flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
 git -C "$repo" -c safe.directory="$repo" add -A
@@ -54,20 +68,20 @@ exec nh os switch -e none "$repo#Ramsay"
 Notes:
 
 - `NH_OS_FLAKE=/root/NixConfig` exists on Ramsay. This wrapper passes the flake path instead, so
-  the `hermes` clone is the deploy source.
-- Root reads a `hermes`-owned repo. Pass `safe.directory` to `git`. Confirm that `nh` and `nix`
+  the agent checkout is the deploy source.
+- Root reads an `agent`-owned repo. Pass `safe.directory` to `git`. Confirm that `nh` and `nix`
   accept the same path. Test this before you rely on it.
-- The store path is read-only for `hermes`. The agent cannot edit the wrapper.
-- `ramsay-deploy-approve` publishes `/home/agent/NixConfig` HEAD to the mirror, then refuses when
-  the clone does not hold that commit. A publish inside the switch moves `origin/main` past a
-  clone that just synced, and the switch then refuses its own push.
-- A root-owned bare mirror at `/var/lib/hermes/NixConfig.git` carries the published tree, and the
-  clone takes the mirror as origin. `/root/NixConfig` is never the origin.
+- The store path is read-only for `agent`. The agent cannot edit the wrapper.
+- `ramsay-deploy-approve` checks the repo's own `refs/remotes/origin/main`, then refuses when
+  HEAD does not match it. A push inside the switch moves `origin/main` past a checkout that
+  just synced, and the switch then refuses its own push.
+- The checkout takes GitHub as its origin. `/root/NixConfig` and `/var/lib/hermes` are links,
+  not copies.
 - The wrapper checks the token before it touches git. A call without one writes nothing: no
-  staging, no root-owned index, no clone change.
+  staging, no root-owned index, no checkout change.
 - The wrapper commits the staged tree before the switch. Nix git mode then sees every file, and
   the change has a commit id to review.
-- A trap gives `.git` back to hermes on every exit path, including a refusal.
+- A trap gives `.git` back to its owner on every exit path, including a refusal.
 
 Hard-block the raw root paths, so the wrapper is the only route:
 
@@ -212,7 +226,7 @@ guarantee. The Hermes layer is the convenience gate.
 |---|---|
 | `dendritic/packages/ramsay-deploy.nix` | `ramsay-deploy-sync`, `ramsay-deploy-diff`, `ramsay-deploy-tree`, `ramsay-gate`, `ramsay-deploy-approve`, `ramsay-deploy-switch` |
 | `dendritic/overlays.nix` | `pkgs.ramsayDeploy`, in `common-overlays` |
-| `dendritic/nixos-modules/hermes.nix` | approvals, hooks, deny globs, `extraPackages`, sudo rule, clone unit |
+| `dendritic/nixos-modules/hermes.nix` | approvals, hooks, deny globs, `extraPackages`, the `agent` user and group |
 | `dendritic/nixos-modules/hermes-skills/deploy/SKILL.md` | the five-step recipe for the agent |
 | `scripts/hermes-gate-test.sh` | one spawned Hermes turn, with the payload and the verdict |
 | `scripts/hermes-gate-tmux-test.sh` | the `block` against `approve` comparison |
@@ -222,17 +236,16 @@ One manual step remains: deploy with `nh os switch`. The agent must not build th
 ## Verification
 
 ```sh
-# The wrapper is the only sudo path for hermes, and approve is absent.
-sudo -l -U hermes
+# The account runs the wrapper without a password prompt for approve and switch.
+sudo -l -U agent
 # The gate blocks the switch with no token, and it allows a benign call.
 printf '%s' '{"tool_name":"terminal","tool_input":{"command":"sudo /run/current-system/sw/bin/ramsay-deploy-switch"}}' \
   | /run/current-system/sw/bin/ramsay-gate
 # A fresh approval writes the token, and hermes can read it.
 sudo /run/current-system/sw/bin/ramsay-deploy-approve
 ls -l /var/lib/ramsay-deploy/approval
-# The clone is a git-mode flake that evaluates.
-systemctl status hermes-nixconfig
-sudo -u hermes git -C /var/lib/hermes/NixConfig status --short
+# The checkout is a git-mode flake that evaluates.
+git -C /home/agent/NixConfig status --short
 # A raw root route is refused before a prompt.
 # Ask Hermes to run: sudo nh os switch → expect the deny glob, not a card.
 ```

@@ -480,9 +480,9 @@ in
         # chowns the agent key to agent:agent.
         users.groups.agent = { };
 
-        # The agent checkout is the shared source of truth. hermes needs the group
-        # to read it through /home/agent.
-        users.groups.users.members = [ "hermes" ];
+        # The agent's primary group, named by isNormalUser. The hermes user is
+        # gone: the main hermes agent runs as agent, so no member list is needed.
+        users.groups.users = { };
 
         # Key only across the tailnet. The Match block sits in extraConfig,
         # which NixOS appends after its own keys.
@@ -820,21 +820,10 @@ SEED
           "d ${halogenCacheRoot}/abliter-v2 0750 root root -"
           "d ${halogenRecordRoot}/signal 0750 root root -"
           "d ${halogenRecordRoot}/abliter-v2 0750 root root -"
-          # One repo, three paths. NH_OS_FLAKE and the hermes scripts keep their
+          # One repo, two paths. NH_OS_FLAKE and the deploy scripts keep their
           # hardcoded paths, which now resolve to the agent checkout. Remove the old
           # directories first: tmpfiles cannot replace a directory with a link.
           "L+ /root/NixConfig - - - - /home/agent/NixConfig"
-          "L+ /var/lib/hermes/NixConfig - - - - /home/agent/NixConfig"
-          # hermes needs w on the home dir to create `wt` worktrees beside the repo.
-          # An ACL entry grants it and leaves the mode at 0750, so sshd StrictModes
-          # still accepts the agent key. chmod 0770 would break that login.
-          "a+ /home/agent - - - - u:hermes:wx"
-          # logind makes /run/user/1000 mode 0700, so hermes cannot reach the
-          # agent tmux socket inside it. One A+ rule covered both paths and put
-          # r-x on the socket, and a socket needs w, so hermes got permission
-          # denied. Keep the rules separate: r-x on the dirs, rw on the socket.
-          "a+ /run/user/1000 - - - - u:hermes:r-x"
-          "a+ /run/user/1000/tmux-1000 - - - - u:hermes:r-x"
         ];
 
         # One Halogen stack runs at a time: each maps a whole pack into graphics

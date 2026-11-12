@@ -67,15 +67,15 @@ Four path-flake evals cost 21 GB of store space on 2026-10-22.
 | --- | --- | --- |
 | `/home/agent/NixConfig` | the checkout | `agent:users`, group-writable, setgid, `core.sharedRepository = group` |
 | `/root/NixConfig` | symlink | tmpfiles |
-| `/var/lib/hermes/NixConfig` | symlink | tmpfiles |
+| `/var/lib/hermes` | symlink to the hermes state dir | tmpfiles |
 | Goofeus `/root/NixConfig` | symlink to the built source store path | `scripts/deploy-goofeus.sh` |
 | MacMini `/Users/mattgmak/NixConfig` | own checkout | macOS, separate |
 
 `NH_OS_FLAKE=/root/NixConfig` now resolves to the agent checkout, so `nh` as root and `nh` as agent build the same tree.
 
 1. One working directory holds one branch. Two people or two agents need two worktrees. One index serves the whole checkout, so `git add -N` by one user changes what another user builds.
-2. The old root and hermes clones must go before the switch: `systemd.tmpfiles` cannot replace a directory with a symlink.
-3. `hermes` joins group `users` for traversal. `programs.git.config.safe.directory = "*"` replaces the per-script `-c safe.directory=` flags.
+2. The old root and hermes directories must go before the switch: `systemd.tmpfiles` cannot replace a directory with a symlink.
+3. The main hermes agent runs as `agent`, so it needs no group grant. Only `hermes-alt` keeps its own user. `programs.git.config.safe.directory = "*"` replaces the per-script `-c safe.directory=` flags.
 
 ## Worktree workflow
 
