@@ -101,11 +101,11 @@ Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrive
 
 ### Model
 
-Pass `model: "deepseek/deepseek-v4.1-flash-1017"` in every spawn, for lanes and reviewers alike. The model comes from OpenRouter. Do not rely on profile inheritance, because `~/.pi/agent/agents` is a read-only link into the Nix store. A model line written there is lost when home-manager runs.
+Pass `model: "balance/deepseek-v4.1-flash"` in every spawn, at every level. That covers a lane, a reviewer, and a child a lane spawns. The model comes from OpenRouter. Do not rely on profile inheritance, because `~/.pi/agent/agents` is a read-only link into the Nix store. A model line written there is lost when home-manager runs.
 
 This rule cascades. A lane passes the same model in each subagent it spawns. A lane also writes that rule into the brief of each child it spawns.
 
-Add one line to every lane brief: `Pass model: "deepseek/deepseek-v4.1-flash-1017" in every subagent call you make.`
+Add one line to every lane brief: `Pass model: "balance/deepseek-v4.1-flash" in every subagent call you make, at every level.`
 
 No lane limit applies. Spawn the next lane as soon as a ticket needs it.
 
