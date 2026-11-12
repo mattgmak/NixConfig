@@ -181,18 +181,18 @@
         };
       };
 
-      # Upstream unit waits for graphical-session.target, but session units that
-      # need the portal block on that same target — start the backend with the
-      # main portal service instead. Home-manager writes a whole unit file, it
-      # does not merge with the unit in the system profile, so the override has
-      # to repeat Unit and Service.
+      # The main portal unit is Type=dbus, so systemd marks it started only when
+      # the binary owns org.freedesktop.portal.Desktop. That binary first
+      # activates the backend bus name. Ordering the backend after the main
+      # portal makes the two units wait for each other. Every GoofyEnvy boot
+      # burns the full 90 s start timeout in xdg-desktop-portal.service, and a
+      # retry then starts it in 0.03 s. Keep only dbus.socket in After.
+      # Home-manager replaces the whole unit file, so the override repeats Unit
+      # and Service.
       systemd.user.services.xdg-desktop-portal-hyprland = {
         Unit = {
           Description = "Portal service (Hyprland implementation)";
-          After = lib.mkForce [
-            "dbus.socket"
-            "xdg-desktop-portal.service"
-          ];
+          After = lib.mkForce [ "dbus.socket" ];
         };
         Service = {
           Type = "dbus";
