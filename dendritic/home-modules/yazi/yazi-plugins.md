@@ -33,4 +33,25 @@ git clone https://github.com/DreamMaoMao/searchjump.yazi.git $"($env.APPDATA)/ya
 ya pack -a orhnk/system-clipboard
 scoop install clipboard
 
+# yatline.yazi
+ya pack -a imsi32/yatline
+
+# yatline-selected-size.yazi
+ya pack -a pakhromov/yatline-selected-size
+
+# yatline-tab-path.yazi
+ya pack -a blackdaemon/yatline-tab-path
+
+# yatline-page-counter.yazi
+ya pack -a PepeRoConde/yatline-page-counter
+
+# yatline-modified-time.yazi
+ya pack -a wekauwau/yatline-modified-time
+
+# yatline-created-time.yazi
+ya pack -a wekauwau/yatline-created-time
+
+# yatline-symlink.yazi
+ya pack -a lpanebr/yazi-plugins:yatline-symlink
+
 ```

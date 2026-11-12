@@ -19,6 +19,12 @@ run = [
   "yank",
 ]
 
+# Copy selected files with the cb binary
+[[mgr.prepend_keymap]]
+on = ["<C-y>"]
+run = "plugin system-clipboard"
+desc = "Copy selected files to the system clipboard"
+
 [[mgr.prepend_keymap]]
 on = ["<Backspace>"]
 run = "plugin searchjump"

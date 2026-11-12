@@ -42,25 +42,71 @@ th.git.renamed_sign = 'R'
 th.git.staged = ui.Style():fg('green')
 require('git'):setup()
 
--- Add symlink to status bar
-Status:children_add(function(self)
-  local h = self._current.hovered
-  if h and h.link_to then
-    return ' -> ' .. tostring(h.link_to)
-  else
-    return ''
-  end
-end, 3300, Status.LEFT)
 
--- Add user and group to status bar
-Status:children_add(function()
-  local h = cx.active.current.hovered
-  if h == nil or ya.target_family() ~= 'unix' then return '' end
+require('yatline'):setup({
+  header_line = {
+    left = {
+      section_a = {
+        { type = 'line', name = 'tabs' },
+      },
+      section_b = {
+        { type = 'coloreds', custom = false, name = 'tab_path' },
+      },
+      section_c = {},
+    },
+    right = {
+      section_a = {
+        { type = 'string', name = 'date', params = { '%A, %d %B %Y' } },
+      },
+      section_b = {
+        { type = 'string', name = 'date', params = { '%X' } },
+      },
+      section_c = {},
+    },
+  },
 
-  return ui.Line({
-    ui.Span(ya.user_name(h.cha.uid) or tostring(h.cha.uid)):fg('magenta'),
-    ':',
-    ui.Span(ya.group_name(h.cha.gid) or tostring(h.cha.gid)):fg('magenta'),
-    ' ',
-  })
-end, 500, Status.RIGHT)
+  status_line = {
+    left = {
+      section_a = {
+        { type = 'string', name = 'tab_mode' },
+      },
+      section_b = {
+        { type = 'string', name = 'hovered_size' },
+        { type = 'coloreds', custom = false, name = 'selected-files-size' },
+      },
+      section_c = {
+        { type = 'string', name = 'hovered_path' },
+        { type = 'coloreds', custom = false, name = 'symlink' },
+        { type = 'coloreds', name = 'count' },
+      },
+    },
+    right = {
+      section_a = {
+        { type = 'string', name = 'cursor_position' },
+      },
+      section_b = {
+        { type = 'string', name = 'cursor_percentage' },
+        { type = 'coloreds', custom = false, name = 'page_count' },
+        { type = 'coloreds', custom = false, name = 'modified_time' },
+        { type = 'coloreds', custom = false, name = 'created_time' },
+      },
+      section_c = {
+        { type = 'string', name = 'hovered_file_extension', params = { true } },
+        { type = 'coloreds', name = 'permissions' },
+        { type = 'string', name = 'hovered_ownership' },
+      },
+    },
+  },
+})
+
+-- Yatline addons need the global Yatline, so they load after its setup.
+require('yatline-tab-path'):setup()
+require('yatline-symlink'):setup({
+  symlink_color = 'white',
+})
+require('yatline-selected-size'):setup()
+require('yatline-modified-time'):setup()
+require('yatline-created-time'):setup()
+require('yatline-page-counter'):setup({
+  show_icon = false,
+})

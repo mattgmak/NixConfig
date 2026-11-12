@@ -11,7 +11,14 @@
         shellWrapperName = "y";
         initLua = ./init.lua;
         plugins = with pkgs.yaziPlugins; {
-          inherit git;
+          inherit git yatline yatline-created-time;
+
+          system-clipboard = pkgs.callPackage self.yaziPluginSystemClipboard { };
+          yatline-modified-time = pkgs.callPackage self.yaziPluginYatlineModifiedTime { };
+          yatline-page-counter = pkgs.callPackage self.yaziPluginYatlinePageCounter { };
+          yatline-selected-size = pkgs.callPackage self.yaziPluginYatlineSelectedSize { };
+          yatline-symlink = pkgs.callPackage self.yaziPluginYatlineSymlink { };
+          yatline-tab-path = pkgs.callPackage self.yaziPluginYatlineTabPath { };
         };
         theme = {
           indicator = {
@@ -26,6 +33,9 @@
 
       home.packages = with pkgs; [
         _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
+        clipboard-jh # `cb`, the binary system-clipboard.yazi spawns
+        djvulibre # `djvused`, used by yatline-page-counter for DjVu files
+        unzip # yatline-page-counter reads EPUB and Office documents as archives
         file # `file` previewer/spotter, no wrapper means PATH lookup
         imagemagick # `magick` previewer
         poppler-utils # `pdftoppm` PDF previewer
