@@ -26,6 +26,10 @@
       approvalFile = "${approvalDir}/approval";
       approvalSeconds = 300;
       gitCommon = "-c safe.directory=${repo}";
+      # The scripts run as hermes and as root, so neither reads the owner's git
+      # config from home-modules/git.nix. Name the owner on the commits they make.
+      gitOwner = "-c user.name=mattgmak -c user.email=u3592095@connect.hku.hk";
+      commitMessage = "Commit unstaged changes.";
 
       # writeTextFile, not writeShellApplication: the scripts stay out of
       # shellcheck's way, and each one sets its own PATH because sudo resets it.
@@ -51,15 +55,15 @@
             # Commit first. A rebase over a dirty tree refuses to run.
             git -C "$repo" add -A
             if ! git -C "$repo" diff --cached --quiet; then
-              git -C "$repo" -c user.name=hermes -c user.email=hermes@ramsay \
-                commit -q -m "Hermes deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              git -C "$repo" ${gitOwner} \
+                commit -q -m "${commitMessage}"
             fi
             # origin is the root-owned mirror, so this fetch stays local and cheap.
             git -C "$repo" fetch --quiet origin main
             if git -C "$repo" merge-base --is-ancestor origin/main HEAD; then
               echo "clone is current with origin/main"
             else
-              git -C "$repo" -c user.name=hermes -c user.email=hermes@ramsay \
+              git -C "$repo" ${gitOwner} \
                 rebase origin/main
             fi
             # The mirror carries main-repo objects only. Materialize the submodule
@@ -249,9 +253,8 @@
             if ! git -C "$repo" ${gitCommon} diff --cached --quiet; then
               git -C "$repo" ${gitCommon} \
                 diff --cached --stat | tee -a "$log"
-              git -C "$repo" ${gitCommon} \
-                -c user.name=hermes -c user.email=hermes@ramsay \
-                commit -q -m "Hermes deploy $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+              git -C "$repo" ${gitCommon} ${gitOwner} \
+                commit -q -m "${commitMessage}"
             fi
             rev=$(git -C "$repo" rev-parse --short HEAD)
             # Root git leaves root-owned files behind. Give the clone back to its owner.
