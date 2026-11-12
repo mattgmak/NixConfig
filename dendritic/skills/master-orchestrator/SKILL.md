@@ -250,6 +250,8 @@ Never take route 2 by default. Never take route 2 because a lane finished. Never
 
 A lane report is not a gate state. Read the three states by hand after every wake: checks, `mergeable`, unresolved threads. Read `reference/pr-gates.md`.
 
+Every pull request targets `mattmak/meal-plan-agent`. Read `reference/pr-base.md` before you open or report one.
+
 ## 9. Keep moving
 
 Rush `on`: do not wait for the user's merge gate. Stack the next branch and spawn the lanes that the merge unblocks.
