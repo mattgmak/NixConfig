@@ -587,9 +587,9 @@
           }
 
           install_agent_ste() {
-            local dir="$VENDOR_ROOT/ctotheameron/agent-ste"
+            local dir="$VENDOR_ROOT/mattgmak/agent-ste"
             [ -f "$dir/scripts/build-dist.sh" ] || return 0
-            echo "pi-ext-deps-install: vendor/ctotheameron/agent-ste (gleam build --target javascript; build dist/)"
+            echo "pi-ext-deps-install: vendor/mattgmak/agent-ste (gleam build --target javascript; build dist/)"
             (cd "$dir" && ./scripts/build-dist.sh)
             if [ ! -f "$dir/dist/ste/ste.mjs" ]; then
               echo "pi-ext-deps-install: agent-ste dist/ste/ste.mjs missing after build" >&2
@@ -658,7 +658,7 @@
           for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
             case "$vendor" in
-              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"|"$VENDOR_ROOT/ctotheameron/agent-ste") continue ;;
+              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"|"$VENDOR_ROOT/mattgmak/agent-ste") continue ;;
             esac
             case "$(basename "$vendor")" in
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
@@ -673,7 +673,7 @@
           queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-cursor-sdk" "vendor/fitchmultz/pi-cursor-sdk" install_pi_cursor_sdk
           queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-agent-browser-native" "vendor/fitchmultz/pi-agent-browser-native" install_pi_agent_browser_native
           queue_parallel gated_install "$VENDOR_ROOT/Gentleman-Programming/engram" "gentle-engram" install_engram_deps
-          queue_parallel gated_install "$VENDOR_ROOT/ctotheameron/agent-ste" "vendor/ctotheameron/agent-ste" install_agent_ste
+          queue_parallel gated_install "$VENDOR_ROOT/mattgmak/agent-ste" "vendor/mattgmak/agent-ste" install_agent_ste
 
           wait_parallel
 

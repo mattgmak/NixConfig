@@ -83,9 +83,9 @@
 [submodule "patlux/pi-commandcode-provider"]
 	path = vendor/patlux/pi-commandcode-provider
 	url = https://github.com/patlux/pi-commandcode-provider.git
-[submodule "ctotheameron/agent-ste"]
-	path = vendor/ctotheameron/agent-ste
-	url = https://github.com/ctotheameron/agent-ste
+[submodule "mattgmak/agent-ste"]
+	path = vendor/mattgmak/agent-ste
+	url = https://github.com/mattgmak/agent-ste
 [submodule "theo-kirby/tmax"]
 	path = vendor/theo-kirby/tmax
 	url = https://github.com/theo-kirby/tmax

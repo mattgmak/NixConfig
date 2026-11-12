@@ -95,7 +95,6 @@
           vendorRepos = [
             "arpagon/pi-rewind"
             "carderne/pi-nvim"
-            "ctotheameron/agent-ste"
             "fgladisch/pi-extensions"
             "fitchmultz/pi-agent-browser-native"
             "fitchmultz/pi-cursor-sdk"
@@ -106,6 +105,7 @@
             "k0valik/pi-blackhole"
             "MattDevy/pi-extensions"
             "mattgmak/agent-sesh"
+            "mattgmak/agent-ste"
             "mattgmak/pi-autoname"
             "mattgmak/pi-interactive-subagents"
             "mattgmak/pi-nvim-bridge"
@@ -371,7 +371,7 @@
           agentSte = pkgs.stdenvNoCC.mkDerivation {
             pname = "agent-ste-dist";
             version = "0";
-            src = srcOf "vendor/ctotheameron/agent-ste";
+            src = srcOf "vendor/mattgmak/agent-ste";
             nativeBuildInputs = [ pkgs.gleam ];
             postPatch = ''
               patchShebangs scripts
@@ -617,7 +617,7 @@
               }}/node_modules $stage/vendor/fitchmultz/pi-agent-browser-native/node_modules
 
               # agent-ste loads its compiled Gleam output from dist/.
-              cp -a ${agentSte}/dist $stage/vendor/ctotheameron/agent-ste/
+              cp -a ${agentSte}/dist $stage/vendor/mattgmak/agent-ste/
 
               # pi-lean-ctx loads its bundled MCP SDK from extensions/vendor. The staged dir
               # already exists, so copy the contents, not the dir itself.

@@ -162,7 +162,7 @@ The compile needs no network. Each staged repo that imports npm packages gets it
 | `gotgenes/pi-packages` | `fetchPnpmDeps` for the workspace, `fetcherVersion = 4`, plus `pnpmConfigHook` |
 | `fitchmultz/pi-cursor-sdk` | lockfile install, then `bun build` as one extra kit entry |
 | `fitchmultz/pi-agent-browser-native` | dev lockfile install, then `node scripts/build.mjs` |
-| `ctotheameron/agent-ste` | gleam build, plus four hex tarballs in `$HOME/.cache/gleam/hex/hexpm/packages`, named by manifest checksum |
+| `mattgmak/agent-ste` | gleam build, plus four hex tarballs in `$HOME/.cache/gleam/hex/hexpm/packages`, named by manifest checksum |
 | `Gentleman-Programming/engram` | manifest cut to `dependencies`, then `npm install --omit=dev --offline`. Bare imports reach the staged `vendor/node_modules` |
 | `mattgmak/lean-ctx/packages/pi-lean-ctx` | dev install trimmed to `@modelcontextprotocol/sdk` and `esbuild`, then `npm run build:vendor` |
 

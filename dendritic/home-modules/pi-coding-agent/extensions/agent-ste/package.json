@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for agent-ste (vendored ctotheameron/agent-ste submodule)",
+  "description": "Pi loader for agent-ste (vendored mattgmak/agent-ste submodule)",
   "pi": {
     "extensions": ["./index.ts"]
   }
