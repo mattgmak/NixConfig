@@ -122,3 +122,6 @@
 [submodule "mattgmak/pi-vim"]
 	path = vendor/mattgmak/pi-vim
 	url = https://github.com/mattgmak/pi-vim.git
+[submodule "robbyczgw-cla/hermes-ui-plus"]
+	path = vendor/robbyczgw-cla/hermes-ui-plus
+	url = https://github.com/robbyczgw-cla/hermes-ui-plus

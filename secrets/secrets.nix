@@ -201,6 +201,17 @@ in
     publicKeys = piRecipients;
   };
 
+  # HUI+ bridge-to-plugin secrets: one per Hermes tenant.
+  "hui-plugin-secret.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
+  "hui-plugin-secret-alt.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   "nix-builder-goofydesky.age" = {
     armor = true;
     publicKeys = [

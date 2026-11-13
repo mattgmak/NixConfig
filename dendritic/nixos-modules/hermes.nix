@@ -76,6 +76,10 @@
         settings = lib.recursiveUpdate config.services.hermes-agent.settings {
           gateway.standalone = true;
           platforms.api_server.extra.port = 8643;
+          # The alt plugin needs its own port and secret. The main plugin holds
+          # 8646, and the main secret belongs to another user.
+          plugins.entries.hermes-ui-plus.settings.server.port = 8647;
+          plugins.entries.hermes-ui-plus.settings.server.secret_file = config.age.secrets."hui-plugin-secret-alt".path;
           # The main config points the Dashboard link at the main dashboard, so
           # the alt config needs its own URL.
           webui.dashboard.url = "https://hermes-api-alt.dab-octatonic.ts.net:8443";
@@ -116,6 +120,18 @@
       age.secrets."hermes-env-alt" = {
         file = ../../secrets/hermes-env-alt.age;
         mode = "0400";
+      };
+      # HUI+ plugin secrets. The plugin accepts only mode 0600 or 0640, so each
+      # tenant owns one file. The matching bridge reads that same file.
+      age.secrets."hui-plugin-secret" = {
+        file = ../../secrets/hui-plugin-secret.age;
+        mode = "0600";
+        owner = "agent";
+      };
+      age.secrets."hui-plugin-secret-alt" = {
+        file = ../../secrets/hui-plugin-secret-alt.age;
+        mode = "0600";
+        owner = "hermes-alt";
       };
 
       systemd.tmpfiles.rules = [
@@ -168,6 +184,20 @@
             pname = "hermes-lean-ctx";
             version = "0.1.0";
             src = ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx;
+            dontUnpack = true;
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out
+              cp -r --no-preserve=mode $src/. $out/
+              runHook postInstall
+            '';
+          })
+          # plugin.yaml names this plugin hermes-ui-plus. The npm bridge package
+          # ships no plugin dir, so the source comes from the vendored repo.
+          (pkgs.stdenv.mkDerivation {
+            pname = "hermes-ui-plus";
+            version = "0.3.0";
+            src = ../../vendor/robbyczgw-cla/hermes-ui-plus/hermes-plugin/hermes_ui_plus;
             dontUnpack = true;
             installPhase = ''
               runHook preInstall
@@ -233,7 +263,15 @@
           # extraPlugins installs the plugin dir, and the webui shows it Disabled
           # until its name joins this list. `hermes plugins enable` writes the same
           # key into config.yaml.
-          plugins.enabled = [ "hermes-lean-ctx" ];
+          plugins.enabled = [ "hermes-lean-ctx" "hermes-ui-plus" ];
+          # HUI+ settings. The main gateway keeps port 8646, and the bridge points
+          # at the same agenix secret. expose_memory lets paired devices read
+          # MEMORY.md and USER.md.
+          plugins.entries.hermes-ui-plus.settings = {
+            server.port = 8646;
+            server.secret_file = config.age.secrets."hui-plugin-secret".path;
+            library.expose_memory = true;
+          };
           # Built-in compressor tuning. A sub-512K window floors threshold at
           # 0.75, so compaction fires at 98304 tokens here. protect_first_n = 0
           # keeps only the system prompt plus the rolling summary, and three real
@@ -552,6 +590,8 @@
             "HERMES_HOME=/home/agent/hermes/.hermes"
             "BRIDGE_PUBLIC_URL=https://hermes-bridge.dab-octatonic.ts.net"
             "BRIDGE_STATE_DIR=/home/agent/.local/state/hermes-ui-bridge"
+            "BRIDGE_HERMES_PLUGIN_URL=http://127.0.0.1:8646"
+            "BRIDGE_HERMES_PLUGIN_SECRET_FILE=${config.age.secrets."hui-plugin-secret".path}"
           ];
           EnvironmentFile = [ config.age.secrets."hermes-env".path ];
           ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8792'";
@@ -578,6 +618,8 @@
             "HERMES_HOME=/var/lib/hermes-alt/.hermes/profiles/private"
             "BRIDGE_PUBLIC_URL=https://hermes-bridge-alt.dab-octatonic.ts.net"
             "BRIDGE_STATE_DIR=/var/lib/hermes-alt/.local/state/hermes-ui-bridge"
+            "BRIDGE_HERMES_PLUGIN_URL=http://127.0.0.1:8647"
+            "BRIDGE_HERMES_PLUGIN_SECRET_FILE=${config.age.secrets."hui-plugin-secret-alt".path}"
           ];
           EnvironmentFile = [ config.age.secrets."hermes-env-alt".path ];
           ExecStart = "${pkgs.bash}/bin/bash -c 'HERMES_API_KEY=\"$API_SERVER_KEY\" exec ${pkgs.hermesUiPlusBridge}/bin/hermes-ui-plus-bridge --port 8791'";
