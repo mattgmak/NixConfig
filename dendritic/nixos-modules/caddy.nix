@@ -63,7 +63,18 @@
             immich = {
               hostName = "immich.${baseDomain}";
               extraConfig = ''
-                reverse_proxy :${toString config.services.immich.port}
+                @thumb {
+                  method GET
+                  path /thumb/assets/*
+                }
+                handle @thumb {
+                  header_up X-Api-Key {env.IMMICH_API_KEY}
+                  uri replace_prefix /thumb /api
+                  reverse_proxy :${toString config.services.immich.port}
+                }
+                handle {
+                  reverse_proxy :${toString config.services.immich.port}
+                }
                 import cloudflare
               '';
             };
@@ -230,11 +241,17 @@
       services.tailscale.permitCertUid = "caddy";
 
       # Explicitly inject env file; nixpkgs module may not apply it with custom package
-      # systemd.services.caddy.serviceConfig.EnvironmentFile =
-      #   lib.mkForce config.age.secrets.cloudflare-caddy.path;
+      systemd.services.caddy.serviceConfig.EnvironmentFile =
+        lib.mkForce [ config.age.secrets.cloudflare-caddy.path config.age.secrets.immich-api-key.path ];
 
       age.secrets.cloudflare-caddy = {
         file = ../../secrets/cloudflare-caddy.age;
+        owner = "caddy";
+        group = "caddy";
+      };
+
+      age.secrets.immich-api-key = {
+        file = ../../secrets/immich-api-key.age;
         owner = "caddy";
         group = "caddy";
       };
