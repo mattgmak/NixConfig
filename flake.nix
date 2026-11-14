@@ -140,12 +140,9 @@
     };
 
     hermes-agent = {
-      # v0.22.5+canary.20261102T065013Z, rev 4d26e0cceaed0a08ede833caec0ec6d6ca77a4b8.
-      # Nix percent-encodes the '+' in the ref, so the tag form resolves to the
-      # tag commit. The rev carries the patchelf fix for NixOS/patchelf#674,
-      # where patchelf 0.19.2 corrupts the pinned prebuilt node 26.12.1 and node
-      # segfaults in the hermes-tui build.
-      url = "github:NousResearch/hermes-agent/v0.22.5+canary.20261102T065013Z";
+      # v0.23.1, rev 3b421578588243f920886e6fe79a6faa87ea026e. The stable tag
+      # carries the patchelf fix for NixOS/patchelf#674 from the canary line.
+      url = "github:NousResearch/hermes-agent/v0.23.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
