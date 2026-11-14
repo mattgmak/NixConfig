@@ -336,6 +336,9 @@
         dockerCompat = true;
         defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.
       };
+      # Podman resolves a short image name only through this list. Without it,
+      # every podman run or build fails with "short-name ... did not resolve".
+      virtualisation.containers.registries.search = [ "docker.io" "quay.io" ];
       # Add flatpak support
       services.flatpak.enable = true;
     }
