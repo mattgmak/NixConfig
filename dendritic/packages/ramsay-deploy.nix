@@ -262,7 +262,11 @@
             # Root git leaves root-owned files behind. Give the checkout back to its owner.
             chown -R "$(stat -L -c '%U:%G' "$repo")" "$repo/.git"
             echo "deploy $rev" | tee -a "$log"
-            exec nh os switch -e none "$repo#Ramsay"
+            # nh 4.4.2 aborts in its package diff on some closures (nh-diff
+            # lib.rs:248, "an error occurred when formatting an argument").
+            # The crash follows a good activation, and a non-zero exit strands
+            # the later deploy steps. ramsay-deploy-diff already shows the change.
+            exec nh os switch -e none --diff never "$repo#Ramsay"
           '')
         ];
       };
