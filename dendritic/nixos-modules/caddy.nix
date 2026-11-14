@@ -68,9 +68,10 @@
                   path /thumb/assets/*
                 }
                 handle @thumb {
-                  header_up X-Api-Key {env.IMMICH_API_KEY}
-                  uri replace_prefix /thumb /api
-                  reverse_proxy :${toString config.services.immich.port}
+                  uri replace /thumb /api
+                  reverse_proxy :${toString config.services.immich.port} {
+                    header_up X-Api-Key {env.IMMICH_API_KEY}
+                  }
                 }
                 handle {
                   reverse_proxy :${toString config.services.immich.port}
