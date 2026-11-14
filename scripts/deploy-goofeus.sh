@@ -104,7 +104,8 @@ if [ "$dir_only" = 1 ]; then
   exit 0
 fi
 
-nh_args=(-H "$ATTR" --target-host "$HOST" --build-host "$HOST")
+# nh 4.4.2 hides a failed stdout write in the dix diff as a fmt error, so the deploy skips the diff.
+nh_args=(-H "$ATTR" --target-host "$HOST" --build-host "$HOST" --diff never)
 if [ "$dry" = 1 ]; then
   nh_args+=(--dry)
 fi
