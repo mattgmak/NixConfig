@@ -39,7 +39,6 @@
           donetick
           trek
           radicale
-          # nextcloud
           caddy
           resticGoofeus
           syncthing

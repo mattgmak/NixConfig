@@ -37,7 +37,7 @@
           plugins = [
             "github.com/caddy-dns/cloudflare@v0.2.3"
           ];
-          hash = "sha256-to0fhW7LWBocw1ccpPQ7e2nod7iJO9gkWZpjHsZDeu4=";
+          hash = "sha256-weP1HzwGvPlLqiAViJus1GN74bps3bI179gomTCb6N4=";
         };
         extraConfig = ''
           (cloudflare) {
@@ -155,7 +155,7 @@
             bazarr = {
               hostName = "bazarr.${baseDomain}";
               extraConfig = ''
-                reverse_proxy 127.0.0.1:${toString config.services.bazarr.listenPort}
+                reverse_proxy 127.0.0.1:${toString config.services.bazarr.settings.general.port}
                 import cloudflare
               '';
             };
@@ -179,56 +179,7 @@
                 import cloudflare
               '';
             };
-          }
-          // lib.optionalAttrs config.services.nextcloud.enable (
-            let
-              nextcloudPhpConfig = ''
-                root * ${config.services.nextcloud.finalPackage}
-                root /store-apps/* ${config.services.nextcloud.home}
-                root /nix-apps/* ${config.services.nextcloud.home}
-                encode zstd gzip
-
-                php_fastcgi unix//${config.services.phpfpm.pools.nextcloud.socket} {
-                  env front_controller_active true
-                }
-                file_server
-
-                header {
-                  Strict-Transport-Security max-age=31536000;
-                }
-
-                redir /.well-known/carddav /remote.php/dav 301
-                redir /.well-known/caldav /remote.php/dav 301
-                redir /.well-known/webfinger /index.php/.well-known/webfinger 301
-                redir /.well-known/nodeinfo /index.php/.well-known/nodeinfo 301
-
-                @sensitive {
-                  path /config/* /data/* /db_structure /.htaccess /.xml /README /3rdparty/* /lib/* /templates/* /occ /console.php /autotest* /issue* /indie* /db_* /build /build/* /tests /tests/*
-                }
-                respond @sensitive 404
-              '';
-              baseDomain = "px.goofy.me.in";
-            in
-            {
-              # Caddy: public domain (Cloudflare TLS)
-              nextcloud = {
-                hostName = "nextcloud.${baseDomain}";
-                extraConfig = ''
-                  ${nextcloudPhpConfig}
-
-                  import cloudflare
-                '';
-              };
-              # Tailscale Serve: proxies to Caddy (tls internal for *.ts.net)
-              nextcloud-ts = {
-                hostName = tailnetFqdn;
-                extraConfig = ''
-                  tls internal
-                  ${nextcloudPhpConfig}
-                '';
-              };
-            }
-          );
+          };
       };
 
       # Only Caddy needs ports on tailscale - services are reached via localhost
@@ -312,7 +263,7 @@
                 tailscale serve --yes --service=svc:prowlarr --https=443 127.0.0.1:${toString config.services.prowlarr.settings.server.port}
               '';
               bazarrServe = lib.optionalString config.services.bazarr.enable ''
-                tailscale serve --yes --service=svc:bazarr --https=443 127.0.0.1:${toString config.services.bazarr.listenPort}
+                tailscale serve --yes --service=svc:bazarr --https=443 127.0.0.1:${toString config.services.bazarr.settings.general.port}
               '';
               transmissionServe = lib.optionalString transmissionRpcEnabled ''
                 tailscale serve --yes --service=svc:transmission --https=443 127.0.0.1:${toString transmissionRpcPort}

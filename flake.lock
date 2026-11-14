@@ -1886,11 +1886,11 @@
     },
     "multiverse": {
       "locked": {
-        "lastModified": 1792633408,
-        "narHash": "sha256-KHOaJXPqUvHqKDyJBmlRcdFAuBWA/1s+XvAb/0p799A=",
+        "lastModified": 1794338321,
+        "narHash": "sha256-ECn+pD6FzQhSRsQ3OiPjDsQs2rZfCIoO+lNxeBZXB+U=",
         "owner": "fzakaria",
         "repo": "nixpkgs-multiverse",
-        "rev": "8d6a14c6a6b35c8f9bba82239b32a7d82942bb31",
+        "rev": "390f52c4d0f49772ef625e0f8352030e31b40a7b",
         "type": "github"
       },
       "original": {
@@ -3197,17 +3197,17 @@
     "trek-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1781177503,
-        "narHash": "sha256-7VpCFID3wbjyJBZYFnY1ot4X3KvIT72ZH4/rSB5Q6tU=",
-        "owner": "mauriceboe",
+        "lastModified": 1794304614,
+        "narHash": "sha256-KqoGeZjHCF8toYB1T+daVR7gICTssMPweddmVEkMj4g=",
+        "owner": "liketrek",
         "repo": "TREK",
-        "rev": "e65acb3de765f3c958dd4e139064b11fbbde79d1",
+        "rev": "6fbe10fe6383b18f9cbdb97fe55b8993de951dea",
         "type": "github"
       },
       "original": {
-        "owner": "mauriceboe",
+        "owner": "liketrek",
         "repo": "TREK",
-        "rev": "e65acb3de765f3c958dd4e139064b11fbbde79d1",
+        "rev": "6fbe10fe6383b18f9cbdb97fe55b8993de951dea",
         "type": "github"
       }
     },

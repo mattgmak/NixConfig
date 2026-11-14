@@ -38,14 +38,6 @@ in
     ];
   };
 
-  "nextcloud-admin-pass.age" = {
-    armor = true;
-    publicKeys = [
-      Goofeus
-      GoofyDesky
-    ];
-  };
-
   "copyparty-goofy-pass.age" = {
     armor = true;
     publicKeys = [
@@ -141,6 +133,11 @@ in
   };
 
   "github-mcp-token.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
+  "immich-mcp-api-key.age" = {
     armor = true;
     publicKeys = piRecipients;
   };

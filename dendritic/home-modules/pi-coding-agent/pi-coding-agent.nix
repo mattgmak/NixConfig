@@ -32,6 +32,7 @@
           }
         );
       };
+      immichMcp = self.packages.${system}.immich-mcp;
       base = builtins.fromJSON (builtins.readFile ./mcp.json);
       # manzanas and mcp-nixos need absolute paths: neither reaches every node's PATH.
       mcpConfig = base // {
@@ -41,6 +42,13 @@
           };
           manzanas = base.mcpServers.manzanas // {
             command = "${self.packages.${system}.manzanas}/bin/manzanas";
+          };
+          immich-mcp = {
+            command = "${immichMcp}/bin/immich-mcp";
+            env = {
+              IMMICH_BASE_URL = "https://goofeus.dab-octatonic.ts.net";
+              IMMICH_API_KEY = "\${IMMICH_MCP_API_KEY}";
+            };
           };
         };
       };

@@ -58,6 +58,7 @@ in
           tailscale
           gufo
           inference
+          immich-ml
           strixHaloMemory
           hermes
           # qemu-vm.nix forces swapDevices = [], so zswap's swap-device assertion fails in the VM variant.
