@@ -827,6 +827,19 @@ SEED
           "L+ /root/NixConfig - - - - /home/agent/NixConfig"
         ];
 
+        # Podman resolves a short image name only through this list. Without it,
+        # every podman run or build fails with "short-name ... did not resolve".
+        virtualisation.containers.registries.settings = {
+          unqualified-search-registries = [
+            "docker.io"
+            "quay.io"
+          ];
+          registry = [
+            { location = "docker.io"; }
+            { location = "quay.io"; }
+          ];
+        };
+
         # One Halogen stack runs at a time: each maps a whole pack into graphics
         # memory, so a second start would evict the first anyway. Signal is the
         # resident main model, abliter-v2 waits for an explicit start.
