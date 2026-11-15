@@ -177,7 +177,7 @@
     };
 
     trek-src = {
-      url = "github:liketrek/TREK/6fbe10fe6383b18f9cbdb97fe55b8993de951dea";
+      url = "github:liketrek/TREK/2bcfc1bfcbbff0affd097c0f789c835396389572";
       flake = false;
     };
 

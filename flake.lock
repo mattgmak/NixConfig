@@ -3175,17 +3175,17 @@
     "trek-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1794304614,
-        "narHash": "sha256-KqoGeZjHCF8toYB1T+daVR7gICTssMPweddmVEkMj4g=",
+        "lastModified": 1794513066,
+        "narHash": "sha256-wJKg+Msnl75lUxk6V6MqcKZKh2XZ3aH6+V9LM1F8ZN8=",
         "owner": "liketrek",
         "repo": "TREK",
-        "rev": "6fbe10fe6383b18f9cbdb97fe55b8993de951dea",
+        "rev": "2bcfc1bfcbbff0affd097c0f789c835396389572",
         "type": "github"
       },
       "original": {
         "owner": "liketrek",
         "repo": "TREK",
-        "rev": "6fbe10fe6383b18f9cbdb97fe55b8993de951dea",
+        "rev": "2bcfc1bfcbbff0affd097c0f789c835396389572",
         "type": "github"
       }
     },

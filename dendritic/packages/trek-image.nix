@@ -1,4 +1,4 @@
-# OCI image for TREK — built from pinned inputs.trek-src (dev branch).
+# OCI image for TREK — built from pinned inputs.trek-src.
 # The image is built on the host via systemd (podman cannot run in the Nix sandbox).
 # Manual build: nix run .#packages.x86_64-linux.trek-image
 { inputs, ... }:
@@ -8,8 +8,11 @@
     let
       trekSrc = inputs.trek-src;
       trekRev = builtins.substring 0 7 trekSrc.rev;
+      # The Dockerfile writes APP_VERSION into /app/server/VERSION, and the server reads
+      # that file, so the build has to pass the real release number instead of a dev tag.
+      version = (builtins.fromJSON (builtins.readFile (trekSrc + "/package.json"))).version;
       imageName = "trek";
-      imageTag = "dev-${trekRev}";
+      imageTag = "v${version}-${trekRev}";
       fullName = "${imageName}:${imageTag}";
 
       buildScript = pkgs.writeShellApplication {
@@ -31,7 +34,7 @@
           podman build \
             --isolation=chroot \
             --network=host \
-            --build-arg APP_VERSION=${imageTag} \
+            --build-arg APP_VERSION=${version} \
             -t ${fullName} \
             -f Dockerfile .
 

@@ -124,7 +124,7 @@
       config = lib.mkMerge [
         { services.trek.enable = lib.mkDefault true; }
         (lib.mkIf cfg.enable {
-          # podman-trek and trek-image-build pull short names (trek:dev-*, golang:1.26-alpine).
+          # podman-trek and trek-image-build pull short names (trek:v*, golang:1.26-alpine).
           # Podman resolves a short name only through this list.
           virtualisation.containers.registries.settings = {
             unqualified-search-registries = [

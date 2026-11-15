@@ -79,6 +79,25 @@
                 import cloudflare
               '';
             };
+            immich-ts = {
+              hostName = "immich.${tailnetBaseDomain}";
+              extraConfig = ''
+                tls internal
+                @thumb {
+                  method GET
+                  path /thumb/assets/*
+                }
+                handle @thumb {
+                  uri replace /thumb /api
+                  reverse_proxy :${toString config.services.immich.port} {
+                    header_up X-Api-Key {env.IMMICH_API_KEY}
+                  }
+                }
+                handle {
+                  reverse_proxy :${toString config.services.immich.port}
+                }
+              '';
+            };
           }
           // lib.optionalAttrs piholeEnabled {
             pihole = {
@@ -208,7 +227,7 @@
         group = "caddy";
       };
 
-      # Tailscale serve: glance/immich directly; nextcloud via Caddy
+      # Tailscale serve: glance direct, immich via Caddy
       systemd.services.tailscale-serve =
         lib.mkIf
           (
@@ -216,7 +235,6 @@
             && (
               config.services.glance.enable
               || config.services.immich.enable
-              || config.services.nextcloud.enable
               || config.services.copyparty.enable
               || (options.services ? donetick && config.services.donetick.enable)
               || config.services.jellyfin.enable
@@ -238,10 +256,8 @@
                 lib.optionalString config.services.${service}.enable ''
                   tailscale serve --yes --service=svc:${service} --https=443 127.0.0.1:${toString port}
                 '';
-              # Nextcloud: TS Serve -> Caddy:443 -> PHP-FPM
-              nextcloudServe = lib.optionalString config.services.nextcloud.enable "tailscale serve --yes --service=svc:nextcloud --https=443 127.0.0.1:443";
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
-              immichServe = mkServeDirect "immich" config.services.immich.port;
+              immichServe = lib.optionalString config.services.immich.enable "tailscale serve --yes --service=svc:immich --https=443 127.0.0.1:443";
               copypartyServe = lib.optionalString config.services.copyparty.enable "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
               donetickServe =
                 lib.optionalString (options.services ? donetick && config.services.donetick.enable)
@@ -311,7 +327,6 @@
                 ${transmissionServe}
                 ${radicaleServe}
                 ${piholeServe}
-                ${nextcloudServe}
               '';
             }
           );
