@@ -18,7 +18,7 @@
       localBaseUrl = "http://127.0.0.1:9292/v1";
       # The flake input pins the release tag. The builder still names the package
       # after its own default, so stamp the tag on the derivation.
-      hermesVersion = "0.22.5+canary.20261102T065013Z";
+      hermesVersion = "0.23.1";
       agentPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
         (_: {
           version = hermesVersion;
