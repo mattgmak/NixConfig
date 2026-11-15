@@ -338,7 +338,16 @@
       };
       # Podman resolves a short image name only through this list. Without it,
       # every podman run or build fails with "short-name ... did not resolve".
-      virtualisation.containers.registries.search = [ "docker.io" "quay.io" ];
+      virtualisation.containers.registries.settings = {
+        unqualified-search-registries = [
+          "docker.io"
+          "quay.io"
+        ];
+        registry = [
+          { location = "docker.io"; }
+          { location = "quay.io"; }
+        ];
+      };
       # Add flatpak support
       services.flatpak.enable = true;
     }

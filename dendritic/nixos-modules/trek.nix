@@ -124,6 +124,19 @@
       config = lib.mkMerge [
         { services.trek.enable = lib.mkDefault true; }
         (lib.mkIf cfg.enable {
+          # podman-trek and trek-image-build pull short names (trek:dev-*, golang:1.26-alpine).
+          # Podman resolves a short name only through this list.
+          virtualisation.containers.registries.settings = {
+            unqualified-search-registries = [
+              "docker.io"
+              "quay.io"
+            ];
+            registry = [
+              { location = "docker.io"; }
+              { location = "quay.io"; }
+            ];
+          };
+
           systemd.services.trek-data-dir = {
             description = "Ensure TREK state directory on 2TB HDD";
             serviceConfig.Type = "oneshot";
