@@ -77,9 +77,20 @@ Four path-flake evals cost 21 GB of store space on 2026-10-22.
 2. The old root and hermes directories must go before the switch: `systemd.tmpfiles` cannot replace a directory with a symlink.
 3. The main hermes agent runs as `agent`, so it needs no group grant. Only `hermes-alt` keeps its own user. `programs.git.config.safe.directory = "*"` replaces the per-script `-c safe.directory=` flags.
 
+## Workflow choice: worktree or direct
+
+Two workflows exist. Pick one before you edit, and ask the user when the choice is unclear.
+
+| Workflow | Use it for | Where you work | Push | Approval |
+| --- | --- | --- | --- | --- |
+| `worktree` | Large changes, and changes that need a deployment or a user review. | New branch created with `wt`. | On merge. | `scripts/approve-and-deploy.sh` |
+| `direct` | Small chores with no deployment, such as agent instruction files, skills, docs, and pi config json. | `main` in the `/home/agent/NixConfig` checkout. | Never | None |
+
+Never use `direct` for a change that needs an `nh` switch or a host build.
+
 ## Worktree workflow
 
-The user starts every pi session, either `pi` or `pi-local`. The agent never starts a session. Every new implementation runs in a fresh worktree. Run `wt switch --create <branch>` from the repo root. Use worktrunk (`wt`) only, never raw `git worktree`. Do not edit the `main` checkout in place.
+The user starts every pi session, either `pi` or `pi-local`. The agent never starts a session. A `worktree` change runs in a fresh worktree. Run `wt switch --create <branch>` from the repo root. Use worktrunk (`wt`) only, never raw `git worktree`. Do not edit the `main` checkout in place for a `worktree` change.
 
 The agent manages worktrees only: create one per task, keep the branch clean, and remove it after the merge. `wt` names each worktree `<repo>.<branch>` beside the repo, so every worktree inherits the shared group of `/home/agent`.
 
@@ -135,6 +146,20 @@ No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
 | 12. Close | script | `tmux kill-pane` on its own pane |
 
 `scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. Test it with `--dry-run`.
+
+## Direct workflow
+
+Use `direct` for a small chore that needs no deployment and no review pass. Examples: `AGENTS.md`, `dendritic/skills/`, and pi config json under `dendritic/home-modules/pi-coding-agent/`.
+
+1. Confirm the branch: `git branch --show-current` must print `main`.
+2. Edit the file in place. Do not run `wt`.
+3. Run `git add -N <file>` for a new file, because a git-mode flake hides untracked files.
+4. Commit with the subject-only convention.
+5. Stop. Do not push, and do not run `nh`. The user pushes later.
+
+A `direct` commit stays local, so a later `worktree` branch starts from it and carries it to the remote at its own merge.
+
+A home-manager file built with `mkOutOfStoreSymlink` is live on save, so pi reads it after `/reload`.
 
 ## Sandbox verification
 
