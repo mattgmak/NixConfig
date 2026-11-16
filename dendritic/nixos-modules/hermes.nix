@@ -337,6 +337,11 @@
               provider = "custom";
               base_url = localBaseUrl;
             };
+            halogen-flash-next-thinkingcap-abliterated = {
+              model = "halogen-flash-next-thinkingcap-abliterated";
+              provider = "custom";
+              base_url = localBaseUrl;
+            };
             gufo-flash-next = {
               model = "gufo-flash-next";
               provider = "custom";

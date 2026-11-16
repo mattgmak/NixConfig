@@ -213,10 +213,11 @@ in
       let
         halogenSignalPack = "/var/lib/inference/models/halogen-signal";
         halogenAbliterPack = "/var/lib/inference/models/halogen-abliter-v2";
+        halogenThinkingcapPack = "/var/lib/inference/models/halogen-thinkingcap";
         halogenCacheRoot = "/var/lib/inference/halogen-cache";
         halogenRecordRoot = "/var/lib/inference/halogen-records";
 
-        # The two stacks differ in four values only. The rest is the tuning set
+        # The three stacks differ in four values only. The rest is the tuning set
         # the bench ran with success.
         halogenContainer =
           {
@@ -680,6 +681,31 @@ in
               want "$tok/tokenizer/$file" "$root/halogen-abliter-v2/tokenizer/$file"
             done
 
+            # ThinkingCap abliterated: the repo ships its own complete tokenizer
+            # directory, so no peonist tokenizer files are needed for this pack.
+            tc=https://huggingface.co/johnlockejrr/ThinkingCap-Qwen3.8-Flash-Next-abliterated-HGN/resolve/3a79d828d1e25cd8ff29f6fab3ae5137ede6d891
+            for file in \
+              model.hgn \
+              qwen38-flash-next-ngram.hgn \
+              qwen38-flash-next-vision.hgn \
+              config.json \
+              preprocessor_config.json \
+              video_preprocessor_config.json
+            do
+              want "$tc/$file" "$root/halogen-thinkingcap/$file"
+            done
+            for file in \
+              chat_template.jinja \
+              config.json \
+              generation_config.json \
+              merges.txt \
+              tokenizer.json \
+              tokenizer_config.json \
+              vocab.json
+            do
+              want "$tc/tokenizer/$file" "$root/halogen-thinkingcap/tokenizer/$file"
+            done
+
             # The requant writes this map and its guard path never rebuilds it, so
             # the prune must not treat it as litter.
             printf '%s\n' "$root/swift/tensor-types.txt" >> "$keep"
@@ -842,7 +868,8 @@ SEED
 
         # One Halogen stack runs at a time: each maps a whole pack into graphics
         # memory, so a second start would evict the first anyway. Signal is the
-        # resident main model, abliter-v2 waits for an explicit start.
+        # resident main model, abliter-v2 and thinkingcap wait for an explicit
+        # start.
         virtualisation.oci-containers = {
           backend = "podman";
           containers = {
@@ -864,6 +891,16 @@ SEED
             } // {
               autoStart = false;
             };
+            halogen-thinkingcap = halogenContainer {
+              enginePort = 8750;
+              apiPort = 8751;
+              modelId = "halogen-flash-next-thinkingcap-abliterated";
+              checkpoint = "/models/model.hgn";
+              packDir = halogenThinkingcapPack;
+              stack = "thinkingcap";
+            } // {
+              autoStart = false;
+            };
           };
         };
 
@@ -871,13 +908,22 @@ SEED
           wantedBy = lib.mkForce [ "inference.target" ];
           after = [ "gufo-models.service" ];
           wants = [ "gufo-models.service" ];
-          conflicts = [ "podman-halogen-abliter-v2.service" ];
+          conflicts = [ "podman-halogen-abliter-v2.service" "podman-halogen-thinkingcap.service" ];
         };
 
         systemd.services.podman-halogen-abliter-v2 = {
           after = [ "gufo-models.service" ];
           wants = [ "gufo-models.service" ];
-          conflicts = [ "podman-halogen-signal.service" ];
+          conflicts = [ "podman-halogen-signal.service" "podman-halogen-thinkingcap.service" ];
+        };
+
+        systemd.services.podman-halogen-thinkingcap = {
+          after = [ "gufo-models.service" ];
+          wants = [ "gufo-models.service" ];
+          conflicts = [
+            "podman-halogen-signal.service"
+            "podman-halogen-abliter-v2.service"
+          ];
         };
 
         # ADR 0001: the Collector is the only client allowed to read Halogen /metrics, so
