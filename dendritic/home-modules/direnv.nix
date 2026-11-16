@@ -9,6 +9,7 @@
       config.whitelist.prefix = [
         "/home/goofy/code/drpom_tcm"
         "/home/agent/drpom"
+        "/home/goofy/drpom"
         "/Volumes/Kingston480GB/code/tcm"
       ];
     };
