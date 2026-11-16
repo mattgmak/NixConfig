@@ -228,7 +228,7 @@ in
             stack,
           }:
           {
-            image = "ghcr.io/peonist-ai/halogen-flash-server:0.18.22";
+            image = "ghcr.io/peonist-ai/halogen-flash-server:0.20.5";
             # Host networking shares the host stack, so the API answers the
             # tailnet. The engine keeps its loopback bind, because the engine
             # protocol has no authentication.
