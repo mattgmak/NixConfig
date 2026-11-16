@@ -80,9 +80,8 @@
               '';
             };
             immich-ts = {
-              hostName = "immich.${tailnetBaseDomain}";
+              hostName = "http://immich.${tailnetBaseDomain}";
               extraConfig = ''
-                tls internal
                 @thumb {
                   method GET
                   path /thumb/assets/*
@@ -257,7 +256,7 @@
                   tailscale serve --yes --service=svc:${service} --https=443 127.0.0.1:${toString port}
                 '';
               glanceServe = mkServeDirect "glance" config.services.glance.settings.server.port;
-              immichServe = lib.optionalString config.services.immich.enable "tailscale serve --yes --service=svc:immich --https=443 https://127.0.0.1:443";
+              immichServe = lib.optionalString config.services.immich.enable "tailscale serve --yes --service=svc:immich --https=443 http://127.0.0.1:80";
               copypartyServe = lib.optionalString config.services.copyparty.enable "tailscale serve --yes --service=svc:copyparty --https=443 127.0.0.1:${toString copypartyPort}";
               donetickServe =
                 lib.optionalString (options.services ? donetick && config.services.donetick.enable)
