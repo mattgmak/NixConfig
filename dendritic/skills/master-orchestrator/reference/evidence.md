@@ -4,7 +4,7 @@ A pull request that changes app UI carries visual proof. A pull request that cha
 
 Every app UI change carries evidence before the review opens. A small change takes no exception: a badge, a chip, or a copy line still needs one artifact per changed screen.
 
-Capture it from the real app on a leased simulator, built on the mini. Publish it on the pull request as a release asset shown inline. A pull request without that block waits at the gate, and the body names the missing artifact.
+Capture it from the real app on a leased simulator, built on the mini. Embed it in the pull request body as an inline image. Never use a GitHub release, a release asset, or a release download link. A pull request without that block waits at the gate, and the body names the missing artifact.
 
 | Change | Evidence |
 |---|---|
@@ -37,7 +37,7 @@ One still per turn took 6 h 39 min for 5 frames. Work the set instead:
 
 1. Keep one lease for the whole set, and drive the app from state to state without a restart.
 2. Capture each frame and name it `<ticket>-<n>-<state>.png` as you go.
-3. Publish every file with `scripts/publish-evidence.sh <folder>`. It uploads each file and prints the body rows.
+3. Upload every file with `scripts/publish-evidence.sh <pr> <folder>`. It runs `gh pr edit --attach` per file, so GitHub mints a `user-attachments` asset and appends the image to the body. Nothing is committed.
 4. Release the lease only after the script prints its count and the body holds the images.
 
 Reuse one lease per wave. Do not erase a simulator unless the client fingerprint mismatches. A TTL of 3600 s covers one set of frames.
@@ -61,7 +61,7 @@ Steps for UI:
 3. Lease a simulator from the manzanas fleet. Install the dev client. Launch the app.
 4. Drive the screens with `argent` on the leased device. Record the trigger twice: before and after.
 5. Keep a working copy under `/tmp/agent-tmp/<project>/evidence/<ticket>/` while you capture.
-6. Publish every artifact on the pull request. Never commit an evidence file into the repository unless the ticket asks for a tracked file. Upload it as a pull request attachment or a release asset, and link it from the body.
+6. Upload every artifact into the pull request body with `gh pr edit --attach`. The repository holds no evidence file.
 7. Publish motion as an animated GIF. A body gives no player. The renderer strips a `<video>` tag, and an mp4 inside an image tag shows a broken image. A GIF plays inline and loops.
 8. Add an `## Evidence` block to the body. Name the artifact, the screen, and the proof it gives. The block holds no local path and no untracked file name.
 
@@ -82,11 +82,12 @@ Rules:
 - A pull request without proof waits at the gate. Name the missing artifact.
 - A green unit test does not replace the sandbox run. Say which claim the run settles.
 - Release the lease and stop the sandbox after the capture.
-- A reviewer reads the proof in the pull request, with no clone. An uploaded image renders inline, and a release asset opens on one click. A clip too large to upload gets a link beside its key frames.
+- A reviewer reads the proof in the pull request, with no clone. An inline image renders with the body. A release link is banned: the reviewer leaves the review to see it.
 - Each changed screen gets its own artifact. One screenshot of a screen that did not change proves nothing.
-- An evidence file stays out of the repository. Commit one only when a ticket names it as a tracked artifact.
+- An evidence file stays out of the repository. One route publishes it: `gh pr edit <pr> --attach <file>`. Never a release asset, a committed file, a raw URL, or an outside image host.
 - Keep each uploaded image small. Shrink a clip with `ffmpeg` before the upload, and keep the value or the dish name readable.
 - A GIF stays under 10 MB at about 420 pixels wide. Confirm the frame count, and confirm one frame shows the action. A frame the eye cannot read is no proof.
-- A person can reach one route that code cannot: the web editor turns a dropped clip into an inline player. Probe `POST https://api.github.com/user-attachments/assets` and expect 404. No `gh api` call creates an attachment, and a release asset gives no player. Ask the user when a true player is needed.
+- A person can reach one route that code cannot: the web editor turns a dropped clip into an inline player. `gh pr edit --attach` uploads images and video only, through its own path. A GIF stays the default because it needs no click. Ask the user when a true player is needed.
+- One route, no exception: `gh pr edit <pr> --attach <file>`. A release asset, a committed file, a raw URL and an outside host are all defects.
 - The GIF is the default. It needs no session, no account, and no click. Offer the player route once, then ship the GIF.
 - When the app must run, build it on the mini and read `reference/macos-remote-build.md` first.

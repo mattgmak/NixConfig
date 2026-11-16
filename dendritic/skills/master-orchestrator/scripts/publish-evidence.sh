@@ -1,48 +1,45 @@
 #!/usr/bin/env bash
-# Publish evidence artifacts and print the body rows (reference/evidence.md).
+# Publish evidence stills into a pull request body (reference/evidence.md).
 #
-# Uploads every image in a folder to the `evidence` release, then prints the
-# table rows and the inline images for the pull request body. Fill SCREEN and
-# PROOF in the body; this script fills the name, the head and the url.
+# Uploads each image with `gh pr edit --attach`, so GitHub mints a
+# user-attachments asset and appends the inline image to the body. Nothing is
+# committed, nothing goes to a release, and the repository stays clean.
 #
-# Usage: publish-evidence.sh <folder> [tag]
-# Default tag: evidence
+# Usage: publish-evidence.sh <pr-number> <folder>
+# Example: publish-evidence.sh 214 /tmp/agent-tmp/tcm/evidence/1515
 
 set -uo pipefail
 
-DIR="${1:?publish-evidence.sh needs a folder}"
-TAG="${2:-evidence}"
+PR="${1:?publish-evidence.sh needs a pull request number}"
+DIR="${2:?publish-evidence.sh needs a folder}"
 
 [ -d "$DIR" ] || {
   echo "FAIL: no folder $DIR"
   exit 1
 }
 
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner) || {
-  echo "FAIL: no GitHub repo"
+command -v gh >/dev/null || {
+  echo "FAIL: no gh"
   exit 1
 }
-HEAD=$(git rev-parse --short HEAD)
-ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-PROJECT=$(basename "$ROOT")
+
+GH_MAJOR=$(gh --version | head -1 | awk '{print $3}' | cut -d. -f1)
+GH_MINOR=$(gh --version | head -1 | awk '{print $3}' | cut -d. -f2)
+if [ "${GH_MAJOR:-0}" -lt 2 ] || { [ "$GH_MAJOR" -eq 2 ] && [ "${GH_MINOR:-0}" -lt 99 ]; }; then
+  echo "FAIL: gh 2.99.0 or later is required for --attach"
+  exit 1
+fi
 
 count=0
-rows="/tmp/agent-tmp/$PROJECT/evidence-rows.md"
-mkdir -p "$(dirname "$rows")"
-: >"$rows"
-
 for f in "$DIR"/*.png "$DIR"/*.gif "$DIR"/*.jpg; do
   [ -e "$f" ] || continue
   name=$(basename "$f")
-  gh release upload "$TAG" "$f" --clobber >/dev/null || {
-    echo "FAIL: upload $name"
+  gh pr edit "$PR" --attach "$f" >/dev/null || {
+    echo "FAIL: attach $name"
     exit 1
   }
-  printf '| `%s` | SCREEN | `%s` | PROOF |\n' "$name" "$HEAD" >>"$rows"
-  printf '![%s](https://github.com/%s/releases/download/%s/%s)\n\n' \
-    "$name" "$REPO" "$TAG" "$name" >>"$rows"
+  echo "attached $name"
   count=$((count + 1))
-  echo "uploaded $name"
 done
 
 if [ "$count" -eq 0 ]; then
@@ -50,11 +47,9 @@ if [ "$count" -eq 0 ]; then
   exit 1
 fi
 
-echo "rows in $rows"
-echo "--- body block ---"
-echo "## Evidence"
-echo
-cat "$rows"
+echo "--- body asset urls ---"
+gh pr view "$PR" --json body -q .body | rg -o 'https://github\.com/user-attachments/assets/[0-9a-f-]+' || true
 
-# The lease rule: release only after this script prints its count.
-echo "Release the lease only after the body holds these $count images."
+# The lease rule: release only after every still shows in the body.
+echo "Attached $count images to #$PR. Release the lease only after the body renders them."
+echo "Name the screen and the proof beside each image, and keep the head sha in the block."

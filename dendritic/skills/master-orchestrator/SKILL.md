@@ -382,6 +382,17 @@ A lane runs `scripts/preflight-evidence.sh` before the first capture, and pastes
 
 A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
 
+### Where the evidence lives
+
+One route publishes evidence: `gh pr edit <pr> --attach <file>`. It mints a `user-attachments`
+asset and appends the image to the body. The repository keeps no evidence file.
+
+Never use a release asset, a committed file, a raw URL, or an outside image host.
+
+You need `gh` 2.99.0 or later. `scripts/publish-evidence.sh <pr> <folder>` does the uploads.
+
+A pull request whose `## Evidence` block holds a release link fails the gate. Send it back.
+
 ## Remote iOS build
 
 Builds run on the Mac mini, never on this host. Read `reference/macos-remote-build.md`.
