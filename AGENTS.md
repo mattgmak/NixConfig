@@ -61,13 +61,13 @@ Four path-flake evals cost 21 GB of store space on 2026-10-22.
 
 ## Repo locations
 
-`/home/agent/NixConfig` is the source of truth on Ramsay. Other paths reach it, and none hold a second copy.
+Each host has its own checkout, and the table names it. The Ramsay checkout is `/home/agent/NixConfig`, and the other Ramsay paths reach it without a second copy.
 
 | Path | Form | Owner |
 | --- | --- | --- |
-| `/home/agent/NixConfig` | the checkout | `agent:users`, group-writable, setgid, `core.sharedRepository = group` |
-| `/root/NixConfig` | symlink | tmpfiles |
-| `/var/lib/hermes` | symlink to the hermes state dir | tmpfiles |
+| Ramsay `/home/agent/NixConfig` | the checkout | `agent:users`, group-writable, setgid, `core.sharedRepository = group` |
+| Ramsay `/root/NixConfig` | symlink | tmpfiles |
+| Ramsay `/var/lib/hermes` | symlink to the hermes state dir | tmpfiles |
 | Goofeus `/root/NixConfig` | symlink to the built source store path | `scripts/deploy-goofeus.sh` |
 | MacMini `/Users/mattgmak/NixConfig` | own checkout | macOS, separate |
 
@@ -81,10 +81,12 @@ Four path-flake evals cost 21 GB of store space on 2026-10-22.
 
 Two workflows exist. Pick one before you edit, and ask the user when the choice is unclear.
 
+`<repo-root>` means the checkout you work in. `## Repo locations` lists the path for each host.
+
 | Workflow | Use it for | Where you work | Push | Approval |
 | --- | --- | --- | --- | --- |
 | `worktree` | Large changes, and changes that need a deployment or a user review. | New branch created with `wt`. | On merge. | `scripts/approve-and-deploy.sh` |
-| `direct` | Small chores with no deployment, such as agent instruction files, skills, docs, and pi config json. | `main` in the `/home/agent/NixConfig` checkout. | Never | None |
+| `direct` | Small chores with no deployment, such as agent instruction files, skills, docs, and pi config json. | `main` at `<repo-root>`. | Never | None |
 
 Never use `direct` for a change that needs an `nh` switch or a host build.
 
@@ -92,7 +94,7 @@ Never use `direct` for a change that needs an `nh` switch or a host build.
 
 The user starts every pi session, either `pi` or `pi-local`. The agent never starts a session. A `worktree` change runs in a fresh worktree. Run `wt switch --create <branch>` from the repo root. Use worktrunk (`wt`) only, never raw `git worktree`. Do not edit the `main` checkout in place for a `worktree` change.
 
-The agent manages worktrees only: create one per task, keep the branch clean, and remove it after the merge. `wt` names each worktree `<repo>.<branch>` beside the repo, so every worktree inherits the shared group of `/home/agent`.
+The agent manages worktrees only: create one per task, keep the branch clean, and remove it after the merge. `wt` names each worktree `<repo>.<branch>` beside the repo, so every worktree inherits the group of the checkout.
 
 Shell integration is off on this host, so `wt switch` cannot change your working directory. Read the path, then `cd`:
 
@@ -107,7 +109,7 @@ A fresh worktree has empty submodule directories, so every nix eval of its path 
 
 A worktree is a separate flake ref. Nix copies its tree once and reuses that copy for every eval in the branch. Sandbox logs stay per session. Two agents work at the same time without touching each other's tree. `main` moves only when the approval script merges, so the shared checkout never holds a half-finished commit.
 
-`scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout. On a worktree with empty submodules, pass `--flake "git+file:///home/agent/NixConfig?ref=refs/heads/<branch>"`. That form reads the branch through the main repo and needs no submodule checkout.
+`scripts/host-sandbox.sh` resolves the flake with `git rev-parse --show-toplevel`, so it verifies the worktree you are in. Pass `--flake <path>` to point at another checkout. On a worktree with empty submodules, pass `--flake "git+file://<repo-root>?ref=refs/heads/<branch>"`. That form reads the branch through the main repo and needs no submodule checkout.
 
 ### Pane layout
 
