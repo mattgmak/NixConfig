@@ -393,6 +393,19 @@ You need `gh` 2.99.0 or later. `scripts/publish-evidence.sh <pr> <folder>` does 
 
 A pull request whose `## Evidence` block holds a release link fails the gate. Send it back.
 
+### A follow-up that changes a proven surface
+
+A follow-up prompt can change a surface that the body already shows. That stale artifact is a
+defect, because the reviewer reads proof of older code.
+
+1. Recapture every artifact whose surface the follow-up changed.
+2. Remove the stale image from the body, and attach the new one.
+3. Name the new head sha beside each artifact.
+
+A block that names an older head than the pull request fails the gate. Send it back to the lane.
+
+An unchanged surface keeps its artifact. Do not recapture a screen that the follow-up did not touch.
+
 ## Remote iOS build
 
 Builds run on the Mac mini, never on this host. Read `reference/macos-remote-build.md`.

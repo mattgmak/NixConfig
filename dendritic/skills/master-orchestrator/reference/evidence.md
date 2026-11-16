@@ -89,5 +89,7 @@ Rules:
 - A GIF stays under 10 MB at about 420 pixels wide. Confirm the frame count, and confirm one frame shows the action. A frame the eye cannot read is no proof.
 - A person can reach one route that code cannot: the web editor turns a dropped clip into an inline player. `gh pr edit --attach` uploads images and video only, through its own path. A GIF stays the default because it needs no click. Ask the user when a true player is needed.
 - One route, no exception: `gh pr edit <pr> --attach <file>`. A release asset, a committed file, a raw URL and an outside host are all defects.
+- A follow-up that changes a proven surface recaptures that artifact. Remove the stale image, attach the new one, and name the new head sha. A block that names an older head fails the gate.
+- An unchanged surface keeps its artifact. Do not recapture a screen that the follow-up did not touch.
 - The GIF is the default. It needs no session, no account, and no click. Offer the player route once, then ship the GIF.
 - When the app must run, build it on the mini and read `reference/macos-remote-build.md` first.
