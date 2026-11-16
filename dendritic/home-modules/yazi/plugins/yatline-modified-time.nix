@@ -13,9 +13,19 @@
         hash = "sha256-sus3GNM6CEfL5AmhJfRLT56MH3+xU20vcIfW9+C1RLg=";
       };
 
+      # Upstream bug: `hovered()` is a global that returns "" when no file is
+      # hovered, so `h or h.cha.mtime` indexes a string and the yatline render
+      # blanks the whole UI in an empty directory. Scope it local and guard it.
+      # TODO: drop when upstream fixes wekauwau/yatline-modified-time.yazi.
+      patchPhase = ''
+        sed -i -e 's/^function hovered(/local function hovered(/' \
+          -e 's/return ""/return nil/' \
+          -e 's/if h or h.cha.mtime then/if h and h.cha.mtime then/' main.lua
+      '';
+
       installPhase = ''
         mkdir -p $out
-        cp -r $src/* $out/
+        cp -r ./* $out/
       '';
 
       meta = with lib; {
