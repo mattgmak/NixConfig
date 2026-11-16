@@ -51,6 +51,7 @@
           # `npmDepRepos` below supplies.
           extensions = [
             "agent-ste"
+            "chisle"
             "filter-output"
             "gentle-engram"
             "pi-agent-browser-native"
@@ -59,7 +60,6 @@
             "pi-away"
             "pi-balance"
             "pi-blackhole"
-            "pi-caveman"
             "pi-codegraph"
             "pi-clinepass-provider"
             "pi-clinepass-usage"
@@ -99,6 +99,7 @@
             "fitchmultz/pi-agent-browser-native"
             "fitchmultz/pi-cursor-sdk"
             "gotgenes/pi-packages"
+            "JayPokale/Chisle"
             "jellydn/pi-clinepass-provider"
             "juicesharp/rpiv-mono"
             "justmytwospence/pi-plugins"

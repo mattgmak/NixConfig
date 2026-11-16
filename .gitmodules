@@ -125,3 +125,6 @@
 [submodule "robbyczgw-cla/hermes-ui-plus"]
 	path = vendor/robbyczgw-cla/hermes-ui-plus
 	url = https://github.com/robbyczgw-cla/hermes-ui-plus
+[submodule "JayPokale/Chisle"]
+	path = vendor/JayPokale/Chisle
+	url = https://github.com/JayPokale/Chisle

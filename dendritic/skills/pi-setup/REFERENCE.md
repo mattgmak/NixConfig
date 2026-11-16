@@ -646,7 +646,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | `pi-cursor-sdk` | cursor provider models |
 | `pi-web-access` | web_search / fetch_content |
 | `pi-powerline-footer` | footer in tmux panes |
-| `pi-caveman` | caveman mode in subagents |
+| `chisle` | chisle mode in subagents |
 | `filter-output` | redacts secrets in tool output, blocks sensitive reads |
 | `rpiv-todo` | `todo` tool, needs `todo` in the agent `tools:` line |
 | `pi-codegraph` | codegraph tools |

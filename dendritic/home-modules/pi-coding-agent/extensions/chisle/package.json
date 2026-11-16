@@ -1,0 +1,10 @@
+{
+  "name": "chisle",
+  "private": true,
+  "type": "module",
+  "keywords": ["pi-package"],
+  "description": "Pi loader for chisle (vendored JayPokale/Chisle submodule)",
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
