@@ -190,6 +190,12 @@ in
     publicKeys = piRecipients;
   };
 
+  # Web dashboard bearer token read by the gateway media auth in hermes.nix.
+  "hermes-dashboard-session-token.age" = {
+    armor = true;
+    publicKeys = piRecipients;
+  };
+
   # Credentials for the alt Hermes tenant. The file starts as a copy of
   # hermes-env.age; replace it with the private profile's own tokens and
   # HERMES_WEBUI_PASSWORD.
