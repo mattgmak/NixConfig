@@ -13,12 +13,27 @@ import { join } from "node:path";
 
 export type QuotaKey = "commandcode" | "opencode-go" | "clinepass";
 
+/** The three window names every provider maps onto. */
+export type WindowKind = "five_hour" | "weekly" | "monthly";
+
+export interface QuotaWindow {
+  kind: WindowKind;
+  /** Percentage used, 0 to 100. */
+  percent: number;
+  /** Reset as epoch seconds, when the provider reports one. */
+  resetAt: number | null;
+}
+
 export interface ProviderQuota {
   /** Percentage used in the tightest window, 0 to 100. */
   usedPercent: number;
   /** Earliest window reset as epoch seconds, when the API reports one. */
   soonestReset: number | null;
   exhausted: boolean;
+  /** Per-window usage, the source for /balanced-usage. */
+  windows: QuotaWindow[];
+  /** Leftover dollar credits, reported by Command Code only. */
+  remainingCredits?: number;
 }
 
 const FETCH_TIMEOUT_MS = 5000;
@@ -123,6 +138,24 @@ interface Window {
   reset: number | undefined;
 }
 
+const WINDOW_ALIASES: Record<string, WindowKind> = {
+  fivehour: "five_hour",
+  fivehours: "five_hour",
+  "5hour": "five_hour",
+  "5h": "five_hour",
+  hour5: "five_hour",
+  week: "weekly",
+  weekly: "weekly",
+  month: "monthly",
+  monthly: "monthly",
+};
+
+/** Map a provider window name onto one of the three common kinds. */
+function windowKind(value: unknown): WindowKind | undefined {
+  if (typeof value !== "string") return undefined;
+  return WINDOW_ALIASES[value.toLowerCase().replace(/[-_\s]/g, "")];
+}
+
 function windowOf(value: unknown): Window | undefined {
   const entry = record(value);
   if (!entry) return undefined;
@@ -135,7 +168,8 @@ function windowOf(value: unknown): Window | undefined {
 /**
  * Command Code: GET /alpha/billing/credits gives window caps and the leftover
  * balance. The windows reset on their own clock, so the period spend from
- * /alpha/usage/summary sets the pool total and the real used percentage.
+ * /alpha/usage/summary sets the pool total and the real used percentage. The
+ * credit pool is the monthly window.
  */
 export async function commandCodeQuota(key: string): Promise<ProviderQuota | undefined> {
   const base = process.env.COMMAND_CODE_API_BASE ?? "https://api.commandcode.ai";
@@ -145,9 +179,10 @@ export async function commandCodeQuota(key: string): Promise<ProviderQuota | und
   ]);
   if (!json && !summary) return undefined;
   const limits = record(json?.windowLimits);
-  const windows = [windowOf(limits?.fiveHour), windowOf(limits?.weekly)].filter(
-    (entry): entry is Window => entry !== undefined,
-  );
+  const found: Array<[WindowKind, Window]> = [
+    ["five_hour", windowOf(limits?.fiveHour)],
+    ["weekly", windowOf(limits?.weekly)],
+  ].filter((entry): entry is [WindowKind, Window] => entry[1] !== undefined);
   const credits = record(json?.credits);
   const remaining = credits
     ? count(credits.remainingCredits) ??
@@ -156,60 +191,103 @@ export async function commandCodeQuota(key: string): Promise<ProviderQuota | und
         .reduce((total, value) => total + value, 0)
     : undefined;
   const spent = count(summary?.totalCost);
-  let poolPercent: number | undefined;
-  if (spent !== undefined && remaining !== undefined && spent + remaining > 0) {
-    poolPercent = (spent / (spent + remaining)) * 100;
+  const poolPercent =
+    spent !== undefined && remaining !== undefined && spent + remaining > 0
+      ? (spent / (spent + remaining)) * 100
+      : undefined;
+  if (found.length === 0 && poolPercent === undefined) return undefined;
+  const windows: QuotaWindow[] = found.map(([kind, entry]) => ({
+    kind,
+    percent: entry.cap > 0 ? (entry.used / entry.cap) * 100 : 0,
+    resetAt: entry.reset ?? null,
+  }));
+  if (poolPercent !== undefined) {
+    windows.push({ kind: "monthly", percent: Math.min(100, poolPercent), resetAt: null });
   }
-  if (windows.length === 0 && poolPercent === undefined) return undefined;
   const resets = windows
-    .map((entry) => entry.reset)
+    .map((window) => window.resetAt)
     .filter((value): value is number => value !== undefined);
-  const windowPercent = windows.length
-    ? Math.max(...windows.map((entry) => (entry.cap > 0 ? (entry.used / entry.cap) * 100 : 0)))
-    : 0;
   return {
-    usedPercent: Math.max(windowPercent, poolPercent ?? 0),
+    usedPercent: Math.max(...windows.map((window) => window.percent)),
     soonestReset: resets.length ? Math.min(...resets) : null,
     exhausted:
-      windows.some((entry) => entry.exceeded) ||
+      found.some(([, entry]) => entry.exceeded) ||
       (poolPercent !== undefined && poolPercent >= 99.5) ||
       (remaining !== undefined && remaining <= MIN_BALANCE),
+    windows,
+    ...(remaining === undefined ? {} : { remainingCredits: remaining }),
   };
 }
 
-/** OpenCode Go: GET /zen/go/v1/usage returns rolling, weekly, and monthly windows. */
+/**
+ * OpenCode Go: GET /zen/go/v1/usage returns rolling, weekly, and monthly
+ * windows. The rolling window is the 5-hour window.
+ */
 export async function openCodeGoQuota(key: string): Promise<ProviderQuota | undefined> {
   const base = process.env.OPENCODE_API_BASE ?? "https://opencode.ai";
   const json = await getJson(`${base}/zen/go/v1/usage`, key);
   const usage = record(json?.usage);
   if (!usage) return undefined;
-  const resets: number[] = [];
-  let usedPercent = 0;
+  const kinds: ReadonlyArray<readonly [WindowKind, string]> = [
+    ["five_hour", "rolling"],
+    ["weekly", "weekly"],
+    ["monthly", "monthly"],
+  ];
+  const windows: QuotaWindow[] = [];
   let exhausted = false;
-  for (const name of ["rolling", "weekly", "monthly"] as const) {
+  for (const [kind, name] of kinds) {
     const window = record(usage[name]);
     if (!window) continue;
-    const percent = count(window.percent);
-    if (percent !== undefined) usedPercent = Math.max(usedPercent, percent);
-    if (window.status === "exceeded" || (percent !== undefined && percent >= 100)) {
-      exhausted = true;
-    }
-    const reset = epochSeconds(window.resetsAt);
-    if (reset !== undefined) resets.push(reset);
+    const status = typeof window.status === "string" ? window.status : undefined;
+    const percent = count(window.percent) ?? (status === "exceeded" ? 100 : undefined);
+    if (percent === undefined) continue;
+    if (status === "exceeded" || percent >= 100) exhausted = true;
+    windows.push({
+      kind,
+      percent: Math.min(100, percent),
+      resetAt: epochSeconds(window.resetsAt) ?? null,
+    });
   }
-  return { usedPercent, soonestReset: resets.length ? Math.min(...resets) : null, exhausted };
+  if (windows.length === 0) return undefined;
+  const resets = windows
+    .map((window) => window.resetAt)
+    .filter((value): value is number => value !== undefined);
+  return {
+    usedPercent: Math.max(...windows.map((window) => window.percent)),
+    soonestReset: resets.length ? Math.min(...resets) : null,
+    exhausted,
+    windows,
+  };
 }
 
 /** ClinePass: GET /api/v1/users/me/plan/usage-limits returns percentUsed per window. */
 export async function clinepassQuota(key: string): Promise<ProviderQuota | undefined> {
   const base = process.env.CLINE_API_BASE ?? "https://api.cline.bot";
   const json = await getJson(`${base}/api/v1/users/me/plan/usage-limits`, key);
-  const limits = record(json?.data)?.limits;
+  const limits = record(json?.data)?.limits ?? record(json)?.limits;
   if (!Array.isArray(limits)) return undefined;
-  let usedPercent = 0;
+  const windows: QuotaWindow[] = [];
   for (const entry of limits) {
-    const percent = count(record(entry)?.percentUsed);
-    if (percent !== undefined) usedPercent = Math.max(usedPercent, percent);
+    const fields = record(entry);
+    if (!fields) continue;
+    const kind = windowKind(fields.type ?? fields.limitType ?? fields.windowType);
+    const percent = count(fields.percentUsed ?? fields.percent ?? fields.usagePercent);
+    if (kind === undefined || percent === undefined) continue;
+    windows.push({
+      kind,
+      percent: Math.min(100, percent),
+      resetAt: epochSeconds(fields.resetsAt ?? fields.resetAt) ?? null,
+    });
   }
-  return { usedPercent, soonestReset: null, exhausted: usedPercent >= 100 };
+  if (windows.length === 0) return undefined;
+  const usedPercent = Math.max(...windows.map((window) => window.percent));
+  const resets = windows
+    .map((window) => window.resetAt)
+    .filter((value): value is number => value !== undefined);
+  return {
+    usedPercent,
+    soonestReset: resets.length ? Math.min(...resets) : null,
+    exhausted: usedPercent >= 100,
+    windows,
+  };
 }
