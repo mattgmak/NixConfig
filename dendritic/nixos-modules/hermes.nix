@@ -115,6 +115,15 @@
         file = ../../secrets/hermes-env.age;
         mode = "0400";
       };
+      # The dashboard backend accepts this as a bearer token. Without it the
+      # backend mints a random token on every start, so only its own SPA can
+      # authenticate a request. The backend opens this path itself through the
+      # file: indirection, so — like the HUI+ secret — it belongs to agent.
+      age.secrets."hermes-dashboard-session-token" = {
+        file = ../../secrets/hermes-dashboard-session-token.age;
+        mode = "0400";
+        owner = "agent";
+      };
       # The alt tenant reads its own credentials, so the two gateways never hold
       # one bot token at the same time.
       age.secrets."hermes-env-alt" = {
@@ -256,6 +265,25 @@
             base_url = localBaseUrl;
             context_length = 131072;
           };
+          # Hermes has no Qwen STT provider, so the local Qwen3-ASR runs through
+          # the `openai` provider's self-hosted path. A loopback base_url with no
+          # api_key authenticates as `not-needed`. The model name is pinned because
+          # the server rejects the default `whisper-1` with 400 invalid_model.
+          stt = {
+            enabled = true;
+            provider = "openai";
+            language = "en";
+            openai = {
+              model = "qwen3-asr-1.7b";
+              base_url = "http://127.0.0.1:8181/v1";
+              language = "";
+              timeout = 60;
+              max_retries = 1;
+            };
+          };
+          # client-direct voice hands remote clients the loopback ASR URL, so
+          # every client transcribes through the gateway relay instead.
+          voice.client_direct = false;
           # The active context engine. lean-ctx replaces the built-in
           # ContextCompressor, so the compression.* keys below stay inert until
           # this reverts to "compressor".
@@ -337,6 +365,9 @@
           # The API server answers 403 to any request that carries an Origin
           # header while this list stays empty.
           API_SERVER_CORS_ORIGINS = "https://hermes-api.dab-octatonic.ts.net,https://ramsay.dab-octatonic.ts.net";
+          # The dashboard accepts this as a bearer token for /api/fs/download.
+          # The file: form keeps the token itself out of the environment.
+          HERMES_DASHBOARD_SESSION_TOKEN = "file:${config.age.secrets."hermes-dashboard-session-token".path}";
           # lean-ctx engine settings. The plugin reads its whole config from this
           # namespace (config.py), and the port is the `lean-ctx serve` tools API,
           # not the LLM proxy. update_model() overrides the window on model
