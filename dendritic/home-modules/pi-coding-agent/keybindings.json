@@ -9,6 +9,7 @@
   "app.models.reorderUp": "ctrl+shift+alt+up",
   "app.models.reorderDown": "ctrl+shift+alt+down",
 
+  "tui.input.newLine": ["shift+enter"],
   "tui.editor.deleteToLineEnd": [],
   "tui.altScreen.bottom": ["ctrl+end", "ctrl+shift+j"],
   "tui.altScreen.halfPageUp": "ctrl+u",
