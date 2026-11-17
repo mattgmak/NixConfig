@@ -97,24 +97,6 @@
                 }
               '';
             };
-            immich-http = {
-              hostName = "http://immich.${tailnetBaseDomain}";
-              extraConfig = ''
-                @thumb {
-                  method GET
-                  path /thumb/assets/*
-                }
-                handle @thumb {
-                  uri replace /thumb /api
-                  reverse_proxy :${toString config.services.immich.port} {
-                    header_up X-Api-Key {env.IMMICH_API_KEY}
-                  }
-                }
-                handle {
-                  reverse_proxy :${toString config.services.immich.port}
-                }
-              '';
-            };
           }
           // lib.optionalAttrs piholeEnabled {
             pihole = {
