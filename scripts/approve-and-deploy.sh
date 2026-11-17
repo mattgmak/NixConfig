@@ -7,7 +7,8 @@
 #   scripts/approve-and-deploy.sh fix-ramsay-agenix --caller %4
 #
 # You read it and press Enter. The script merges the branch into main, pushes,
-# deploys through the ramsay-deploy gate, then sends the handoff to the pi pane.
+# deploys through the ramsay-deploy gate, then sends /cd to the main checkout and
+# the handoff to the pi pane.
 # A failed step sends the failure to the same pane and keeps the pane open.
 #
 #   scripts/approve-and-deploy.sh <branch>                  ramsay only
@@ -22,11 +23,18 @@
 # A failed step stops the run and leaves the pane open with the log on screen.
 set -euo pipefail
 
-usage() { sed -n '3,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 send_to_caller() {
   if [ "$dry" = 1 ] || [ -z "$caller" ]; then printf '  -> %s: %s\n' "$caller" "$1"; return 0; fi
   tmux send-keys -t "$caller" -l "$1"
   tmux send-keys -t "$caller" Enter
+}
+# wt merge trashes the worktree, so a caller session started there now holds a
+# dead cwd and every tool call fails. Move it to main before any handoff.
+cd_caller() {
+  [ "$caller_cd_sent" = 1 ] && return 0
+  caller_cd_sent=1
+  send_to_caller "/cd $main_path"
 }
 say() { printf '\n== %s\n' "$*"; }
 run() {
@@ -38,6 +46,7 @@ run() {
 branch=''
 hosts='ramsay'
 dry=0
+caller_cd_sent=0
 no_deploy=0
 no_kill=0
 allow_dirty=0
@@ -144,6 +153,7 @@ main() {
 
   # The pi session is the worktree memory. The handoff line replaces the old
   # HANDOFF.md file: the session keeps the context, and git keeps the change.
+  cd_caller
   local msg=${msg:-}
   if [ -n "$handoff" ] && [ -f "$handoff" ]; then
     msg=$(tr '\n' ' ' < "$handoff")
@@ -171,6 +181,7 @@ on_err() {
   if [ -z "$err" ]; then
     err="Deploy failed in $where at line $1. Read the log at $log, fix it, then report the result."
   fi
+  cd_caller || true
   send_to_caller "$err" || true
   exit 1
 }

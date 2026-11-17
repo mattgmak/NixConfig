@@ -147,7 +147,7 @@ No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
 | 11. Verify the live host | agent | pi gets the prompt the script sends into its pane |
 | 12. Close | script | `tmux kill-pane` on its own pane |
 
-`scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. Test it with `--dry-run`.
+`scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. The script first sends `/cd <main checkout>` to the caller pane: `wt merge` trashes the worktree, so a caller session started there holds a dead cwd. Test it with `--dry-run`.
 
 ## Direct workflow
 
