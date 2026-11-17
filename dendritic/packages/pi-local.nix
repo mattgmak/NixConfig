@@ -25,70 +25,11 @@
       # an account that cannot read it simply skips the export.
       piOauthKey = "/run/agenix/pi-mcp-adapter-oauth-file-key";
 
-      provider = "ramsay";
-      modelId = "halogen-flash-next-thinkingcap-abliterated";
-      model = "${provider}/${modelId}";
-
-      modelsJson = builtins.fromJSON (builtins.readFile (piModule + "/models.json"));
-      modelEntry = pkgs.lib.findFirst (
-        m: (m.id or "") == modelId
-      ) null modelsJson.providers.${provider}.models;
-
-      settingsJson = builtins.fromJSON (builtins.readFile (piModule + "/settings.json"));
-      settings = pkgs.writeText "pi-local-settings.json" (
-        builtins.toJSON (
-          settingsJson
-          // {
-            defaultProvider = provider;
-            defaultModel = model;
-            enabledModels = [ "ramsay/*" ];
-            modelThinkingLevels = pkgs.lib.filterAttrs (
-              key: _: pkgs.lib.hasPrefix "ramsay/" key
-            ) settingsJson.modelThinkingLevels;
-          }
-        )
-      );
-
-      # pi-autoname reads its own model field and ignores enabledModels, so it
-      # needs the loadout copy.
-      autoname = pkgs.writeText "pi-local-pi-autoname.json" (
-        builtins.toJSON (
-          (
-            builtins.fromJSON (builtins.readFile (piModule + "/extensions/pi-autoname/pi-autoname.json"))
-          )
-          // {
-            inherit model;
-            fallbackModels = [ ];
-          }
-        )
-      );
-
-      modelRef =
-        thinking: {
-          inherit provider;
-          id = modelId;
-          inherit thinking;
-          cooldownHours = 2;
-          contextWindow = modelEntry.contextWindow;
-        };
-      blackholeConfig = pkgs.writeText "pi-local-pi-blackhole-config.json" (
-        builtins.toJSON (
-          (
-            builtins.fromJSON (
-              builtins.readFile (piModule + "/extensions/pi-blackhole/pi-blackhole-config.json")
-            )
-          )
-          // {
-            model = modelRef "low";
-            observerModel = modelRef "low";
-            observerFallbackModels = [ ];
-            reflectorModel = modelRef "low";
-            reflectorFallbackModels = [ ];
-            dropperModel = modelRef "off";
-            dropperFallbackModels = [ ];
-          }
-        )
-      );
+      # The ramsay loadout comes from the same file the home-manager module calls.
+      loadout = self.piLoadout pkgs;
+      settings = loadout.settings;
+      autoname = loadout.autoname;
+      blackholeConfig = loadout.blackholeConfig;
 
       # Extension loaders come from the compiled tree. The shell lists them at
       # build time, so a pi bump updates the set without an edit here.

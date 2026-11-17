@@ -247,83 +247,24 @@
         '';
       };
 
-      # The ramsay loadout. One settings.json derived from the canonical file, with the
-      # model set clamped to the ramsay provider. enabledModels is the same pattern list
-      # the --models flag takes, so one glob gates every source at once.
-      piLocalProvider = "ramsay";
-      piLocalModelId = "halogen-flash-next-thinkingcap-abliterated";
-      piLocalModel = "${piLocalProvider}/${piLocalModelId}";
-      settingsJson = builtins.fromJSON (builtins.readFile ./settings.json);
-      modelsJson = builtins.fromJSON (builtins.readFile ./models.json);
-      piLocalModelEntry = lib.findFirst (
-        model: (model.id or "") == piLocalModelId
-      ) null modelsJson.providers.${piLocalProvider}.models;
-      piLocalSettings = pkgs.writeText "pi-local-settings.json" (
-        builtins.toJSON (
-          settingsJson
-          // {
-            defaultProvider = piLocalProvider;
-            defaultModel = piLocalModel;
-            enabledModels = [ "ramsay/*" ];
-            modelThinkingLevels = lib.filterAttrs (
-              key: _: lib.hasPrefix "ramsay/" key
-            ) settingsJson.modelThinkingLevels;
-          }
-        )
-      );
-
-      # pi-autoname reads its own model field and ignores enabledModels, so the loadout
-      # needs its own copy. The ramsay model names itself and the openrouter fallbacks
-      # go away, which keeps every naming call on the local server.
-      piLocalAutoname = pkgs.writeText "pi-local-pi-autoname.json" (
-        builtins.toJSON (
-          (builtins.fromJSON (builtins.readFile ./extensions/pi-autoname/pi-autoname.json))
-          // {
-            model = piLocalModel;
-            fallbackModels = [ ];
-          }
-        )
-      );
+      # The ramsay loadout lives in loadout.nix, which the wrapper package calls too.
+      loadout = self.piLoadout pkgs;
+      piLocalSettings = loadout.settings;
+      piLocalAutoname = loadout.autoname;
+      piLocalBlackholeConfig = loadout.blackholeConfig;
 
       # Subagent definitions for the loadout. pi-interactive-subagents hands the frontmatter
       # model to the child pi as --model, which bypasses enabledModels, so every model line
-      # gets rewritten to piLocalModel. The rest of each file stays as the repo defines it.
+      # gets rewritten to loadout.model. The rest of each file stays as the repo defines it.
       piLocalAgents = pkgs.runCommand "pi-local-agents" {
         src = ./agents;
-        model = piLocalModel;
+        model = loadout.model;
       } ''
         mkdir -p $out
         for f in $src/*.md; do
           sed "s|^model:.*|model: $model|" "$f" > "$out/$(basename "$f")"
         done
       '';
-
-      # pi-blackhole reads its config from <agent dir>/pi-blackhole/, so the loadout
-      # needs its own file. Every model slot names the ramsay model and the openrouter
-      # and commandcode fallback lists go away, which keeps observation on the local
-      # server. The repo file names models the current catalog dropped.
-      blackholeConfig = builtins.fromJSON (builtins.readFile ./extensions/pi-blackhole/pi-blackhole-config.json);
-      ramsayModelRef = thinking: {
-        provider = piLocalProvider;
-        id = piLocalModelId;
-        inherit thinking;
-        cooldownHours = 2;
-        contextWindow = piLocalModelEntry.contextWindow;
-      };
-      piLocalBlackholeConfig = pkgs.writeText "pi-local-pi-blackhole-config.json" (
-        builtins.toJSON (
-          blackholeConfig
-          // {
-            model = ramsayModelRef "low";
-            observerModel = ramsayModelRef "low";
-            observerFallbackModels = [ ];
-            reflectorModel = ramsayModelRef "low";
-            reflectorFallbackModels = [ ];
-            dropperModel = ramsayModelRef "off";
-            dropperFallbackModels = [ ];
-          }
-        )
-      );
 
       # Second binary on the same compiled package, same shape as pi-stock. The
       # derivation now lives in dendritic/packages/pi-local.nix as piLocal, so the
