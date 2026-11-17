@@ -12,14 +12,15 @@
 #   watch-wave.sh <branch> --all-merged    stop once every branch landed
 # Default: window 3000 s, interval 45 s.
 #
-# Lines: PR_OPEN, CONFLICT, BEHIND, BLOCKED, CIFAIL, CLEAN, MERGED, CLOSED,
-# FOUND, REVIEW, DONE, TIMEOUT, ERROR. Every state exits 0, because a merge is
-# a result.
+# Lines: PR_OPEN, CONFLICT, BEHIND, BLOCKED, CIFAIL, CLEAN, PENDING, MERGED,
+# CLOSED, FOUND, CR_REVIEW, REVIEW, DONE, TIMEOUT, ERROR. Every state exits 0,
+# because a merge is a result.
 #
 # The job ends as soon as a line needs you: a conflict, a red check, a new
-# unresolved review thread, a review that asks for changes, a merge, a close,
-# or DONE. A finished job always wakes the orchestrator, so a fault that exists
-# before the start still reaches it. Restart the job after you act.
+# unresolved review thread, a new bot review that carries no thread, a review
+# that asks for changes, a merge, a close, or DONE. A finished job always wakes
+# the orchestrator, so a fault that exists before the start still reaches it.
+# Restart the job after you act.
 #
 # One job per branch is the default, so the jobs widget shows one row each.
 
@@ -97,7 +98,8 @@ probe() {
       end'
 }
 
-# One line per pull request: unresolved threads, review decision, first thread site.
+# One line per pull request: unresolved threads, review decision, first thread site,
+# then the newest review author, time and state.
 probe_reviews() {
   local number="$1"
   gh api graphql -f query="
@@ -105,11 +107,13 @@ probe_reviews() {
       pullRequest(number: $number) {
         reviewDecision
         reviewThreads(first: 100) { nodes { isResolved isOutdated path line } }
+        reviews(last: 1) { nodes { author { login } createdAt state } }
       } } }" 2>/dev/null |
     jq -r '
       .data.repository.pullRequest as $p |
       ($p.reviewThreads.nodes | map(select((.isResolved | not) and (.isOutdated | not)))) as $open |
-      "\($open | length)|\($p.reviewDecision // "-")|\($open[0].path // "-"):\($open[0].line // 0)"'
+      ($p.reviews.nodes[0]) as $r |
+      "\($open | length)|\($p.reviewDecision // "-")|\($open[0].path // "-"):\($open[0].line // 0)|\($r.author.login // "-")|\($r.createdAt // "-")|\($r.state // "-")"'
 }
 
 FOUND_FAULT=0
@@ -125,21 +129,26 @@ report() {
   bad=$(printf '%s' "$line" | cut -d'|' -f6)
 
   local threads="-" decision="-" site="-" rv
+  local rev_author="-" rev_at="-" rev_state="-"
   if [ "$number" != "-" ]; then
     rv=$(probe_reviews "$number")
     if [ -n "$rv" ]; then
       threads=$(printf '%s' "$rv" | cut -d'|' -f1)
       decision=$(printf '%s' "$rv" | cut -d'|' -f2)
       site=$(printf '%s' "$rv" | cut -d'|' -f3)
+      rev_author=$(printf '%s' "$rv" | cut -d'|' -f4)
+      rev_at=$(printf '%s' "$rv" | cut -d'|' -f5)
+      rev_state=$(printf '%s' "$rv" | cut -d'|' -f6)
     fi
   fi
 
-  local key prev now prev_threads prev_decision
+  local key prev now prev_threads prev_decision prev_rev
   key=$(printf '%s' "$branch" | tr '/' '_')
   prev=$(grep -F "$key|" "$STATE" 2>/dev/null | tail -1)
   prev_threads=$(printf '%s' "$prev" | cut -d'|' -f7)
   prev_decision=$(printf '%s' "$prev" | cut -d'|' -f8)
-  now="$key|$number|$state|$mergeable|$merge|$bad|$threads|$decision|$site"
+  prev_rev=$(printf '%s' "$prev" | cut -d'|' -f10)
+  now="$key|$number|$state|$mergeable|$merge|$bad|$threads|$decision|$site|$rev_at"
   [ "$prev" = "$now" ] && return 0
   grep -vF "$key|" "$STATE" >"$STATE.tmp" 2>/dev/null
   mv "$STATE.tmp" "$STATE"
@@ -155,7 +164,7 @@ report() {
   case "$state" in
     MERGED)
       echo "MERGED $number $branch"
-      FOUND_FAULT=1
+      [ "$ALL_MERGED" -eq 0 ] && FOUND_FAULT=1
       return 0
       ;;
     CLOSED)
@@ -194,6 +203,18 @@ report() {
     FOUND_FAULT=1
     return 0
   fi
+
+  # A bot review wakes you even when it posts no inline thread. Its summary body
+  # holds findings that no thread carries, so read the body after this line.
+  case "$rev_author" in
+    *coderabbit*)
+      if [ "$rev_at" != "-" ] && [ "$rev_at" != "$prev_rev" ] && [ -n "$prev" ]; then
+        echo "CR_REVIEW $number $branch ($rev_state at $rev_at: read the review body)"
+        FOUND_FAULT=1
+        return 0
+      fi
+      ;;
+  esac
 
   if [ "$merge" = "CLEAN" ]; then
     echo "CLEAN $number $branch"
