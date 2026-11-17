@@ -212,6 +212,10 @@
               "--cap-add=NET_ADMIN"
               "--cap-add=NET_RAW"
               "--cap-add=SYS_MODULE"
+              # svc: domains resolve only through MagicDNS. The sidecar keeps
+              # TS_ACCEPT_DNS=false for ACME, so pin the Services VIP here.
+              # The trek container shares this netns and inherits the entry.
+              "--add-host=inference.dab-octatonic.ts.net:100.90.64.40"
             ]
             ++ map (dns: "--dns=${dns}") cfg.tailscaleDnsServers;
             podman = {
@@ -254,11 +258,6 @@
               "--health-timeout=10s"
               "--health-retries=3"
               "--health-start-period=15s"
-              # svc: domains resolve only through MagicDNS. The trek-ts sidecar keeps
-              # TS_ACCEPT_DNS=false for ACME, so the trek container cannot resolve them.
-              # Pin the Services VIP so the AI connection resolves.
-              "--add-host=inference.dab-octatonic.ts.net:100.90.64.40"
-              "--add-host=inference.dab-octatonic.ts.net:fd7a:115c:a1e0::972c:4029"
             ];
             podman = {
               sdnotify = "healthy";
