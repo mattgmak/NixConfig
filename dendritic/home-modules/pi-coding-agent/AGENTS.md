@@ -11,12 +11,16 @@ Write each sentence in one draft:
   `show`, `fix` — not `spin up`, `utilize`, `indicate`, `address`.
 - Split a semicolon into two sentences while you draft.
 
-Before the write lands, run `ste_lint` on the draft text. Fix every fault,
-or log the suppression. Done = zero hard faults, or one rule-id suppression
-comment per surviving fault:
+Before the write lands, run `ste_lint` on the draft text. Fix every fault. Done =
+zero hard faults. No suppression comment exists: the engine holds no such
+directive. To relax a rule, set its severity in `.ste.json` at the project root:
 
-- code: `// ste-disable-next-line <rule-id>`
-- markdown: `<!-- ste-disable-next-line <rule-id> -->`
+```json
+{ "rules": { "length/sentence": "soft" } }
+```
+
+The file reads once, at session start. A rule reads `hard`, `soft` or `off`.
+A project file wins over `~/.config/ste/config.json`.
 
 Maintenance: keep this section short. A stale line goes out during review.
 
@@ -61,5 +65,6 @@ Maintenance: keep this section short. A stale line goes out during review.
 - Create and manage git worktrees with `wt` (worktrunk) always. Do not use raw `git worktree`.
 - NEVER mutate PRs — merges, closes, approvals, admin bypass (`gh pr merge`, `gh pr close`, `gh pr review --approve`, `gh api .../pulls/.../merge`) unless explicit same-session request. Stop + ask first.
 - NEVER modify previous commits or make commits unless explicitly asked.
-- Commits: subject only, empty body. Follow project convention.
+- Commits: see the project file. "Subject only, empty body" applies where no project rule
+  says otherwise.
 - Explicit message → explain WHY: problem solved, design decision, context not visible in code. No test lists, no "works" claims — presupposed.
