@@ -87,6 +87,7 @@
             "prompt-snippets"
             "rpiv-ask-user-question"
             "rpiv-todo"
+            "shell-wait-guard"
             "tmax-status"
             "tool-allowlist"
           ];
@@ -464,11 +465,20 @@
 
           # pnpm workspace repos, same idea with one hash per lockfile. `hash` covers the
           # fetched pnpm store; a lockfile change makes the build stop and print the new
-          # value at fetcherVersion 4, which pnpm 11 requires.
+          # value at fetcherVersion 4, which pnpm 11 requires. pnpm fetches the optional
+          # dependencies of one platform, so the store differs between linux and darwin.
+          # Each value below came from the build that prints the mismatch.
+          pnpmDepsHashes = {
+            "x86_64-linux" = "sha256-4Y1toGVK2MSKaaZuUGDCf/hIwqXSgcPojFoBSRTjHLg=";
+            "aarch64-darwin" = "sha256-gKQr6q81EfbVvliMifveiFECJbkMefqlyOFaz81nhn4=";
+          };
+
           pnpmDepRepos = [
             {
               repo = "gotgenes/pi-packages";
-              hash = "sha256-gKQr6q81EfbVvliMifveiFECJbkMefqlyOFaz81nhn4=";
+              hash =
+                pnpmDepsHashes.${stdenv.hostPlatform.system}
+                  or (throw "pi-bolt-compiled: no pnpmDeps hash for ${stdenv.hostPlatform.system}");
               workspaces = [
                 "@gotgenes/pi-permission-system"
                 "@gotgenes/pi-session-tools"

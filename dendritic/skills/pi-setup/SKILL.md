@@ -118,6 +118,8 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 
 **Tool allowlist.** A new extension that registers tools changes the visible tool set. Deny each new name in `BLOCKED_TOOLS`, or record it in `REVIEWED_TOOLS`. Then run the audit script. Detail: [REFERENCE.md — Tool allowlist](REFERENCE.md#tool-allowlist).
 
+**Hook-only extension.** An extension that only watches `tool_call` registers no tool, so it needs no allowlist entry. Add it to `SUBAGENT_BASE_EXTENSIONS` when it must guard a child session. A restricted child launches with `--no-extensions`, so it loads the base list only. Detail: [REFERENCE.md — Shell wait guard](REFERENCE.md#shell-wait-guard).
+
 **Shortcut conflicts.** `pi` keeps a reserved list of built-in actions. pi skips an extension shortcut on a reserved key and loads the extension without it. Free the key in `dendritic/home-modules/pi-coding-agent/keybindings.json` by setting the built-in action to `[]`. That file is a live symlink for every loadout, so the edit needs no rebuild. Detail: [REFERENCE.md — Key files to edit](REFERENCE.md#key-files-to-edit).
 
 ### 4. Finish

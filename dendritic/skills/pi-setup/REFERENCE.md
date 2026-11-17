@@ -40,7 +40,7 @@ Deployed at runtime:
 
 User settings (`~/.pi/agent/settings.json`) are **not** managed by Nix.
 
-Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. On x86_64-linux and aarch64-darwin the overlay installs `dendritic/packages/pi-bolt-compiled.nix` instead, the same binary with 31 extensions compiled in (see [Compiled host](#compiled-host-picompiled)). Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
+Pi itself is pinned via the `coding-agents` flake input (`flake.nix` → `github:kissgyorgy/coding-agents`). `dendritic/overlays.nix` overrides `pkgs.pi-coding-agent` with `dendritic/packages/pi-bolt.nix` — the native Pi-Bolt binary, which ships `bin/pi` for the swap — so the node build is not installed. On x86_64-linux and aarch64-darwin the overlay installs `dendritic/packages/pi-bolt-compiled.nix` instead, the same binary with 40 extensions compiled in (see [Compiled host](#compiled-host-picompiled)). Bump = `dendritic/packages/pi-bolt.nix` (version + per-platform hash) plus `dendritic/packages/pi-bolt-compiled.nix` (version + six hashes). Linux hosts need `programs.nix-ld.enable`: the linux asset is a dynamically linked ELF hardcoding `/lib64/ld-linux-x86-64.so.2`, which NixOS otherwise only provides as a stub.
 
 ### Loader, theme, and skill examples
 
@@ -95,7 +95,11 @@ Loader dirs in `extensions/` are what pi loads; the submodule checkouts live at 
 
 `packages.piCompiled` (`dendritic/packages/pi-bolt-compiled.nix`) runs on x86_64-linux and aarch64-darwin. `dendritic/overlays.nix` points `pkgs.pi-coding-agent` at it on both systems, and at `packages.pi` (plain 1.0.4) on the others.
 
-The package compiles 35 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
+The package compiles 40 loaders into the executable. On linux the binary costs 562 MB and the store path costs 1.6 GB. On darwin the binary costs 461 MB and the store path costs 1.3 GB. A warm build takes 5 to 9 minutes on linux.
+
+A pnpm deps hash covers one platform, because pnpm fetches the optional deps of the
+system that builds. `pnpmDepsHashes` maps each system to its own value. A build on a
+new system stops and prints the value that it needs.
 
 ### Package shape
 
@@ -475,6 +479,32 @@ Nothing hides by silence.
 - Denying `read` or `bash` also denies the pi-cursor-sdk replay wrappers. They share those names.
 - agent-ste lints only `write`, `edit`, `say`, and `bash`. A write through `ctx_patch` skips the hard-fault gate.
 
+## Shell wait guard
+
+`extensions/shell-wait-guard/index.ts` blocks a foreground wait in a shell tool call.
+It watches `tool_call` on `ctx_shell` and `bash`. A wait of 3 s or more returns
+`block` with a reason that names the fix.
+
+The tool layer cannot see a job finish, so the fix is `ctx_bg`. That tool ends the
+turn, and the harness wakes the agent with the result. A command that must wait for
+a condition uses a blocking form instead.
+
+- `gh run watch <id> --exit-status`
+- `xcrun simctl bootstatus <udid> -b`
+- `tail -f --pid=<pid> /dev/null`
+
+A short settle sleep stays allowed. A sequence such as `tap; sleep 1; dump` costs
+nothing, and a block would delete the work. The floor is `MIN_WAIT_SECONDS` in the
+extension. A scan of 103 tcm sessions found 278 such calls, and 1,038 waits worth
+blocking.
+
+The guard registers no tool. It needs no `BLOCKED_TOOLS` or `REVIEWED_TOOLS`
+entry. It must sit in `SUBAGENT_BASE_EXTENSIONS` to reach a restricted subagent,
+because such a child launches with `--no-extensions`.
+
+`pi-bolt-compiled.nix` compiles it in, so a content edit needs `nh` on a compiled
+host. `pi-stock` reads the repo loader and takes the edit at once.
+
 ## Install extension deps (`pi-ext-deps-install`)
 
 Home Manager installs `pi-ext-deps-install`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
@@ -652,6 +682,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | `pi-codegraph` | codegraph tools |
 | `pi-token-speed` | live tok/s in subagent footer |
 | `agent-ste` | STE lint on subagent writes and replies |
+| `shell-wait-guard` | blocks a foreground wait of 3 s or more in a child shell call |
 
 **Conditional:**
 - `pi-interactive-subagents` loader when agent declares `subagent_agents` (worker spawn path).
@@ -705,6 +736,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | Compiled host: extension list, deps, patches | `dendritic/packages/pi-bolt-compiled.nix` (see [Compiled host](#compiled-host-picompiled)) |
 | Extension bundle for compiled bun hosts | `pi-ext-deps-install` → `install_pi_cursor_sdk` → `extensions/pi-cursor-sdk/pi-bolt-bundle.js` + bun branch in that loader's `index.ts` |
 | Tool deny list | `dendritic/home-modules/pi-coding-agent/extensions/tool-allowlist/index.ts` |
+| Foreground shell wait guard | `dendritic/home-modules/pi-coding-agent/extensions/shell-wait-guard/index.ts` (3 s floor) |
 
 ## Goofeus agent workspace (GoofeusAgent)
 

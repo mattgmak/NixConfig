@@ -35,10 +35,10 @@ Maintenance: keep this section short. A stale line goes out during review.
 
 - Shell grep always `rg` over `grep`. Faster.
 - NEVER `find` on `/`, `/nix`, `~` — never completes, may crash terminal.
-- Never prefix a command with `sleep`. `ctx_shell` blocks it (extension
-  `shell-wait-guard`). Run long work with `ctx_bg`, then end the turn: the result
-  wakes you. To wait for a condition, use a blocking form such as `gh run watch`
-  or `tail -f --pid`.
+- Never prefix a command with `sleep`. `ctx_shell` blocks a wait of 3 s or more
+  (extension `shell-wait-guard`). Run long work with `ctx_bg`, then end the turn:
+  the result wakes you. To wait for a condition, use a blocking form such as
+  `gh run watch`, `simctl bootstatus -b`, or `tail -f --pid`.
 - No lint/format/type checks — Pi runs them, reports all errors on finish. Tests/other checks OK.
 
 # Large output
