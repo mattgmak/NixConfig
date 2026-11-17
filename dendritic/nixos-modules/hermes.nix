@@ -232,6 +232,28 @@
               runHook postInstall
             '';
           })
+          # vcc: deterministic no-LLM compaction (port of pi-vcc). Only the
+          # plugin files ship. The Nix build reports Hermes 0.0.0, so the
+          # upstream requires_hermes gate must be stripped or the host skips
+          # the plugin.
+          (pkgs.stdenv.mkDerivation {
+            pname = "hermes-vcc-engine";
+            version = "0.4.5";
+            src = pkgs.fetchurl {
+              url = "https://github.com/danbiocchi/hermes-vcc-engine/archive/refs/tags/v0.4.5.tar.gz";
+              hash = "sha256-W4kQEPgDSqrbRZfepGrCC+p3C0ffQwTfEPSl5b9Mgyk=";
+            };
+            sourceRoot = "hermes-vcc-engine-0.4.5";
+            dontConfigure = true;
+            dontBuild = true;
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out
+              cp -r --no-preserve=mode __init__.py plugin.yaml vcc $out/
+              sed -i '/requires_hermes/d' $out/plugin.yaml
+              runHook postInstall
+            '';
+          })
         ];
         hermesHomeFiles = {
           "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
@@ -295,14 +317,16 @@
           # client-direct voice hands remote clients the loopback ASR URL, so
           # every client transcribes through the gateway relay instead.
           voice.client_direct = false;
-          # The active context engine. lean-ctx replaces the built-in
-          # ContextCompressor, so the compression.* keys below stay inert until
-          # this reverts to "compressor".
-          context.engine = "lean-ctx";
+          # The active context engine. vcc (hermes-vcc-engine) replaces the
+          # built-in ContextCompressor with deterministic no-LLM compaction;
+          # it subclasses the built-in, so the compression.* keys below apply.
+          # Rollback: restore "lean-ctx" here and in plugins.enabled — the
+          # lean-ctx plugin stays installed.
+          context.engine = "vcc";
           # extraPlugins installs the plugin dir, and the webui shows it Disabled
           # until its name joins this list. `hermes plugins enable` writes the same
           # key into config.yaml.
-          plugins.enabled = [ "hermes-lean-ctx" "hermes-ui-plus" ];
+          plugins.enabled = [ "hermes-vcc-engine" "hermes-ui-plus" ];
           # HUI+ settings. The main gateway keeps port 8646, and the bridge points
           # at the same agenix secret. expose_memory lets paired devices read
           # MEMORY.md and USER.md.
@@ -470,8 +494,9 @@
           for d in cron sessions logs memories plugins; do
             mkdir -p "$home/$d"
           done
-          # The alt config selects context.engine = "lean-ctx", which the plugin
-          # provides. The main agent links the same set as nix-managed-<name>.
+          # The alt config mirrors main's settings (context.engine: vcc).
+          # Link main's full extraPlugins set as nix-managed-<name> so every
+          # plugin the mirrored config enables exists in this home.
           for p in ${toString config.services.hermes-agent.extraPlugins}; do
             ln -sfn "$p" "$home/plugins/nix-managed-$(basename "$p")"
           done
