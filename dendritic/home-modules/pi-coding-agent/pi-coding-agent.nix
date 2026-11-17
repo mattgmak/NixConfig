@@ -229,7 +229,11 @@
       # The MCP OAuth encrypted-file store reads its key from the environment.
       # Only this wrapper exports it, so other shells and their children never
       # hold it. hiPrio wins the bin/pi clash against the package.
-      piOauthKey = config.age.secrets."pi-mcp-adapter-oauth-file-key".path;
+      piOauthKey =
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          "/run/agenix/pi-mcp-adapter-oauth-file-key"
+        else
+          config.age.secrets."pi-mcp-adapter-oauth-file-key".path;
       piOauthWrapper = pkgs.writeShellApplication {
         name = "pi";
         runtimeInputs = [ pkgs.coreutils ];
@@ -762,8 +766,9 @@
       config = {
         # Sealed for every pi host. The wrapper above reads the plaintext.
         # A fixed path keeps the wrapper free of ${XDG_RUNTIME_DIR}, which fails
-        # under the wrapper's nounset on hosts that leave it unset.
-        age.secrets."pi-mcp-adapter-oauth-file-key" = {
+        # under the wrapper's nounset on hosts that leave it unset. On darwin the
+        # darwin agenix module provides the file, so home-manager declares none.
+        age.secrets."pi-mcp-adapter-oauth-file-key" = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
           file = ../../../secrets/pi-mcp-adapter-oauth-file-key.age;
           path = "${config.home.homeDirectory}/.pi/agent/oauth-file-key";
           mode = "0400";

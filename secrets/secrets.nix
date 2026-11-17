@@ -114,63 +114,63 @@ in
 
   "opencode-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "openrouter-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "mercury-ai-token.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "context7-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "github-mcp-token.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "immich-mcp-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   # Key for the MCP OAuth encrypted-file store. Script: scripts/make-pi-oauth-key.sh.
   "pi-mcp-adapter-oauth-file-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "cursor-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "cline-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "cursor-usage-session-token.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "deepseek-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   "commandcode-api-key.age" = {
     armor = true;
-    publicKeys = piRecipients;
+    publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
   # Simulator endpoints on MacMini. Every host may drive them, so each host

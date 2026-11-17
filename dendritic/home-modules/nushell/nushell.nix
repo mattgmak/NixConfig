@@ -27,7 +27,11 @@
       secretFile = name: ../../../secrets/${name}.age;
       availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
       secretNames = builtins.attrValues availableSecrets;
-      secretPathOf = name: config.age.secrets.${name}.path;
+      # darwin: home-manager agenix needs a GUI session, so the darwin agenix
+      # module owns the files under /run/agenix and home-manager declares none.
+      useSystemSecrets = pkgs.stdenv.hostPlatform.isDarwin;
+      secretPathOf = name:
+        if useSystemSecrets then "/run/agenix/${name}" else config.age.secrets.${name}.path;
       # Every secret file holds one line, the raw value (no `ENV=` prefix). Bash
       # expands agenix paths (e.g. $(getconf DARWIN_USER_TEMP_DIR)/agenix/… and ''${XDG_RUNTIME_DIR}/agenix/…) like HM activation.
       readSecret = name: pkgs.writeShellScript "read-${name}" ''

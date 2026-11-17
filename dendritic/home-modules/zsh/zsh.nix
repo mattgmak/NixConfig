@@ -25,7 +25,12 @@
       secretFile = name: ../../../secrets/${name}.age;
       availableSecrets = lib.filterAttrs (_: name: builtins.pathExists (secretFile name)) envSecrets;
       secretNames = builtins.attrValues availableSecrets;
-      secretPathOf = name: config.age.secrets.${name}.path;
+      # darwin: home-manager agenix mounts secrets through a LaunchAgent, which
+      # needs a GUI session. A headless Mac has none, so the darwin agenix module
+      # owns the files under /run/agenix and home-manager declares no secrets.
+      useSystemSecrets = pkgs.stdenv.hostPlatform.isDarwin;
+      secretPathOf = name:
+        if useSystemSecrets then "/run/agenix/${name}" else config.age.secrets.${name}.path;
 
       # Waiting only helps while agenix is still decrypting. The service state
       # says so on systemd hosts; elsewhere the file check alone decides.
@@ -39,9 +44,9 @@
       imports = [ inputs.agenix.homeManagerModules.default ];
 
       # Also declared in nushell/nushell.nix (identical values merge).
-      age.secrets = lib.genAttrs (builtins.attrValues availableSecrets) (name: {
+      age.secrets = lib.mkIf (!useSystemSecrets) (lib.genAttrs (builtins.attrValues availableSecrets) (name: {
         file = secretFile name;
-      });
+      }));
 
       # root: decrypt headless with the host key, no ~/.ssh identities.
       age.identityPaths = lib.mkIf (config.home.username == "root") [

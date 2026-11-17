@@ -792,12 +792,29 @@ in
         };
       };
 
-      # Bearer token for the shared argent tool-server. The owner is the login
-      # user, so the daemon below can read it.
-      age.secrets.argent-server-token = {
-        file = ../../secrets/argent-server-token.age;
+      # Every key the mini reads, mounted at /run/agenix by the darwin agenix
+      # daemon. The home-manager agenix agent needs a GUI session, so the headless
+      # mini gets nothing from it. The owner is the login user, so the agent
+      # daemons and every shell can read the files. argent-server-token is the
+      # bearer token for the shared argent tool-server below.
+      age.secrets = lib.genAttrs [
+        "argent-server-token"
+        "cline-api-key"
+        "commandcode-api-key"
+        "context7-api-key"
+        "cursor-api-key"
+        "cursor-usage-session-token"
+        "deepseek-api-key"
+        "github-mcp-token"
+        "immich-mcp-api-key"
+        "mercury-ai-token"
+        "opencode-api-key"
+        "openrouter-api-key"
+        "pi-mcp-adapter-oauth-file-key"
+      ] (name: {
+        file = ../../secrets/${name}.age;
         owner = username;
-      };
+      });
 
       # Shared argent tool-server. Run the bundled entry directly: the
       # `argent server start` CLI mints its own token and prints it to stdout,
