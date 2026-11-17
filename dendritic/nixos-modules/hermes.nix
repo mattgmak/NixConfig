@@ -62,6 +62,8 @@
       # these units copy the native unit shape by hand.
       altStateDir = "/var/lib/hermes-alt";
       altProfileHome = "${altStateDir}/.hermes/profiles/private";
+      # Upstream for tailscale serve --http=80 on svc:hermes-api-alt.
+      altStaticPort = 8761;
       # The module's own renderers, so the alt config.yaml and .env match the
       # shape the package expects, including the _config_version stamp.
       altCommon = import (inputs.hermes-agent + "/nix/moduleCommon.nix") {
@@ -694,12 +696,33 @@
         };
       };
 
+      # HUI+ renders images over plain HTTP only: its loader rejects the ts.net
+      # cert. tailscale serve --http=80 proxies here so port 80 serves files
+      # while 443 keeps the TLS API.
+      systemd.services.hermes-alt-static = {
+        description = "Plain HTTP file server for the alt workspace";
+        after = [ "hermes-alt-home.service" ];
+        wants = [ "hermes-alt-home.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "simple";
+          User = "hermes-alt";
+          Group = "hermes-alt";
+          ExecStart = "${pkgs.python3}/bin/python3 -m http.server ${toString altStaticPort} --bind 127.0.0.1 --directory ${altStateDir}/workspace";
+          Restart = "on-failure";
+          RestartSec = 5;
+          NoNewPrivileges = true;
+          ProtectSystem = "strict";
+        };
+      };
+
       systemd.services.tailscale-serve-hermes = lib.mkIf config.services.tailscale.enable {
         description = "Tailscale serve for the Hermes web UI and API";
         after = [
           "tailscaled.service"
           "hermes-webui.service"
           "hermes-webui-alt.service"
+          "hermes-alt-static.service"
           "hermes-agent.service"
           "hermes-agent-alt.service"
           "hermes-backend.service"
@@ -735,6 +758,7 @@
           tailscale serve --yes --service=svc:hermes-api --https=8443 127.0.0.1:9119
           tailscale serve --yes --service=svc:hermes-api-alt --https=443 127.0.0.1:8643
           tailscale serve --yes --service=svc:hermes-api-alt --https=8443 127.0.0.1:9120
+          tailscale serve --yes --service=svc:hermes-api-alt --http=80 127.0.0.1:${toString altStaticPort}
           tailscale serve --yes --service=svc:hermes-bridge --https=443 127.0.0.1:8792
           tailscale serve --yes --service=svc:hermes-bridge-alt --https=443 127.0.0.1:8791
         '';
