@@ -845,8 +845,10 @@ SEED
         systemd.tmpfiles.rules = [
           "d ${halogenCacheRoot}/signal 0750 root root -"
           "d ${halogenCacheRoot}/abliter-v2 0750 root root -"
+          "d ${halogenCacheRoot}/thinkingcap 0750 root root -"
           "d ${halogenRecordRoot}/signal 0750 root root -"
           "d ${halogenRecordRoot}/abliter-v2 0750 root root -"
+          "d ${halogenRecordRoot}/thinkingcap 0750 root root -"
           # One repo, two paths. NH_OS_FLAKE and the deploy scripts keep their
           # hardcoded paths, which now resolve to the agent checkout. Remove the old
           # directories first: tmpfiles cannot replace a directory with a link.
