@@ -66,6 +66,7 @@
       ] // {
         API_SERVER_PORT = "8643";
         API_SERVER_CORS_ORIGINS = "https://hermes-api-alt.dab-octatonic.ts.net,https://hermes-webui-alt.dab-octatonic.ts.net";
+        HERMES_DASHBOARD_SESSION_TOKEN = "file:${config.age.secrets."hermes-dashboard-session-token-alt".path}";
       };
       altAgentCfg = {
         environment = altEnvironment;
@@ -123,6 +124,13 @@
         file = ../../secrets/hermes-dashboard-session-token.age;
         mode = "0400";
         owner = "agent";
+      };
+      # The alt backend runs as hermes-alt and cannot read the agent-owned file,
+      # so the alt tenant gets its own token.
+      age.secrets."hermes-dashboard-session-token-alt" = {
+        file = ../../secrets/hermes-dashboard-session-token-alt.age;
+        mode = "0400";
+        owner = "hermes-alt";
       };
       # The alt tenant reads its own credentials, so the two gateways never hold
       # one bot token at the same time.
