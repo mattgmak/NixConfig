@@ -44,7 +44,9 @@
           // {
             defaultProvider = provider;
             defaultModel = model;
-            enabledModels = [ "${provider}/*" ];
+            # Pi picks the first entry of enabledModels and ignores defaultModel when
+            # the list holds only the glob, so name the loadout model first.
+            enabledModels = [ model "${provider}/*" ];
             inherit modelThinkingLevels;
           }
         )
