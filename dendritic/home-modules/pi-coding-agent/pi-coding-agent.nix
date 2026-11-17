@@ -306,6 +306,11 @@
           public_instance: false
           image_proxy: false
           method: GET
+        # SearXNG's 2 s default makes engines (wikipedia, brave, google cse) time out
+        # in the gateway log; 10 s/30 s stops the timeouts.
+        outgoing:
+          request_timeout: 10.0
+          max_request_timeout: 30.0
         search:
           formats:
             - html
@@ -766,7 +771,9 @@
               let
                 hostPort = toString crawl4aiPort;
               in
-              "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
+              # The pool monitor reports host memory (89% from the resident model server),
+              # so cap the container to keep crawl4ai's browsers from adding to the pressure.
+              "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --memory=6g --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
             ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-crawl4ai";
           };
           Install.WantedBy = [ "default.target" ];
