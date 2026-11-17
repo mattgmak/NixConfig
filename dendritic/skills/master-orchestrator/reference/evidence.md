@@ -16,6 +16,40 @@ Capture it from the real app on a leased simulator, built on the mini. Embed it 
 
 An evidence run reuses the dev client already on the simulator when its native fingerprint matches the tree. Build only on a mismatch. The method sits in `reference/macos-remote-build.md`.
 
+### Device ladder
+
+Try each device in this order. Stop at the first one that works.
+
+1. Leased iOS simulator on the mini. This route is the default.
+2. Android emulator on this host. Use it only when the fleet does not answer.
+3. No device. Name the gap in the body and file a ticket.
+
+A fallback to the Android emulator needs four things in the report and in the body:
+
+- the reason, with the fleet error string verbatim
+- the device name, as `android-emulator:<avd>`
+- the bundle check, one word drawn from this head
+- the Metro url that the app reached
+
+Name the route in the Evidence block. A reviewer must know which device drew the frame.
+
+| Signal | Action |
+|---|---|
+| `/v0/healthz` answers 200, and `ui_tree` returns a tree | stay on the simulator |
+| `ui_tree` fails with `accessibility bridge not ready`, and the screenshot reads black | go to the Android emulator |
+| `ssh mattgmak@macmini 'stat -f%Su /dev/console'` prints `root` | the mini holds no GUI session. Ask the user to log in, then go to the Android emulator |
+
+Before you fall back, check the host has a device:
+
+```bash
+command -v adb emulator
+ls ~/.android/avd
+```
+
+An AVD from an older ticket works. Give it a fresh wipe only when the client fingerprint mismatches.
+
+An Android frame is a fallback, never the default. Report it as a fallback so the user knows the proof came from a second device.
+
 ### Preflight, before any capture
 
 Run `scripts/preflight-evidence.sh` in the worktree. It prints the head, the branch, and the Metro that serves this worktree. A `FOREIGN` line names another checkout, and the device then proves nothing.

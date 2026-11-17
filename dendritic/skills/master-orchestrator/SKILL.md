@@ -172,7 +172,8 @@ Rules to state in every brief:
 - Commit with a subject only. No body, no trailers.
 - Push the branch. Open one pull request against the base. Merge nothing.
 - Name each surface the diff touches: a screen, a query, a mutation, or a schema table.
-- A diff that touches an app screen carries simulator evidence before the pull request opens. The lane captures it on a leased simulator and publishes it on the pull request. Read `reference/evidence.md`.
+- A diff that touches an app screen carries device evidence before the pull request opens. The lane captures it on a leased simulator and publishes it on the pull request. Read `reference/evidence.md`.
+- The device ladder decides the capture device. A leased iOS simulator on the mini is the default. The Android emulator on this host is the fallback, and it applies when the fleet does not answer. Name the device in the Evidence block.
 - The lane asks the user before the first simulator command. Ask once per wave, then reuse the lease.
 - A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
@@ -381,6 +382,20 @@ The lane captures the evidence, not the orchestrator. A UI brief names each chan
 A lane runs `scripts/preflight-evidence.sh` before the first capture, and pastes its four checks. A `FOREIGN` line names another checkout, so the device proves nothing.
 
 A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
+
+### Device ladder
+
+The iOS simulator is the default device. It is not the only one.
+
+| Order | Device | Condition |
+|---|---|---|
+| 1 | leased iOS simulator on the mini | always try this first |
+| 2 | Android emulator on this host | the fleet does not answer, or it returns a black frame |
+| 3 | no device | name the gap in the body, and file a ticket |
+
+A fallback names four facts in the body: the reason with the fleet error string, the device as
+`android-emulator:<avd>`, the bundle check, and the Metro url. Read `reference/evidence.md` for
+the detection signals and the preflight commands.
 
 ### Where the evidence lives
 
