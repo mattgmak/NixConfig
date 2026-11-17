@@ -163,10 +163,48 @@ So a shim costs more code than `manzanas mcp`, and it weakens the argent side. D
 5. **Reload the agent.** Run the two `launchctl` calls in the failure table. The switch writes the plist and leaves the old process running.
 6. **Verify.** Run `manzanas --daemon "$URL" lease ls` from a second node. It must exit 0 without a token.
 
+## Aqua session dependency
+
+`simctl` and `manzanasd` need no console session. The `axe` path does.
+AXe reads the accessibility tree of a RenderServer-hosted process. That tree
+lives in an Aqua session, which starts only when `loginwindow` completes a
+login. A fresh boot sits at `loginwindow` with a `root` console user, so the
+fleet boots and AXe fails.
+
+Check the session from any node:
+
+```sh
+stat -f%Su /dev/console        # root means nobody logged in
+pgrep -x WindowServer          # no match means no Aqua
+launchctl print gui/$(id -u)   # fails without a GUI domain
+```
+
+SSH does not help. `sshd` runs in the system domain and gives a `Background`
+session. `open -a Simulator` then fails with `LSOpenURLsWithRole() failed with
+error -10810`. `launchctl asuser` cannot attach, because `gui/<uid>` is absent.
+
+Fix after each boot: log in over Screen Sharing. The session then stays alive
+after you disconnect, so the fleet keeps AXe until the next reboot.
+
+1. Enable Screen Sharing once, on the mini: System Settings → General →
+   Sharing → Screen Sharing. The setting survives reboots. The Remote
+   Management path is `sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all`.
+2. Connect from a Mac: `open vnc://macmini`, or `vnc://<tailnet-ip>`.
+3. Log in as `mattgmak`. The desktop appears, `WindowServer` starts, AXe works.
+4. Disconnect. Do not log out, and do not lock the screen.
+
+`power.sleep` is `never` in `MacMini.nix`, so the session never sleeps. Never
+add `loginwindow.autoLoginUser` as a substitute: modern macOS ignores that key,
+and it skips the password that a console attacker needs.
+
+A headless mini gives Screen Sharing a small virtual framebuffer. Add an HDMI
+dummy plug for a sane geometry.
+
 ## Failure modes
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| `axe`: `No translation object returned for simulator` | No Aqua session. Simulator runs headless under `launchctl` | Log in over Screen Sharing, then leave the session unlocked |
 | `connection refused` on `IP:7433` | Loopback bind, by design | Use the service URL |
 | `connection refused` on the service URL | `tailscale-serve-sim` down | `launchctl kickstart gui/$(id -u)/org.nixos.tailscale-serve-sim` |
 | `unauthorized` after the token removal | The daemon still runs the old generation. A plist change does not restart a launchd job | Run `launchctl bootout gui/$(id -u)/org.nixos.manzanasd`, then `launchctl bootstrap gui/$(id -u) /Library/LaunchAgents/org.nixos.manzanasd.plist` |
