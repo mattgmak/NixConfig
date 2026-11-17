@@ -251,7 +251,7 @@
       # model set clamped to the ramsay provider. enabledModels is the same pattern list
       # the --models flag takes, so one glob gates every source at once.
       piLocalProvider = "ramsay";
-      piLocalModelId = "halogen-flash-next-signal-abliterated";
+      piLocalModelId = "halogen-flash-next-thinkingcap-abliterated";
       piLocalModel = "${piLocalProvider}/${piLocalModelId}";
       settingsJson = builtins.fromJSON (builtins.readFile ./settings.json);
       modelsJson = builtins.fromJSON (builtins.readFile ./models.json);

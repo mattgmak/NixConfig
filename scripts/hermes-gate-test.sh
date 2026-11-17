@@ -39,7 +39,7 @@ security:
     transport_fallback: deny
 model:
   provider: custom
-  default: halogen-flash-next-signal-abliterated
+  default: halogen-flash-next-thinkingcap-abliterated
   base_url: http://127.0.0.1:9292/v1
   context_length: 131072
   api_key: local-no-key

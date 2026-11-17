@@ -26,7 +26,7 @@
       piOauthKey = "/run/agenix/pi-mcp-adapter-oauth-file-key";
 
       provider = "ramsay";
-      modelId = "halogen-flash-next-signal-abliterated";
+      modelId = "halogen-flash-next-thinkingcap-abliterated";
       model = "${provider}/${modelId}";
 
       modelsJson = builtins.fromJSON (builtins.readFile (piModule + "/models.json"));

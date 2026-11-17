@@ -60,7 +60,6 @@
   "enabledModels": [
     "balance/deepseek-v4.1-flash",
     "ramsay/halogen-flash-next-signal-abliterated",
-    "ramsay/halogen-flash-next-v2-abliterated",
     "ramsay/halogen-flash-next-thinkingcap-abliterated",
     "cursor/composer-2.5:fast",
     "cursor/composer-2.5:slow",
@@ -101,7 +100,6 @@
     "commandcode/stealth/glyph-cluster:free": "medium",
     "commandcode/inclusionai/ling-3.1-flash": "medium",
     "ramsay/halogen-flash-next-signal-abliterated": "high",
-    "ramsay/halogen-flash-next-v2-abliterated": "high",
     "ramsay/halogen-flash-next-thinkingcap-abliterated": "high",
     "ramsay/gufo-flash-next": "medium",
     "ramsay/gufo-flash-next-swift": "medium",

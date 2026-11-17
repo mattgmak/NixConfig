@@ -22,7 +22,7 @@ stdout holds the final text. stderr holds errors. A nonzero exit means the run f
 |---|---|
 | `--append-system-prompt <file>` | Give pi a role file, for example a review brief |
 | `--system-prompt <file>` | Replace the default coding prompt |
-| `--model <provider/id>` | Pick a model. The default is `ramsay/halogen-flash-next-signal-abliterated` |
+| `--model <provider/id>` | Pick a model. The default is `ramsay/halogen-flash-next-thinkingcap-abliterated` |
 | `--no-session` | Skip session files for a throwaway run |
 | `--resume <id>` | Continue an earlier session |
 | `--tools read,bash,edit,write` | Narrow the tool set |

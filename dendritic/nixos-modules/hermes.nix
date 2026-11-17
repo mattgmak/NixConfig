@@ -269,7 +269,7 @@
           ];
           model = {
             provider = "custom";
-            default = "halogen-flash-next-signal-abliterated";
+            default = "halogen-flash-next-thinkingcap-abliterated";
             base_url = localBaseUrl;
             context_length = 131072;
           };
@@ -340,11 +340,6 @@
           # Every id below is on the llama-swap /v1/models list. The aliases
           # let a running session switch with /model <name>.
           model_aliases = {
-            halogen-flash-next-v2-abliterated = {
-              model = "halogen-flash-next-v2-abliterated";
-              provider = "custom";
-              base_url = localBaseUrl;
-            };
             halogen-flash-next-thinkingcap-abliterated = {
               model = "halogen-flash-next-thinkingcap-abliterated";
               provider = "custom";

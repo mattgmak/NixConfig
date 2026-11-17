@@ -212,12 +212,11 @@ in
       }:
       let
         halogenSignalPack = "/var/lib/inference/models/halogen-signal";
-        halogenAbliterPack = "/var/lib/inference/models/halogen-abliter-v2";
         halogenThinkingcapPack = "/var/lib/inference/models/halogen-thinkingcap";
         halogenCacheRoot = "/var/lib/inference/halogen-cache";
         halogenRecordRoot = "/var/lib/inference/halogen-records";
 
-        # The three stacks differ in four values only. The rest is the tuning set
+        # The two stacks differ in four values only. The rest is the tuning set
         # the bench ran with success.
         halogenContainer =
           {
@@ -660,27 +659,6 @@ in
               want "$tok/tokenizer/$file" "$root/halogen-signal/tokenizer/$file"
             done
 
-            # The v2 repo ships one .hgn and no lookup table, no image sidecar
-            # and no tokenizer. Both stacks run with the vision tower on, so the
-            # v2 dir takes the same shared files.
-            v2=https://huggingface.co/Quat3rnion/halogen-qwen3.8-flash-next-v2-abliterated/resolve/2fd96054e10fd12ac5d667a5be897fd58ab6b6ad
-            want "$v2/qwen38-flash-next-v2-abliterated.hgn" \
-              "$root/halogen-abliter-v2/qwen38-flash-next-v2-abliterated.hgn"
-            want "$signal/qwen38-flash-next-ngram.hgn" \
-              "$root/halogen-abliter-v2/qwen38-flash-next-ngram.hgn"
-            want "$signal/qwen38-flash-next-vision.hgn" \
-              "$root/halogen-abliter-v2/qwen38-flash-next-vision.hgn"
-            for file in \
-              chat_template.jinja \
-              generation_config.json \
-              merges.txt \
-              tokenizer.json \
-              tokenizer_config.json \
-              vocab.json
-            do
-              want "$tok/tokenizer/$file" "$root/halogen-abliter-v2/tokenizer/$file"
-            done
-
             # ThinkingCap abliterated: the repo ships its own complete tokenizer
             # directory, so no peonist tokenizer files are needed for this pack.
             tc=https://huggingface.co/johnlockejrr/ThinkingCap-Qwen3.8-Flash-Next-abliterated-HGN/resolve/3a79d828d1e25cd8ff29f6fab3ae5137ede6d891
@@ -743,15 +721,6 @@ signal/tokenizer/merges.txt halogen-signal/tokenizer/merges.txt
 signal/tokenizer/tokenizer_config.json halogen-signal/tokenizer/tokenizer_config.json
 signal/tokenizer/tokenizer.json halogen-signal/tokenizer/tokenizer.json
 signal/tokenizer/vocab.json halogen-signal/tokenizer/vocab.json
-abliter-v2/qwen38-flash-next-v2-abliterated.hgn halogen-abliter-v2/qwen38-flash-next-v2-abliterated.hgn
-abliter-v2/qwen38-flash-next-ngram.hgn halogen-abliter-v2/qwen38-flash-next-ngram.hgn
-signal/qwen38-flash-next-vision.hgn halogen-abliter-v2/qwen38-flash-next-vision.hgn
-abliter-v2/tokenizer/chat_template.jinja halogen-abliter-v2/tokenizer/chat_template.jinja
-abliter-v2/tokenizer/generation_config.json halogen-abliter-v2/tokenizer/generation_config.json
-abliter-v2/tokenizer/merges.txt halogen-abliter-v2/tokenizer/merges.txt
-abliter-v2/tokenizer/tokenizer_config.json halogen-abliter-v2/tokenizer/tokenizer_config.json
-abliter-v2/tokenizer/tokenizer.json halogen-abliter-v2/tokenizer/tokenizer.json
-abliter-v2/tokenizer/vocab.json halogen-abliter-v2/tokenizer/vocab.json
 SEED
 
             # Name bash by store path. A unit PATH carries coreutils, findutils,
@@ -844,10 +813,8 @@ SEED
         # on build and settings, so a shared one would only mix them.
         systemd.tmpfiles.rules = [
           "d ${halogenCacheRoot}/signal 0750 root root -"
-          "d ${halogenCacheRoot}/abliter-v2 0750 root root -"
           "d ${halogenCacheRoot}/thinkingcap 0750 root root -"
           "d ${halogenRecordRoot}/signal 0750 root root -"
-          "d ${halogenRecordRoot}/abliter-v2 0750 root root -"
           "d ${halogenRecordRoot}/thinkingcap 0750 root root -"
           # One repo, two paths. NH_OS_FLAKE and the deploy scripts keep their
           # hardcoded paths, which now resolve to the agent checkout. Remove the old
@@ -869,9 +836,8 @@ SEED
         };
 
         # One Halogen stack runs at a time: each maps a whole pack into graphics
-        # memory, so a second start would evict the first anyway. Signal is the
-        # resident main model, abliter-v2 and thinkingcap wait for an explicit
-        # start.
+        # memory, so a second start would evict the first anyway. Thinkingcap is
+        # the resident main model, signal waits for an explicit start.
         virtualisation.oci-containers = {
           backend = "podman";
           containers = {
@@ -882,14 +848,6 @@ SEED
               checkpoint = "/models/model.hgn";
               packDir = halogenSignalPack;
               stack = "signal";
-            };
-            halogen-abliter-v2 = halogenContainer {
-              enginePort = 8740;
-              apiPort = 8741;
-              modelId = "halogen-flash-next-v2-abliterated";
-              checkpoint = "/models/qwen38-flash-next-v2-abliterated.hgn";
-              packDir = halogenAbliterPack;
-              stack = "abliter-v2";
             } // {
               autoStart = false;
             };
@@ -900,32 +858,21 @@ SEED
               checkpoint = "/models/model.hgn";
               packDir = halogenThinkingcapPack;
               stack = "thinkingcap";
-            } // {
-              autoStart = false;
             };
           };
         };
 
         systemd.services.podman-halogen-signal = {
-          wantedBy = lib.mkForce [ "inference.target" ];
           after = [ "gufo-models.service" ];
           wants = [ "gufo-models.service" ];
-          conflicts = [ "podman-halogen-abliter-v2.service" "podman-halogen-thinkingcap.service" ];
-        };
-
-        systemd.services.podman-halogen-abliter-v2 = {
-          after = [ "gufo-models.service" ];
-          wants = [ "gufo-models.service" ];
-          conflicts = [ "podman-halogen-signal.service" "podman-halogen-thinkingcap.service" ];
+          conflicts = [ "podman-halogen-thinkingcap.service" ];
         };
 
         systemd.services.podman-halogen-thinkingcap = {
+          wantedBy = lib.mkForce [ "inference.target" ];
           after = [ "gufo-models.service" ];
           wants = [ "gufo-models.service" ];
-          conflicts = [
-            "podman-halogen-signal.service"
-            "podman-halogen-abliter-v2.service"
-          ];
+          conflicts = [ "podman-halogen-signal.service" ];
         };
 
         # ADR 0001: the Collector is the only client allowed to read Halogen /metrics, so

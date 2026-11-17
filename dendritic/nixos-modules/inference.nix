@@ -165,10 +165,6 @@
               proxy = "http://127.0.0.1:8731";
               models = [ "halogen-flash-next-signal-abliterated" ];
             };
-            halogen-abliter-v2 = {
-              proxy = "http://127.0.0.1:8741";
-              models = [ "halogen-flash-next-v2-abliterated" ];
-            };
             halogen-thinkingcap = {
               proxy = "http://127.0.0.1:8751";
               models = [ "halogen-flash-next-thinkingcap-abliterated" ];
@@ -182,11 +178,6 @@
               strategy = "pin";
               unlisted = true;
               targets = [ "halogen-signal/halogen-flash-next-signal-abliterated" ];
-            };
-            halogen-flash-next-v2-abliterated = {
-              strategy = "pin";
-              unlisted = true;
-              targets = [ "halogen-abliter-v2/halogen-flash-next-v2-abliterated" ];
             };
             halogen-flash-next-thinkingcap-abliterated = {
               strategy = "pin";
