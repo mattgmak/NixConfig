@@ -75,6 +75,13 @@
         # RunAtLoad=true runs the agent once at login; no KeepAlive means
         # launchd never respawns.
         launchd.agents.activate-agenix.config.KeepAlive = lib.mkForce false;
+
+        # A headless mini has no Aqua session, so the gui/501 domain does not
+        # exist and home-manager's bootstrap fails with "Bootstrap failed:
+        # 125: Domain does not support specified action". The nix-darwin
+        # daemon org.nixos.activate-agenix already decrypts secrets at boot,
+        # so the agent only breaks the switch.
+        launchd.agents.activate-agenix.enable = lib.mkForce false;
       };
   };
 }
