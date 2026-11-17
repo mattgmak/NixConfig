@@ -16,6 +16,15 @@
     { config, lib, pkgs, ... }:
     let
       localBaseUrl = "http://127.0.0.1:9292/v1";
+      # The Qwen3-ASR server accepts only RIFF WAV. Hermes already hands the local
+      # provider a WAV, so this helper uploads it and writes the transcript file that
+      # provider requires. `jq -e` turns a missing .text (an error body) into a failure
+      # instead of silence.
+      qwenAsrSttScript = pkgs.writeShellScript "qwen-asr-stt" ''
+        set -eu
+        resp=$(${pkgs.curl}/bin/curl -sS -f -F "file=@$1" -F model=qwen3-asr-1.7b http://127.0.0.1:8181/v1/audio/transcriptions)
+        printf '%s' "$resp" | ${pkgs.jq}/bin/jq -er '.text' > "$2/transcript.txt"
+      '';
       # The flake input pins the release tag. The builder still names the package
       # after its own default, so stamp the tag on the derivation.
       hermesVersion = "0.23.1";
@@ -273,21 +282,15 @@
             base_url = localBaseUrl;
             context_length = 131072;
           };
-          # Hermes has no Qwen STT provider, so the local Qwen3-ASR runs through
-          # the `openai` provider's self-hosted path. A loopback base_url with no
-          # api_key authenticates as `not-needed`. The model name is pinned because
-          # the server rejects the default `whisper-1` with 400 invalid_model.
+          # The Qwen3-ASR server accepts only RIFF WAV, and the `openai` provider
+          # uploads the webui's webm blob untouched — its m4a recovery is rejected too.
+          # The local provider normalizes any input to WAV before running the command,
+          # so it is the only path this server accepts. The command lives in the
+          # environment (HERMES_LOCAL_STT_COMMAND), not here.
           stt = {
             enabled = true;
-            provider = "openai";
+            provider = "local";
             language = "en";
-            openai = {
-              model = "qwen3-asr-1.7b";
-              base_url = "http://127.0.0.1:8181/v1";
-              language = "";
-              timeout = 60;
-              max_retries = 1;
-            };
           };
           # client-direct voice hands remote clients the loopback ASR URL, so
           # every client transcribes through the gateway relay instead.
@@ -376,6 +379,7 @@
           # The dashboard accepts this as a bearer token for /api/fs/download.
           # The file: form keeps the token itself out of the environment.
           HERMES_DASHBOARD_SESSION_TOKEN = "file:${config.age.secrets."hermes-dashboard-session-token".path}";
+          HERMES_LOCAL_STT_COMMAND = "${qwenAsrSttScript} {input_path} {output_dir}";
           # lean-ctx engine settings. The plugin reads its whole config from this
           # namespace (config.py), and the port is the `lean-ctx serve` tools API,
           # not the LLM proxy. update_model() overrides the window on model
