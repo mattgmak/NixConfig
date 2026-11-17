@@ -465,6 +465,39 @@ in
       # Join once with `sudo tailscale up --hostname=macmini`.
       services.tailscale.enable = true;
 
+      # The module sets RunAtLoad only and keeps the node key in the login
+      # keychain, so a boot with no GUI login yields a daemon that cannot sign
+      # and a peer that shows offline until someone signs in. The override puts
+      # the state on disk and adds the restart the module leaves out.
+      launchd.daemons.tailscaled.command = lib.mkForce (
+        pkgs.writeShellScript "tailscaled-headless" ''
+          set -u
+          ${tailscalePackage}/bin/tailscaled --state=file:/var/lib/tailscale/tailscaled.state &
+          pid=$!
+          trap 'kill $pid' TERM INT
+          for _ in $(seq 1 30); do
+            ${tailscalePackage}/bin/tailscale status >/dev/null 2>&1 && break
+            sleep 2
+          done
+          # A reusable auth key in this root-only file finishes a headless login.
+          if [ -r /var/db/tailscale-authkey ]; then
+            ${tailscalePackage}/bin/tailscale up \
+              --authkey=file:/var/db/tailscale-authkey \
+              --hostname=${lib.toLower hostname} || true
+          fi
+          wait $pid
+        ''
+      );
+
+      launchd.daemons.tailscaled.serviceConfig = {
+        KeepAlive = {
+          SuccessfulExit = false;
+        };
+        ThrottleInterval = 60;
+        StandardOutPath = "/var/log/tailscaled.log";
+        StandardErrorPath = "/var/log/tailscaled.log";
+      };
+
       # A sleeping console stalls the simulators that agents drive.
       power.sleep = {
         computer = "never";
