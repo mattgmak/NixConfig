@@ -469,10 +469,13 @@ in
       # keychain, so a boot with no GUI login yields a daemon that cannot sign
       # and a peer that shows offline until someone signs in. The override puts
       # the state on disk and adds the restart the module leaves out.
+      # --state takes a plain path. A "file:" prefix leaves tailscaled to create
+      # a relative "file:" directory, which fails on the read-only root.
       launchd.daemons.tailscaled.command = lib.mkForce (
         pkgs.writeShellScript "tailscaled-headless" ''
           set -u
-          ${tailscalePackage}/bin/tailscaled --state=file:/var/lib/tailscale/tailscaled.state &
+          mkdir -p /var/lib/tailscale
+          ${tailscalePackage}/bin/tailscaled --state=/var/lib/tailscale/tailscaled.state &
           pid=$!
           trap 'kill $pid' TERM INT
           for _ in $(seq 1 30); do
