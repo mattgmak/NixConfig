@@ -878,14 +878,14 @@ SEED
         # ADR 0001: the Collector is the only client allowed to read Halogen /metrics, so
         # one Collector runs per stack and Prometheus reads the Collector instead of the
         # engine. The stack is gated behind inference.target, so this unit only orders
-        # after podman-halogen-signal and never starts it. With the engine down the
-        # Collector serves history and marks the gap as an Outage.
+        # after podman-halogen-thinkingcap and never starts it. With the engine down
+        # the Collector serves history and marks the gap as an Outage.
         systemd.services.halogen-dashboard = {
-          description = "Halogen dashboard Collector (signal stack)";
+          description = "Halogen dashboard Collector (thinkingcap stack)";
           wantedBy = [ "multi-user.target" ];
-          after = [ "network-online.target" "podman-halogen-signal.service" ];
+          after = [ "network-online.target" "podman-halogen-thinkingcap.service" ];
           serviceConfig = {
-            ExecStart = "${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.halogen-dashboard} --halogen-url http://127.0.0.1:8731 --listen 127.0.0.1:8790 --db /var/lib/halogen-dashboard/halogen-dashboard.sqlite";
+            ExecStart = "${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.halogen-dashboard} --halogen-url http://127.0.0.1:8751 --listen 127.0.0.1:8790 --db /var/lib/halogen-dashboard/halogen-dashboard.sqlite";
             DynamicUser = true;
             StateDirectory = "halogen-dashboard";
             Restart = "always";
