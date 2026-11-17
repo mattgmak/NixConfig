@@ -661,17 +661,17 @@ in
       # Engram persistent-memory HTTP server (default port 7437). The
       # gentle-engram Pi extension talks to this over localhost; without it
       # mem_* tools fail with "Engram server not running". RunAtLoad starts it
-      # at login, KeepAlive restarts it on crash/exit. DB + logs live in
+      # at boot, KeepAlive restarts it on crash/exit. DB + logs live in
       # ~/.engram (created on first serve).
-      launchd.agents.engram = {
+      launchd.daemons.engram = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
             "-c"
             "/bin/wait4path /nix/store && exec ${self.packages.${system}.engram}/bin/engram serve"
           ];
-          # nix-darwin loads agents into the system domain here; without
-          # UserName the job would run as root. Pin the user explicitly.
+          # Daemons run as root unless UserName is set. Pin the user so the
+          # DB and file ownership stay with the account.
           UserName = username;
           # launchd daemon/agent context does not set $HOME; engram refuses
           # to start without it ("determine home directory: $HOME is not
@@ -692,8 +692,8 @@ in
 
       # Crawl4AI fetch server for pi-web-access (fetch_content fallback).
       # Linux pi hosts use systemd.user.services.crawl4ai in pi-coding-agent.nix;
-      # darwin has no user systemd, so mirror engram with a launchd agent.
-      launchd.agents.crawl4ai = {
+      # darwin has no user systemd, so mirror engram as a launchd daemon.
+      launchd.daemons.crawl4ai = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
@@ -718,8 +718,8 @@ in
 
       # SearXNG meta-search for pi web-search (http://127.0.0.1:8888).
       # Linux pi hosts use systemd.user.services.searxng in pi-coding-agent.nix;
-      # darwin has no user systemd, so mirror engram with a launchd agent.
-      launchd.agents.searxng = {
+      # darwin has no user systemd, so mirror engram as a launchd daemon.
+      launchd.daemons.searxng = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
@@ -747,7 +747,7 @@ in
       # ~/Library/Logs because launchd cannot create a missing parent dir.
       # No bearer token: the Tailscale ACL on svc:manzanas is the only gate.
       # A token-free daemon also closes POST /v0/devices, which spawns host processes.
-      launchd.agents.manzanasd = {
+      launchd.daemons.manzanasd = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
@@ -793,7 +793,7 @@ in
       };
 
       # Bearer token for the shared argent tool-server. The owner is the login
-      # user, so the agent below can read it.
+      # user, so the daemon below can read it.
       age.secrets.argent-server-token = {
         file = ../../secrets/argent-server-token.age;
         owner = username;
@@ -803,7 +803,7 @@ in
       # `argent server start` CLI mints its own token and prints it to stdout,
       # which defeats a fixed token from the secret store. The entry reads
       # ARGENT_AUTH_TOKEN, so our token reaches the server unchanged.
-      launchd.agents.argent = {
+      launchd.daemons.argent = {
         serviceConfig = {
           ProgramArguments = [
             "/bin/sh"
