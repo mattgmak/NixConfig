@@ -84,7 +84,19 @@
       "fd * /": "deny",
       "fd * / *": "deny",
       "fd * /nix*": "deny",
-      "fd * ~": "deny"
+      "fd * ~": "deny",
+      "rm /mnt/copyparty*": "deny",
+      "rm -r /mnt/copyparty*": "deny",
+      "rm -rf /mnt/copyparty*": "deny",
+      "rm -f /mnt/copyparty*": "deny",
+      "rmdir /mnt/copyparty*": "deny",
+      "mv /mnt/copyparty*": "deny",
+      "mv * /mnt/copyparty*": "deny",
+      "cp * /mnt/copyparty*": "deny",
+      "truncate /mnt/copyparty*": "deny",
+      "truncate * /mnt/copyparty*": "deny",
+      "tee /mnt/copyparty*": "deny",
+      "dd * of=/mnt/copyparty*": "deny"
     },
     "ctx_shell": {
       "*": "allow",
@@ -150,7 +162,19 @@
       "fd * /": "deny",
       "fd * / *": "deny",
       "fd * /nix*": "deny",
-      "fd * ~": "deny"
+      "fd * ~": "deny",
+      "rm /mnt/copyparty*": "deny",
+      "rm -r /mnt/copyparty*": "deny",
+      "rm -rf /mnt/copyparty*": "deny",
+      "rm -f /mnt/copyparty*": "deny",
+      "rmdir /mnt/copyparty*": "deny",
+      "mv /mnt/copyparty*": "deny",
+      "mv * /mnt/copyparty*": "deny",
+      "cp * /mnt/copyparty*": "deny",
+      "truncate /mnt/copyparty*": "deny",
+      "truncate * /mnt/copyparty*": "deny",
+      "tee /mnt/copyparty*": "deny",
+      "dd * of=/mnt/copyparty*": "deny"
     },
     "external_directory": "allow"
   }

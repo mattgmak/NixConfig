@@ -61,6 +61,27 @@ in
           immich-ml
           strixHaloMemory
           hermes
+          copyparty-client
+          ({
+            config,
+            ...
+          }: {
+            # copyparty on Goofeus, on-demand WebDAV via copyparty-mount (see programs.copyparty-client).
+            age.secrets.copyparty-goofy-pass = {
+              file = ../../secrets/copyparty-goofy-pass.age;
+              owner = "agent";
+              mode = "0400";
+            };
+
+            programs.copyparty-client = {
+              enable = true;
+              url = "https://goofeus.dab-octatonic.ts.net/";
+              mountPoint = "/mnt/copyparty";
+              passwordFile = config.age.secrets.copyparty-goofy-pass.path;
+              webdavUser = "goofy";
+              localUser = "agent";
+            };
+          })
           # qemu-vm.nix forces swapDevices = [], so zswap's swap-device assertion fails in the VM variant.
           {
             virtualisation.vmVariant = {
