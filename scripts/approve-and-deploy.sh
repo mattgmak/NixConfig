@@ -7,24 +7,26 @@
 #   scripts/approve-and-deploy.sh fix-ramsay-agenix --caller %4
 #
 # You read it and press Enter. The script merges the branch into main, pushes,
-# deploys through the ramsay-deploy gate, then sends the handoff to the pi pane.
+# runs the deploy action for each host, then sends the handoff to the pi pane.
 # The merge keeps the worktree, so the caller session keeps a live cwd. The
 # handoff tells that session to remove the worktree once it verifies the deploy.
 # A failed step sends the failure to the same pane and keeps the pane open.
 #
-#   scripts/approve-and-deploy.sh <branch>                  ramsay only
+#   scripts/approve-and-deploy.sh <branch>              host = hostname -s
 #   scripts/approve-and-deploy.sh <branch> --hosts ramsay,goofeus
 #   scripts/approve-and-deploy.sh <branch> --dry-run        print every step
 #   scripts/approve-and-deploy.sh <branch> --no-deploy      merge and push only
 #   scripts/approve-and-deploy.sh <branch> --no-kill        keep the pane open
 #   scripts/approve-and-deploy.sh <branch> --handoff <file> replace the handoff text
 #
-# Run it as the agent user. The two sudo calls need the NOPASSWD rules in
-# dendritic/hosts/Ramsay.nix, so no password is typed on a phone session.
+# deploy_action() maps a host to its deploy action. Ramsay runs the sudo gate
+# from dendritic/hosts/Ramsay.nix and works only there. Goofeus deploys over
+# ssh. GoofyDesky, GoofyEnvy and MacMini print the switch command, because the
+# user runs nh for the current machine.
 # A failed step stops the run and leaves the pane open with the log on screen.
 set -euo pipefail
 
-usage() { sed -n '3,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 send_to_caller() {
   if [ "$dry" = 1 ] || [ -z "$caller" ]; then printf '  -> %s: %s\n' "$caller" "$1"; return 0; fi
   tmux send-keys -t "$caller" -l "$1"
@@ -37,16 +39,36 @@ run() {
   "$@"
 }
 
+# deploy_action <host> prints run: lines to execute and print: lines to show.
+# Ramsay's sudo gate needs the NOPASSWD rules in dendritic/hosts/Ramsay.nix, so
+# it runs only on Ramsay. A print: host never runs nh from here.
+deploy_action() {
+  local h=${1,,}
+  case "$h" in
+    ramsay)
+      [ "$(hostname -s)" = Ramsay ] || { printf 'deploy ramsay only on ramsay\n' >&2; return 1; }
+      printf 'run:sudo /run/current-system/sw/bin/ramsay-deploy-approve\n'
+      printf 'run:sudo /run/current-system/sw/bin/ramsay-deploy-switch\n' ;;
+    goofeus)
+      printf 'run:bash %s/scripts/deploy-goofeus.sh\n' "$main_path" ;;
+    goofydesky) printf 'print:nh os switch --flake %s#GoofyDesky\n' "$main_path" ;;
+    goofyenvy)  printf 'print:nh os switch --flake %s#GoofyEnvy\n' "$main_path" ;;
+    macmini)    printf 'print:nh darwin switch --flake %s#MacMini\n' "$main_path" ;;
+    *) printf 'no deploy action for host: %s\n' "$h" >&2; return 1 ;;
+  esac
+}
+
 branch=''
-hosts='ramsay'
+hosts=${HOSTS:-$(hostname -s)}
 dry=0
 no_deploy=0
 no_kill=0
 allow_dirty=0
+deploy_ran=0
+main_path=''
 caller=${APPROVE_CALLER:-}
 msg=${APPROVE_MSG:-}
 handoff=${APPROVE_HANDOFF:-}
-host_required=${HOST_REQUIRED:-Ramsay}
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -72,11 +94,9 @@ done
   exit 2
 }
 
-case "$(hostname -s)" in
-  "$host_required") : ;;
-  *) printf 'this script runs on %s, not on %s\n' "$(hostname -s)" "$host_required" >&2
-     exit 1 ;;
-esac
+for h in ${hosts//,/ }; do
+  deploy_action "$h" >/dev/null || exit 2
+done
 
 command -v wt >/dev/null || { printf 'wt not in PATH\n' >&2; exit 1; }
 command -v jq >/dev/null || { printf 'jq not in PATH\n' >&2; exit 1; }
@@ -100,10 +120,6 @@ main_path=$(wt list --format json 2>/dev/null |
   exit 1
 }
 
-for h in ${hosts//,/ }; do
-  case "$h" in ramsay | goofeus) : ;; *) printf 'unknown host: %s\n' "$h" >&2; exit 2 ;; esac
-done
-
 log=${LOG:-${TMPDIR:-/tmp}/agent-tmp/NixConfig/approve-and-deploy-${branch}.log}
 [ "$dry" = 1 ] || mkdir -p "$(dirname "$log")"
 
@@ -125,19 +141,18 @@ main() {
   if [ "$no_deploy" = 1 ]; then
     say 'deploy skipped (--no-deploy)'
   else
-    case ",$hosts," in
-      *,ramsay,*)
-        say 'deploy ramsay'
-        run sudo /run/current-system/sw/bin/ramsay-deploy-approve
-        run sudo /run/current-system/sw/bin/ramsay-deploy-switch
-        ;;
-    esac
-    case ",$hosts," in
-      *,goofeus,*)
-        say 'deploy goofeus'
-        run bash "$main_path/scripts/deploy-goofeus.sh"
-        ;;
-    esac
+    for h in ${hosts//,/ }; do
+      say "deploy $h"
+      while IFS= read -r line; do
+        case "$line" in
+          run:*)
+            deploy_ran=1
+            run ${line#run:}
+            ;;
+          print:*) printf '  manual: %s\n' "${line#print:}" ;;
+        esac
+      done < <(deploy_action "$h")
+    done
   fi
 
   # The pi session is the worktree memory. The handoff line replaces the old
@@ -149,6 +164,8 @@ main() {
     :
   elif [ "$no_deploy" = 1 ]; then
     msg="Branch $branch merged as $sha, deploy skipped. Report the result."
+  elif [ "$deploy_ran" = 0 ]; then
+    msg="Branch $branch merged as $sha, deploy left to you. Run the printed switch command, then report the result."
   else
     msg="Deploy of $sha finished. Read the log at $log, check journalctl, then report the result."
   fi
