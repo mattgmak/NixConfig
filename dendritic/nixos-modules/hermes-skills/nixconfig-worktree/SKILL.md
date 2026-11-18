@@ -52,6 +52,9 @@ The agent account owns the tree, so no `chown` and no mode fix ever comes back.
 Never edit `/home/agent/NixConfig` itself for a task, and never edit a worktree
 another task owns.
 
+A session started on main keeps that cwd: pi has no `/cd`, and shell integration
+is off. Work the worktree through absolute paths and the `--flake` form above.
+
 ## Delegate
 
 Write the brief with the rules in the `pi` skill: one task, the full context, no
