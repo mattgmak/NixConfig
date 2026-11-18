@@ -75,6 +75,7 @@ shell_allowlist_extra = [
     "pi-local",
     "ffmpeg",
     "lua",
+    "kdeconnect-cli",
 ]
 
 [telemetry]
