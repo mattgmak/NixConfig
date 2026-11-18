@@ -142,6 +142,9 @@ in
         ];
         tools.nixconfigSync.enable = true;
 
+        # Headless: no display, so the pi-ssh-image-clipboard extension owns ctrl+v.
+        piCodingAgent.clipboardPasteImageKeys = [];
+
         # pi's X11 clipboard backend for the ssh -X route. wl-clipboard needs a
         # live compositor, so it cannot serve a headless host.
         # android-tools gives adb. pi drives the phone with `adb connect` against

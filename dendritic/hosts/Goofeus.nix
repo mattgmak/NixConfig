@@ -101,6 +101,9 @@
         ];
         tools.nixconfigSync.enable = true;
 
+        # Headless: no display, so the pi-ssh-image-clipboard extension owns ctrl+v.
+        piCodingAgent.clipboardPasteImageKeys = [];
+
         # Agent decrypts API secrets with its own age identity (root uses the
         # ssh host key via nushell's mkIf; agent gets the dedicated key path).
         age.identityPaths = [ "/run/agenix/agent-age-key" ];

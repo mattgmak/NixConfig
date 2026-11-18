@@ -1,5 +1,4 @@
 {
-  "app.clipboard.pasteImage": [],
   "app.message.followUp": ["ctrl+enter", "alt+enter"],
   "app.session.resume": "ctrl+r",
 

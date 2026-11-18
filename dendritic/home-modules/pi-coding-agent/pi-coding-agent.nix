@@ -10,6 +10,7 @@
     let
       system = pkgs.stdenv.hostPlatform.system;
       autoExtDepsInstall = config.piCodingAgent.autoExtDepsInstall;
+      clipboardPasteImageKeys = config.piCodingAgent.clipboardPasteImageKeys;
       nixConfigRoot = "${config.home.homeDirectory}/NixConfig";
       repoRoot = "${nixConfigRoot}/dendritic";
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
@@ -704,6 +705,12 @@
         };
       };
 
+      options.piCodingAgent.clipboardPasteImageKeys = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "ctrl+v" ];
+        description = "Keybindings for pi's built-in image paste. A headless host sets [ ] so the vendored pi-ssh-image-clipboard extension keeps ctrl+v.";
+      };
+
       imports = [
         inputs.coding-agents.homeManagerModules.default
         inputs.agenix.homeManagerModules.default
@@ -900,8 +907,18 @@
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/copy.json";
         home.file.".pi/agent/settings.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/settings.json";
+        # The default keeps the live repo symlink, so pi binds its own ctrl+v and the
+        # vendored pi-ssh-image-clipboard extension stays out (it bails on a display).
+        # Any other value generates the file from the repo JSON plus the override;
+        # ./keybindings.json keeps the read pure, unlike piAgentRoot.
         home.file.".pi/agent/keybindings.json".source =
-          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json";
+          if clipboardPasteImageKeys == [ "ctrl+v" ] then
+            config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/keybindings.json"
+          else
+            pkgs.writeText "pi-keybindings.json" (builtins.toJSON (
+              builtins.fromJSON (builtins.readFile ./keybindings.json)
+              // { "app.clipboard.pasteImage" = clipboardPasteImageKeys; }
+            ));
         home.file.".pi/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/agents";
         # SearXNG needs settings.yml with json in search.formats (else JSON API 403)
         # and use_default_settings: true (else KeyError, zero engines). Written via
