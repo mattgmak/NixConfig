@@ -29,6 +29,16 @@ Six fields go in the file, never in the chat:
 
 The master reads the file only when a fact is missing from the three lines. A lane that pastes a diff or a file body into the reply wastes both contexts.
 
+### No interim reply
+
+A lane ends its turn on a result or a blocker. It never reports a start, a wait, or a job that finished.
+
+A long job starts with `ctx_bg`. The lane keeps working in the same turn and reads the job result itself.
+
+A blocker reply holds three lines: the command, its output, and the step that failed.
+
+A lane that returns an interim status gets one steer: `End your turn only on a result or a blocker.` Repeat the miss and the lane stops.
+
 ### Gate cache
 
 Run the gate block once per head. Then read it.
