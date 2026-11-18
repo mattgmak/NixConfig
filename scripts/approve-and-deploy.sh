@@ -175,7 +175,7 @@ main() {
   fi
   # The worktree survives the merge, so the caller owns its cleanup. Remove comes
   # last: deleting the worktree deletes the cwd of the session running it.
-  msg="$msg If the deploy is good, run 'wt remove -f $branch' as your last action. If it is bad, rebase the worktree onto main, fix on top, and run the approval flow again."
+  msg="$msg If the deploy is good, run 'wt remove -f -D $branch' as your last action. If it is bad, rebase the worktree onto main, fix on top, and run the approval flow again."
   send_to_caller "$msg"
 
   if [ "$no_kill" = 1 ] || [ "$dry" = 1 ]; then
