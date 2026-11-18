@@ -138,6 +138,22 @@
 
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
 
+        # Pinned to one invocation: the approval pane switches without a
+        # password, and every other nh subcommand still asks. Rollback and
+        # generation pruning (`nh os boot`, `nh os clean`, `nix store gc`)
+        # keep the password as the safety net.
+        security.sudo.extraRules = [
+          {
+            users = [ username ];
+            commands = [
+              {
+                command = "/run/current-system/sw/bin/nh os switch -e none --diff never /home/goofy/NixConfig#GoofyEnvy";
+                options = [ "NOPASSWD" ];
+              }
+            ];
+          }
+        ];
+
         # common.nix sets no keys here. Ramsay's agent key is listed so
         # tmux-bridge can ssh back and run xdg-open or wl-copy.
         users.users.${username}.openssh.authorizedKeys.keys = with self.sshKeys; [

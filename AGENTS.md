@@ -145,7 +145,7 @@ caller session keeps a live cwd.
 | 7. Open the approval panes | agent | split the pi pane per [Pane layout](#pane-layout), then `send-keys` the command with no Enter |
 | 8. Approve | user | press Enter in the pane |
 | 9. Merge and push | script | `wt -C <worktree> merge main --no-remove`, then `git push origin main` |
-| 10. Deploy | script | the `deploy_action()` table in `scripts/approve-and-deploy.sh`: Ramsay runs the sudo gate, Goofeus deploys over ssh, every other host prints its own switch command |
+| 10. Deploy | script | the `deploy_action()` table in `scripts/approve-and-deploy.sh`: Ramsay runs the sudo gate, Goofeus deploys over ssh, GoofyDesky and GoofyEnvy run `nh` through their own NOPASSWD rule, MacMini prints its switch command |
 | 11. Verify, then clean up | agent | pi gets the prompt the script sends into its pane. On a good deploy, run `wt remove -f <branch>` last. On a bad one, rebase the worktree onto main, fix, and repeat from step 5 |
 | 12. Close | script | `tmux kill-pane` on its own pane |
 

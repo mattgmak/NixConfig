@@ -458,6 +458,22 @@
           memoryPercent = 50; # 16 GiB zram on 32 GiB RAM
         };
 
+        # Pinned to one invocation: the approval pane switches without a
+        # password, and every other nh subcommand still asks. Rollback and
+        # generation pruning (`nh os boot`, `nh os clean`, `nix store gc`)
+        # keep the password as the safety net.
+        security.sudo.extraRules = [
+          {
+            users = [ username ];
+            commands = [
+              {
+                command = "/run/current-system/sw/bin/nh os switch -e none --diff never /home/goofy/NixConfig#GoofyDesky";
+                options = [ "NOPASSWD" ];
+              }
+            ];
+          }
+        ];
+
         # Ramsay's agent key needs an entry here or tmux-bridge on Ramsay gets
         # `Permission denied (publickey)` when it ssh's back to run xdg-open.
         users.users.${username}.openssh.authorizedKeys.keys = with self.sshKeys; [

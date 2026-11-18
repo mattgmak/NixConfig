@@ -51,8 +51,12 @@ deploy_action() {
       printf 'run:sudo /run/current-system/sw/bin/ramsay-deploy-switch\n' ;;
     goofeus)
       printf 'run:bash %s/scripts/deploy-goofeus.sh\n' "$main_path" ;;
-    goofydesky) printf 'print:nh os switch --flake %s#GoofyDesky\n' "$main_path" ;;
-    goofyenvy)  printf 'print:nh os switch --flake %s#GoofyEnvy\n' "$main_path" ;;
+    goofydesky)
+      [ "$(hostname -s)" = GoofyDesky ] || { printf 'deploy goofydesky only on goofydesky\n' >&2; return 1; }
+      printf 'run:sudo /run/current-system/sw/bin/nh os switch -e none --diff never %s#GoofyDesky\n' "$main_path" ;;
+    goofyenvy)
+      [ "$(hostname -s)" = GoofyEnvy ] || { printf 'deploy goofyenvy only on goofyenvy\n' >&2; return 1; }
+      printf 'run:sudo /run/current-system/sw/bin/nh os switch -e none --diff never %s#GoofyEnvy\n' "$main_path" ;;
     macmini)    printf 'print:nh darwin switch --flake %s#MacMini\n' "$main_path" ;;
     *) printf 'no deploy action for host: %s\n' "$h" >&2; return 1 ;;
   esac
