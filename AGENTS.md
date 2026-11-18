@@ -130,7 +130,9 @@ Never add a second window, and never kill the pi pane. `spawn-approval-session` 
 
 ### Change workflow
 
-No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves only in step 9.
+No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
+only in step 9. The script passes `--no-remove`, so the worktree survives and the
+caller session keeps a live cwd.
 
 | Step | Owner | Command |
 | --- | --- | --- |
@@ -142,12 +144,12 @@ No PRs. `wt merge` squashes the branch and fast-forwards `main`, so `main` moves
 | 6. Fix and repeat | agent | commit each fix, then rerun until exit 0 |
 | 7. Open the approval panes | agent | split the pi pane per [Pane layout](#pane-layout), then `send-keys` the command with no Enter |
 | 8. Approve | user | press Enter in the pane |
-| 9. Merge and push | script | `wt -C <worktree> merge main`, then `git push origin main` |
+| 9. Merge and push | script | `wt -C <worktree> merge main --no-remove`, then `git push origin main` |
 | 10. Deploy | script | `sudo ramsay-deploy-approve`, `sudo ramsay-deploy-switch`, then `scripts/deploy-goofeus.sh` for Goofeus |
-| 11. Verify the live host | agent | pi gets the prompt the script sends into its pane |
+| 11. Verify, then clean up | agent | pi gets the prompt the script sends into its pane. On a good deploy, run `wt remove -f <branch>` last. On a bad one, rebase the worktree onto main, fix, and repeat from step 5 |
 | 12. Close | script | `tmux kill-pane` on its own pane |
 
-`scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. The script first sends `/cd <main checkout>` to the caller pane: `wt merge` trashes the worktree, so a caller session started there holds a dead cwd. Test it with `--dry-run`.
+`scripts/approve-and-deploy.sh <branch> --caller <pane-id>` runs steps 9-12. A failed step stops the run and keeps the pane open. The handoff text carries the cleanup and the rebase instruction, so the caller never needs to change its own cwd. Test it with `--dry-run`.
 
 ## Direct workflow
 

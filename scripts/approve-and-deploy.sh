@@ -7,8 +7,9 @@
 #   scripts/approve-and-deploy.sh fix-ramsay-agenix --caller %4
 #
 # You read it and press Enter. The script merges the branch into main, pushes,
-# deploys through the ramsay-deploy gate, then sends /cd to the main checkout and
-# the handoff to the pi pane.
+# deploys through the ramsay-deploy gate, then sends the handoff to the pi pane.
+# The merge keeps the worktree, so the caller session keeps a live cwd. The
+# handoff tells that session to remove the worktree once it verifies the deploy.
 # A failed step sends the failure to the same pane and keeps the pane open.
 #
 #   scripts/approve-and-deploy.sh <branch>                  ramsay only
@@ -29,13 +30,6 @@ send_to_caller() {
   tmux send-keys -t "$caller" -l "$1"
   tmux send-keys -t "$caller" Enter
 }
-# wt merge trashes the worktree, so a caller session started there now holds a
-# dead cwd and every tool call fails. Move it to main before any handoff.
-cd_caller() {
-  [ "$caller_cd_sent" = 1 ] && return 0
-  caller_cd_sent=1
-  send_to_caller "/cd $main_path"
-}
 say() { printf '\n== %s\n' "$*"; }
 run() {
   if [ "$dry" = 1 ]; then printf '  dry: %s\n' "$*"; return 0; fi
@@ -46,7 +40,6 @@ run() {
 branch=''
 hosts='ramsay'
 dry=0
-caller_cd_sent=0
 no_deploy=0
 no_kill=0
 allow_dirty=0
@@ -115,20 +108,16 @@ log=${LOG:-${TMPDIR:-/tmp}/agent-tmp/NixConfig/approve-and-deploy-${branch}.log}
 [ "$dry" = 1 ] || mkdir -p "$(dirname "$log")"
 
 main() {
-  local start_dir=$PWD
   printf 'branch  %s (%s)\nmain    %s\nhosts   %s\nlog     %s\n' \
     "$branch" "$wt_path" "$main_path" "$hosts" "$log"
 
   say 'merge'
-  run wt -C "$wt_path" merge main
+  # --no-remove keeps the worktree alive. A caller session started there keeps a
+  # live cwd, and a bad deploy can be rebased onto main in the same worktree.
+  run wt -C "$wt_path" merge main --no-remove
   local sha
   sha=$(git -C "$main_path" rev-parse --short HEAD)
   printf '  main is now %s\n' "$sha"
-
-  # wt merge moves the worktree to its trash, so the shell cwd disappears here.
-  # Later steps run nix, which dies on a missing cwd: `cannot get cwd: No such
-  # file or directory`.
-  cd "$start_dir" 2>/dev/null || cd "$main_path" || return 1
 
   say 'push'
   run git -C "$main_path" push origin main
@@ -153,7 +142,6 @@ main() {
 
   # The pi session is the worktree memory. The handoff line replaces the old
   # HANDOFF.md file: the session keeps the context, and git keeps the change.
-  cd_caller
   local msg=${msg:-}
   if [ -n "$handoff" ] && [ -f "$handoff" ]; then
     msg=$(tr '\n' ' ' < "$handoff")
@@ -164,6 +152,9 @@ main() {
   else
     msg="Deploy of $sha finished. Read the log at $log, check journalctl, then report the result."
   fi
+  # The worktree survives the merge, so the caller owns its cleanup. Remove comes
+  # last: deleting the worktree deletes the cwd of the session running it.
+  msg="$msg If the deploy is good, run 'wt remove -f $branch' as your last action. If it is bad, rebase the worktree onto main, fix on top, and run the approval flow again."
   send_to_caller "$msg"
 
   if [ "$no_kill" = 1 ] || [ "$dry" = 1 ]; then
@@ -181,7 +172,6 @@ on_err() {
   if [ -z "$err" ]; then
     err="Deploy failed in $where at line $1. Read the log at $log, fix it, then report the result."
   fi
-  cd_caller || true
   send_to_caller "$err" || true
   exit 1
 }
