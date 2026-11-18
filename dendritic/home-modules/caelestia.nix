@@ -47,6 +47,9 @@
           };
           services = {
             maxVolume = 1.5;
+            # Temporary: the ip-api lookup is plain HTTP and returns the wrong city.
+            # Revert when upstream fixes it (caelestia-dots/shell#2096).
+            weatherLocation = "Hong Kong";
           };
           notifs = {
             actionOnClick = true;
