@@ -172,6 +172,14 @@
           }
         ];
 
+        # The daemon is what makes the key below usable. Without it, every
+        # tmux-bridge call to this host fails with "Connection refused" and
+        # fzf-tmux-url reports "no opener".
+        services.openssh = {
+          enable = true;
+          settings.PermitRootLogin = "no";
+        };
+
         # common.nix sets no keys here. Ramsay's agent key is listed so
         # tmux-bridge can ssh back and run xdg-open or wl-copy.
         users.users.${username}.openssh.authorizedKeys.keys = with self.sshKeys; [
