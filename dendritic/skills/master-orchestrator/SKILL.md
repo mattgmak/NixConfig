@@ -515,6 +515,17 @@ still, states what it sees, and fixes a fault before it reports.
 - Devices: a leased iOS simulator still needs the user ask, in both modes. A change that touches a
   native path still needs a device run that the user approves.
 
+A `direct` lane owns its own sandbox and its own stills.
+
+- The lane starts the sandbox and the dev server for its own worktree, then stops them before it
+  reports.
+- The lane reads its own Metro port from `pnpm sandbox:status`, as the **Metro port** rule says. It
+  never stops the Metro of another worktree.
+- The lane boots the AVD it needs and captures the stills itself. It reads each still and fixes a
+  fault before it reports.
+- The lane stops the sandbox it started. It leaves no service behind.
+- `work-mode=standard` keeps the old rule: a lane runs neither action.
+
 The gate list does not change. A direct merge runs `pnpm check-types`, `pnpm biome check --write`,
 and the package tests before it merges.
 
@@ -541,7 +552,7 @@ changes nothing. The default is `standard`. Read `## Work mode`.
 
 `sandbox-dev up` starts the sandbox and a dev server in a new tmux session. `sandbox-dev reset` clears the sandbox data and seeds fresh rows. Neither action changes this skill. Read `docs/agents/sandbox.md` and `docs/agents/sandbox-tailscale.md` first.
 
-Both actions use a worktree of the tcm monorepo. This skill documents the commands. A lane runs neither action on its own.
+Both actions use a worktree of the tcm monorepo. This skill documents the commands. A lane runs neither action on its own, except a `work-mode=direct` lane, which runs both for its own still.
 
 ### `sandbox-dev up`
 
