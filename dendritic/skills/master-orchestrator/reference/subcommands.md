@@ -41,3 +41,18 @@ A wave session learns a new step, a new gate or a dead rule. Fold it into the fi
 Ask the user first, every time.
 
 Path: `dendritic/skills/master-orchestrator/SKILL.md`. Spawn a peer on `~/NixConfig` when the edit touches more than two sections.
+
+## Sub-command: work-mode
+
+`/skill:master-orchestrator work-mode [direct|standard]` sets the `work-mode` flag. It starts no lane and touches no ticket.
+
+No argument reports the value and changes nothing. The default is `standard`.
+
+| Value | Flow per change |
+|---|---|
+| `standard` | Linear ticket, worktree, lane, pull request, user merge |
+| `direct` | spec in chat, worktree, one lane, local `--no-ff` merge, push |
+
+`direct` writes no Linear record and opens no pull request. Read `## Work mode` in `SKILL.md` before the first change.
+
+A change that edits a schema, a backend mutation, or a native path stays `standard`.

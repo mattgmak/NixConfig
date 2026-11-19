@@ -5,27 +5,41 @@
 #   state-flag.sh get <name>      print one value
 #   state-flag.sh set <name> <v>  write one value
 #
-# The file holds one NAME=value line per flag. A missing file means both
-# flags read off.
+# The file holds one NAME=value line per flag. A missing file means `rush`
+# and `code-review` read off, and `work-mode` reads standard.
 set -uo pipefail
 
 FLAG_FILE="${MASTER_ORCHESTRATOR_FLAG:-/tmp/agent-tmp/tcm/master-orchestrator-state-flag}"
-KNOWN="rush code-review"
+KNOWN="rush code-review work-mode"
 
 usage() {
-  echo "usage: state-flag.sh [get <name> | set <name> <on|off>]" >&2
+  echo "usage: state-flag.sh [get <name> | set <name> <value>]" >&2
   exit 2
+}
+
+allowed_values() {
+  case "$1" in
+    work-mode) echo "direct or standard" ;;
+    *) echo "on or off" ;;
+  esac
+}
+
+default_value() {
+  case "$1" in
+    work-mode) echo standard ;;
+    *) echo off ;;
+  esac
 }
 
 read_flag() {
   local name="$1"
   if [ ! -f "$FLAG_FILE" ]; then
-    echo off
+    default_value "$name"
     return
   fi
   local value
   value=$(rg -N "^${name}=" "$FLAG_FILE" 2>/dev/null | tail -1 | cut -d= -f2)
-  echo "${value:-off}"
+  echo "${value:-$(default_value "$name")}"
 }
 
 write_flag() {
@@ -53,7 +67,10 @@ case "${1:-}" in
     ;;
   set)
     [ $# -eq 3 ] || usage
-    case "$3" in on|off) ;; *) echo "value reads on or off" >&2; exit 2 ;; esac
+    case "$2:$3" in
+      work-mode:direct|work-mode:standard|rush:on|rush:off|code-review:on|code-review:off) ;;
+      *) echo "value reads $(allowed_values "$2")" >&2; exit 2 ;;
+    esac
     write_flag "$2" "$3"
     read_flag "$2"
     ;;

@@ -28,6 +28,8 @@ Completion criterion: you merge, block, or escalate every ticket in the wave wit
 
 The peer grills, never the master session. Read `reference/grilling.md`.
 
+One exception: in `work-mode=direct` the master session grills. Read `## Work mode`.
+
 ## Lane watch
 
 Never poll, never sleep, never tail a log. The job holds the loop. Read `reference/lane-watch.md`.
@@ -250,7 +252,7 @@ After the user merges, retarget the branch above it and rebase it in the same tu
 | Route | Trigger | Action | Who merges |
 |---|---|---|---|
 | 1. Pull request | the default for every wave | open a pull request on the lane branch, report the url, stop | the user, in the web interface |
-| 2. Direct local merge | the user asks in the wave, in words such as "merge direct, no pull request" | merge and push the base | you |
+| 2. Direct local merge | `work-mode=direct`, or the user asks in the wave in words such as "merge direct, no pull request" | merge and push the base | you |
 
 Route 1 steps:
 
@@ -268,7 +270,9 @@ git push origin $BASE
 
 The shell policy denies `gh pr merge` and `gh pr close`. On route 1 the user merges in the web interface, so the denial does not block the wave.
 
-Never take route 2 by default. Never take route 2 because a lane finished. Never mutate a pull request without an explicit request.
+Never take route 2 in `work-mode=standard`. Never take route 2 in `direct` mode because a lane finished. Never mutate a pull request without an explicit request.
+
+`work-mode=direct` selects route 2 with no per-wave request. Read `## Work mode`. A pull request merge stays a user action in both modes.
 
 ## PR checks and conflicts
 
@@ -361,6 +365,8 @@ Write one line of status per phase change.
 
 Set the state at every lane milestone. Do not wait for the GitHub integration, and do not trust it alone.
 
+These steps belong to `standard`. A `direct` change writes no Linear record.
+
 | Milestone | Linear state | Extra |
 |---|---|---|
 | lane spawned | `In Progress` | assignee `me` |
@@ -443,20 +449,66 @@ Reply terse. Use Simplified Technical English in every reply, comment, document,
 
 ## State flags
 
-Two flags live in one file: `rush` and `code-review`. The path is
-`/tmp/agent-tmp/tcm/master-orchestrator-state-flag`. Each line reads `name=on` or `name=off`.
+Three flags live in one file: `rush`, `code-review`, and `work-mode`. The path is
+`/tmp/agent-tmp/tcm/master-orchestrator-state-flag`. Each line reads `name=value`.
 
 Read the file at session start, before a gate report, and after each wake. A missing file means
-both flags read off.
+`rush` and `code-review` read off, and `work-mode` reads `standard`.
 
 Use `scripts/state-flag.sh`. No argument prints every flag. `get <name>` prints one value.
-`set <name> <on|off>` writes one value. The `MASTER_ORCHESTRATOR_FLAG` variable overrides the path.
+`set <name> <value>` writes one value. The `MASTER_ORCHESTRATOR_FLAG` variable overrides the path.
+
+`rush` and `code-review` take `on` or `off`. `work-mode` takes `direct` or `standard`. The
+`work-mode` flag picks the flow per change. Read `## Work mode`.
 
 The `rush` flag decides the wait at the gate. `on` keeps the wave moving and stacks the next
 branch. `off` stops at the reported pull request.
 
 The `code-review` flag decides the review spawn. `off` means a lane reports its own gate exits,
 and the user reviews in the web interface.
+
+## Work mode
+
+The `work-mode` flag picks the flow for each change. The default is `standard`.
+
+| Mode | Flow per change |
+|---|---|
+| `standard` | Linear ticket, worktree, lane, branch push, pull request, user merge |
+| `direct` | spec in chat, worktree, one lane, local `--no-ff` merge, push |
+
+### standard
+
+Unchanged from today. Read sections 1 to 15. Plan a Linear ticket per change, cut a worktree, and
+spawn a lane. Push the branch and open a pull request against `mattmak/meal-plan-agent`. The user
+merges.
+
+### direct
+
+This mode serves a rapid UI tweak. Take no step that the merge does not need.
+
+This mode is the one exception to `## Grilling`. The master session asks the short questions
+itself, because no ticket carries the spec. Keep the exception narrow: one short round, then spawn.
+
+Per change:
+
+1. Ask the short clarifying questions in this session. Wait for the answers.
+2. Cut a worktree with `wt switch --create <branch>`, then spawn one `peer` lane.
+3. The lane edits, runs the full gate list, and commits on its own branch.
+4. Merge with route 2 of `## 8. Merge`, then remove the worktree, kill the lane session, and
+   report one line.
+
+A `direct` change writes no Linear record, opens no pull request, and spawns no review. Read
+section 13 for the removal and the kill.
+
+Evidence: the lane captures a still only when the user asks. The publish route stays
+`gh pr edit --attach`, and it needs a pull request. A local capture writes to
+`/tmp/agent-tmp/tcm/evidence/<change>/`.
+
+The gate list does not change. A direct merge runs `pnpm check-types`, `pnpm biome check --write`,
+and the package tests before it merges.
+
+Out of scope: a change that edits a schema, a backend mutation, or a native path. Route that change
+to `standard`.
 
 ## Sub-commands
 
@@ -466,6 +518,9 @@ and the user reviews in the web interface.
 
 `code-review [on|off]` sets the `code-review` flag. It reads the state with no argument. The
 default is `off`, by user ruling on 2026-11-12.
+
+`work-mode [direct|standard]` sets the `work-mode` flag. It reads the state with no argument and
+changes nothing. The default is `standard`. Read `## Work mode`.
 
 `sandbox-dev up` starts the sandbox and a dev server in the tmux session `sandbox-dev`. Read `## Sandbox dev`.
 
