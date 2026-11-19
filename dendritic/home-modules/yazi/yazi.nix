@@ -15,7 +15,6 @@
 
           yatline = pkgs.callPackage self.yaziPluginYatline { };
           mermaid = pkgs.callPackage self.yaziPluginMermaid { };
-          system-clipboard = pkgs.callPackage self.yaziPluginSystemClipboard { };
           yatline-modified-time = pkgs.callPackage self.yaziPluginYatlineModifiedTime { };
           yatline-page-counter = pkgs.callPackage self.yaziPluginYatlinePageCounter { };
           yatline-selected-size = pkgs.callPackage self.yaziPluginYatlineSelectedSize { };
@@ -35,7 +34,8 @@
 
       home.packages = with pkgs; [
         _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
-        clipboard-jh # `cb`, the binary system-clipboard.yazi spawns
+        clipboard-jh # `cb`, the fallback yazi-clipboard uses off Wayland and macOS
+        self.packages.${pkgs.system}.yaziClipboard # copy tool chosen per session
         djvulibre # `djvused`, used by yatline-page-counter for DjVu files
         unzip # yatline-page-counter reads EPUB and Office documents as archives
         file # `file` previewer/spotter, no wrapper means PATH lookup

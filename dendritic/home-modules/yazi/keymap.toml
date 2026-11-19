@@ -19,11 +19,13 @@ run = [
   "yank",
 ]
 
-# Copy selected files with the cb binary
+# Copies image data for images, file URIs for the rest. yazi-clipboard picks
+# wl-copy, pbcopy, or cb from the session, so every host keeps working.
 [[mgr.prepend_keymap]]
 on = ["<C-y>"]
-run = "plugin system-clipboard"
-desc = "Copy selected files to the system clipboard"
+for = "unix"
+run = "shell -- yazi-clipboard %s"
+desc = "Copy image data or file URIs to the system clipboard"
 
 # Mermaid preview controls
 [[mgr.prepend_keymap]]
