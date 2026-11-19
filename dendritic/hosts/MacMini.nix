@@ -792,6 +792,23 @@ in
         };
       };
 
+      # AXe reads the accessibility tree of the Aqua session. sshd gives a
+      # background session, and `open` there fails with -10810, so the window
+      # opens at login from this Aqua job instead.
+      launchd.user.agents.simulator = {
+        serviceConfig = {
+          ProgramArguments = [
+            "/usr/bin/open"
+            "-a"
+            "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+          ];
+          LimitLoadToSessionType = "Aqua";
+          RunAtLoad = true;
+          StandardOutPath = "/Users/${username}/Library/Logs/simulator.log";
+          StandardErrorPath = "/Users/${username}/Library/Logs/simulator.log";
+        };
+      };
+
       # Every key the mini reads, mounted at /run/agenix by the darwin agenix
       # daemon. The home-manager agenix agent needs a GUI session, so the headless
       # mini gets nothing from it. The owner is the login user, so the agent
@@ -1162,12 +1179,11 @@ in
               LoginwindowLaunchesRelaunchApps = false;
             };
           };
-          # Boot lands on the desktop, so an agent session needs no password.
-          # FileVault must stay off: a pre-boot unlock prompt defeats this.
-          loginwindow.autoLoginUser = username;
-          # A locked screen blocks the session that the launchd agents use.
+          # No auto-login. A boot parks at the login window, and an operator
+          # logs in. AXe needs that Aqua session, and a lock keeps it: measured
+          # 19 Nov 2026, the simulator answered with the screen locked.
           screensaver = {
-            askForPassword = false;
+            askForPassword = true;
             askForPasswordDelay = 0;
           };
         };

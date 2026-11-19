@@ -183,22 +183,28 @@ SSH does not help. `sshd` runs in the system domain and gives a `Background`
 session. `open -a Simulator` then fails with `LSOpenURLsWithRole() failed with
 error -10810`. `launchctl asuser` cannot attach, because `gui/<uid>` is absent.
 
-Fix after each boot: log in over Screen Sharing. The session then stays alive
-after you disconnect, so the fleet keeps AXe until the next reboot.
+Fix after each boot: log in. Screen Sharing is one way, a keyboard is another.
+The session then stays alive until you log out, so the fleet keeps AXe across a
+lock and across a disconnect.
 
 1. Enable Screen Sharing once, on the mini: System Settings → General →
    Sharing → Screen Sharing. The setting survives reboots. The Remote
    Management path is `sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -restart -agent -privs -all`.
-2. Connect from a Mac: `open vnc://macmini`, or `vnc://<tailnet-ip>`.
-3. Log in as `mattgmak`. The desktop appears, `WindowServer` starts, AXe works.
-4. Disconnect. Do not log out, and do not lock the screen.
+2. Connect from a Mac: `open vnc://macmini`, or `vnc://<tailnet-ip>`. From
+   Linux: `nix shell nixpkgs#tigervnc -c vncviewer <tailnet-ip>:5900`, after you
+   enable the legacy VNC password on the mini.
+3. Log in as `mattgmak`. `WindowServer` starts, the Aqua job opens
+   `Simulator.app`, and AXe works.
+4. Lock or disconnect. Both keep the session. Do not log out.
+
+Measured 19 Nov 2026, screen locked and no display attached: `manzanas
+screenshot` wrote a 140 KB PNG, and `manzanas tap` returned ok. So a lock costs
+nothing, and the AXe path needs no framebuffer. A headless mini may still show
+a black window in Screen Sharing. That limits watching, not driving.
 
 `power.sleep` is `never` in `MacMini.nix`, so the session never sleeps. Never
 add `loginwindow.autoLoginUser` as a substitute: modern macOS ignores that key,
 and it skips the password that a console attacker needs.
-
-A headless mini gives Screen Sharing a small virtual framebuffer. Add an HDMI
-dummy plug for a sane geometry.
 
 ## Failure modes
 
