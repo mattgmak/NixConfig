@@ -178,8 +178,13 @@ in
 
         # Headless: no tray, so the indicator unit fails. Start kdeconnectd from
         # default.target, not the module's graphical-session.target.
+        # kdeconnectd links QtWidgets and aborts with no display, so give Qt the
+        # offscreen platform.
         services.kdeconnect.indicator = lib.mkForce false;
-        systemd.user.services.kdeconnect.Install.WantedBy = lib.mkForce [ "default.target" ];
+        systemd.user.services.kdeconnect = {
+          Service.Environment = [ "QT_QPA_PLATFORM=offscreen" ];
+          Install.WantedBy = lib.mkForce [ "default.target" ];
+        };
 
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
