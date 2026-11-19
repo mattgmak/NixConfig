@@ -42,7 +42,6 @@ th.git.renamed_sign = 'R'
 th.git.staged = ui.Style():fg('green')
 require('git'):setup()
 
-
 require('yatline'):setup({
   header_line = {
     left = {
@@ -76,7 +75,7 @@ require('yatline'):setup({
       },
       section_c = {
         { type = 'string', name = 'hovered_path' },
-        { type = 'coloreds', custom = false, name = 'symlink' },
+        { type = 'coloreds', name = 'symlink' },
         { type = 'coloreds', name = 'count' },
       },
     },
@@ -88,7 +87,6 @@ require('yatline'):setup({
         { type = 'string', name = 'cursor_percentage' },
         { type = 'coloreds', custom = false, name = 'page_count' },
         { type = 'coloreds', custom = false, name = 'modified_time' },
-        { type = 'coloreds', custom = false, name = 'created_time' },
       },
       section_c = {
         { type = 'string', name = 'hovered_file_extension', params = { true } },
@@ -106,7 +104,6 @@ require('yatline-symlink'):setup({
 })
 require('yatline-selected-size'):setup()
 require('yatline-modified-time'):setup()
-require('yatline-created-time'):setup()
 require('yatline-page-counter'):setup({
   show_icon = false,
 })
