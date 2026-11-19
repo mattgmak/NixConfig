@@ -44,6 +44,7 @@ in
       Goofeus
       GoofyDesky
       GoofyDeskyRoot
+      GoofyEnvy
       Ramsay
     ];
   };

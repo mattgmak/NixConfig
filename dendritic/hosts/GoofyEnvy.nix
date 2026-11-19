@@ -22,6 +22,7 @@
         modules = with self.nixosModules; [
           common
           caTrust
+          copyparty-client
           GoofyEnvy
           GoofyEnvyHardware
           steam
@@ -112,6 +113,7 @@
       {
         pkgs,
         lib,
+        config,
         username,
         common-overlays,
         common-nixpkgs-config,
@@ -137,6 +139,22 @@
         ];
 
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
+
+        # copyparty on Goofeus: on-demand WebDAV via copyparty-mount (see programs.copyparty-client).
+        age.identityPaths = [ "/home/goofy/.ssh/id_ed25519" ];
+        age.secrets.copyparty-goofy-pass = {
+          file = ../../secrets/copyparty-goofy-pass.age;
+          owner = username;
+          mode = "0400";
+        };
+
+        programs.copyparty-client = {
+          enable = true;
+          url = "https://copyparty.dab-octatonic.ts.net/";
+          mountPoint = "/mnt/copyparty";
+          passwordFile = config.age.secrets.copyparty-goofy-pass.path;
+          webdavUser = username;
+        };
 
         # Pinned to one invocation: the approval pane switches without a
         # password, and every other nh subcommand still asks. Rollback and

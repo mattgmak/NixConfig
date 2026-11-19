@@ -237,7 +237,7 @@
 
         programs.copyparty-client = {
           enable = true;
-          url = "https://goofeus.dab-octatonic.ts.net/";
+          url = "https://copyparty.dab-octatonic.ts.net/";
           mountPoint = "/mnt/copyparty";
           passwordFile = config.age.secrets.copyparty-goofy-pass.path;
           webdavUser = username;
