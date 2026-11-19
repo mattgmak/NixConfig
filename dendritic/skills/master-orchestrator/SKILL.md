@@ -492,7 +492,15 @@ tmux attach -t sandbox-dev:dev
 
 `pnpm dev:mock` runs the full chain. The root script reads `sandbox:status`, starts the sandbox when it is down, then runs `scripts/sandbox/dev-mock.ts`. That script starts `pnpm --filter tcm-app dev:mock -- --host lan`. The app script is `TCM_AUTH_MODE=mock EXPO_NO_DOTENV=1 expo start --dev-client --clear --port $TCM_METRO_PORT` (`apps/tcm-app/package.json:96`).
 
-Do not write `pnpm dev:mock --filter tcm-app`. The root script passes no filter, and the extra argument reaches `tsx`. The chain sets the filter itself (`scripts/sandbox/metro-command.ts:18`).
+A public origin also sets `REACT_NATIVE_PACKAGER_HOSTNAME` to the host (`scripts/sandbox/metro-command.ts:28-30`). Metro then prints the tailnet host in its QR line and deep link:
+
+```
+Metro: exp+easy-tcm://?__expo_url=http%3A%2F%2F<host>%3A<metroPort>
+```
+
+Without the setting, Metro prints the LAN address and a plain `pnpm dev` on the host keeps its default.
+
+Do not write `pnpm dev:mock --filter tcm-app`. The root script passes no filter, and the extra argument reaches `tsx`. The chain sets the filter itself (`scripts/sandbox/metro-command.ts:20`).
 
 **Metro port.** The supervisor reserves five ports at startup and records them in `state.json`. Each worktree gets its own port, and `dev:mock` passes it as `TCM_METRO_PORT`. Read the port with `pnpm sandbox:status`.
 
@@ -502,9 +510,9 @@ A stale process on the Metro port means one action: wait. `pnpm dev:mock` waits 
 
 The full deep link reads `easy-tcm://expo-development-client/?url=http%3A%2F%2F<host>%3A<metroPort>` (`docs/agents/envy-android-emulator.md:100`). Send that link with `adb shell am start` on Android.
 
-The tailnet address reaches the phone because Expo runs with `--host lan` (`scripts/sandbox/metro-command.ts:18-20`). Metro then binds every interface. The phone on the same tailnet resolves the bare host name and reaches the port.
+The tailnet address reaches the phone because Expo runs with `--host lan` (`scripts/sandbox/metro-command.ts:21-23`). Metro then binds every interface. The phone on the same tailnet resolves the bare host name and reaches the port.
 
-`turbo.json:114` lists `REACT_NATIVE_PACKAGER_HOSTNAME` for the `dev` task only. The `dev:mock` chain skips Turbo, so a value in that variable changes nothing here.
+`turbo.json:114` lists `REACT_NATIVE_PACKAGER_HOSTNAME` for the `dev` task. The `dev:mock` chain skips Turbo, so the chain sets the variable itself from `SANDBOX_PUBLIC_ORIGIN`.
 
 **Failure.** `up` fails with exit code 1. Read the log path that the command prints, then run `pnpm sandbox:status`. Do not start a second `dev:mock`.
 
