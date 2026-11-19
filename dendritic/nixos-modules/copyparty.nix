@@ -112,6 +112,10 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # rclone mount needs the setuid fusermount3 wrapper; without it the mount fails with
+        # "fusermount3: mount failed: Operation not permitted".
+        programs.fuse.enable = true;
+
         environment.systemPackages = [
           (pkgs.writeShellApplication {
             name = "copyparty-mount";
