@@ -240,7 +240,7 @@
           url = "https://copyparty.dab-octatonic.ts.net/";
           mountPoint = "/mnt/copyparty";
           passwordFile = config.age.secrets.copyparty-goofy-pass.path;
-          webdavUser = username;
+          webdavUser = "goofy";
           localUser = username;
         };
 

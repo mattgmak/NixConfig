@@ -89,9 +89,8 @@
           type = lib.types.str;
           default = "";
           description = ''
-            Account name for copyparty’s WebDAV cookie. Non-empty: cookie value is
-            `cppwd=<this>:<password>` (named accounts). Empty: `cppwd=<password>` only.
-            Matches copyparty docs/rclone.md (Cookie auth; avoids Basic auth issues behind redirects).
+            Account name for copyparty’s WebDAV Basic auth (rclone user). The server
+            defines one account per passwordFile; use that account name.
           '';
         };
 
@@ -127,10 +126,9 @@
                 remote = lib.escapeShellArg "${cfg.remoteName}:/";
                 urlNorm = if lib.hasSuffix "/" cfg.url then cfg.url else cfg.url + "/";
                 urlLit = lib.escapeShellArg urlNorm;
-                # copyparty expects Cookie cppwd=… (see docs/rclone.md); Basic auth can break
-                # behind redirects (e.g. Tailscale serve) when Authorization is dropped.
-                cookieUserPrefix = if cfg.webdavUser != "" then "${cfg.webdavUser}:" else "";
-                cookieUserPrefixLit = lib.escapeShellArg cookieUserPrefix;
+                # copyparty accepts the cppwd cookie only for GET/HEAD; WebDAV PROPFIND
+                # needs Basic auth, so write user/pass instead of the cookie header.
+                userLit = lib.escapeShellArg cfg.webdavUser;
                 remoteSection = lib.escapeShellArg "[${cfg.remoteName}]";
               in
               ''
@@ -154,9 +152,7 @@
                   exit 0
                 fi
                 pass="$(tr -d '\n' < ${passPath})"
-                qual=${cookieUserPrefixLit}
-                cookie_val="cppwd=''${qual}$pass"
-                hdr_val_esc=$(printf '%s' "$cookie_val" | sed 's/"/""/g')
+                pass_obf="$(rclone obscure "$pass")"
                 conf="$RUNDIR/rclone.conf"
                 cache="$RUNDIR/cache"
                 # Root (e.g. sudo -E) can leave rclone.conf/cache here; you cannot overwrite or mkdir into them.
@@ -174,7 +170,8 @@
                   printf '%s\n' 'type = webdav'
                   printf '%s\n' 'vendor = owncloud'
                   printf 'url = %s\n' ${urlLit}
-                  printf 'headers = "Cookie","%s"\n' "$hdr_val_esc"
+                  printf 'user = %s\n' ${userLit}
+                  printf 'pass = %s\n' "$pass_obf"
                   printf '%s\n' 'auth_redirect = true'
                   printf '%s\n' 'pacer_min_sleep = 0.01ms'
                 } > "$conf"
