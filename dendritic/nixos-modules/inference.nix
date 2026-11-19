@@ -228,11 +228,17 @@
             "video"
           ];
           LimitMEMLOCK = "infinity";
+          # Each HIP process opens hardware queues of its own. Above eight
+          # compute queues on the box the iGPU stays 100% busy at idle, so
+          # every spawned model caps itself at one.
+          Environment = [ "GPU_MAX_HW_QUEUES=1" ];
         };
       };
 
       # mkGufoServe drops --mmproj and --context outside the llm modality, so
-      # this unit spells the command out. Only /v1/systemone is served.
+      # this unit spells the command out. It serves only /v1/systemone, and
+      # llama-swap routes by model name, so llama-swap cannot front it. The
+      # queue cap below keeps the unit cheap to hold.
       systemd.services.gufo-decide = {
         description = "gufo decision (d1-Omni-2B)";
         wantedBy = [ "inference.target" ];
@@ -254,6 +260,7 @@
             "video"
           ];
           LimitMEMLOCK = "infinity";
+          Environment = [ "GPU_MAX_HW_QUEUES=1" ];
           PrivateDevices = false;
           PrivateUsers = false;
           ProtectHome = true;
@@ -292,6 +299,7 @@
             "video"
           ];
           LimitMEMLOCK = "infinity";
+          Environment = [ "GPU_MAX_HW_QUEUES=1" ];
           PrivateDevices = false;
           PrivateUsers = false;
           ProtectHome = true;
