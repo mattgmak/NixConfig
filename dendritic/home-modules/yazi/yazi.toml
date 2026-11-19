@@ -126,6 +126,11 @@ suppress_preload = false
 [plugin]
 
 prepend_previewers = [
+	# eza -TL=3 and git status stall on procfs and the rclone WebDAV FUSE mount.
+	{ url = "/proc", run = "true" },
+	{ url = "/proc/**", run = "true" },
+	{ url = "/mnt/copyparty", run = "true" },
+	{ url = "/mnt/copyparty/**", run = "true" },
 	{ url = "*.tar*", run = 'piper --format=url -- tar tf "$1"' },
 	{ url = "*.md", run = "mermaid" },
 	{ url = "*.mmd", run = "mermaid" },
