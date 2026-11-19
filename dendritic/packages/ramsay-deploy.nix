@@ -154,13 +154,24 @@
             flock -n 9 || { echo "another deploy runs" >&2; exit 1; }
             # Root git leaves root-owned objects and an index. Every exit path gives the checkout back.
             trap 'chown -R "$(stat -L -c "%U:%G" "$repo")" "$repo/.git"' EXIT
-            # Publish here, never inside the switch. The push is best-effort: the
-            # caller normally pushes as agent, and root holds no GitHub credentials.
-            # A plain push keeps a rewritten history safe: it fails instead of
-            # clobbering origin/main.
-            git -C "$repo" ${gitCommon} push --quiet origin HEAD:refs/heads/main \
-              || echo "warning: push to origin failed; the switch uses the local tree" >&2
-            git -C "$repo" ${gitCommon} fetch --quiet origin main || true
+            # Publish here, never inside the switch. A plain push keeps a
+            # rewritten history safe: it fails instead of clobbering origin/main.
+            head=$(git -C "$repo" ${gitCommon} rev-parse HEAD)
+            known=$(git -C "$repo" ${gitCommon} rev-parse --verify -q refs/remotes/origin/main || true)
+            # Root holds no GitHub credentials. Push only when the caller left the
+            # tree unpublished, so the usual run stays quiet.
+            if [ "$known" != "$head" ]; then
+              git -C "$repo" ${gitCommon} push --quiet origin HEAD:refs/heads/main \
+                || echo "warning: push to origin failed; the switch uses the local tree" >&2
+            fi
+            # Refuse when no fetch can confirm the remote. A stale ref would let an
+            # unpublished commit reach the switch.
+            fetched=0
+            if git -C "$repo" ${gitCommon} fetch --quiet origin main; then fetched=1; fi
+            if [ "$fetched" = 0 ] && [ "$known" != "$head" ]; then
+              echo "cannot confirm origin/main holds this tree: push as agent first" >&2
+              exit 1
+            fi
             # A revert of a published commit is a silent rollback. Refuse it.
             origin_main=$(git -C "$repo" ${gitCommon} rev-parse --verify -q refs/remotes/origin/main || true)
             if [ -n "$origin_main" ] && ! git -C "$repo" ${gitCommon} \
