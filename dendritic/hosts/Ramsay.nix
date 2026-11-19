@@ -160,6 +160,7 @@ in
           bash
           carapace
           nixconfig-sync
+          kdeconnect
         ];
         tools.nixconfigSync.enable = true;
 
@@ -174,6 +175,11 @@ in
           android-tools
           xclip
         ];
+
+        # Headless: no tray, so the indicator unit fails. Start kdeconnectd from
+        # default.target, not the module's graphical-session.target.
+        services.kdeconnect.indicator = lib.mkForce false;
+        systemd.user.services.kdeconnect.Install.WantedBy = lib.mkForce [ "default.target" ];
 
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
@@ -377,7 +383,23 @@ in
         boot.loader.efi.canTouchEfiVariables = true;
 
         networking.hostName = hostname;
-        networking.firewall.enable = true;
+        networking.firewall = {
+          enable = true;
+          allowedTCPPortRanges = [
+            # KDE Connect
+            {
+              from = 1714;
+              to = 1764;
+            }
+          ];
+          allowedUDPPortRanges = [
+            # KDE Connect
+            {
+              from = 1714;
+              to = 1764;
+            }
+          ];
+        };
         networking.networkmanager.enable = true;
 
         environment.sessionVariables = {
