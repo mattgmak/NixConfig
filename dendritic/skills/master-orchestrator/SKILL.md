@@ -466,3 +466,58 @@ and the user reviews in the web interface.
 
 `code-review [on|off]` sets the `code-review` flag. It reads the state with no argument. The
 default is `off`, by user ruling on 2026-11-12.
+
+`sandbox-dev up` starts the sandbox and a dev server in the tmux session `sandbox-dev`. Read `## Sandbox dev`.
+
+`sandbox-dev reset` clears the sandbox data, then seeds fresh rows. Read `## Sandbox dev`.
+
+## Sandbox dev
+
+`sandbox-dev up` starts the sandbox and a dev server in a new tmux session. `sandbox-dev reset` clears the sandbox data and seeds fresh rows. Neither action changes this skill. Read `docs/agents/sandbox.md` and `docs/agents/sandbox-tailscale.md` first.
+
+Both actions use a worktree of the tcm monorepo. This skill documents the commands. A lane runs neither action on its own.
+
+### `sandbox-dev up`
+
+The session is `sandbox-dev`. Its first window is `dev`, and that window runs the dev server. The worktree root is the working directory.
+
+```bash
+export SANDBOX_LAN=1
+export SANDBOX_PUBLIC_ORIGIN=sandbox-host
+tmux new-session -d -s sandbox-dev -n dev -c "$PWD" 'pnpm dev:mock'
+tmux attach -t sandbox-dev:dev
+```
+
+`sandbox-host` is the bare tailnet host name. The repository prints no host name, so the operator supplies it. Add no scheme and no port, because `parsePublicOrigin` adds `http://` (`scripts/sandbox/common.ts:111`). The name must resolve on the tailnet, or the phone cannot reach Metro.
+
+`pnpm dev:mock` runs the full chain. The root script reads `sandbox:status`, starts the sandbox when it is down, then runs `scripts/sandbox/dev-mock.ts`. That script starts `pnpm --filter tcm-app dev:mock -- --host lan`. The app script is `TCM_AUTH_MODE=mock EXPO_NO_DOTENV=1 expo start --dev-client --clear --port $TCM_METRO_PORT` (`apps/tcm-app/package.json:96`).
+
+Do not write `pnpm dev:mock --filter tcm-app`. The root script passes no filter, and the extra argument reaches `tsx`. The chain sets the filter itself (`scripts/sandbox/metro-command.ts:18`).
+
+**Metro port.** The supervisor reserves five ports at startup and records them in `state.json`. Each worktree gets its own port, and `dev:mock` passes it as `TCM_METRO_PORT`. Read the port with `pnpm sandbox:status`.
+
+A stale process on the Metro port means one action: wait. `pnpm dev:mock` waits for the port itself. Never stop the Metro of another worktree. Never give the app a different port by hand.
+
+**Phone step.** Open the dev-client launcher and tap `Enter URL manually`. Type `<host>:<metroPort>`, for example `sandbox-host:44981`. Add no scheme, because the launcher adds `http://`.
+
+The full deep link reads `easy-tcm://expo-development-client/?url=http%3A%2F%2F<host>%3A<metroPort>` (`docs/agents/envy-android-emulator.md:100`). Send that link with `adb shell am start` on Android.
+
+The tailnet address reaches the phone because Expo runs with `--host lan` (`scripts/sandbox/metro-command.ts:18-20`). Metro then binds every interface. The phone on the same tailnet resolves the bare host name and reaches the port.
+
+`turbo.json:114` lists `REACT_NATIVE_PACKAGER_HOSTNAME` for the `dev` task only. The `dev:mock` chain skips Turbo, so a value in that variable changes nothing here.
+
+**Failure.** `up` fails with exit code 1. Read the log path that the command prints, then run `pnpm sandbox:status`. Do not start a second `dev:mock`.
+
+### `sandbox-dev reset`
+
+```bash
+pnpm sandbox:reset
+```
+
+The command stops the sandbox and clears the Convex deployment directory of this worktree. It then starts the services, pushes the functions, and seeds data (`docs/agents/sandbox.md`, command table).
+
+`pnpm sandbox:seed` replaces the mock auth data and the seeded rows with no wipe (`docs/agents/sandbox.md`, command table). Use it when a stale row only needs fresh values.
+
+Three guards keep the reset local. The CLI call clears the deployment selector with `CONVEX_DEPLOYMENT: ""` (`scripts/sandbox/convex-cli.ts:20`). It sets `CONVEX_SELF_HOSTED_URL` to the local `state.convexUrl`. No script passes `--prod`. `wipeDeployment` refuses a path that is not a plain directory (`scripts/sandbox/common.ts:206-207`).
+
+**Failure.** `reset` fails with exit code 1. Read the log, run `pnpm sandbox:status`, then retry once. Do not delete the deployment directory by hand.
