@@ -387,6 +387,8 @@ The lane captures the evidence, not the orchestrator. A UI brief names each chan
 
 A lane runs `scripts/preflight-evidence.sh` before the first capture, and pastes its four checks. A `FOREIGN` line names another checkout, so the device proves nothing.
 
+`work-mode=direct` is the one exception: the lane captures its own Android still with no ask, and the still serves no review. Read `## Work mode`.
+
 A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
 
 ### Device ladder
@@ -500,9 +502,18 @@ Per change:
 A `direct` change writes no Linear record, opens no pull request, and spawns no review. Read
 section 13 for the removal and the kill.
 
-Evidence: the lane captures a still only when the user asks. The publish route stays
-`gh pr edit --attach`, and it needs a pull request. A local capture writes to
-`/tmp/agent-tmp/tcm/evidence/<change>/`.
+Evidence: in `direct` mode a lane captures its own still on the Android emulator of this host,
+with no user ask. The still serves visual verification, not a review gate. The lane looks at the
+still, states what it sees, and fixes a fault before it reports.
+
+- Route: the dev server of the lane worktree, plus the AVD on this host. Read the **Metro port**
+  rule in `## Sandbox dev`. Each worktree gets its own port, and `dev:mock` passes it as
+  `TCM_METRO_PORT`.
+- Still path: `/tmp/agent-tmp/tcm/evidence/<change>/`. The repository keeps no evidence file.
+- `work-mode=standard` keeps the current rule: one ask per wave, and the still goes on the pull
+  request.
+- Devices: a leased iOS simulator still needs the user ask, in both modes. A change that touches a
+  native path still needs a device run that the user approves.
 
 The gate list does not change. A direct merge runs `pnpm check-types`, `pnpm biome check --write`,
 and the package tests before it merges.
