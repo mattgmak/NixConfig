@@ -1,6 +1,6 @@
 {
   flake.homeModules.lazygit =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
     {
       programs.lazygit = {
         enable = true;
@@ -37,6 +37,13 @@
               editAtLineAndWait = "nvim {{filename}} -c 'call cursor({{line}}, 0)'";
               editInTerminal = true;
               openDirInEditor = "nvim {{dir}}";
+              # The built-in clipboard calls xclip or wl-copy, and both exit 1 on a
+              # headless host. Route the text to the ssh client instead.
+              copyToClipboardCmd =
+                if pkgs.stdenv.hostPlatform.isDarwin then
+                  ""
+                else
+                  "printf '%s' {{text}} | ${lib.getExe pkgs.tmuxBridge} copy";
               # edit = "${cursorOpenCmd} {{filename}}";
               # editAtLine = "${cursorOpenCmd} {{filename}}:{{line}}";
               # editAtLineAndWait = "${cursorOpenCmd} {{filename}}:{{line}}";
