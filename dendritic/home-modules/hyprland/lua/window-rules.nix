@@ -7,11 +7,7 @@ let
     primary = "DP-3";
     secondary = "HDMI-A-5";
   };
-  allWorkspacesIndex = lib.map (i: toString i) (lib.range 1 10);
-  primaryWorkspaces = lib.take 5 allWorkspacesIndex;
-  secondaryWorkspaces = lib.drop 5 allWorkspacesIndex;
-  primaryWorkspacesMatcher = "r[${lib.head primaryWorkspaces}-${lib.last primaryWorkspaces}]";
-  secondaryWorkspacesMatcher = "r[${lib.head secondaryWorkspaces}-${lib.last secondaryWorkspaces}]";
+  secondaryWorkspaces = lib.map (i: toString i) (lib.range 6 10);
 
   luaBool = b: if b then "true" else "false";
 
@@ -48,47 +44,31 @@ let
     in
     "hl.window_rule({ name = \"${name}\", ${matchLua}${effectsLua} })";
 
-  utilityFloatRule =
-    name: matchExtra:
+  # The rotated Desky panel is 1080 px wide, so both hosts use sizes that fit it.
+  utilitySize = if hostname == "GoofyDesky" then vec2 1000 800 else vec2 1200 800;
+  btopSize = if hostname == "GoofyDesky" then vec2 1000 800 else vec2 1600 900;
+
+  # A workspace match turns a rule into a dynamic rule. Hyprland then re-applies it
+  # on every workspace change, so a floating window loses its float when it moves.
+  # These match on title alone, so they hold on all workspaces and on both monitors.
+  floatTitled =
+    name: title: size:
     mkRule {
       inherit name;
-      match = matchExtra;
+      match = { inherit title; };
       float = true;
-      size = vec2 1200 800;
+      inherit size;
       center = true;
       stay_focused = true;
       pin = true;
     };
 
-  btopFloatRule =
-    name: matchExtra:
-    mkRule {
-      inherit name;
-      match = matchExtra;
-      float = true;
-      size = vec2 1600 900;
-      center = true;
-      stay_focused = true;
-      pin = true;
-    };
+  utilityFloatRule = name: floatTitled name "(clipse|bluetui|nmtui|wiremix|window-switcher)" utilitySize;
+  btopFloatRule = name: floatTitled name "(btop)" btopSize;
 
   sharedRules = [
-    (utilityFloatRule "utils-primary" {
-      workspace = primaryWorkspacesMatcher;
-      title = "(clipse|bluetui|nmtui|wiremix|window-switcher)";
-    })
-    (utilityFloatRule "utils-game" {
-      workspace = "name:Game";
-      title = "(clipse|bluetui|nmtui|wiremix|window-switcher)";
-    })
-    (btopFloatRule "btop-primary" {
-      workspace = primaryWorkspacesMatcher;
-      title = "(btop)";
-    })
-    (btopFloatRule "btop-game" {
-      workspace = "name:Game";
-      title = "(btop)";
-    })
+    (utilityFloatRule "utils-float")
+    (btopFloatRule "btop-float")
     (mkRule {
       name = "pip";
       match = {
@@ -165,18 +145,6 @@ let
         class = "(steam_app_.*)";
       };
       fullscreen = true;
-    })
-    (mkRule {
-      name = "utils-secondary";
-      match = {
-        workspace = secondaryWorkspacesMatcher;
-        title = "(btop|clipse|bluetui|nmtui|wiremix)";
-      };
-      float = true;
-      size = vec2 1000 800;
-      center = true;
-      stay_focused = true;
-      pin = true;
     })
     (mkRule {
       name = "android-emulator-ws6";
