@@ -138,6 +138,13 @@
           inputs.xremap-flake.nixosModules.default
         ];
 
+        # The kernel keeps RAPL counters root-only (CVE-2020-8694), so btop shows
+        # no CPU watts. udev MODE only touches device nodes, so chmod the
+        # attribute through RUN. The battery keeps 0.00W: BAT1 has no power_now.
+        services.udev.extraRules = lib.mkAfter ''
+          ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl*", TEST=="energy_uj", RUN+="${pkgs.coreutils}/bin/chmod 0444 /sys/%p/energy_uj"
+        '';
+
         home-manager.users.${username} = self.homeConfigurations.GoofyEnvy;
 
         # copyparty on Goofeus: on-demand WebDAV via copyparty-mount (see programs.copyparty-client).
