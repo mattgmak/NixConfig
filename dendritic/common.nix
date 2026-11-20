@@ -293,6 +293,7 @@
         # Hyprland plugins resolve hook symbols by parsing `nm -D` output on
         # /proc/self/exe. The cap wrapper below skips the package's PATH wrapper.
         binutils
+        croc
       ];
 
       programs.gpu-screen-recorder.enable = true;
