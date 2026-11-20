@@ -11,6 +11,7 @@
     let
       system = pkgs.stdenv.hostPlatform.system;
       powerkitPluginsDir = ./tmux/powerkit/plugins;
+      powerkitEntitiesDir = ./tmux/powerkit/entities;
 
       mkTmuxPowerkitTheme =
         colors:
@@ -94,6 +95,7 @@
         chmod -R u+w $out/src/plugins $out/src/renderer $out/src/core $out/src/contract $out/bin
         install -Dm755 ${powerkitPluginsDir}/pane_application.sh $out/src/plugins/pane_application.sh
         install -Dm755 ${powerkitPluginsDir}/agent_counts.sh $out/src/plugins/agent_counts.sh
+        install -Dm644 ${powerkitEntitiesDir}/hostname.sh $out/src/renderer/entities/hostname.sh
         # Patched: pill caps, session mode, format-native escape, render cache TTL
         ${pkgs.python3}/bin/python3 ${./tmux/powerkit/patches/apply.py} $out
       '';
@@ -286,8 +288,8 @@
           {
             plugin = tmuxPowerkit;
             extraConfig = ''
-              set -g @powerkit_status_order "session,plugins"
-              set -g @powerkit_plugins "hostname,pane_application,agent_counts,datetime"
+              set -g @powerkit_status_order "hostname,session,plugins"
+              set -g @powerkit_plugins "pane_application,agent_counts,datetime"
               set -g @powerkit_theme "custom"
               set -g @powerkit_custom_theme_path "${config.home.homeDirectory}/.config/tmux-powerkit/themes/stylix.sh"
               set -g @powerkit_transparent "true"
@@ -302,6 +304,7 @@
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
               set -g @powerkit_session_show_mode "true"
+              set -g @powerkit_session_icon ""
               set -g @powerkit_session_prefix_icon ""
               set -g @powerkit_session_copy_icon ""
               set -g @powerkit_session_search_icon ""

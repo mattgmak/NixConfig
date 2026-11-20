@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Powerkit patches: pill-group caps, session mode, render cache."""
+"""Powerkit patches: pill-group caps, session mode, hostname entity, render cache."""
 
 from __future__ import annotations
 
 import pathlib
 import sys
 
+
+def patch_compositor_entity_source(path: pathlib.Path) -> None:
+    text = path.read_text()
+    old = '. "${POWERKIT_ROOT}/src/renderer/entities/plugins.sh"'
+    new = old + '\n. "${POWERKIT_ROOT}/src/renderer/entities/hostname.sh"'
+    if old not in text:
+        raise SystemExit(f"compositor entity source patch: pattern not found in {path}")
+    if new not in text:
+        path.write_text(text.replace(old, new, 1))
 
 def patch_compositor(path: pathlib.Path) -> None:
     text = path.read_text()
@@ -171,15 +180,20 @@ def patch_session_icon_all_modes(path: pathlib.Path) -> None:
         [[ -z "$val" ]] && return 1
         local _empty_cond_re="^#\\{\\?[0-9]+,,\\}$"
         [[ "$val" =~ $_empty_cond_re ]] && return 1
+        [[ "$val" == "''" || "$val" == '""' ]] && return 1
         return 0
     }
-    _session_icon_has_content "$icon_prefix" && icon_prefix="${icon_prefix} "
-    _session_icon_has_content "$icon_copy" && icon_copy="${icon_copy} "
-    _session_icon_has_content "$icon_search" && icon_search="${icon_search} "
-    _session_icon_has_content "$icon_command" && icon_command="${icon_command} "
-    _session_icon_has_content "$icon_normal" && icon_normal="${icon_normal} "
+    _session_icon_has_content "$icon_prefix" && icon_prefix="${icon_prefix} " || icon_prefix=""
+    _session_icon_has_content "$icon_copy" && icon_copy="${icon_copy} " || icon_copy=""
+    _session_icon_has_content "$icon_search" && icon_search="${icon_search} " || icon_search=""
+    _session_icon_has_content "$icon_command" && icon_command="${icon_command} " || icon_command=""
+    _session_icon_has_content "$icon_normal" && icon_normal="${icon_normal} " || icon_normal=""
 
     # prefix > search > copy > command > normal (matches _session_build_bg_condition)
+    if [[ -z "$icon_prefix$icon_search$icon_copy$icon_command$icon_normal" ]]; then
+        printf ''
+        return
+    fi
     printf '#{?client_prefix,%s,#{?pane_in_mode,#{?search_present,%s,%s},#{?command_prompt,%s,%s}}}' \\
         "$icon_prefix" "$icon_search" "$icon_copy" "$icon_command" "$icon_normal"
 }
@@ -319,6 +333,7 @@ def patch_window_zoom_icon_append(path: pathlib.Path) -> None:
 
 def main() -> None:
     root = pathlib.Path(sys.argv[1])
+    patch_compositor_entity_source(root / "src/renderer/compositor.sh")
     patch_compositor(root / "src/renderer/compositor.sh")
     patch_windows_group_edges(root / "src/renderer/entities/windows.sh")
     patch_windows_trim_content_trailing_space(root / "src/renderer/entities/windows.sh")
