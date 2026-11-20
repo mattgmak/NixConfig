@@ -77,12 +77,12 @@
       sessionCommandHex = sessionBgHex;
       accentHex = hexOr "base0E" "#cba6f7";
       hostnameColorMap = {
-        Ramsay = { bg = "base0E"; fg = "base00"; };
-        MacMini = { bg = "base08"; fg = "base00"; };
-        Goofeus = { bg = "base0B"; fg = "base00"; };
-        GoofyDesky = { bg = "base0E"; fg = "base00"; };
-        GoofyEnvy = { bg = "base0F"; fg = "base00"; };
-        Droid = { bg = "base08"; fg = "base00"; };
+        Ramsay = { bg = "base08"; fg = "base00"; };
+        MacMini = { bg = "base0B"; fg = "base00"; };
+        Goofeus = { bg = "base0C"; fg = "base00"; };
+        GoofyDesky = { bg = "base09"; fg = "base00"; };
+        GoofyEnvy = { bg = "base0A"; fg = "base00"; };
+        Droid = { bg = "base0F"; fg = "base00"; };
       };
       hostnameColor = hostnameColorMap.${hostname} or { bg = "base03"; fg = "base05"; };
       hostnameBgHex = hexOr hostnameColor.bg "#878d96";
