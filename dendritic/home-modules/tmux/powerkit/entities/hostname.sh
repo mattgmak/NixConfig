@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # =============================================================================
 # PowerKit Entity: hostname
-# Description: Left-side hostname pill — dynamic OS icon + short hostname
+# Description: Left-side hostname pill — single pill, OS icon + short hostname
 # =============================================================================
-# Mirrors the hostname plugin's two-layer segment (icon section + internal
-# curve + content section) so the pill looks unchanged, then renders it as a
-# left entity so the compositor places it before the session pill.
+# Renders one pill in the per-host color (or grey fallback) so the OS icon and
+# hostname share a background, then the compositor places it before the session
+# pill.
 # =============================================================================
 
 POWERKIT_ROOT="${POWERKIT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
@@ -23,10 +23,15 @@ declare -g _HOSTNAME_PILL_FIRST_BG=""
 declare -g _HOSTNAME_PILL_BODY=""
 
 _hostname_fill() {
-    local colors content_bg content_fg icon_bg icon_fg icon host sep body
+    local colors content_bg content_fg icon host body bg fg
 
     colors=$(resolve_plugin_colors_full "active" "ok" "local" "0")
-    read -r content_bg content_fg icon_bg icon_fg <<<"$colors"
+    read -r content_bg content_fg _icon_bg _icon_fg <<<"$colors"
+
+    bg=$(get_tmux_option "@powerkit_hostname_bg" "")
+    fg=$(get_tmux_option "@powerkit_hostname_fg" "")
+    [[ -n "$bg" ]] && content_bg="$bg"
+    [[ -n "$fg" ]] && content_fg="$fg"
 
     icon=$(get_os_icon)
     case "$(get_tmux_option "@powerkit_plugin_hostname_format" "short")" in
@@ -34,14 +39,11 @@ _hostname_fill() {
         *) host=$(get_hostname) ;;
     esac
     host="${host//#/##}"
-    sep=$(get_right_separator)
 
-    body="#[fg=${icon_fg},bg=${icon_bg}]${icon} "
-    [[ -n "$sep" ]] && body+="#[fg=${icon_bg},bg=${content_bg}]${sep}"
-    body+="#[fg=${content_fg},bg=${content_bg}] ${host} "
+    body="#[$( [[ -n "$content_fg" ]] && printf 'fg=%s,' "$content_fg" )bg=${content_bg}] ${icon} ${host} "
 
     _HOSTNAME_PILL_BG="$content_bg"
-    _HOSTNAME_PILL_FIRST_BG="$icon_bg"
+    _HOSTNAME_PILL_FIRST_BG="$content_bg"
     _HOSTNAME_PILL_BODY="$body"
 }
 

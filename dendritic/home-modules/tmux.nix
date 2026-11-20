@@ -76,6 +76,17 @@
       sessionSearchHex = hexOr "base09" "#ffc387";
       sessionCommandHex = sessionBgHex;
       accentHex = hexOr "base0E" "#cba6f7";
+      hostnameColorMap = {
+        Ramsay = { bg = "base0E"; fg = "base00"; };
+        MacMini = { bg = "base08"; fg = "base00"; };
+        Goofeus = { bg = "base0B"; fg = "base00"; };
+        GoofyDesky = { bg = "base0E"; fg = "base00"; };
+        GoofyEnvy = { bg = "base0F"; fg = "base00"; };
+        Droid = { bg = "base08"; fg = "base00"; };
+      };
+      hostnameColor = hostnameColorMap.${hostname} or { bg = "base03"; fg = "base05"; };
+      hostnameBgHex = hexOr hostnameColor.bg "#878d96";
+      hostnameFgHex = hexOr hostnameColor.fg "#171726";
       agentSeshBin = lib.getExe config.programs.agent-sesh.package;
       agentSeshStyle = config.programs.agent-sesh.popupStyle;
       agentSeshWidth = config.programs.agent-sesh.popupWidth;
@@ -312,6 +323,8 @@
               set -g @powerkit_active_window_title "#W "
               set -g @powerkit_inactive_window_title "#W "
               set -g @powerkit_zoomed_window_icon "󰊔"
+              set -g @powerkit_hostname_bg "${hostnameBgHex}"
+              set -g @powerkit_hostname_fg "${hostnameFgHex}"
               set -g @powerkit_plugin_hostname_format "short"
               set -g @powerkit_plugin_datetime_format "time"
               set -g @powerkit_plugin_pane_application_icon ""
