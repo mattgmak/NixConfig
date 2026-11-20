@@ -142,6 +142,11 @@ main() {
   say 'push'
   run git -C "$main_path" push origin main
 
+  say 'sync submodules'
+  # The deploy gate commits unstaged drift in the main checkout. A submodule
+  # left behind by the merge counts as drift and reverts the pointer it set.
+  run git -C "$main_path" submodule update --quiet
+
   if [ "$no_deploy" = 1 ]; then
     say 'deploy skipped (--no-deploy)'
   else
