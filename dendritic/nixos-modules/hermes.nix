@@ -202,6 +202,8 @@
           pkgs.ripgrep
           pkgs.nodejs
           pkgs.ffmpeg
+          # bladebro needs a Chrome/Chromium binary on the service PATH.
+          pkgs.chromium
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
@@ -262,6 +264,12 @@
           "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
           "skills/nixconfig-worktree/SKILL.md" = ./hermes-skills/nixconfig-worktree/SKILL.md;
         } // hermesUiSkillFiles;
+        # bladebro MCP browser driver; merged into config.yaml's mcp_servers.
+        # See dendritic/packages/bladebro.nix.
+        mcpServers.bladebro = {
+          command = "${pkgs.bladebro}/bin/bladebro";
+          args = [ "mcp" ];
+        };
         settings = {
           # The deploy gate. `manual` asks the owner on every flagged call, and
           # the mode stays here so the agent cannot reach the bypass keys.
@@ -534,6 +542,8 @@
           pkgs.nix
           pkgs.comma
           pkgs.lean-ctx
+          # bladebro MCP needs a Chrome/Chromium binary on the PATH.
+          pkgs.chromium
         ];
         environment = {
           HOME = altStateDir;
@@ -582,6 +592,8 @@
           pkgs.nix
           pkgs.comma
           pkgs.lean-ctx
+          # bladebro MCP needs a Chrome/Chromium binary on the PATH.
+          pkgs.chromium
         ];
         environment = {
           HOME = altStateDir;

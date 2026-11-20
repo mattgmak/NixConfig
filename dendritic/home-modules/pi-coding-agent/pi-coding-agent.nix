@@ -519,24 +519,6 @@
             restore_vendor_tracked_changes "$dir" "pi-cursor-sdk"
           }
 
-          install_pi_agent_browser_native() {
-            local dir="$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"
-            [ -f "$dir/package.json" ] || return 0
-            echo "pi-ext-deps-install: vendor/fitchmultz/pi-agent-browser-native (npm ci --ignore-scripts; build dist/)"
-            if [ -f "$dir/package-lock.json" ]; then
-              (cd "$dir" && npm ci --ignore-scripts)
-            else
-              (cd "$dir" && npm install --omit=dev --no-package-lock --ignore-scripts)
-            fi
-            (cd "$dir" && node scripts/build.mjs)
-            (cd "$dir" && npm prune --omit=dev --ignore-scripts)
-            if [ ! -f "$dir/dist/extensions/agent-browser/index.js" ]; then
-              echo "pi-ext-deps-install: pi-agent-browser-native dist/extensions/agent-browser/index.js missing after build" >&2
-              exit 1
-            fi
-            restore_vendor_tracked_changes "$dir" "pi-agent-browser-native"
-          }
-
           install_agent_ste() {
             local dir="$VENDOR_ROOT/mattgmak/agent-ste"
             [ -f "$dir/scripts/build-dist.sh" ] || return 0
@@ -609,7 +591,7 @@
           for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
             case "$vendor" in
-              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/fitchmultz/pi-agent-browser-native"|"$VENDOR_ROOT/mattgmak/agent-ste") continue ;;
+              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/mattgmak/agent-ste") continue ;;
             esac
             case "$(basename "$vendor")" in
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
@@ -622,7 +604,6 @@
           queue_parallel gated_install "$VENDOR_ROOT/fgladisch/pi-extensions" "vendor/fgladisch/pi-extensions" install_fgladisch_pi
           queue_parallel gated_install "$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx" "vendor/mattgmak/lean-ctx/packages/pi-lean-ctx" install_lean_ctx_pi
           queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-cursor-sdk" "vendor/fitchmultz/pi-cursor-sdk" install_pi_cursor_sdk
-          queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-agent-browser-native" "vendor/fitchmultz/pi-agent-browser-native" install_pi_agent_browser_native
           queue_parallel gated_install "$VENDOR_ROOT/Gentleman-Programming/engram" "gentle-engram" install_engram_deps
           queue_parallel gated_install "$VENDOR_ROOT/mattgmak/agent-ste" "vendor/mattgmak/agent-ste" install_agent_ste
 
@@ -742,7 +723,7 @@
           [
             node-bin
             ffmpeg
-            agent-browser
+            bladebro
             uv
             bunBin
             mcpNixos

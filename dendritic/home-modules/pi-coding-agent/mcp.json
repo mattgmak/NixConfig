@@ -25,6 +25,10 @@
     "nixos": {
       "command": "mcp-nixos",
       "args": []
+    },
+    "bladebro": {
+      "command": "bladebro",
+      "args": ["mcp"]
     }
   }
 }

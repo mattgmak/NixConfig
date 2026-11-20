@@ -54,7 +54,6 @@
             "chisle"
             "filter-output"
             "gentle-engram"
-            "pi-agent-browser-native"
             "pi-agent-sesh"
             "pi-autoname"
             "pi-away"
@@ -97,7 +96,6 @@
             "arpagon/pi-rewind"
             "carderne/pi-nvim"
             "fgladisch/pi-extensions"
-            "fitchmultz/pi-agent-browser-native"
             "fitchmultz/pi-cursor-sdk"
             "gotgenes/pi-packages"
             "JayPokale/Chisle"
@@ -319,31 +317,6 @@
             installPhase = ''
               mkdir -p $out
               cp pi-bolt-bundle.js $out/
-            '';
-          };
-
-          # pi-agent-browser-native ships TypeScript sources and a build script. The
-          # published entry is dist/extensions/agent-browser/index.js, so the build runs
-          # here from a lockfile install, and the stage phase gets that tree plus the
-          # runtime deps its bundles leave external.
-          agentBrowserNative = pkgs.stdenvNoCC.mkDerivation {
-            pname = "pi-agent-browser-native-dist";
-            version = "0";
-            src = srcOf "vendor/fitchmultz/pi-agent-browser-native";
-            nativeBuildInputs = [ pkgs.nodejs ];
-            buildPhase = ''
-              runHook preBuild
-              cp -a ${npmNodeModules {
-                repo = "fitchmultz/pi-agent-browser-native";
-                devDeps = true;
-              }}/node_modules node_modules
-              chmod -R u+w node_modules
-              node scripts/build.mjs
-              runHook postBuild
-            '';
-            installPhase = ''
-              mkdir -p $out
-              cp -a dist $out/
             '';
           };
 
@@ -618,14 +591,6 @@
               ${lib.concatMapStrings (dep: ''
                 cp -a ${pnpmNodeModules dep}/. $stage/vendor/${dep.repo}/
               '') pnpmDepRepos}
-
-              # pi-agent-browser-native loads a built file, and its bundles leave the
-              # runtime deps external.
-              cp -a ${agentBrowserNative}/dist \
-                $stage/vendor/fitchmultz/pi-agent-browser-native/
-              cp -a ${npmNodeModules {
-                repo = "fitchmultz/pi-agent-browser-native";
-              }}/node_modules $stage/vendor/fitchmultz/pi-agent-browser-native/node_modules
 
               # agent-ste loads its compiled Gleam output from dist/.
               cp -a ${agentSte}/dist $stage/vendor/mattgmak/agent-ste/

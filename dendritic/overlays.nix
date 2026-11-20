@@ -76,6 +76,13 @@
           tmuxBridge = self.packages.${system}.tmuxBridge;
         };
 
+      # The bladebro browser driver. See dendritic/packages/bladebro.nix.
+      bladebroOverlay =
+        _final: _prev:
+        {
+          bladebro = self.packages.${system}.bladebro;
+        };
+
       tmaxOverlay =
         _final: prev:
         prev.lib.optionalAttrs (
@@ -146,12 +153,12 @@
         piLocalOverlay
         hermesUiPlusBridgeOverlay
         leanCtxOverlay
+        bladebroOverlay
         tmuxBridgeOverlay
         ramsayDeployOverlay
         spawnApprovalSessionOverlay
         tmaxOverlay
         btopOverlay
-        self.agentBrowserOverlay
         self.tmuxMasterOverlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {
