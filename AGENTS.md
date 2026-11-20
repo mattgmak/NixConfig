@@ -90,6 +90,8 @@ Two workflows exist. Pick one before you edit, and ask the user when the choice 
 
 Never use `direct` for a change that needs an `nh` switch or a host build.
 
+A submodule edit is a `worktree` change in that submodule's own repo. Run `wt switch --create <branch>` inside `vendor/<owner>/<repo>/`, commit and push there, then commit the pointer in the parent. `direct` never applies: the submodule has its own remote to push.
+
 ## Worktree workflow
 
 The user starts every pi session, either `pi` or `pi-local`. The agent never starts a session. A `worktree` change runs in a fresh worktree. Run `wt switch --create <branch>` from the repo root. Use worktrunk (`wt`) only, never raw `git worktree`. Do not edit the `main` checkout in place for a `worktree` change.
