@@ -488,6 +488,7 @@ in
           jq
           # CPU + APU + Strix Halo XDNA NPU TUI: btop has no NPU panel.
           amdtop
+          croc
         ];
 
         users.users.${username} = {
