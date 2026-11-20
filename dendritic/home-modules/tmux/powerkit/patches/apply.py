@@ -113,6 +113,24 @@ def patch_windows_trim_content_trailing_space(path: pathlib.Path) -> None:
     path.write_text(text)
 
 
+def patch_windows_index_no_trailing_pad(path: pathlib.Path) -> None:
+    text = path.read_text()
+    old = """    if [[ "$side" == "left" && -n "$_W_SEP_CHAR" ]]; then
+        printf '#[fg=%s,bg=%s%s]%s%s%s' "$index_fg" "$index_bg" "$style_attr" "$leading" "$(window_get_index_display)" "$pad"
+    else
+        printf '#[fg=%s,bg=%s%s]%s%s%s' "$index_fg" "$index_bg" "$style_attr" "$leading" "$(window_get_index_display)" "$pad"
+    fi"""
+    new = """    if [[ "$side" == "left" && -n "$_W_SEP_CHAR" ]]; then
+        printf '#[fg=%s,bg=%s%s]%s%s' "$index_fg" "$index_bg" "$style_attr" "$leading" "$(window_get_index_display)"
+    else
+        printf '#[fg=%s,bg=%s%s]%s%s' "$index_fg" "$index_bg" "$style_attr" "$leading" "$(window_get_index_display)"
+    fi"""
+    if old not in text:
+        if "%s%s' \"$index_fg\" \"$index_bg\" \"$style_attr\" \"$leading\" \"$(window_get_index_display)\"" in text:
+            return
+        raise SystemExit(f"windows index no trailing pad patch: pattern not found in {path}")
+    path.write_text(text.replace(old, new, 1))
+
 def patch_session_copy_icon_default(path: pathlib.Path) -> None:
     text = path.read_text()
     old = 'icon_copy=$(get_tmux_option "@powerkit_session_copy_icon" "${POWERKIT_DEFAULT_SESSION_COPY_MODE_COLOR}")'
@@ -336,6 +354,7 @@ def main() -> None:
     patch_compositor_entity_source(root / "src/renderer/compositor.sh")
     patch_compositor(root / "src/renderer/compositor.sh")
     patch_windows_group_edges(root / "src/renderer/entities/windows.sh")
+    patch_windows_index_no_trailing_pad(root / "src/renderer/entities/windows.sh")
     patch_windows_trim_content_trailing_space(root / "src/renderer/entities/windows.sh")
     patch_session_copy_icon_default(root / "src/renderer/entities/session.sh")
     patch_session_icon_all_modes(root / "src/renderer/entities/session.sh")

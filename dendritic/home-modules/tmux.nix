@@ -304,7 +304,7 @@
               set -g @powerkit_session_prefix_color "${sessionPrefixHex}"
               set -g @powerkit_session_copy_mode_color "${sessionCopyHex}"
               set -g @powerkit_session_show_mode "true"
-              set -g @powerkit_session_icon ""
+              set -g @powerkit_session_icon ""
               set -g @powerkit_session_prefix_icon ""
               set -g @powerkit_session_copy_icon ""
               set -g @powerkit_session_search_icon ""
