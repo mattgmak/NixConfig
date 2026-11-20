@@ -281,6 +281,10 @@ in
               "--group-add=keep-groups"
               "--ipc=host"
               "--ulimit=memlock=-1:-1"
+              # Cap the engine so a runaway KV pool dies inside its own cgroup
+              # instead of pushing the whole host into a stall. Weights are 62 GiB
+              # and the running container measured 67 GiB, so 96 GiB leaves room.
+              "--memory=96g"
             ];
             environment = {
               HALOGEN_PORT = toString enginePort;

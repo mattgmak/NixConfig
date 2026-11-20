@@ -39,6 +39,17 @@
         maxPoolPercent = 5;
       };
 
+      # A hard power-off discards the unflushed journal file. The 2026-11-20
+      # crash lost every record of the kill, so the sync interval drops to 1 min.
+      services.journald.settings.Journal.SyncIntervalSec = "1min";
+
+      # atop keeps per-process history in /var/log/atop, so the killer's victim
+      # stays readable after a crash. The journal alone does not survive one.
+      programs.atop = {
+        enable = true;
+        settings.interval = 60;
+      };
+
       # oomd reacts to PSI memory pressure, not to raw usage. This box idles
       # above 95% used, so a usage-based killer fires all the time.
       systemd.oomd = {
@@ -48,8 +59,9 @@
         enableUserSlices = true;
         settings.OOM = {
           DefaultMemoryPressureLimit = "80%";
-          # A model swap presses for tens of seconds. 45 s ignores that spike.
-          DefaultMemoryPressureDurationSec = 45;
+          # 15 s acts before the stall. The 2026-11-20 crash reached 0 available
+          # while the 45 s window waited out a model swap that never ended.
+          DefaultMemoryPressureDurationSec = 15;
         };
       };
 
