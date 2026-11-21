@@ -7,7 +7,11 @@ let
     primary = "DP-3";
     secondary = "HDMI-A-5";
   };
-  secondaryWorkspaces = lib.map (i: toString i) (lib.range 6 10);
+  allWorkspacesIndex = lib.map (i: toString i) (lib.range 1 10);
+  primaryWorkspaces = lib.take 5 allWorkspacesIndex;
+  secondaryWorkspaces = lib.drop 5 allWorkspacesIndex;
+  primaryWorkspacesMatcher = "r[${lib.head primaryWorkspaces}-${lib.last primaryWorkspaces}]";
+  secondaryWorkspacesMatcher = "r[${lib.head secondaryWorkspaces}-${lib.last secondaryWorkspaces}]";
 
   luaBool = b: if b then "true" else "false";
 
@@ -44,31 +48,39 @@ let
     in
     "hl.window_rule({ name = \"${name}\", ${matchLua}${effectsLua} })";
 
-  # The rotated Desky panel is 1080 px wide, so both hosts use sizes that fit it.
-  utilitySize = if hostname == "GoofyDesky" then vec2 1000 800 else vec2 1200 800;
-  btopSize = if hostname == "GoofyDesky" then vec2 1000 800 else vec2 1600 900;
+  utilityTitle = "(clipse|bluetui|nmtui|wiremix|window-switcher)";
+  btopTitle = "(btop)";
 
-  # A workspace match turns a rule into a dynamic rule. Hyprland then re-applies it
-  # on every workspace change, so a floating window loses its float when it moves.
-  # These match on title alone, so they hold on all workspaces and on both monitors.
-  floatTitled =
-    name: title: size:
+  floatRule =
+    name: match: size:
     mkRule {
-      inherit name;
-      match = { inherit title; };
+      inherit name match size;
       float = true;
-      inherit size;
       center = true;
       stay_focused = true;
       pin = true;
     };
 
-  utilityFloatRule = name: floatTitled name "(clipse|bluetui|nmtui|wiremix|window-switcher)" utilitySize;
-  btopFloatRule = name: floatTitled name "(btop)" btopSize;
+  # Envy has no per-monitor size need, so it matches on title alone. A workspace
+  # match makes the rule dynamic: Hyprland re-applies it on every workspace
+  # change, so a floating window loses its float when it moves.
+  envyFloatRules = [
+    (floatRule "utils-float" { title = utilityTitle; } (vec2 1200 800))
+    (floatRule "btop-float" { title = btopTitle; } (vec2 1600 900))
+  ];
+
+  # Desky needs a per-monitor size: the rotated HDMI-A-5 panel is 1080 px wide,
+  # so a 1200 px window does not fit there. Only a workspace match selects the
+  # monitor, so these rules stay dynamic on Desky.
+  deskyFloatRules = [
+    (floatRule "utils-primary" { workspace = primaryWorkspacesMatcher; title = utilityTitle; } (vec2 1200 800))
+    (floatRule "utils-game" { workspace = "name:Game"; title = utilityTitle; } (vec2 1200 800))
+    (floatRule "btop-primary" { workspace = primaryWorkspacesMatcher; title = btopTitle; } (vec2 1600 900))
+    (floatRule "btop-game" { workspace = "name:Game"; title = btopTitle; } (vec2 1600 900))
+    (floatRule "utils-secondary" { workspace = secondaryWorkspacesMatcher; title = "(btop|clipse|bluetui|nmtui|wiremix)"; } (vec2 1000 800))
+  ];
 
   sharedRules = [
-    (utilityFloatRule "utils-float")
-    (btopFloatRule "btop-float")
     (mkRule {
       name = "pip";
       match = {
@@ -161,5 +173,11 @@ let
       workspace = lib.head secondaryWorkspaces;
     })
   ];
+
+  floatRules = if hostname == "GoofyDesky" then deskyFloatRules else envyFloatRules;
 in
-lib.concatStringsSep "\n" (sharedRules ++ lib.optionals (hostname == "GoofyDesky") deskyRules)
+lib.concatStringsSep "\n" (
+  floatRules
+  ++ sharedRules
+  ++ lib.optionals (hostname == "GoofyDesky") deskyRules
+)
