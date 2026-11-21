@@ -189,13 +189,6 @@ in
         # Agent decrypts API secrets with its own age identity.
         age.identityPaths = [ "/run/agenix/agent-ramsay-age-key" ];
 
-        # The pi hook and the tmux status line read these from a fixed path
-        # under $HOME, so link the packaged copies instead of a checkout path.
-        home.file.".local/share/tmax/agent_status.py".source =
-          "${pkgs.tmax}/share/tmax/scripts/agent_status.py";
-        home.file.".local/share/tmax/lab_agents.py".source =
-          "${pkgs.tmax}/share/tmax/scripts/lab_agents.py";
-
         # Empty `agents` tmux session on boot — pi started manually after attach.
         systemd.user.services.agents-tmux = {
           Unit = {

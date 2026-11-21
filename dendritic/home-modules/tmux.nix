@@ -171,7 +171,6 @@
       };
 
       # Required by programs.sesh enableTmuxIntegration (home-manager modules/programs/sesh.nix)
-      # tmax also needs fzf 0.74.3+ for live activity dots; the flake fzf overlay lifts pkgs.fzf.
       programs.fzf = {
         enable = true;
         enableNushellIntegration = false;
@@ -196,21 +195,10 @@
       home.packages = [
         pkgs.fd
         pkgs.bash
-        pkgs.python3 # tmax sources scripts/remote.py through bare python3 on PATH
         pkgs.tmuxBridge # opens and copies on the ssh client, see packages/tmux-bridge.nix
       ];
 
       home.file.".config/tmux-powerkit/themes/stylix.sh".source = tmuxPowerkitThemeFile;
-
-      home.file.".config/tmax/tmax.conf".text = ''
-        [switcher]
-        key = Space
-        hosts = all
-
-        [host ramsay]
-        destination = agent@ramsay.dab-octatonic.ts.net
-        label = ramsay
-      '';
 
       programs.tmux = {
         enable = true;
@@ -271,9 +259,6 @@
           set -g extended-keys on
           set -s terminal-features 'xterm*:clipboard:ccolour:cstyle:focus:title:extkeys screen*:title rxvt*:ignorefkeys'
           set -g extended-keys-format csi-u
-
-          # Must come after the settings above: tmax reads tmax.conf, then binds keys.
-          run-shell "${lib.getExe pkgs.bash} ${pkgs.tmax}/share/tmax/tmax.tmux"
         '';
         plugins = with pkgs.tmuxPlugins; [
           sensible

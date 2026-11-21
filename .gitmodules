@@ -83,9 +83,6 @@
 [submodule "mattgmak/agent-ste"]
 	path = vendor/mattgmak/agent-ste
 	url = https://github.com/mattgmak/agent-ste
-[submodule "theo-kirby/tmax"]
-	path = vendor/theo-kirby/tmax
-	url = https://github.com/theo-kirby/tmax
 [submodule "mattgmak/pi-nvim-bridge"]
 	path = vendor/mattgmak/pi-nvim-bridge
 	url = https://github.com/mattgmak/pi-nvim-bridge.git

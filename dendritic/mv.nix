@@ -19,7 +19,7 @@
             ];
           };
           # nix-on-droid takes a plain pkgs; no nixpkgs.overlays hook exists in
-          # the droid config, so bake common-overlays in (tmax, …).
+          # the droid config, so bake common-overlays in.
           mv-droid = inputs.multiverse.lib.mkMultiverse {
             inherit system;
             config.allowUnfree = true;

@@ -83,19 +83,6 @@
           bladebro = self.packages.${system}.bladebro;
         };
 
-      tmaxOverlay =
-        _final: prev:
-        prev.lib.optionalAttrs (
-          builtins.elem prev.stdenv.hostPlatform.system [
-            "aarch64-darwin"
-            "aarch64-linux"
-            "x86_64-linux"
-            "x86_64-darwin"
-          ]
-        ) {
-          tmax = self.packages.${system}.tmax;
-        };
-
       # TODO: drop once the nixpkgs pin ships btop 1.4.8 (pin 3ec636362e18 has 1.4.7).
       # 1.4.8 adds the amdgpu sysfs backend (PR #1661), which reports the Strix Halo
       # iGPU busy/temp/watts without rocm-smi or /dev/kfd access.
@@ -157,7 +144,6 @@
         tmuxBridgeOverlay
         ramsayDeployOverlay
         spawnApprovalSessionOverlay
-        tmaxOverlay
         btopOverlay
         self.tmuxMasterOverlay
         (_final: super: {

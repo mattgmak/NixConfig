@@ -87,7 +87,6 @@
             "rpiv-ask-user-question"
             "rpiv-todo"
             "shell-wait-guard"
-            "tmax-status"
             "tool-allowlist"
           ];
 
@@ -119,7 +118,6 @@
             "pasky/pi-ssh-image-clipboard"
             "patlux/pi-commandcode-provider"
             "Pringled/pi-extensions"
-            "theo-kirby/tmax"
             "vndv/pi-codegraph"
           ];
 
