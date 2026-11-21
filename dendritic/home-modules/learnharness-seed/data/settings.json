@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "general": { "autoUpdate": false },
+  "customProvider": {
+    "credentialBindingId": "5f4c3b2a19087766554433221100ff00",
+    "authMode": "keyless",
+    "baseUrl": "https://inference.dab-octatonic.ts.net/v1",
+    "models": [
+      { "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" }
+    ]
+  },
+  "models": {
+    "strong": { "model": { "provider": "custom", "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" } },
+    "cheap": { "model": { "provider": "custom", "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" } },
+    "vision": { "model": { "provider": "custom", "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" } }
+  }
+}

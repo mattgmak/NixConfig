@@ -84,6 +84,7 @@
         tailscale-systray
         voxtype
         bash
+        learnharness-seed
       ];
       # whisper-dictation defines no enable option. Importing it always
       # activates it, so dropping it from the imports list is the disable path.
@@ -282,6 +283,7 @@
           # Argent MCP server: pi's mcp.json spawns bare "argent", so it must be on the
           # global PATH, not just a devshell. Deduplicated from dev-shells/drpom.
           self.packages.${pkgs.stdenv.hostPlatform.system}.argent
+          packages.learnharness
         ];
 
         boot = {

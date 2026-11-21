@@ -80,6 +80,18 @@
                   path = "${basePath}/OfflineMedia";
                   inherit devices versioning;
                 };
+                # Phone excluded so the Electron cache never lands on it.
+                LearnHarness = {
+                  path = "${basePath}/LearnHarness";
+                  devices =
+                    with self.constants;
+                    builtins.filter (d: d != hostname && d != phoneName) [
+                      laptopName
+                      desktopName
+                      serverName
+                    ];
+                  inherit versioning;
+                };
               };
           };
       }

@@ -76,6 +76,7 @@
         tailscale-systray
         voxtype
         bash
+        learnharness-seed
       ];
 
       # age accepts an SSH private key file as its identity, and has no agent path
@@ -236,6 +237,7 @@
           vial
           kbd
           zoom-us
+          self.packages.${pkgs.stdenv.hostPlatform.system}.learnharness
         ];
 
         boot = {
