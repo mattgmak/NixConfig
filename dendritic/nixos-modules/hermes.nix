@@ -165,6 +165,11 @@
       systemd.tmpfiles.rules = [
         # /var/lib/hermes stays reachable as a symlink to the new state dir.
         "L+ /var/lib/hermes - - - - /home/agent/hermes"
+        # Keep the gateway home group-write-free: the CLI's gateway discovery
+        # refuses a group-writable HERMES_HOME whose group is not the owner's
+        # private group (gid 991 vs primary gid 100), which breaks kanban
+        # workers after every deploy. tmpfiles re-asserts 0750 on activation.
+        "d /home/agent/hermes/.hermes 0750 agent agent - -"
         "d /home/agent/hermes/.cache 0700 agent agent - -"
         "d /home/agent/hermes/.cache/nix-index 0700 agent agent - -"
         "L+ /home/agent/hermes/.cache/nix-index/files - - - - ${nixIndexDb}"
