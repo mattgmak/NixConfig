@@ -933,6 +933,7 @@ SEED
           description = "Halogen dashboard Collector (thinkingcap stack)";
           wantedBy = [ "multi-user.target" ];
           after = [ "network-online.target" "podman-halogen-thinkingcap.service" ];
+          wants = [ "network-online.target" ];
           serviceConfig = {
             ExecStart = "${lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.halogen-dashboard} --halogen-url http://127.0.0.1:8751 --listen 127.0.0.1:8790 --db /var/lib/halogen-dashboard/halogen-dashboard.sqlite";
             DynamicUser = true;
