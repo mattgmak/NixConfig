@@ -78,7 +78,6 @@
         ramsay
         curlMinimal
         busybox
-        cursor-cli
         dnsutils
       ];
 

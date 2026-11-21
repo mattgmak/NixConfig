@@ -109,7 +109,7 @@ Same as steps 3–7, but skip the keygen unless the identity changed. Reliable l
 ## Secrets (agenix)
 
 - Recipient for the phone is the `Droid` var — defined **twice**: `dendritic/ssh-keys.nix` and the `let` block of `secrets/secrets.nix`. Keep them identical.
-- 10 pi API secrets (cline, cursor, github-mcp, openrouter, …) list `Droid` as a recipient.
+- 9 pi API secrets (cline, github-mcp, openrouter, …) list `Droid` as a recipient.
 - Rekey after changing any recipient:
 
 ```bash

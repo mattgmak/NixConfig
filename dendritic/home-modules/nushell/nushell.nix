@@ -18,9 +18,7 @@
         GITHUB_MCP_TOKEN = "github-mcp-token";
         IMMICH_MCP_API_KEY = "immich-mcp-api-key";
         OPENROUTER_API_KEY = "openrouter-api-key";
-        CURSOR_API_KEY = "cursor-api-key";
         CLINE_API_KEY = "cline-api-key";
-        CURSOR_USAGE_SESSION_TOKEN = "cursor-usage-session-token";
         DEEPSEEK_API_KEY = "deepseek-api-key";
         COMMAND_CODE_API_KEY = "commandcode-api-key";
       };

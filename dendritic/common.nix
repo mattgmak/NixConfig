@@ -284,7 +284,6 @@
         podman-tui
         jq
         dnsutils
-        cursor-cli
         systemctl-tui
         vesktop
         inputs.codegraph.packages.${pkgs.stdenv.hostPlatform.system}.default

@@ -150,17 +150,7 @@ in
     publicKeys = piRecipients ++ [ MacMiniHost ];
   };
 
-  "cursor-api-key.age" = {
-    armor = true;
-    publicKeys = piRecipients ++ [ MacMiniHost ];
-  };
-
   "cline-api-key.age" = {
-    armor = true;
-    publicKeys = piRecipients ++ [ MacMiniHost ];
-  };
-
-  "cursor-usage-session-token.age" = {
     armor = true;
     publicKeys = piRecipients ++ [ MacMiniHost ];
   };

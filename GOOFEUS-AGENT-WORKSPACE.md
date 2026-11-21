@@ -34,7 +34,7 @@ Stack: **pi** + **pi-interactive-subagents** (tmux) — **locked**
 | Rebuilds | **agent runs rebuild** — **manual sudo with password**; **never** passwordless sudo for agent |
 | Engram | **Local per host** — cross-host sync **deferred** (see TODO below) |
 | SSH keys | **Fleet keys** — GoofyDesky, GoofyEnvy, Droid (same as root pattern) |
-| agenix / secrets | **Full nushell HM** on agent — cursor-api-key, github-mcp-token, etc. |
+| agenix / secrets | **Full nushell HM** on agent — github-mcp-token, etc. |
 | agent decrypt | **Agent own age key** — never reuse root host key |
 | Bootstrap | **Remote builder** from GoofyDesky — `nh os switch --flake .#Goofeus` triggers first Goofeus rebuild creating agent user |
 | Droid | Dismissed (Nix-on-Droid access N/A for now; SSH key still in fleet) |
@@ -185,7 +185,7 @@ built, survives `nix-collect-garbage`, and needs no git, branch or pull.
 
 ### 6. Secrets (agenix)
 
-- cursor-api-key, github-mcp-token, etc. — extend `secrets.nix` for agent user if not already covered.
+- github-mcp-token, etc. — extend `secrets.nix` for agent user if not already covered.
 - Session sync secrets (`PI_SYNC_*`) — only if B-layer enabled; not in NixConfig git.
 
 ### 7. Post-rebuild manual (until automated)
@@ -208,7 +208,7 @@ pi list   # verify exts/skills
 
 ### agenix decrypt for agent
 - **Agent own age key**: dedicated passphrase-less ed25519 identity for agent user.
-- Add agent age pubkey to `secrets.nix` recipients (`cursor-api-key`, `github-mcp-token`, …).
+- Add agent age pubkey to `secrets.nix` recipients (`github-mcp-token`, …).
 - `nushell` HM on agent: `age.identityPaths = [ <agentKey> ]` (mirror root's host-key pattern, but own key).
 - Root's `/etc/ssh/ssh_host_ed25519_key` stays root-only — **never** shared with agent.
 

@@ -47,7 +47,6 @@ in
       devenv
       lazygit
       ghostty
-      # cursor
       pi-coding-agent
       carapace
       zellij
@@ -819,8 +818,6 @@ in
         "cline-api-key"
         "commandcode-api-key"
         "context7-api-key"
-        "cursor-api-key"
-        "cursor-usage-session-token"
         "deepseek-api-key"
         "github-mcp-token"
         "immich-mcp-api-key"
@@ -983,7 +980,6 @@ in
           stylua
           podman-tui
           go_1_27
-          cursor-cli
           bat
           llama-cpp
           self.packages.${pkgs.stdenv.hostPlatform.system}.simslim
@@ -1100,7 +1096,7 @@ in
             "alt-1" = "workspace 1";
             "alt-w" = "workspace 1";
 
-            # Workspace 2 for cursor
+            # Workspace 2
             "alt-2" = "workspace 2";
             "alt-e" = "workspace 2";
 
@@ -1139,7 +1135,6 @@ in
 
             # Focus key apps
             # "alt-w" = "exec-and-forget osascript -e 'tell application \"Ghostty\" to activate'";
-            # "alt-e" = "exec-and-forget osascript -e 'tell application \"Cursor\" to activate'";
             # "alt-r" = "exec-and-forget osascript -e 'tell application \"Zen\" to activate'";
             "alt-x" = "exec-and-forget osascript -e 'tell application \"Xcode\" to activate'";
             "alt-a" = "exec-and-forget osascript -e 'tell application \"Android Studio\" to activate'";

@@ -185,10 +185,6 @@
     # v0.30.0 carries extension API 0.1.19, which the vendored LFM3 extension needs.
     gufo.url = "github:gufo-org/gufo/v0.30.0";
 
-    # code-cursor-flake = {
-    #   url = "github:jacopone/code-cursor-nix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
   outputs =

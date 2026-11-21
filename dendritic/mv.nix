@@ -29,7 +29,6 @@
         {
           mv = {
             unstable = mv.daysBehind "2026-08-13" 14;
-            cursor = mv.daysBehind "2026-08-13" 14;
             vr = mv.daysBehind "2026-08-13" 14;
             homelab = mv-homelab.daysBehind "2026-11-11" 14;
             droid = mv-droid.daysBehind "2026-08-13" 14;
