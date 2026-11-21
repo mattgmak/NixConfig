@@ -314,6 +314,7 @@
             base_url = localBaseUrl;
             context_length = 131072;
           };
+          platform_toolsets.api_server = [ "hermes-api-server" "kanban" ];
           # The Qwen3-ASR server accepts only RIFF WAV, and the `openai` provider
           # uploads the webui's webm blob untouched — its m4a recovery is rejected too.
           # The local provider normalizes any input to WAV before running the command,
