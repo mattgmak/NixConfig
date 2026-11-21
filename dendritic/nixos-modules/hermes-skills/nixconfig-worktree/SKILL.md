@@ -20,7 +20,7 @@ the script deploys. One worktree per task, one review session per worktree.
 | 1 | Create the worktree | `wt switch --create <branch>` from `/home/agent/NixConfig`, then read the path (see Worktree) |
 | 2 | Materialize submodules | `git -C <worktree> submodule update --init`, only when the change needs a checkout. Skip it for a nix-only change and pass `--flake` in step 5 |
 | 3 | Delegate the edit | `pi-local -p "<brief>" > <worktree>/../.pi-brief.out` (see the `pi` skill) |
-| 4 | Commit | `git -C <worktree> commit -m "<subject>"`. The agent git config carries the owner identity |
+| 4 | Commit | `git -C <worktree> commit -m "<subject>"` — subject only, imperative, capitalized, period, no `dendritic:` prefix, one sentence (see Commit message). The agent git config carries the owner identity |
 | 5 | Verify | `bash scripts/host-sandbox.sh ramsay --tier build --flake "git+file:///home/agent/NixConfig?ref=refs/heads/<branch>"` |
 | 6 | Open the review session | `spawn-approval-session <branch> --worktree <path>` builds the three panes |
 | 7 | Hand over | reply with the session name and the command waiting in the approval pane. The owner presses Enter |

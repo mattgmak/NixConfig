@@ -197,10 +197,14 @@ Rules:
 
 ## Commit convention
 
+Single standard for every agent and every host. Copy this rule into each agent file that owns a commit step. Do not restate a variant.
+
 - **Subject only** — one line, no body, no trailers (`Co-authored-by`, `Signed-off-by`, etc.) unless user explicitly requests one
+- **No prefix** — no `dendritic:`, `ramsay:`, `fix(ramsay):`, or other scope/Conventional-Commit prefix. The diff names the scope.
 - **Never** pass `git commit --trailer` or append attribution trailers for Cursor, agents, or tooling — not default, not "helpful"
 - Use plain `git commit -m "$(cat <<'EOF' … EOF)"` — subject line only inside the heredoc
-- Imperative mood, capitalize first word (e.g. `Generate pi themes from Stylix palette.`)
+- Imperative mood, capitalize first word, end with a period (e.g. `Generate pi themes from Stylix palette.`)
+- One sentence per commit. Split two actions into two commits.
 
 ## Comments
 
