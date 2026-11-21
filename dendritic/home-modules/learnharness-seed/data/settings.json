@@ -6,7 +6,7 @@
     "authMode": "keyless",
     "baseUrl": "https://inference.dab-octatonic.ts.net/v1",
     "models": [
-      { "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" }
+      { "id": "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated", "image": true }
     ]
   },
   "models": {
