@@ -122,3 +122,6 @@
 [submodule "JayPokale/Chisle"]
 	path = vendor/JayPokale/Chisle
 	url = https://github.com/JayPokale/Chisle
+[submodule "junyeong-nero/kitsune"]
+	path = vendor/junyeong-nero/kitsune
+	url = https://github.com/junyeong-nero/kitsune

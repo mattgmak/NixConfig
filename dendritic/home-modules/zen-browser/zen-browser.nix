@@ -110,6 +110,13 @@
                   "a7812ae3-777d-43ee-922f-871e684fc6c5" = "youtube-recommended-videos";
                 }
                 // {
+                  # Kitsune drives Zen through its MCP server; dev build from vendor.
+                  "kitsune@junyeong-nero.github.io" = {
+                    install_url = "file://${self.packages.${pkgs.stdenv.hostPlatform.system}.kitsune-extension}/share/kitsune/kitsune-extension.zip";
+                    installation_mode = "normal_installed";
+                  };
+                }
+                // {
                   # AdNauseam is a uBO fork — block uBlock so Sync/manual install cannot re-add it.
                   "uBlock0@raymondhill.net" = {
                     installation_mode = "blocked";
