@@ -13,6 +13,7 @@
       };
       # Electron userData pinned to ~/LearnHarness so syncthing mirrors it between hosts.
       wrapper = pkgs.writeShellScriptBin "learnharness" ''
+        [ -f "$HOME/.config/learnharness/env" ] && . "$HOME/.config/learnharness/env"
         exec ${appimage}/bin/learnharness --user-data-dir="$HOME/LearnHarness" "$@"
       '';
       extracted = pkgs.appimageTools.extractType2 {

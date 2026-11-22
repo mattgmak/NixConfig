@@ -86,6 +86,10 @@
       # TODO: drop once the nixpkgs pin ships btop 1.4.8 (pin 3ec636362e18 has 1.4.7).
       # 1.4.8 adds the amdgpu sysfs backend (PR #1661), which reports the Strix Halo
       # iGPU busy/temp/watts without rocm-smi or /dev/kfd access.
+      iosevkaCharonOverlay = _final: _prev: {
+        iosevka-charon = self.packages.${system}.iosevka-charon;
+      };
+
       btopOverlay =
         _final: prev:
         {
@@ -145,6 +149,7 @@
         ramsayDeployOverlay
         spawnApprovalSessionOverlay
         btopOverlay
+        iosevkaCharonOverlay
         self.tmuxMasterOverlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {

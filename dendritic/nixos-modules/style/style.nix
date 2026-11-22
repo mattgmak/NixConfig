@@ -6,6 +6,7 @@
     }:
     {
       fonts.packages = with pkgs; [
+        iosevka-charon
         nerd-fonts.iosevka-term
         inter
         noto-fonts-cjk-serif
