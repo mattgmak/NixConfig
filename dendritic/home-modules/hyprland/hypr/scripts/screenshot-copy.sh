@@ -16,14 +16,9 @@ outs="$(hyprctl monitors -j | jq -r '.[] | "\(.x),\(.y) \(if (.transform % 2) ==
 visible="$(hyprctl monitors -j | jq -c '[.[] | if .specialWorkspace.name != "" then .specialWorkspace.id else .activeWorkspace.id end]')"
 wins="$(hyprctl clients -j | jq -r --argjson visible "$visible" --argjson b "$border" '.[] | select(.mapped and (.workspace.id as $id | $visible | index($id))) | "\(.at[0] - $b),\(.at[1] - $b) \(.size[0] + 2 * $b)x\(.size[1] + 2 * $b)"')"
 
-# hyprpicker -r paints a frozen copy of each display in a layer surface, so the
-# region select sees still frames. It must stay alive during grim, or the
-# screen repaints mid capture.
-hyprpicker -r -z -q >/dev/null 2>&1 &
-picker=$!
-trap 'kill "$picker" 2>/dev/null || true' EXIT
-
-sleep 0.2
+# hyprpicker -r renders its freeze overlay without the output transform, so
+# grim captures the sideways overlay frame instead of the desktop on a rotated
+# display. Select on the live screen instead.
 geometry="$(printf '%s\n%s\n' "$outs" "$wins" | slurp)" || exit 0
 
 grim -g "$geometry" "$file"
@@ -45,8 +40,6 @@ if [ "$snapped" = true ] && [ "$radius" -gt 0 ]; then
 	magick "$file" -alpha set \( -size "${w}x${h}" xc:none -fill white -draw "roundrectangle 0,0,$((w - 1)),$((h - 1)),$radius,$radius" \) -compose DstIn -composite "$masked"
 	mv "$masked" "$file"
 fi
-
-kill "$picker" 2>/dev/null || true
 
 wl-copy --type image/png <"$file"
 
