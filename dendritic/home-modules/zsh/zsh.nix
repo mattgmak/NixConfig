@@ -85,12 +85,15 @@
 
         shellAliases = {
           c = "command clear";
+          ll = "eza -lh --git";
+          ls = "eza";
           q = "exit";
           s = "sesh connect $(sesh list --icons | fzf --ansi)";
         };
 
         sessionVariables = {
           EDITOR = "nvim";
+          EZA_ICONS_AUTO = "1";
         };
 
         # Secrets are read per shell start, not through sessionVariables: HM
