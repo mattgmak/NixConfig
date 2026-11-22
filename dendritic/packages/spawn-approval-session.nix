@@ -31,6 +31,7 @@
         name = "spawn-approval-session";
         runtimeInputs = [
           pkgs.coreutils
+          pkgs.glibc
           pkgs.tmux
           pkgs.util-linux
         ];
@@ -92,7 +93,13 @@
           done
 
           [ -n "$branch" ] || usage
-          [ -n "$worktree" ] || worktree="$HOME/NixConfig.$branch"
+
+          # A kanban worker runs this with HOME set to its own state dir, so
+          # $HOME is not the login home. Name the real home from passwd; fall
+          # back to $HOME when the lookup fails.
+          login_home="$(getent passwd "$(id -un)" | cut -d: -f6)"
+          [ -n "$login_home" ] || login_home="$HOME"
+          [ -n "$worktree" ] || worktree="$login_home/NixConfig.$branch"
           [ -n "$session" ] || session="NixConfig-$branch"
 
           if [ ! -d "$worktree" ]; then
@@ -143,15 +150,16 @@
           # it. A pane process copies the server's environment instead, so the flags
           # alone leave the wrong PATH in every pane. Put `env` in front of each pane
           # command: that sets the environment of the process the pane runs.
-          # The caller's PATH is wrong here, because a sudo or hermes call carries its
-          # own profile dirs, so a pane finds the wrong pi-local. Name the login PATH
-          # of the account that owns the server.
+          # The caller's PATH and HOME are wrong here, because a sudo or hermes
+          # call carries its own profile dirs, so a pane finds the wrong pi-local
+          # or zsh config. Name the login PATH and home of the account that owns
+          # the server.
           user="$(id -un)"
           shell="''${SPAWN_SHELL:-/run/current-system/sw/bin/zsh}"
-          session_path="''${SPAWN_PATH:-/run/wrappers/bin:$HOME/.nix-profile/bin:/nix/profile/bin:$HOME/.local/state/nix/profile/bin:/etc/profiles/per-user/$user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin}"
-          envstr="PATH=$session_path HOME=$HOME USER=$user"
-          if [ -d "$HOME/.config/zsh" ]; then
-            envstr="$envstr ZDOTDIR=$HOME/.config/zsh"
+          session_path="''${SPAWN_PATH:-/run/wrappers/bin:$login_home/.nix-profile/bin:/nix/profile/bin:$login_home/.local/state/nix/profile/bin:/etc/profiles/per-user/$user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin}"
+          envstr="PATH=$session_path HOME=$login_home USER=$user"
+          if [ -d "$login_home/.config/zsh" ]; then
+            envstr="$envstr ZDOTDIR=$login_home/.config/zsh"
           fi
 
           review="env $envstr $shell -i -c 'l; exec $shell -i'"
