@@ -9,6 +9,8 @@
           stdenv,
           fetchurl,
           autoPatchelfHook,
+          copyDesktopItems,
+          makeWrapper,
           alsa-lib,
           at-spi2-core,
           cups,
@@ -49,7 +51,17 @@
 
           sourceRoot = "vesktop-${finalAttrs.version}";
 
-          nativeBuildInputs = [ autoPatchelfHook ];
+          # Upstream tarball ships no icon; fetch the app icon from the repo.
+          icon = fetchurl {
+            url = "https://raw.githubusercontent.com/Vencord/Vesktop/v${finalAttrs.version}/build/icon.svg";
+            hash = "sha256-fQ+dvbPIb4AFd9f7JqIt7+twJdEMQF9jTTwrk5p1vn8=";
+          };
+
+          nativeBuildInputs = [
+            autoPatchelfHook
+            copyDesktopItems
+            makeWrapper
+          ];
 
           buildInputs = [
             alsa-lib
@@ -84,10 +96,40 @@
             runHook preInstall
             install -d $out/lib/vesktop
             cp -r . $out/lib/vesktop/
-            install -d $out/bin
-            ln -s $out/lib/vesktop/vesktop $out/bin/vesktop
+            install -d $out/share/icons/hicolor/scalable/apps
+            install -m644 ${finalAttrs.icon} $out/share/icons/hicolor/scalable/apps/vesktop.svg
             runHook postInstall
           '';
+
+          postFixup = ''
+            makeWrapper $out/lib/vesktop/vesktop $out/bin/vesktop \
+              --add-flags "''${NIXOS_OZONE_WL:+''${WAYLAND_DISPLAY:+--ozone-platform-hint=auto --enable-features=WaylandWindowDecorations --enable-wayland-ime=true}}"
+          '';
+
+          desktopItems = [
+            (pkgs.makeDesktopItem {
+              name = "vesktop";
+              desktopName = "Vesktop";
+              exec = "vesktop %U";
+              icon = "vesktop";
+              startupWMClass = "Vesktop";
+              genericName = "Internet Messenger";
+              keywords = [
+                "discord"
+                "vencord"
+                "electron"
+                "chat"
+              ];
+              categories = [
+                "Network"
+                "InstantMessaging"
+                "Chat"
+              ];
+              mimeTypes = [
+                "x-scheme-handler/discord"
+              ];
+            })
+          ];
 
           meta = {
             description = "Alternative Discord client with Vencord built-in";
