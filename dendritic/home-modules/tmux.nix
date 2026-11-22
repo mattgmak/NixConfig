@@ -155,6 +155,9 @@
 
       programs.agent-sesh = {
         enable = true;
+        # Shadow the Go picker with the Rust port; the Rust wrapper still execs
+        # the Go binary for unported commands, so the Go path stays intact.
+        package = inputs.agent-sesh.packages.${system}.agent-sesh-rust;
         tmuxKey = "a";
         # The picker sizes its preview column to the pane it shows, so the popup
         # gives it every column the list does not use. A narrower popup truncates
