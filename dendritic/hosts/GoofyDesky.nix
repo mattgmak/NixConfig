@@ -45,6 +45,7 @@
         atuin
         zoxide
         zen-browser
+        vesktop
         cs2
         nushell
         zsh
