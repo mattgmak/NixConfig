@@ -48,6 +48,7 @@
         slurp
         swayidle
         swaylock-effects
+        wayfreeze
         wl-clipboard
         wlogout
         inputs.woomer.packages.${pkgs.stdenv.hostPlatform.system}.default
