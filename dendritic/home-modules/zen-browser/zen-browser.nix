@@ -71,6 +71,8 @@
                 in
                 {
                   "nebula-tab-switch-animation" = locked 4;
+                  # Kitsune ships unsigned; Zen honors this pref to allow file:// installs.
+                  "xpinstall.signatures.required" = locked false;
                 };
               AutofillAddressEnabled = true;
               AutofillCreditCardEnabled = false;
@@ -90,7 +92,6 @@
               };
               ExtensionSettings =
                 mkExtensionSettings {
-                  "{c4b582ec-4343-438c-bda2-2f691c16c262}" = "600-sound-volume";
                   "maksimovic@outlook.com" = "github-whitespace-disabler";
                   "youtube-timestamps@ris58h" = "youtube-timestamps";
                   "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}" = "video-downloadhelper";
