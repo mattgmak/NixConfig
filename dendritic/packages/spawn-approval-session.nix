@@ -31,7 +31,7 @@
         name = "spawn-approval-session";
         runtimeInputs = [
           pkgs.coreutils
-          pkgs.glibc
+          pkgs.getent
           pkgs.tmux
           pkgs.util-linux
         ];
@@ -97,7 +97,7 @@
           # A kanban worker runs this with HOME set to its own state dir, so
           # $HOME is not the login home. Name the real home from passwd; fall
           # back to $HOME when the lookup fails.
-          login_home="$(getent passwd "$(id -un)" | cut -d: -f6)"
+          login_home="$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f6 || true)"
           [ -n "$login_home" ] || login_home="$HOME"
           [ -n "$worktree" ] || worktree="$login_home/NixConfig.$branch"
           [ -n "$session" ] || session="NixConfig-$branch"
