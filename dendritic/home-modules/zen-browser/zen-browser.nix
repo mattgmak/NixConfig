@@ -178,8 +178,8 @@
                 "findbar.highlightAll" = true;
                 "general.autoScroll" = true;
                 "font.name.monospace.x-western" = "IosevkaTerm Nerd Font";
-                "font.name.sans-serif.x-western" = "Inter";
-                "font.name.serif.x-western" = "Inter";
+                "font.name.sans-serif.x-western" = "Iosevka Charon";
+                "font.name.serif.x-western" = "Iosevka Charon";
                 "font.size.monospace.x-western" = 14;
                 "intl.accept_languages" = "en";
                 "tab.groups.add-arrow" = true;
