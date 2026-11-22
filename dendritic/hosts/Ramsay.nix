@@ -501,6 +501,10 @@ in
         # Agent coding workspace user (AFK / phone-driven pi).
         users.users.agent = {
           isNormalUser = true;
+          # Private primary group (agent:agent). The hermes gateway's owner
+          # check rejects a group-writable state dir whose group is not the
+          # owner's private group, and upstream creates .hermes as 2770.
+          group = "agent";
           # Group members traverse here to reach the shared repo. Never group-writable:
           # sshd StrictModes rejects keys from a group-writable home.
           homeMode = "0750";
@@ -529,10 +533,6 @@ in
         # isNormalUser alone does not create a same-named group, and agenix
         # chowns the agent key to agent:agent.
         users.groups.agent = { };
-
-        # The agent's primary group, named by isNormalUser. The hermes user is
-        # gone: the main hermes agent runs as agent, so no member list is needed.
-        users.groups.users = { };
 
         # Key only across the tailnet. The Match block sits in extraConfig,
         # which NixOS appends after its own keys.
