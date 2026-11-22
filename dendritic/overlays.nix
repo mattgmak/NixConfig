@@ -90,6 +90,14 @@
         iosevka-charon = self.packages.${system}.iosevka-charon;
       };
 
+      # TODO: drop once nixpkgs ships vesktop 1.7.0 (pin 3ed67ec has 1.6.7).
+      # Wraps upstream's electron 45 bundle; see dendritic/packages/vesktop.nix.
+      vesktopOverlay =
+        _final: prev:
+        prev.lib.optionalAttrs (prev.stdenv.hostPlatform.isLinux) {
+          vesktop = self.packages.${system}.vesktop;
+        };
+
       btopOverlay =
         _final: prev:
         {
@@ -150,6 +158,7 @@
         spawnApprovalSessionOverlay
         btopOverlay
         iosevkaCharonOverlay
+        vesktopOverlay
         self.tmuxMasterOverlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {
