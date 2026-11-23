@@ -113,6 +113,12 @@
           });
         };
 
+      # Croc 11.6.5 from the mv.croc pin: v11.6.0 fixes the late-probe crash
+      # (schollz/croc#1396). TODO: drop once the nixpkgs pin ships croc 11.6.5.
+      crocOverlay = _final: _prev: {
+        croc = self.legacyPackages.${system}.mv.croc.croc;
+      };
+
       # Shared overlay stack: Hyprland packages (gcc16Stdenv).
       hyprlandBaseOverlays = [inputs.hyprland.overlays.hyprland-packages];
 
@@ -159,6 +165,7 @@
         btopOverlay
         iosevkaCharonOverlay
         vesktopOverlay
+        crocOverlay
         self.tmuxMasterOverlay
         (_final: super: {
           direnv = super.direnv.overrideAttrs (_: {

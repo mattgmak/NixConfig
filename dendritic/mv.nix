@@ -30,6 +30,9 @@
           mv = {
             unstable = mv.daysBehind "2026-08-13" 14;
             vr = mv.daysBehind "2026-08-13" 14;
+            # Croc 11.6.5: v11.6.0 fixes the late-probe crash (schollz/croc#1396).
+            # TODO: drop once the nixpkgs pin ships croc 11.6.5 or newer.
+            croc = mv.at "2026-11-15";
             homelab = mv-homelab.daysBehind "2026-11-11" 14;
             droid = mv-droid.daysBehind "2026-08-13" 14;
           };
