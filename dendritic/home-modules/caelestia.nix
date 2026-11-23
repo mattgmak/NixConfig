@@ -37,6 +37,15 @@
         };
         systemd.enable = false;
         settings = {
+          appearance.font = {
+            headline.family = "Iosevka Charon";
+            title.family = "Iosevka Charon";
+            body.family = "Iosevka Charon";
+            label.family = "Iosevka Charon";
+            clock = "Iosevka Charon";
+            mono.family = "IosevkaTerm Nerd Font";
+            workspaces = "IosevkaTerm Nerd Font";
+          };
           bar = {
             workspaces = {
               activeLabel = " ";
