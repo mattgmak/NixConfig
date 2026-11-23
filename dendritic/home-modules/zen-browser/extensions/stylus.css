@@ -1,27 +1,45 @@
-@-moz-document url-prefix("https://codeberg.org")
+/* Global web font override: Iosevka Charon for proportional text, IosevkaTerm Nerd Font for monospace. */
+@-moz-document url-prefix("http://"), url-prefix("https://")
 {
   * {
-    font-family: "IosevkaTerm Nerd Font Propo" !important;
+    font-family: "Iosevka Charon", sans-serif !important;
   }
-}
 
-@-moz-document url-prefix("https://linear.app")
-{
-  /* Linear sets its mono stack on divs, so match class names, not elements only. */
   code,
   pre,
   kbd,
   samp,
   tt,
+  var,
+  output,
+  textarea,
+  input[type="search"],
   [class*="code" i],
   [class*="diff" i],
-  [class*="mono" i] {
-    font-family: "IosevkaTerm Nerd Font" !important;
-  }
-
+  [class*="mono" i],
   [class*="code" i] *,
   [class*="diff" i] *,
   [class*="mono" i] * {
-    font-family: inherit !important;
+    font-family: "IosevkaTerm Nerd Font", monospace !important;
+  }
+
+  /* Icon fonts keep their own family, otherwise glyphs render as boxes. */
+  .MaterialIcons,
+  .material-icons,
+  .material-icons-outlined,
+  .material-symbols-outlined {
+    font-family: "Material Symbols Outlined", "Material Icons" !important;
+  }
+
+  .fa,
+  .fas,
+  .far,
+  .fab,
+  [class*="fa-" i]::before {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+  }
+
+  [class*="emoji" i] {
+    font-family: "Noto Color Emoji" !important;
   }
 }

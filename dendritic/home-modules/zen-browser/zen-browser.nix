@@ -366,7 +366,10 @@
               keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
               userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
-              userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
+              userContent = pkgs.concatText "userContent.css" [
+                ../../../vendor/mattgmak/zen-wireframe-2/userContent.css
+                ./extensions/stylus.css
+              ];
 
               containersForce = true;
               containers = {
