@@ -29,9 +29,16 @@
         ];
         pythonImportsCheck = [ "kitsune" ];
       };
-      # Interpreter that carries kitsune plus its propagated deps, so the wrapper
-      # resolves imports without hand-listing site-packages.
-      interpreter = python.python.withPackages (_: [ kitsune-pkg ]);
+      # PYTHONPATH carrying kitsune plus its full transitive dep closure.
+      # python.python.withPackages yields an empty env here, so walk
+      # propagatedBuildInputs recursively and join the site-packages dirs.
+      gather = pkg:
+        builtins.foldl' (acc: d: acc ++ gather d) [ pkg ]
+          (pkg.propagatedBuildInputs or [ ]);
+      deps = pkgs.lib.unique (gather kitsune-pkg);
+      pythonPath = pkgs.lib.concatMapStringsSep ":"
+        (p: "${p}/lib/${python.python.libPrefix}/site-packages")
+        deps;
     in
     {
       # The `kitsune` server binary. The root wheel ships only kitsune-bridge;
@@ -41,7 +48,8 @@
         nativeBuildInputs = [ pkgs.makeWrapper ];
       } ''
         mkdir -p $out/bin
-        makeWrapper ${interpreter}/bin/python $out/bin/kitsune \
+        makeWrapper ${python.python}/bin/python $out/bin/kitsune \
+          --prefix PYTHONPATH : "${pythonPath}" \
           --add-flags "-m kitsune.server"
       '';
 
