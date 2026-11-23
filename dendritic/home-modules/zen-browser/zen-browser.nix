@@ -425,7 +425,7 @@
                 {
                   id = 1;
                   name = "Iosevka global";
-                  url = [ "http://*" "https://*" ];
+                  url = "";
                   enabled = true;
                   code = builtins.readFile ./extensions/stylus.css;
                   sections = [
