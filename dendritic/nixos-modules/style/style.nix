@@ -37,8 +37,8 @@
             name = "IosevkaTerm Nerd Font Propo";
           };
           sansSerif = {
-            package = pkgs.inter;
-            name = "Inter";
+            package = pkgs.iosevka-charon;
+            name = "Iosevka Charon";
           };
           serif = {
             package = pkgs.noto-fonts-cjk-sans;
