@@ -4,3 +4,24 @@
     font-family: "IosevkaTerm Nerd Font Propo" !important;
   }
 }
+
+@-moz-document url-prefix("https://linear.app")
+{
+  /* Linear sets its mono stack on divs, so match class names, not elements only. */
+  code,
+  pre,
+  kbd,
+  samp,
+  tt,
+  [class*="code" i],
+  [class*="diff" i],
+  [class*="mono" i] {
+    font-family: "IosevkaTerm Nerd Font" !important;
+  }
+
+  [class*="code" i] *,
+  [class*="diff" i] *,
+  [class*="mono" i] * {
+    font-family: inherit !important;
+  }
+}
