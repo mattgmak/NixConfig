@@ -33,10 +33,20 @@ A package file lives in `dendritic/packages/` and uses the flake-parts module sh
 `import-tree` auto-imports the file as a module under `dendritic/`.
 The file takes `{ ... }:` and defines `perSystem = { pkgs, ... }: { ... }`.
 It registers the derivation under `perSystem` as `packages.<name>`.
+
 Call `pkgs.callPackage` inline and keep the derivation logic in that one file.
-Hosts reach the package through an overlay in `dendritic/overlays.nix` or through the consuming module.
-Add the overlay to the `common-overlays` list.
+Hosts reach the package through an overlay in `dendritic/overlays.nix` or through the consuming module, and the overlay joins the `common-overlays` list.
 A temporary pin carries a TODO that names the version which lets it return to nixpkgs.
+
+## Small-radius package bumps
+
+Bump one package without moving the global nixpkgs input. Use a multiverse pin in `dendritic/mv.nix`.
+
+1. Pick a revision that carries the version. Run `nix flake update multiverse` when the pinned index predates it, and commit `flake.lock` in the same commit.
+2. Add an entry: `name = mv.at "<date-or-rev>";` or `name = mv.daysBehind <anchor> <n>;`.
+3. Add an overlay in `dendritic/overlays.nix`: `pkg = self.legacyPackages.${system}.mv.<entry>.<pkg>;`. Add it to `common-overlays`.
+
+Prefer a pin over `prev.<pkg>.overrideAttrs` when the newer version needs a newer toolchain, because the pin ships the matching toolchain. Keep `overrideAttrs` for version-only bumps with no toolchain change (e.g. `btopOverlay`).
 
 ## Flake sources
 
