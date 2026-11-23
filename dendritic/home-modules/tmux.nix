@@ -76,13 +76,15 @@
       sessionSearchHex = hexOr "base09" "#ffc387";
       sessionCommandHex = sessionBgHex;
       accentHex = hexOr "base0E" "#cba6f7";
+      # Hosts must stay clear of the session pill mode colors: base0D normal,
+      # base0A prefix, base0C copy, base09 search, base0F command.
       hostnameColorMap = {
         Ramsay = { bg = "base08"; fg = "base00"; };
         MacMini = { bg = "base0B"; fg = "base00"; };
-        Goofeus = { bg = "base0C"; fg = "base00"; };
-        GoofyDesky = { bg = "base09"; fg = "base00"; };
-        GoofyEnvy = { bg = "base0A"; fg = "base00"; };
-        Droid = { bg = "base0F"; fg = "base00"; };
+        Goofeus = { bg = "base0E"; fg = "base00"; };
+        GoofyDesky = { bg = "base06"; fg = "base00"; };
+        GoofyEnvy = { bg = "base07"; fg = "base00"; };
+        Droid = { bg = "base04"; fg = "base00"; };
       };
       hostnameColor = hostnameColorMap.${hostname} or { bg = "base03"; fg = "base05"; };
       hostnameBgHex = hexOr hostnameColor.bg "#878d96";
