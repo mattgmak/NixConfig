@@ -16,10 +16,9 @@ outs="$(hyprctl monitors -j | jq -r '.[] | "\(.x),\(.y) \(if (.transform % 2) ==
 visible="$(hyprctl monitors -j | jq -c '[.[] | if .specialWorkspace.name != "" then .specialWorkspace.id else .activeWorkspace.id end]')"
 wins="$(hyprctl clients -j | jq -r --argjson visible "$visible" --argjson b "$border" '.[] | select(.mapped and (.workspace.id as $id | $visible | index($id))) | "\(.at[0] - $b),\(.at[1] - $b) \(.size[0] + 2 * $b)x\(.size[1] + 2 * $b)"')"
 
-# wayfreeze freezes the screen for selection. hyprpicker -r renders its overlay
-# without the output transform, which makes grim capture sideways content on a
-# rotated display; wayfreeze renders the transform correctly.
-wayfreeze --hide-cursor >/dev/null 2>&1 &
+# wayfreeze freezes the screen for selection. Its snapshot ignores the output
+# transform, so --inverse-transform unrotates the rotated display before display.
+wayfreeze --hide-cursor --inverse-transform >/dev/null 2>&1 &
 freeze=$!
 trap 'kill "$freeze" 2>/dev/null' EXIT
 sleep 0.15

@@ -7,8 +7,9 @@
   hl.permission("/run/current-system/sw/bin/steam", "keyboard", "allow")
   hl.permission("/run/current-system/sw/bin/steam", "input-capture", "allow")
 
-  -- Screenshot tools. grim captures, hyprpicker paints the frozen screen behind the picker.
+  -- Screenshot tools. grim captures, wayfreeze paints the frozen screen behind slurp.
   hl.permission(".*/grim", "screencopy", "allow")
+  hl.permission(".*/wayfreeze", "screencopy", "allow")
   hl.permission(".*/hyprpicker", "screencopy", "allow")
   hl.permission(".*/hyprpicker", "cursorpos", "allow")
 
