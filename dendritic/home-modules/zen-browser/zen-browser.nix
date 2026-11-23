@@ -366,10 +366,7 @@
               keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
               userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
-              userContent = pkgs.concatText "userContent.css" [
-                ../../../vendor/mattgmak/zen-wireframe-2/userContent.css
-                ./extensions/stylus.css
-              ];
+              userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
 
               containersForce = true;
               containers = {
@@ -423,6 +420,20 @@
             "${configDir}/default/chrome/elements" = elements;
             "${configDir}/tmp/chrome/modules" = modules;
             "${configDir}/tmp/chrome/elements" = elements;
+            ".config/zen/stylus/Iosevka.json" = {
+              text = builtins.toJSON [
+                {
+                  name = "Iosevka global";
+                  url = [ "http://*" "https://*" ];
+                  enabled = true;
+                  sections = [
+                    {
+                      code = builtins.readFile ./extensions/stylus.css;
+                    }
+                  ];
+                }
+              ];
+            };
           };
       };
   };
