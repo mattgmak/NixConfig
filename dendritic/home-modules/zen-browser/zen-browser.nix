@@ -423,9 +423,11 @@
             ".config/zen/stylus/Iosevka.json" = {
               text = builtins.toJSON [
                 {
+                  id = 1;
                   name = "Iosevka global";
                   url = [ "http://*" "https://*" ];
                   enabled = true;
+                  code = builtins.readFile ./extensions/stylus.css;
                   sections = [
                     {
                       code = builtins.readFile ./extensions/stylus.css;
