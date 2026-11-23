@@ -181,6 +181,8 @@ Rules to state in every brief:
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
 - Run a long command in the foreground: `ctx_shell` with `timeout` 900 or more. Never end a turn to wait for anything.
 - Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `ctx_bg` is the master's tool, never a lane tool.
+- A lane that spawns its own subagents passes no model override. The default model applies at every level.
+- A provider rate limit is not a failure. Wait, retry the same call with a growing pause, and keep the worktree so a retry resumes. Report the exact error string only after a retry fails.
 - Run `scripts/gate-cache.sh` once per head, and read the cache in every later turn. Read `reference/agent-loop.md`.
 - Reply once per phase in three lines, and put the six report fields in the file from `scripts/lane-report.sh`. A command result inside a phase earns no reply.
 
