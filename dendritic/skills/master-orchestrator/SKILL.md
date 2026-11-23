@@ -179,6 +179,8 @@ Rules to state in every brief:
 - The lane asks the user before the first simulator command. Ask once per wave, then reuse the lease.
 - A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
+- Run a long command in the foreground: `ctx_shell` with `timeout` 900 or more. Never end a turn to wait for anything.
+- Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `ctx_bg` is the master's tool, never a lane tool.
 - Run `scripts/gate-cache.sh` once per head, and read the cache in every later turn. Read `reference/agent-loop.md`.
 - Reply once per phase in three lines, and put the six report fields in the file from `scripts/lane-report.sh`. A command result inside a phase earns no reply.
 
@@ -357,9 +359,11 @@ The pull request landing is the trigger. Do not leave a session or a worktree be
 
 ## 14. Background gates
 
-Run long gates with `ctx_bg`. Never poll. Never sleep. The result arrives as a message.
+`ctx_bg` is the master's tool only. The master runs it, ends the turn, and messages the lane the result. A lane that runs `ctx_bg` ends its turn, the pane closes, and the job dies.
 
-Write one line of status per phase change.
+A lane runs a long gate in the foreground: `ctx_shell` with `timeout` 900 or more. Read `reference/agent-loop.md`.
+
+Never poll. Never sleep. Write one line of status per phase change.
 
 ## 15. Tracker
 
