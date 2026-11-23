@@ -32,7 +32,8 @@ Maintenance: keep this section short. A stale line goes out during review.
 - No bloated code comments. Only terse comments when necessary.
 - Illustrate architecture, flow, or state with a ```mermaid fence. Pi renders it. Use
   one diagram per answer, and only when prose runs past ~10 lines. Keep nodes under
-  ~8: the fence source still bills tokens.
+  ~8: the fence source still bills tokens. In an erDiagram, write one attribute per
+  line: several attributes on one line break the render.
 
 # Running commands
 
