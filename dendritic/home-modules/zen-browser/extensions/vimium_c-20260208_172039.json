@@ -11,10 +11,6 @@
     {
       "passKeys": "",
       "pattern": ":https://cad.onshape.com/"
-    },
-    {
-      "passKeys": "^ J K s ",
-      "pattern": ":https://linear.app/drpom"
     }
   ],
   "keyLayout": 2,
