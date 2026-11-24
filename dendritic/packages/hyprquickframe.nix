@@ -25,7 +25,11 @@
           && ${pkgs.coreutils}/bin/mkdir -p "$outDir" \
           && ${pkgs.satty}/bin/satty --filename "$img" --output-filename "$out" \
             --early-exit --copy-command "wl-copy --type image/png" \
-            --notification-thumbnail screenshot
+            --disable-notifications
+        if [ -f "$out" ]; then
+          ${pkgs.libnotify}/bin/notify-send -a "HyprQuickFrame" -i "$out" \
+            -h "string:image-path:$out" "Screenshot Saved" "Saved to $out"
+        fi
         ${pkgs.coreutils}/bin/rm -f "$img"
       '';
 
