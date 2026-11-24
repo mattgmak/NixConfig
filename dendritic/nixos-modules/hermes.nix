@@ -458,6 +458,13 @@
         };
       };
 
+      # The gateway reads config.yaml once at start. The module writes that file
+      # in an activation script, and the unit text stays the same, so NixOS keeps
+      # the old process running. Restart on any settings change.
+      systemd.services.hermes-agent.restartTriggers = [
+        (builtins.hashString "sha256" (builtins.toJSON config.services.hermes-agent.settings))
+      ];
+
       # The agent account runs these wrappers directly, so the fixed-argv sudo
       # rules for user hermes are gone. The agent's own rules in
       # hosts/Ramsay.nix still cover `ramsay-deploy-approve` and
