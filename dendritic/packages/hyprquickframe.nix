@@ -16,12 +16,16 @@
       # so the next launch lost the instance lock. Detach the notify and satty step.
       notifyScript = pkgs.writeShellScript "hyprquickframe-temp-notify" ''
         img="$1"
+        outDir="''${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+        out="$outDir/screenshot-$(date +%F_%H-%M-%S).png"
         ${pkgs.libnotify}/bin/notify-send -a "HyprQuickFrame" -i "$img" \
           -h "string:image-path:$img" -p -A edit=Edit \
           "Screenshot Copied" "Copied to clipboard" \
           | ${pkgs.gnugrep}/bin/grep -q edit \
-          && ${pkgs.satty}/bin/satty --filename "$img" --output-filename "$img" \
-            --early-exit --copy-command "wl-copy --type image/png"
+          && ${pkgs.coreutils}/bin/mkdir -p "$outDir" \
+          && ${pkgs.satty}/bin/satty --filename "$img" --output-filename "$out" \
+            --early-exit --copy-command "wl-copy --type image/png" \
+            --notification-thumbnail screenshot
         ${pkgs.coreutils}/bin/rm -f "$img"
       '';
 
