@@ -60,6 +60,7 @@ in
           inference
           immich-ml
           strixHaloMemory
+          cpuIdlePower
           hermes
           copyparty-client
           ({
