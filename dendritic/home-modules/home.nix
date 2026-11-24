@@ -17,16 +17,6 @@
         # installed, so skip the target instead of bumping the Stylix input.
         stylix.targets.rofi.enable = false;
 
-        # Iosevka Charon needs a 1.28em line box. libadwaita pins buttons, entries,
-        # rows and tabs to px heights, so glyph tops clip at 12pt. The em floor
-        # follows the font size. extraCss belongs here: Stylix declares
-        # targets.gtk.extraCss in its home-manager module only.
-        stylix.targets.gtk.extraCss = ''
-          button, entry, row, tab {
-            min-height: 1.5em;
-          }
-        '';
-
         # npm cache stays on the internal disk, and a slow fetch fails in 30s
         # instead of parking home-manager activation for 5 minutes.
         home.file.".npmrc".text = ''
