@@ -38,6 +38,8 @@
     "    backdrop-filter: blur(1.5px);",
     "    color: #e0def4;",
     "    padding: 2px 5px;",
+    "    font-family: \"IosevkaTerm Nerd Font Heavy\", \"IosevkaTerm Nerd Font\", monospace;",
+    "    font-weight: 900;",
     "}",
     "",
     "/* #ui */",
