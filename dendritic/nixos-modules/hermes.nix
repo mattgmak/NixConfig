@@ -4,12 +4,13 @@
 # run through llama-swap on 127.0.0.1:9292. The firewall drops the LAN and trusts
 # tailscale0, so every port here is tailnet-only. The Gateway API binds 8642
 # for REST and the backend binds 9119 for the dashboard routes and the
-# /api/ws JSON-RPC transport. The webui binds loopback. Tailscale serve
-# publishes the webui and the API on 443 and the dashboard on 8443. A second
+# /api/ws JSON-RPC transport. The gateway serves the Webapp on 9121
+# (svc:hermes-webapp), and the webui binds loopback. Tailscale serve publishes
+# the webui, the Webapp and the API on 443 and the dashboard on 8443. A second
 # tenant — user hermes-alt, root /var/lib/hermes-alt — mirrors the first on
-# 8643, 9120 and 8788 as svc:hermes-api-alt and svc:hermes-webui-alt. The HUI+
-# bridges bind 8792 (main) and 8791 (alt) on loopback and publish as
-# svc:hermes-bridge and svc:hermes-bridge-alt on 443.
+# 8643, 9120, 9122 and 8788 as svc:hermes-api-alt, svc:hermes-webapp-alt and
+# svc:hermes-webui-alt. The HUI+ bridges bind 8792 (main) and 8791 (alt) on
+# loopback and publish as svc:hermes-bridge and svc:hermes-bridge-alt on 443.
 { inputs, ... }:
 {
   flake.nixosModules.hermes =
@@ -95,6 +96,10 @@
           # The main config points the Dashboard link at the main dashboard, so
           # the alt config needs its own URL.
           webui.dashboard.url = "https://hermes-api-alt.dab-octatonic.ts.net:8443";
+          # The alt backend holds 9120, so the alt Webapp takes 9122. The enabled
+          # flag inherits from the main config.
+          webapp.port = 9122;
+          webapp.public_url = "https://hermes-webapp-alt.dab-octatonic.ts.net";
         };
         configFile = null;
         extraPythonPackages = [ ];
@@ -374,6 +379,14 @@
           webui.dashboard = {
             enabled = "always";
             url = "https://hermes-api.dab-octatonic.ts.net:8443";
+          };
+          # The Desktop workspace the gateway serves. The upstream default 9120
+          # belongs to the alt backend, so main takes 9121 and host stays on
+          # loopback.
+          webapp = {
+            enabled = true;
+            port = 9121;
+            public_url = "https://hermes-webapp.dab-octatonic.ts.net";
           };
           # Every id below is on the llama-swap /v1/models list. The aliases
           # let a running session switch with /model <name>.
@@ -774,6 +787,8 @@
           tailscale serve --yes --service=svc:hermes-api-alt --http=80 127.0.0.1:${toString altStaticPort}
           tailscale serve --yes --service=svc:hermes-bridge --https=443 127.0.0.1:8792
           tailscale serve --yes --service=svc:hermes-bridge-alt --https=443 127.0.0.1:8791
+          tailscale serve --yes --service=svc:hermes-webapp --https=443 127.0.0.1:9121
+          tailscale serve --yes --service=svc:hermes-webapp-alt --https=443 127.0.0.1:9122
         '';
       };
     };
