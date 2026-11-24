@@ -7,7 +7,7 @@
   hl.permission("/run/current-system/sw/bin/steam", "keyboard", "allow")
   hl.permission("/run/current-system/sw/bin/steam", "input-capture", "allow")
 
-  -- Screenshot tools. grim captures, wayfreeze paints the frozen screen behind slurp.
+  -- Screenshot tools. grim captures; HyprQuickFrame runs as quickshell, allowed below.
   hl.permission(".*/grim", "screencopy", "allow")
   hl.permission(".*woomer", "screencopy", "allow")
   hl.permission(".*/hyprpicker", "screencopy", "allow")

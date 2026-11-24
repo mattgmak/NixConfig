@@ -125,3 +125,6 @@
 [submodule "junyeong-nero/kitsune"]
 	path = vendor/junyeong-nero/kitsune
 	url = https://github.com/junyeong-nero/kitsune
+[submodule "Ronin-CK/HyprQuickFrame"]
+	path = vendor/Ronin-CK/HyprQuickFrame
+	url = https://github.com/Ronin-CK/HyprQuickFrame
