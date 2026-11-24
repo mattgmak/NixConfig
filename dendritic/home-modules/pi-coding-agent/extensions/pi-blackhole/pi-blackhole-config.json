@@ -34,49 +34,49 @@
   "debugLog": false,
 
   "model": {
-    "_comment": "Base model. Ling 3.2 Flash free: newest verified free id, 1M window.",
+    "_comment": "Base model. Ernie 5.5 Flash preview free: newest verified free id, 1M window, mandatory reasoning.",
     "provider": "openrouter",
-    "id": "inclusionai/ling-3.2-flash:free",
-    "thinking": "low",
+    "id": "baidu/ernie-5.5-flash-preview:free",
+    "thinking": "high",
     "cooldownHours": 2,
-    "contextWindow": 1048576
+    "contextWindow": 1024000
   },
 
   "observerModel": {
-    "_comment": "Observer 1: Flint v1.0 free. Fastest valid tool call at 879ms, 262k window.",
+    "_comment": "Observer 1: Nemotron 3.5 Lightning free. Fastest valid tool call at 679ms, 1M window.",
     "provider": "openrouter",
-    "id": "recursive/flint-v1.0:free",
+    "id": "nvidia/nemotron-3.5-lightning:free",
     "thinking": "off",
     "cooldownHours": 2,
-    "contextWindow": 262144
+    "contextWindow": 1000000
   },
   "observerFallbackModels": [
     {
-      "_comment": "Observer 2: Nemotron 3.5 Super VL free. 1290ms probe, 1M window.",
+      "_comment": "Observer 2: Particle 1 free. 1270ms probe, thinking off, 1M window.",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-super-vl:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Observer 3: North Mini Code free. 1316ms probe, 256k window.",
-      "provider": "openrouter",
-      "id": "cohere/north-mini-code:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 256000
-    },
-    {
-      "_comment": "Observer 4: Inkling 2 Small free on commandcode. 1446ms probe, 1M window.",
-      "provider": "commandcode",
-      "id": "thinkingmachines/inkling-2-small:free",
+      "id": "particle-ai/particle-1:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 1048576
     },
     {
-      "_comment": "Observer 5: Glyph Cluster free on commandcode. 1446ms probe, 256k window.",
+      "_comment": "Observer 3: Flint v1.0 free. 1367ms probe, reasoning mandatory, 262k window.",
+      "provider": "openrouter",
+      "id": "recursive/flint-v1.0:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Observer 4: LFM 3 1.7B free. 1526ms probe, reasoning mandatory, 262k window.",
+      "provider": "openrouter",
+      "id": "liquid/lfm-3-1.7b:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Observer 5: Glyph Cluster free on commandcode. 1786ms probe, 256k window.",
       "provider": "commandcode",
       "id": "stealth/glyph-cluster:free",
       "thinking": "low",
@@ -84,7 +84,7 @@
       "contextWindow": 256000
     },
     {
-      "_comment": "Observer 6: Iceman Contributor free on opencode-go. 1742ms probe, 262k window.",
+      "_comment": "Observer 6: Iceman Contributor free on opencode-go. 2516ms probe, 262k window.",
       "provider": "opencode-go",
       "id": "iceman-contributor-free",
       "thinking": "low",
@@ -92,12 +92,12 @@
       "contextWindow": 262144
     },
     {
-      "_comment": "Observer 7: Nemotron 3 Ultra 550B free. 1817ms probe, 1M window.",
+      "_comment": "Observer 7: Ernie 5.5 Flash preview free. 1779ms probe, mandatory high reasoning.",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "id": "baidu/ernie-5.5-flash-preview:free",
       "thinking": "high",
       "cooldownHours": 2,
-      "contextWindow": 1000000
+      "contextWindow": 1024000
     }
   ],
 
@@ -111,23 +111,23 @@
   },
   "reflectorFallbackModels": [
     {
-      "_comment": "Reflector 2: Glyph Cluster free on commandcode. 1446ms probe, 256k window.",
-      "provider": "commandcode",
-      "id": "stealth/glyph-cluster:free",
-      "thinking": "low",
+      "_comment": "Reflector 2: Ernie 5.5 Flash preview free. 1779ms probe, mandatory high reasoning.",
+      "provider": "openrouter",
+      "id": "baidu/ernie-5.5-flash-preview:free",
+      "thinking": "high",
       "cooldownHours": 2,
-      "contextWindow": 256000
+      "contextWindow": 1024000
     },
     {
-      "_comment": "Reflector 3: Iceman Contributor free on opencode-go. 1742ms probe, 262k window.",
-      "provider": "opencode-go",
-      "id": "iceman-contributor-free",
-      "thinking": "low",
+      "_comment": "Reflector 3: Particle 1 free. 1270ms probe, high reasoning, 1M window.",
+      "provider": "openrouter",
+      "id": "particle-ai/particle-1:free",
+      "thinking": "high",
       "cooldownHours": 2,
-      "contextWindow": 262144
+      "contextWindow": 1048576
     },
     {
-      "_comment": "Reflector 4: Dots 3 Note Preview free. 1948ms probe, 512k window.",
+      "_comment": "Reflector 4: Dots 3 Note Preview free. 2202ms probe, 512k window.",
       "provider": "openrouter",
       "id": "dots-studio/dots-3-note-preview:free",
       "thinking": "low",
@@ -135,87 +135,87 @@
       "contextWindow": 512000
     },
     {
-      "_comment": "Reflector 5: Nemotron 3.5 Lightning free. 1602ms probe, 1M window.",
+      "_comment": "Reflector 5: Nemotron 3.5 Lightning free. 679ms probe, 1M window.",
       "provider": "openrouter",
       "id": "nvidia/nemotron-3.5-lightning:free",
+      "thinking": "high",
+      "cooldownHours": 2,
+      "contextWindow": 1000000
+    },
+    {
+      "_comment": "Reflector 6: Glyph Cluster free on commandcode. 1786ms probe, 256k window.",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
       "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Reflector 6: Flint v1.0 free. 879ms probe, 262k window.",
-      "provider": "openrouter",
-      "id": "recursive/flint-v1.0:free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 262144
-    },
-    {
-      "_comment": "Reflector 7: Nemotron 3.5 Super VL free. 1290ms probe, 1M window.",
-      "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-super-vl:free",
-      "thinking": "low",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    }
-  ],
-
-  "dropperModel": {
-    "_comment": "Dropper 1: Flint v1.0 free. Fastest valid tool call wins the cheap retention work.",
-    "provider": "openrouter",
-    "id": "recursive/flint-v1.0:free",
-    "thinking": "off",
-    "cooldownHours": 2,
-    "contextWindow": 262144
-  },
-  "dropperFallbackModels": [
-    {
-      "_comment": "Dropper 2: Nemotron 3.5 Super VL free. 1290ms probe, 1M window.",
-      "provider": "openrouter",
-      "id": "nvidia/nemotron-3.5-super-vl:free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 1000000
-    },
-    {
-      "_comment": "Dropper 3: North Mini Code free. 1316ms probe, 256k window.",
-      "provider": "openrouter",
-      "id": "cohere/north-mini-code:free",
-      "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 256000
     },
     {
-      "_comment": "Dropper 4: Inkling 2 Small free on commandcode. 1446ms probe, 1M window.",
-      "provider": "commandcode",
-      "id": "thinkingmachines/inkling-2-small:free",
+      "_comment": "Reflector 7: HY4 Flash free on opencode-go. 3108ms probe, 1M window.",
+      "provider": "opencode-go",
+      "id": "hy4-flash-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 1048576
+    }
+  ],
+
+  "dropperModel": {
+    "_comment": "Dropper 1: Nemotron 3.5 Lightning free. Fastest valid tool call wins the cheap retention work.",
+    "provider": "openrouter",
+    "id": "nvidia/nemotron-3.5-lightning:free",
+    "thinking": "off",
+    "cooldownHours": 2,
+    "contextWindow": 1000000
+  },
+  "dropperFallbackModels": [
+    {
+      "_comment": "Dropper 2: Particle 1 free. 1270ms probe, thinking off, 1M window.",
+      "provider": "openrouter",
+      "id": "particle-ai/particle-1:free",
       "thinking": "off",
       "cooldownHours": 2,
       "contextWindow": 1048576
     },
     {
-      "_comment": "Dropper 5: Glyph Cluster free on commandcode. 1446ms probe, 256k window.",
-      "provider": "commandcode",
-      "id": "stealth/glyph-cluster:free",
-      "thinking": "off",
-      "cooldownHours": 2,
-      "contextWindow": 256000
-    },
-    {
-      "_comment": "Dropper 6: Iceman Contributor free on opencode-go. 1742ms probe, 262k window.",
-      "provider": "opencode-go",
-      "id": "iceman-contributor-free",
+      "_comment": "Dropper 3: Flint v1.0 free. 1367ms probe, reasoning mandatory, 262k window.",
+      "provider": "openrouter",
+      "id": "recursive/flint-v1.0:free",
       "thinking": "low",
       "cooldownHours": 2,
       "contextWindow": 262144
     },
     {
-      "_comment": "Dropper 7: Nemotron 3 Ultra 550B free. 1817ms probe, 1M window.",
+      "_comment": "Dropper 4: LFM 3 1.7B free. 1526ms probe, reasoning mandatory, 262k window.",
       "provider": "openrouter",
-      "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
-      "thinking": "off",
+      "id": "liquid/lfm-3-1.7b:free",
+      "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 1000000
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Dropper 5: Glyph Cluster free on commandcode. 1786ms probe, 256k window.",
+      "provider": "commandcode",
+      "id": "stealth/glyph-cluster:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 256000
+    },
+    {
+      "_comment": "Dropper 6: Flint v1.0 free on commandcode. 1807ms probe, 262k window.",
+      "provider": "commandcode",
+      "id": "recursive/flint-v1.0:free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
+    },
+    {
+      "_comment": "Dropper 7: Iceman Contributor free on opencode-go. 2516ms probe, 262k window.",
+      "provider": "opencode-go",
+      "id": "iceman-contributor-free",
+      "thinking": "low",
+      "cooldownHours": 2,
+      "contextWindow": 262144
     }
   ]
 }
