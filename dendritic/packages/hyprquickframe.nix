@@ -12,13 +12,24 @@
         + "            `\${grimRegion} - | wl-copy --type image/png `\n"
         + "            + `&& notify-send -a \"HyprQuickFrame\" \"Screenshot Copied\" \"Copied to clipboard\"`;";
 
+      # notify-send -A blocks until a click. The old chain held quickshell open,
+      # so the next launch lost the instance lock. Detach the notify and satty step.
+      notifyScript = pkgs.writeShellScript "hyprquickframe-temp-notify" ''
+        img="$1"
+        ${pkgs.libnotify}/bin/notify-send -a "HyprQuickFrame" -i "$img" \
+          -h "string:image-path:$img" -p -A edit=Edit \
+          "Screenshot Copied" "Copied to clipboard" \
+          | ${pkgs.gnugrep}/bin/grep -q edit \
+          && ${pkgs.satty}/bin/satty --filename "$img" --output-filename "$img" \
+            --early-exit --copy-command "wl-copy --type image/png"
+        ${pkgs.coreutils}/bin/rm -f "$img"
+      '';
+
       tempNew =
         "        const tempPlainCommand =\n"
         + "            `\${grimRegion} \${eTempSnip} `\n"
         + "            + `&& wl-copy --type image/png < \${eTempSnip} `\n"
-        + "            + `&& notify-send -a \"HyprQuickFrame\" -i \${eTempSnip} -h string:image-path:\${eTempSnip} -p -A edit=Edit \"Screenshot Copied\" \"Copied to clipboard\" `\n"
-        + "            + `| grep -q edit && satty --filename \${eTempSnip} --output-filename \${eTempSnip} --early-exit --copy-command \"wl-copy --type image/png\"; `\n"
-        + "            + `rm -f \${eTempSnip}`;";
+        + "            + `&& (${notifyScript} \${eTempSnip} >/dev/null 2>&1 &)`;";
 
       hideOld = "        if (root.editActive)\n            hideOverlaysTimer.start();";
 
