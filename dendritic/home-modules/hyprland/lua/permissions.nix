@@ -9,7 +9,7 @@
 
   -- Screenshot tools. grim captures, wayfreeze paints the frozen screen behind slurp.
   hl.permission(".*/grim", "screencopy", "allow")
-  hl.permission(".*/wayfreeze", "screencopy", "allow")
+  hl.permission(".*woomer", "screencopy", "allow")
   hl.permission(".*/hyprpicker", "screencopy", "allow")
   hl.permission(".*/hyprpicker", "cursorpos", "allow")
 
