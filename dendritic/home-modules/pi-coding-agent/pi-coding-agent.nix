@@ -283,10 +283,14 @@
 
       # Pull only when the image is absent. An unconditional pull lets a
       # rate-limited registry drive an endless restart loop.
+      # Podman aborts on any stale extraction dir, so prune those first.
+      # The 60 minute floor skips a pull still in flight.
       podmanEnsureImage = pkgs.writeShellApplication {
         name = "pi-podman-ensure-image";
-        runtimeInputs = [ pkgs.podman ];
+        runtimeInputs = [ pkgs.coreutils pkgs.podman ];
         text = ''
+          d="''${XDG_DATA_HOME:-$HOME/.local/share}/containers/storage/overlay/tempdirs"
+          if [ -d "$d" ]; then find "$d" -mindepth 1 -maxdepth 1 -mmin +60 -exec rm -rf {} +; fi
           podman image inspect "$1" >/dev/null 2>&1 || exec podman pull "$1"
         '';
       };
