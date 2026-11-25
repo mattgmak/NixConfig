@@ -204,8 +204,7 @@
 
                 # PrismML fork binary: PTQ1_0 packing is not merged upstream
                 # (ggml-org#29672/#29676), so goofyCudaLlamaCpp cannot load Bonsai.
-                # Prebuilt CUDA 12.4 tarball, no compilation; libcuda.so.1 comes from
-                # /run/opengl-driver, so no CUDA build input.
+                # Prebuilt CUDA 12.4 tarball, no compilation.
                 llama-cpp-prism = pkgs.stdenvNoCC.mkDerivation {
                   pname = "llama-cpp-prism";
                   version = "12178";
@@ -213,8 +212,16 @@
                     url = "https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b12178-03ec600/llama-prism-b12178-03ec600-bin-linux-cuda-12.4-x64.tar.gz";
                     hash = "sha256-kVpxOr5QY/IrndMZM3qwm6yZih5yMDKYh1mExaTH9hA=";
                   };
+                  # autoPatchelf reads only buildInputs and nativeBuildInputs.
+                  # libcuda.so.1 comes from /run/opengl-driver at runtime.
                   nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.patchelf ];
-                  runtimeDependencies = [ pkgs.stdenv.cc.cc.lib ];
+                  buildInputs = [
+                    pkgs.stdenv.cc.cc.lib
+                    pkgs.openssl
+                    pkgs.cudaPackages_12.cuda_cudart
+                    pkgs.cudaPackages_12.libcublas
+                  ];
+                  autoPatchelfIgnoreMissingDeps = [ "libcuda.so.1" ];
                   dontBuild = true;
                   # Flat tarball layout: executables and shared objects share the root.
                   installPhase = ''
