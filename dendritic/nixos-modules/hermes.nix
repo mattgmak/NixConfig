@@ -26,13 +26,13 @@
         resp=$(${pkgs.curl}/bin/curl -sS -f -F "file=@$1" -F model=qwen3-asr-1.7b http://127.0.0.1:8181/v1/audio/transcriptions)
         printf '%s' "$resp" | ${pkgs.jq}/bin/jq -er '.text' > "$2/transcript.txt"
       '';
-      # The flake input pins the release tag. The builder still names the package
-      # after its own default, so stamp the tag on the derivation.
+      # The flake input pins the release tag. Pass the tag into the install stamp,
+      # which the CLI and Electron read, via the parameter override, not overrideAttrs.
       hermesVersion = "0.23.1";
-      agentPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
-        (_: {
+      agentPackage = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default.override
+        {
           version = hermesVersion;
-        });
+        };
 
       # The npm package ships the HUI+ skill next to the CLI. hermesHomeFiles takes
       # one entry per file, so list every regular file of the skill dir: SKILL.md
