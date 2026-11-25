@@ -43,6 +43,12 @@ textarea *,
   font-family: "IosevkaTerm Nerd Font", monospace !important;
 }
 
+/* Hermes webapp: conversation prose in Charon; code and fences stay monospace. */
+.aui-md :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, strong, em):not(code, code *),
+.preview-markdown :is(p, li, h1, h2, h3, h4, h5, h6, blockquote, strong, em):not(code, code *) {
+  font-family: "Iosevka Charon", sans-serif !important;
+}
+
 /* Icon fonts keep their own family, otherwise glyphs render as boxes. */
 .MaterialIcons,
 .material-icons,
