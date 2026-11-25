@@ -1,6 +1,6 @@
 {
   flake.nixosModules.ai =
-    { pkgs, ... }:
+    { pkgs, config, ... }:
     {
       # --- llama-swap Service ---
       # Transparent proxy for automatic model swapping with llama.cpp
@@ -244,7 +244,7 @@
           Type = "simple";
           User = "goofy";
           Group = "users";
-          ExecStart = "${pkgs.llama-swap}/bin/llama-swap --config /etc/llama-swap/config.yaml --listen 0.0.0.0:9292 --watch-config";
+          ExecStart = "${pkgs.llama-swap}/bin/llama-swap --config ${config.environment.etc."llama-swap/config.yaml".source} --listen 0.0.0.0:9292 --watch-config";
           Restart = "always";
           RestartSec = 10;
           # Environment for CUDA support
