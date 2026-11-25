@@ -1,6 +1,10 @@
-/* Global web font override: Iosevka Charon for proportional text, IosevkaTerm Nerd Font for monospace. */
-* {
-  font-family: "Iosevka Charon", sans-serif !important;
+/* Text font override: Iosevka Charon for proportional text, IosevkaTerm Nerd Font for monospace.
+   The root and body carry the family only. This rule holds no !important and no universal
+   selector, so a site font or an icon font that declares its own family keeps it. A universal
+   !important rule beats those declarations and renders the glyph icons as boxes. */
+html,
+html body {
+  font-family: "Iosevka Charon", sans-serif;
 }
 
 code,
