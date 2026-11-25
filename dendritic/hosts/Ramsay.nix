@@ -1056,9 +1056,9 @@ SEED
           "r8169"
         ];
         boot.initrd.kernelModules = [ ];
-        # Ramsay-only kernel bump for the reset triage. The default set gives
-        # 6.18.58, and 6.19 is removed upstream, so use 7.2.12.
-        boot.kernelPackages = pkgs.linuxPackages_7_2;
+        # Ramsay-only kernel bump for the reset triage. Kernel 7.2.12 faulted in
+        # lruvec_stat_mod_folio and hung the host, so move to 7.3.
+        boot.kernelPackages = pkgs.linuxPackages_7_3;
         # GTT caps the RAM the GPU may map. 29400781 pages = 112.15 GiB of
         # 124.9 GiB, which left 12.75 GiB for the kernel and all userspace. The
         # 2026-10-30 hang peaked at 95.5 GiB mapped, so 108 GiB keeps the
