@@ -35,7 +35,7 @@
       home.packages = with pkgs; [
         _7zz-rar # RAR extraction, the prebuilt yazi is unwrapped
         clipboard-jh # `cb`, the fallback yazi-clipboard uses off Wayland and macOS
-        self.packages.${pkgs.system}.yaziClipboard # copy tool chosen per session
+        self.packages.${pkgs.stdenv.hostPlatform.system}.yaziClipboard # copy tool chosen per session
         djvulibre # `djvused`, used by yatline-page-counter for DjVu files
         unzip # yatline-page-counter reads EPUB and Office documents as archives
         file # `file` previewer/spotter, no wrapper means PATH lookup

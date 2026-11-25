@@ -112,7 +112,7 @@ Shell integration is off on this host, so `wt switch` cannot change your working
 
 ```sh
 wt switch --create fix-ramsay-agenix   # branch + worktree, based on the default branch
-wt list --format json | jq -r '.[] | select(.branch=="fix-ramsay-agenix") | .path'
+wt list --format json | jq -r 'if type == "object" then (.items // [])[] else .[] end | select(.branch=="fix-ramsay-agenix") | (.path // .worktree.path)'
 cd <path>
 git submodule update --init            # the flake fetches every submodule
 ```

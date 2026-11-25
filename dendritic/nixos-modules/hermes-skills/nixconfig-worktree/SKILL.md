@@ -34,7 +34,7 @@ the JSON list instead of guessing it:
 ```sh
 wt -C /home/agent/NixConfig switch --create fix-ramsay-agenix
 wt -C /home/agent/NixConfig list --format json |
-  jq -r '.[] | select(.branch=="fix-ramsay-agenix") | .path'
+  jq -r 'if type == "object" then (.items // [])[] else .[] end | select(.branch=="fix-ramsay-agenix") | (.path // .worktree.path)'
 ```
 
 A fresh worktree has empty submodule directories, so every nix eval of its path

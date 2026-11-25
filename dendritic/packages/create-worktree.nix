@@ -99,7 +99,8 @@
           printf '%s\n' "$out" >&2
 
           path="$(wt -C "$repo" list --format json |
-            jq -r --arg b "$branch" '[.[] | select(.branch == $b) | .path][0] // ""')"
+            jq -r --arg b "$branch" 'if type == "object" then (.items // [])[] else .[] end
+              | select(.branch == $b) | (.path // .worktree.path)' | head -1)"
           [ -n "$path" ] || fail "no worktree for branch $branch"
 
           if [ "$submodules" -eq 1 ]; then

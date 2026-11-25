@@ -74,7 +74,7 @@
           cp ${shellQml} $out/share/hyprquickframe/shell.qml
 
           mkdir -p $out/bin
-          makeWrapper ${inputs.quickshell.packages.${pkgs.system}.default}/bin/quickshell \
+          makeWrapper ${inputs.quickshell.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/quickshell \
             $out/bin/hyprquickframe \
             --prefix PATH : ${
               pkgs.lib.makeBinPath [

@@ -48,7 +48,7 @@
         slurp
         swayidle
         swaylock-effects
-        self.packages.${pkgs.system}.hyprquickframe
+        self.packages.${pkgs.stdenv.hostPlatform.system}.hyprquickframe
         wl-clipboard
         wlogout
         inputs.woomer.packages.${pkgs.stdenv.hostPlatform.system}.default

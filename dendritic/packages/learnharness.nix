@@ -16,7 +16,7 @@
         [ -f "$HOME/.config/learnharness/env" ] && . "$HOME/.config/learnharness/env"
         exec ${appimage}/bin/learnharness --user-data-dir="$HOME/LearnHarness" "$@"
       '';
-      extracted = pkgs.appimageTools.extractType2 {
+      extracted = pkgs.appimageTools.extract {
         pname = "learnharness";
         version = "0.7.0";
         inherit src;

@@ -117,7 +117,9 @@ if [ "$allow_dirty" != 1 ] && [ -n "$(git -C "$wt_path" status --porcelain)" ]; 
 fi
 
 main_path=$(wt list --format json 2>/dev/null |
-  jq -r '.[] | select(.main_state == "is_main") | .path' | head -1)
+  jq -r 'if type == "object" then (.items // [])[] else .[] end
+    | select((.is_main // false) or ((.display // {}).state == "is_main"))
+    | (.path // .worktree.path)' | head -1)
 [ -n "$main_path" ] || { printf 'cannot find the main worktree from wt list\n' >&2; exit 1; }
 [ "$main_path" != "$wt_path" ] || {
   printf 'the main checkout cannot merge itself: run me from a worktree\n' >&2

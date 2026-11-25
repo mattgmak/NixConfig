@@ -23,11 +23,17 @@
           libdrm,
           libGL,
           libgbm,
+          libx11,
+          libxcomposite,
+          libxdamage,
+          libxext,
+          libxfixes,
           libxkbcommon,
+          libxrandr,
+          libxshmfence,
           nspr,
           nss,
           pango,
-          xorg,
         }:
         stdenv.mkDerivation (finalAttrs: {
           pname = "vesktop";
@@ -80,13 +86,13 @@
             nspr
             nss
             pango
-            xorg.libX11
-            xorg.libXcomposite
-            xorg.libXdamage
-            xorg.libXext
-            xorg.libXfixes
-            xorg.libXrandr
-            xorg.libxshmfence
+            libx11
+            libxcomposite
+            libxdamage
+            libxext
+            libxfixes
+            libxrandr
+            libxshmfence
           ];
 
           # Prebuilt binary: keep its symbols and bundled libraries.
