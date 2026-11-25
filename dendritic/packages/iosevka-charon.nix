@@ -25,12 +25,11 @@
       # nixpkgs ships plain iosevka only, so vendor the zip here. The zip has
       # three top-level entries, so fetchzip refuses it: use fetchurl + unzip.
 
-      # The release declares leading 1.28em (ascender 1015, descender -265). Cap
-      # height needs 735 units, and libadwaita sizes widgets in px, so the tall box
-      # clips glyph tops at 12pt. Upstream answers with `leading` in the build
-      # config (be5invis/Iosevka#103) and jul-sh builds the release in CI, so the
-      # metrics get rewritten here. 965/-215 matches upstream Iosevka and Iosevka
-      # Aile, which ship 1.18em with the same ink-over-box tradeoff.
+      # The release declares leading 1.28em (ascender 1015, descender -265). Measured
+      # ink in the shipped TTFs: caps and ascenders reach 735, descenders -223, and
+      # acutecomb 763. Caron composites reach 985. The box at 763/-223 covers every
+      # glyph except caron composites, which clip as they do upstream. A box shorter
+      # than the ink makes GTK4 clip drawing to the allocation.
       packages.iosevka-charon = pkgs.stdenvNoCC.mkDerivation {
         pname = "iosevka-charon";
         version = "34.801";
@@ -55,7 +54,7 @@
           cp iosevka-charon/iosevkacharonmono/*.ttf $out/share/fonts/truetype/
           install -m 644 iosevka-charon/OFL.txt $out/share/fonts/truetype/OFL-iosevka-charon.txt
           for f in $out/share/fonts/truetype/*.ttf; do
-            ${py}/bin/python3 ${metricsPy} "$f" 965 -215
+            ${py}/bin/python3 ${metricsPy} "$f" 763 -223
           done
           runHook postInstall
         '';
