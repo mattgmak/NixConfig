@@ -304,10 +304,18 @@
         sha256 = "sha256-8VPXzPSwhvw7hTFAV04hKiLhIo38tpR+3+1NriCPR+c=";
       };
 
+      # Podman cannot delete its own extraction dirs: unpacked layers land at mode
+      # 555, so unlink fails and the store refuses to load. Prune them first. An
+      # active load keeps its dir mtime fresh, so the 5 minute floor skips it.
       podmanLoadImage = pkgs.writeShellApplication {
         name = "pi-podman-load-image";
-        runtimeInputs = [ pkgs.podman ];
+        runtimeInputs = with pkgs; [ coreutils podman ];
         text = ''
+          d="''${XDG_DATA_HOME:-$HOME/.local/share}/containers/storage/overlay/tempdirs"
+          if [ -d "$d" ]; then
+            find "$d" -mindepth 1 -maxdepth 1 -mmin +5 -exec chmod -R u+rwX {} +
+            find "$d" -mindepth 1 -maxdepth 1 -mmin +5 -exec rm -rf {} +
+          fi
           podman image inspect "$1" >/dev/null 2>&1 || exec podman load -i "$2"
         '';
       };
