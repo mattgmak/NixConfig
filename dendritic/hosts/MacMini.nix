@@ -207,7 +207,8 @@ in
         exit 2
       '';
       crawl4aiPort = 11235;
-      crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
+      # Pin the arm64 sub-manifest, so the LaunchAgent cannot follow a moved tag.
+      crawl4aiImage = "docker.io/unclecode/crawl4ai:latest@sha256:7e90847dfd89239fee39e1fb5b9d0bd47b2d77842a9f5d794c5fee589bb86850";
       crawl4aiApiToken = builtins.substring 0 64 (
         builtins.hashString "sha256" "pi-crawl4ai-/Users/${username}"
       );
