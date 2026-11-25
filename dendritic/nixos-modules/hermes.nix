@@ -209,6 +209,20 @@
           pkgs.ffmpeg
           # bladebro needs a Chrome/Chromium binary on the service PATH.
           pkgs.chromium
+          # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
+          # components on the service PATH.
+          pkgs.tigervnc
+          pkgs.xfce.xfwm4
+          pkgs.xfce.xfce4-panel
+          pkgs.xfce.xfdesktop
+          pkgs.xfce.xfce4-settings
+          pkgs.dbus
+          pkgs.xorg.xauth
+          pkgs.xorg.xset
+          pkgs.xorg.xsetroot
+          pkgs.xorg.xdpyinfo
+          pkgs.xorg.xprop
+          pkgs.xorg.xkbutils
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
@@ -565,6 +579,20 @@
           pkgs.lean-ctx
           # bladebro MCP needs a Chrome/Chromium binary on the PATH.
           pkgs.chromium
+          # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
+          # components on the service PATH.
+          pkgs.tigervnc
+          pkgs.xfce.xfwm4
+          pkgs.xfce.xfce4-panel
+          pkgs.xfce.xfdesktop
+          pkgs.xfce.xfce4-settings
+          pkgs.dbus
+          pkgs.xorg.xauth
+          pkgs.xorg.xset
+          pkgs.xorg.xsetroot
+          pkgs.xorg.xdpyinfo
+          pkgs.xorg.xprop
+          pkgs.xorg.xkbutils
         ];
         environment = {
           HOME = altStateDir;
@@ -615,6 +643,20 @@
           pkgs.lean-ctx
           # bladebro MCP needs a Chrome/Chromium binary on the PATH.
           pkgs.chromium
+          # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
+          # components on the service PATH.
+          pkgs.tigervnc
+          pkgs.xfce.xfwm4
+          pkgs.xfce.xfce4-panel
+          pkgs.xfce.xfdesktop
+          pkgs.xfce.xfce4-settings
+          pkgs.dbus
+          pkgs.xorg.xauth
+          pkgs.xorg.xset
+          pkgs.xorg.xsetroot
+          pkgs.xorg.xdpyinfo
+          pkgs.xorg.xprop
+          pkgs.xorg.xkbutils
         ];
         environment = {
           HOME = altStateDir;
