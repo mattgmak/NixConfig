@@ -14,8 +14,8 @@
 #
 # The main hermes agent is agent, so it runs this path directly. The old
 # hermes NOPASSWD rule lived in dendritic/nixos-modules/hermes.nix and is gone;
-# hosts/Ramsay.nix keeps the agent rules. See the skill
-# dendritic/nixos-modules/hermes-skills/nixconfig-worktree/SKILL.md.
+# hosts/Ramsay.nix keeps the agent rules. See the runtime skill
+# /home/agent/hermes/.hermes/skills/nixconfig-worktree/SKILL.md.
 #
 # The session is one window with three panes:
 #

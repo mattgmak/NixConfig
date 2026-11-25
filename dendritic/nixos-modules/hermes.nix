@@ -278,11 +278,9 @@
             '';
           })
         ];
-        hermesHomeFiles = {
-          "skills/pi/SKILL.md" = ./hermes-skills/pi/SKILL.md;
-          "skills/deploy/SKILL.md" = ./hermes-skills/deploy/SKILL.md;
-          "skills/nixconfig-worktree/SKILL.md" = ./hermes-skills/nixconfig-worktree/SKILL.md;
-        } // hermesUiSkillFiles;
+        # pi, deploy and nixconfig-worktree are runtime artifacts owned by the
+        # curator; the repo no longer ships them. Only the HUI+ skill is seeded.
+        hermesHomeFiles = hermesUiSkillFiles;
         # bladebro MCP browser driver; merged into config.yaml's mcp_servers.
         # See dendritic/packages/bladebro.nix.
         mcpServers.bladebro = {
