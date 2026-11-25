@@ -238,6 +238,11 @@
                     for f in $out/bin/*; do
                       patchelf --set-rpath "$out/lib:$out/lib64:$(patchelf --print-rpath "$f")" "$f"
                     done
+                    # llama.cpp loads backend plugins only from the executable directory
+                    # (ggml-backend-reg.cpp:492), so mirror them next to the binaries.
+                    for f in $out/lib/libggml*.so*; do
+                      ln -sf "$f" "$out/bin/$(basename "$f")"
+                    done
                   '';
                 };
               in
