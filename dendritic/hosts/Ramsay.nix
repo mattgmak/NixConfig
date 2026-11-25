@@ -199,7 +199,9 @@ in
             Type = "oneshot";
             RemainAfterExit = true;
             Environment = tmuxServicePath;
-            ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+            # A live session makes new-session fail, and home-manager activation
+            # aborts on a degraded unit. Ignore that exit.
+            ExecStart = "-${lib.getExe pkgs.tmux} new-session -d -s agents";
           };
           Install = {
             WantedBy = [ "default.target" ];
@@ -211,8 +213,7 @@ in
             Description = "tmux session 'monitor' with btop and amdtop";
             # One tmux server serves both units, so order them: two parallel
             # new-session calls can race the server startup. Wants not Requires —
-            # agents-tmux exits non-zero when its session already exists, and the
-            # monitor session should not depend on it.
+            # the monitor session should not depend on agents.
             After = [ "agents-tmux.service" ];
             Wants = [ "agents-tmux.service" ];
           };

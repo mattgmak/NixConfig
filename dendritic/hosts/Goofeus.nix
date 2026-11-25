@@ -121,7 +121,7 @@
             # Agent user is fixed (age.identityPaths etc. assume it); login PATH is
             # ~/.nix-profile + /etc/profiles/per-user/agent + system sw.
             Environment = "PATH=/home/agent/.nix-profile/bin:/etc/profiles/per-user/agent/bin:/run/current-system/sw/bin:/usr/bin:/bin";
-            ExecStart = "${lib.getExe pkgs.tmux} new-session -d -s agents";
+            ExecStart = "-${lib.getExe pkgs.tmux} new-session -d -s agents";
           };
           Install = {
             WantedBy = [ "default.target" ];
