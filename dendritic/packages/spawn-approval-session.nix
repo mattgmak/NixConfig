@@ -157,7 +157,10 @@
           user="$(id -un)"
           shell="''${SPAWN_SHELL:-/run/current-system/sw/bin/zsh}"
           session_path="''${SPAWN_PATH:-/run/wrappers/bin:$login_home/.nix-profile/bin:/nix/profile/bin:$login_home/.local/state/nix/profile/bin:/etc/profiles/per-user/$user/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin}"
-          envstr="PATH=$session_path HOME=$login_home USER=$user"
+          # pi's powerline footer cannot detect Nerd Fonts through tmux (its
+          # heuristic reads TERM, which says tmux-256color), so force the glyph
+          # set; every viewer of this server renders Nerd Fonts.
+          envstr="PATH=$session_path HOME=$login_home USER=$user POWERLINE_NERD_FONTS=1"
           if [ -d "$login_home/.config/zsh" ]; then
             envstr="$envstr ZDOTDIR=$login_home/.config/zsh"
           fi
