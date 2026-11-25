@@ -201,9 +201,42 @@
                         ${oldAttrs.preConfigure or ""}
                       '';
                     });
+
+                # PrismML fork binary: PTQ1_0 packing is not merged upstream
+                # (ggml-org#29672/#29676), so goofyCudaLlamaCpp cannot load Bonsai.
+                # Prebuilt CUDA 12.4 tarball, no compilation; libcuda.so.1 comes from
+                # /run/opengl-driver, so no CUDA build input.
+                llama-cpp-prism = pkgs.stdenvNoCC.mkDerivation {
+                  pname = "llama-cpp-prism";
+                  version = "12178";
+                  src = pkgs.fetchzip {
+                    url = "https://github.com/PrismML-Eng/llama.cpp/releases/download/prism-b12178-03ec600/llama-prism-b12178-03ec600-bin-linux-cuda-12.4-x64.tar.gz";
+                    hash = "sha256-kVpxOr5QY/IrndMZM3qwm6yZih5yMDKYh1mExaTH9hA=";
+                  };
+                  nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.patchelf ];
+                  runtimeDependencies = [ pkgs.stdenv.cc.cc.lib ];
+                  dontBuild = true;
+                  # Flat tarball layout: executables and shared objects share the root.
+                  installPhase = ''
+                    runHook preInstall
+                    mkdir -p $out/bin $out/lib
+                    cp -d $src/lib*.so* $out/lib/
+                    cp -d $src/llama* $src/ggml-rpc-server $out/bin/
+                    chmod +x $out/bin/*
+                    runHook postInstall
+                  '';
+                  # Prepend $out/lib to the RPATH so llama-server finds the bundled libs;
+                  # keep the entries autoPatchelf added.
+                  postFixup = ''
+                    for f in $out/bin/*; do
+                      patchelf --set-rpath "$out/lib:$out/lib64:$(patchelf --print-rpath "$f")" "$f"
+                    done
+                  '';
+                };
               in
               {
                 llama-cpp = goofyCudaLlamaCpp;
+                llama-cpp-prism = llama-cpp-prism;
 
                 # The fork's CMake project version is 0.3.0; whisper-cpp asks for
                 # 0.6.0 when WHISPER_USE_SYSTEM_LLAMA is on.

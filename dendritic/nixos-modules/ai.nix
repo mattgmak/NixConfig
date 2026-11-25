@@ -11,6 +11,38 @@
 
         models:  # Ordered from newest to oldest
 
+          # Ternary Bonsai 2.5 27B (Qwen3.8-27B hybrid arch, ternary PTQ1_0) — agentic.
+          # PTQ1_0-mtp 5.80 GiB + ~0.7 GiB CUDA ctx/compute + 0.5 GiB KV q8_0 @16K ≈ 7.0 GiB ✅ 8 GB.
+          # Needs the PrismML fork (pkgs.llama-cpp-prism): PTQ1_0 not merged upstream (ggml-org#29672/#29676).
+          # MTP draft head: 1.5–1.9× decode (vendor RTX 4090 preset); mmproj skipped to stay in VRAM.
+          # Official thinking sampling: temp=1.0, top_p=0.95, top_k=20, min-p=0.
+          # Source: https://huggingface.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF
+          "bonsai-2.5:27b-ptq1_0-mtp":
+            cmd: |
+              ${pkgs.llama-cpp-prism}/bin/llama-server
+              -hf prism-ml/Ternary-Bonsai-2.5-27B-GGUF:Ternary-Bonsai-2.5-27B-PTQ1_0-mtp.gguf
+              --port ''${PORT}
+              --jinja
+              --no-mmproj
+              -ngl 99
+              --fit off
+              -c 16384
+              --parallel 1
+              -b 512
+              -ub 256
+              --flash-attn on
+              -ctk q8_0
+              -ctv q8_0
+              --spec-type draft-mtp
+              --spec-draft-n-max 3
+              --spec-draft-n-min 0
+              --spec-draft-p-min 0
+              --reasoning on
+              --temp 1.0
+              --top-p 0.95
+              --top-k 20
+              --min-p 0.0
+
           # LFM2.5-8B-A1B (8.3B total / 1.5B active MoE, lfm2moe hybrid) — agentic.
           # unsloth UD-Q4_K_XL = 4.98 GiB. Upstream llama.cpp arch support
           # (LLM_ARCH_LFM2MOE, ggml-org#16464) — no fork needed.
