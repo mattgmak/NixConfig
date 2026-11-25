@@ -365,7 +365,18 @@
               # Find this in about:config or prefs.js of your profile
               keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
-              userChrome = ../../../vendor/mattgmak/zen-wireframe-2/userChrome.css;
+              # The wireframe theme imports its modules by a relative path, so the copy keeps
+              # the whole tree. The font file appends after the theme, which wins the cascade.
+              userChrome =
+                let
+                  theme = ../../../vendor/mattgmak/zen-wireframe-2;
+                  chrome = pkgs.runCommandLocal "zen-userchrome" { } ''
+                    cp -r ${theme} $out
+                    chmod -R u+w $out
+                    cat ${./extensions/userChrome-fonts.css} >>$out/userChrome.css
+                  '';
+                in
+                "${chrome}/userChrome.css";
               userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
 
               containersForce = true;
@@ -402,6 +413,17 @@
 
         stylix.targets.zen-browser.enable = false;
 
+        home.packages = [
+          (pkgs.writeShellApplication {
+            name = "sync-stylus";
+            runtimeInputs = [
+              pkgs.git
+              pkgs.jq
+            ];
+            text = builtins.readFile ../../../scripts/sync-stylus.sh;
+          })
+        ];
+
         home.file =
           let
             configDir =
@@ -414,6 +436,30 @@
               source = ../../../vendor/mattgmak/zen-wireframe-2/elements;
               recursive = true;
             };
+            # Stylus style = code plus the "applies to" filters. scripts/sync-stylus.sh keeps
+            # stylus-match.json in step with the list you maintain in the Zen UI.
+            stylusCode = builtins.readFile ./extensions/stylus.css;
+            stylusMatch = builtins.fromJSON (builtins.readFile ./extensions/stylus-match.json);
+            sectionFilters = builtins.intersectAttrs {
+              domains = null;
+              urlPrefixes = null;
+              urls = null;
+              regexps = null;
+            } stylusMatch;
+            styleFilters = builtins.intersectAttrs {
+              exclusions = null;
+              inclusions = null;
+            } stylusMatch;
+            stylusStyle =
+              {
+                id = 1;
+                name = "Iosevka global";
+                url = "";
+                enabled = true;
+                code = stylusCode;
+                sections = [ (sectionFilters // { code = stylusCode; }) ];
+              }
+              // styleFilters;
           in
           {
             "${configDir}/default/chrome/modules" = modules;
@@ -421,20 +467,7 @@
             "${configDir}/tmp/chrome/modules" = modules;
             "${configDir}/tmp/chrome/elements" = elements;
             ".config/zen/stylus/Iosevka.json" = {
-              text = builtins.toJSON [
-                {
-                  id = 1;
-                  name = "Iosevka global";
-                  url = "";
-                  enabled = true;
-                  code = builtins.readFile ./extensions/stylus.css;
-                  sections = [
-                    {
-                      code = builtins.readFile ./extensions/stylus.css;
-                    }
-                  ];
-                }
-              ];
+              text = builtins.toJSON [ stylusStyle ];
             };
           };
       };

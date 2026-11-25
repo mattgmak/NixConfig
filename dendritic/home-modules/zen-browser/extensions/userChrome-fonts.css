@@ -1,0 +1,14 @@
+/* Browser UI text in Iosevka Charon. The wireframe theme sets the terminal face on `*`.
+   Equal specificity wins on order, so this rule replaces it. */
+* {
+  font-family: "Iosevka Charon" !important;
+}
+
+/* Address bar and search bar keep the terminal face. */
+#urlbar,
+#urlbar *,
+#urlbar-container,
+#searchbar,
+#searchbar * {
+  font-family: "IosevkaTerm Nerd Font Propo" !important;
+}

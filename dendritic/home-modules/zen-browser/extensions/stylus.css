@@ -1,10 +1,8 @@
-/* Text font override: Iosevka Charon for proportional text, IosevkaTerm Nerd Font for monospace.
-   The root and body carry the family only. This rule holds no !important and no universal
-   selector, so a site font or an icon font that declares its own family keeps it. A universal
-   !important rule beats those declarations and renders the glyph icons as boxes. */
-html,
-html body {
-  font-family: "Iosevka Charon", sans-serif;
+/* Global web font override: Iosevka Charon for proportional text, IosevkaTerm Nerd Font for monospace.
+   The universal rule beats every site rule, so a site with glyph icons needs an exclusion in
+   stylus-match.json. Run scripts/sync-stylus.sh to refresh that list from a Stylus export. */
+* {
+  font-family: "Iosevka Charon", sans-serif !important;
 }
 
 code,
