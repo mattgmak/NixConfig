@@ -17,8 +17,9 @@ let
 in
 if hostname == "GoofyDesky" then
   ''
-    hl.monitor({ output = "${deskyMonitors.primary}", mode = "2560x1440@240.00Hz", position = "0x0", scale = 1 })
-    hl.monitor({ output = "${deskyMonitors.secondary}", mode = "1920x1080@144.00Hz", position = "-1080x-650", scale = 1, transform = 3 })
+    -- scale 1.05 compensates the 11pt application font; positions use scaled sizes (2560/1.05, 1080/1.05).
+    hl.monitor({ output = "${deskyMonitors.primary}", mode = "2560x1440@240.00Hz", position = "0x0", scale = 1.05 })
+    hl.monitor({ output = "${deskyMonitors.secondary}", mode = "1920x1080@144.00Hz", position = "-1028x-650", scale = 1.05, transform = 3 })
 
     hl.workspace_rule({ workspace = "name:Game", monitor = "${deskyMonitors.primary}" })
     -- A numbered workspace takes a bare number: "name:1" is an invalid filter in Hyprland 0.57.
