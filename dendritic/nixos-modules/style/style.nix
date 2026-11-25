@@ -32,7 +32,7 @@
         image = ./beautiful-mountains-landscape.jpg;
 
         fonts = {
-          sizes.applications = 11;
+          sizes.applications = 13;
           monospace = {
             package = pkgs.nerd-fonts.iosevka-term;
             name = "IosevkaTerm Nerd Font Propo";
