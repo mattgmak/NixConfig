@@ -1057,8 +1057,17 @@ SEED
         ];
         boot.initrd.kernelModules = [ ];
         # Ramsay-only kernel bump for the reset triage. Kernel 7.2.12 faulted in
-        # lruvec_stat_mod_folio and hung the host, so move to 7.3.
-        boot.kernelPackages = pkgs.linuxPackages_7_3;
+        # lruvec_stat_mod_folio and hung the host, so move to 7.3. PSTORE_CONSOLE
+        # saves the next oops in efivars, whose backend the kernel enables on its
+        # own.
+        boot.kernelPackages = pkgs.linuxPackagesFor (pkgs.linux_7_3.override {
+          argsOverride = {
+            structuredExtraConfig = with lib.kernel; {
+              PSTORE = yes;
+              PSTORE_CONSOLE = yes;
+            };
+          };
+        });
         # GTT caps the RAM the GPU may map. 29400781 pages = 112.15 GiB of
         # 124.9 GiB, which left 12.75 GiB for the kernel and all userspace. The
         # 2026-10-30 hang peaked at 95.5 GiB mapped, so 108 GiB keeps the
