@@ -281,21 +281,34 @@
         text = mkPiPowerlineTheme config.lib.stylix.colors;
       };
 
-      # Pull only when the image is absent. An unconditional pull lets a
-      # rate-limited registry drive an endless restart loop.
-      # Podman aborts on any stale extraction dir, so prune those first.
-      # The 60 minute floor skips a pull still in flight. Unpacked layers keep
-      # mode 555, so chmod is needed before rm can unlink inside them.
-      podmanEnsureImage = pkgs.writeShellApplication {
-        name = "pi-podman-ensure-image";
-        runtimeInputs = [ pkgs.coreutils pkgs.podman ];
+      # Build-time images: Nix fetches once per digest, the unit loads from the
+      # store, so boot needs no registry. pullImage pins one arch, so darwin keeps
+      # its own LaunchAgent path in hosts/MacMini.nix.
+      crawl4aiImageDrv = pkgs.dockerTools.pullImage {
+        imageName = "unclecode/crawl4ai";
+        imageDigest = "sha256:14bcdc57464635d7e1467753eb540e438b3f7b21b0423c8b69fa6dbf4f40658f";
+        finalImageName = "unclecode/crawl4ai";
+        finalImageTag = "latest";
+        os = "linux";
+        arch = "amd64";
+        sha256 = "sha256-koNgmIjhNJK9hguIVUaGMP5rAtBmA/qf2zsFbCrhzMY=";
+      };
+
+      searxngImageDrv = pkgs.dockerTools.pullImage {
+        imageName = "searxng/searxng";
+        imageDigest = "sha256:f4177a8ee636359b84f4dc49700fdf0176185c34b0f1791d5b312bde0eb7b7a3";
+        finalImageName = "searxng/searxng";
+        finalImageTag = "2026.9.22-2ed96e6fc";
+        os = "linux";
+        arch = "amd64";
+        sha256 = "sha256-8VPXzPSwhvw7hTFAV04hKiLhIo38tpR+3+1NriCPR+c=";
+      };
+
+      podmanLoadImage = pkgs.writeShellApplication {
+        name = "pi-podman-load-image";
+        runtimeInputs = [ pkgs.podman ];
         text = ''
-          d="''${XDG_DATA_HOME:-$HOME/.local/share}/containers/storage/overlay/tempdirs"
-          if [ -d "$d" ]; then
-            find "$d" -mindepth 1 -maxdepth 1 -mmin +60 -exec chmod -R u+rwX {} +
-            find "$d" -mindepth 1 -maxdepth 1 -mmin +60 -exec rm -rf {} +
-          fi
-          podman image inspect "$1" >/dev/null 2>&1 || exec podman pull "$1"
+          podman image inspect "$1" >/dev/null 2>&1 || exec podman load -i "$2"
         '';
       };
 
@@ -306,10 +319,7 @@
       );
 
       searxngPort = 8888;
-      # Pin the multi-arch OCI *index* digest, not a platform sub-manifest: podman
-      # then selects the native image. Pinning the amd64 sub-manifest digest made
-      # arm64 hosts run the image under qemu, which segfaults.
-      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc@sha256:f6f67c89efdac7b1bd4805703764ecaa9d0777b86a101b86cae4f1563de4d627";
+      searxngImage = "docker.io/searxng/searxng:2026.9.22-2ed96e6fc";
       searxngSecretKey = builtins.substring 0 64 (
         builtins.hashString "sha256" "pi-searxng-${config.home.homeDirectory}"
       );
@@ -757,7 +767,7 @@
           ]
           ++ markdownPreviewDeps;
 
-        systemd.user.services.crawl4ai = {
+        systemd.user.services.crawl4ai = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
           Unit = {
             Description = "Crawl4AI fetch server for pi-web-access";
             After = [ "network-online.target" ];
@@ -772,7 +782,7 @@
             TimeoutStartSec = "10min";
             # --replace breaks rootless podman pasta port forwarding (host gets RST).
             ExecStartPre = [
-              "-${lib.getExe podmanEnsureImage} ${crawl4aiImage}"
+              "-${lib.getExe podmanLoadImage} ${crawl4aiImage} ${crawl4aiImageDrv}"
               "-${lib.getExe pkgs.podman} rm -f pi-crawl4ai"
             ];
             ExecStart =
@@ -788,7 +798,7 @@
         };
 
         # Granian binds :::8080 and ignores server.bind_address; loopback-only via host publish.
-        systemd.user.services.searxng = {
+        systemd.user.services.searxng = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
           Unit = {
             Description = "SearXNG metasearch server for pi-web-access";
             After = [ "network-online.target" ];
@@ -803,7 +813,7 @@
             TimeoutStartSec = "10min";
             # --replace breaks rootless podman pasta port forwarding (host gets RST).
             ExecStartPre = [
-              "-${lib.getExe podmanEnsureImage} ${searxngImage}"
+              "-${lib.getExe podmanLoadImage} ${searxngImage} ${searxngImageDrv}"
               "-${lib.getExe pkgs.podman} rm -f pi-searxng"
             ];
             ExecStart =
