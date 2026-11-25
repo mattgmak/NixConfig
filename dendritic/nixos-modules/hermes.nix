@@ -222,7 +222,7 @@
           pkgs.xorg.xsetroot
           pkgs.xorg.xdpyinfo
           pkgs.xorg.xprop
-          pkgs.xorg.xkbutils
+          pkgs.xorg.setxkbmap
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
@@ -592,7 +592,7 @@
           pkgs.xorg.xsetroot
           pkgs.xorg.xdpyinfo
           pkgs.xorg.xprop
-          pkgs.xorg.xkbutils
+          pkgs.xorg.setxkbmap
         ];
         environment = {
           HOME = altStateDir;
@@ -656,7 +656,7 @@
           pkgs.xorg.xsetroot
           pkgs.xorg.xdpyinfo
           pkgs.xorg.xprop
-          pkgs.xorg.xkbutils
+          pkgs.xorg.setxkbmap
         ];
         environment = {
           HOME = altStateDir;
