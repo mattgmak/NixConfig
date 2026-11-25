@@ -17,10 +17,13 @@
           # MTP draft head: 1.5–1.9× decode (vendor RTX 4090 preset); mmproj skipped to stay in VRAM.
           # Official thinking sampling: temp=1.0, top_p=0.95, top_k=20, min-p=0.
           # Source: https://huggingface.co/prism-ml/Ternary-Bonsai-2.5-27B-GGUF
+          # -hff names the file directly: the resolver's name_is_sidecar rejects any
+          # basename containing "mtp", so -hf repo:...-mtp.gguf resolves to nothing.
           "bonsai-2.5:27b-ptq1_0-mtp":
             cmd: |
               ${pkgs.llama-cpp-prism}/bin/llama-server
-              -hf prism-ml/Ternary-Bonsai-2.5-27B-GGUF:Ternary-Bonsai-2.5-27B-PTQ1_0-mtp.gguf
+              -hf prism-ml/Ternary-Bonsai-2.5-27B-GGUF
+              -hff Ternary-Bonsai-2.5-27B-PTQ1_0-mtp.gguf
               --port ''${PORT}
               --jinja
               --no-mmproj
