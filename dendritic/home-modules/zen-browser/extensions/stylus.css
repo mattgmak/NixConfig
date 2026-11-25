@@ -51,6 +51,10 @@ textarea *,
   font-family: "Material Symbols Outlined", "Material Icons" !important;
 }
 
+.codicon {
+  font-family: codicon !important;
+}
+
 .fa,
 .fas,
 .far,
