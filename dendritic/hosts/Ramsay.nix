@@ -1067,9 +1067,21 @@ SEED
           # Passthrough domain keeps device translation for the NPU driver
           # while dropping the per-map IOMMU work on the GPU path.
           "iommu=pt"
+          # The 2026-11-24 oops printed "reboot is needed" and still ran 12
+          # minutes until a manual power cycle. Make such faults reboot.
+          "panic_on_oops=1"
+          "softlockup_panic=1"
+          "hardlockup_panic=1"
+          "panic=10"
         ];
         # Locked weight pages cannot move, so skip compaction.
         boot.kernel.sysctl."vm.compact_unevictable_allowed" = 0;
+        # The oops faulted in the page_ext path that mem alloc profiling turns
+        # on. Turn it off until a kernel bump fixes mm.
+        boot.kernel.sysctl."vm.mem_profiling" = "0";
+        # Reset the board when the kernel wedges so deeply that even the panic
+        # path cannot run.
+        systemd.settings.Manager.RuntimeWatchdogSec = "1min";
         boot.kernelModules = [
           "kvm-amd"
           "atlantic"

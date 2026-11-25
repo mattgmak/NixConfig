@@ -281,6 +281,16 @@
         text = mkPiPowerlineTheme config.lib.stylix.colors;
       };
 
+      # Pull only when the image is absent. An unconditional pull lets a
+      # rate-limited registry drive an endless restart loop.
+      podmanEnsureImage = pkgs.writeShellApplication {
+        name = "pi-podman-ensure-image";
+        runtimeInputs = [ pkgs.podman ];
+        text = ''
+          podman image inspect "$1" >/dev/null 2>&1 || exec podman pull "$1"
+        '';
+      };
+
       crawl4aiPort = 11235;
       crawl4aiImage = "docker.io/unclecode/crawl4ai:latest";
       crawl4aiApiToken = builtins.substring 0 64 (
@@ -744,15 +754,17 @@
             Description = "Crawl4AI fetch server for pi-web-access";
             After = [ "network-online.target" ];
             Wants = [ "network-online.target" ];
+            StartLimitIntervalSec = "30min";
+            StartLimitBurst = 5;
           };
           Service = {
             Type = "simple";
             Restart = "on-failure";
-            RestartSec = 5;
+            RestartSec = "30s";
             TimeoutStartSec = "10min";
             # --replace breaks rootless podman pasta port forwarding (host gets RST).
             ExecStartPre = [
-              "-${lib.getExe pkgs.podman} pull ${crawl4aiImage}"
+              "-${lib.getExe podmanEnsureImage} ${crawl4aiImage}"
               "-${lib.getExe pkgs.podman} rm -f pi-crawl4ai"
             ];
             ExecStart =
@@ -761,7 +773,7 @@
               in
               # The pool monitor reports host memory (89% from the resident model server),
               # so cap the container to keep crawl4ai's browsers from adding to the pressure.
-              "${lib.getExe pkgs.podman} run --rm --name pi-crawl4ai --memory=6g --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
+              "${lib.getExe pkgs.podman} run --rm --pull=never --name pi-crawl4ai --memory=6g --shm-size=1g -p 127.0.0.1:${hostPort}:11235 -e CRAWL4AI_API_TOKEN=${crawl4aiApiToken} ${crawl4aiImage}";
             ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-crawl4ai";
           };
           Install.WantedBy = [ "default.target" ];
@@ -773,22 +785,24 @@
             Description = "SearXNG metasearch server for pi-web-access";
             After = [ "network-online.target" ];
             Wants = [ "network-online.target" ];
+            StartLimitIntervalSec = "30min";
+            StartLimitBurst = 5;
           };
           Service = {
             Type = "simple";
             Restart = "on-failure";
-            RestartSec = 5;
+            RestartSec = "30s";
             TimeoutStartSec = "10min";
             # --replace breaks rootless podman pasta port forwarding (host gets RST).
             ExecStartPre = [
-              "-${lib.getExe pkgs.podman} pull ${searxngImage}"
+              "-${lib.getExe podmanEnsureImage} ${searxngImage}"
               "-${lib.getExe pkgs.podman} rm -f pi-searxng"
             ];
             ExecStart =
               let
                 hostPort = toString searxngPort;
               in
-              "${lib.getExe pkgs.podman} run --rm --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
+              "${lib.getExe pkgs.podman} run --rm --pull=never --name pi-searxng -p 127.0.0.1:${hostPort}:8080 -v ${searxngSettingsFile}:/etc/searxng/settings.yml:ro ${searxngImage}";
             ExecStop = "-${lib.getExe pkgs.podman} stop -t 10 pi-searxng";
           };
           Install.WantedBy = [ "default.target" ];
