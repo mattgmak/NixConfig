@@ -365,18 +365,19 @@
               # Find this in about:config or prefs.js of your profile
               keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
-              # The wireframe theme imports its modules by a relative path, so the copy keeps
-              # the whole tree. The font file appends after the theme, which wins the cascade.
+              # userChrome takes CSS text, not a path. The theme loads its parts by a relative
+              # path, so a copy goes to the store and the text imports that copy.
               userChrome =
                 let
                   theme = ../../../vendor/mattgmak/zen-wireframe-2;
-                  chrome = pkgs.runCommandLocal "zen-userchrome" { } ''
+                  themeCopy = pkgs.runCommandLocal "zen-userchrome-theme" { } ''
                     cp -r ${theme} $out
-                    chmod -R u+w $out
-                    cat ${./extensions/userChrome-fonts.css} >>$out/userChrome.css
                   '';
                 in
-                "${chrome}/userChrome.css";
+                ''
+                  @import url("${themeCopy}/userChrome.css");
+                  ${builtins.readFile ./extensions/userChrome-fonts.css}
+                '';
               userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
 
               containersForce = true;

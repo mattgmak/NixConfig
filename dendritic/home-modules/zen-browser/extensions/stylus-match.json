@@ -3,6 +3,8 @@
   "urlPrefixes": [],
   "urls": [],
   "regexps": [],
-  "exclusions": [],
+  "exclusions": [
+    "https://www.hltv.org/*"
+  ],
   "inclusions": []
 }
