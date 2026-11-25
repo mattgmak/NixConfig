@@ -12,7 +12,7 @@
         models:  # Ordered from newest to oldest
 
           # Ternary Bonsai 2.5 27B (Qwen3.8-27B hybrid arch, ternary PTQ1_0) — agentic.
-          # PTQ1_0-mtp 5.80 GiB + ~0.7 GiB CUDA ctx/compute + 0.5 GiB KV q8_0 @16K ≈ 7.0 GiB ✅ 8 GB.
+          # PTQ1_0-mtp 5.80 GiB + ~0.7 GiB CUDA ctx/compute + 1.00 GiB KV q8_0 @32K ≈ 7.5 GiB ✅ 8 GB.
           # Needs the PrismML fork (pkgs.llama-cpp-prism): PTQ1_0 not merged upstream (ggml-org#29672/#29676).
           # MTP draft head: 1.5–1.9× decode (vendor RTX 4090 preset); mmproj skipped to stay in VRAM.
           # Official thinking sampling: temp=1.0, top_p=0.95, top_k=20, min-p=0.
@@ -29,7 +29,7 @@
               --no-mmproj
               -ngl 99
               --fit off
-              -c 16384
+              -c 32768
               --parallel 1
               -b 512
               -ub 256
