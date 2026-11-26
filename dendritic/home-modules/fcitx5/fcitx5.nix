@@ -108,10 +108,19 @@
                   EnableFractionalScale = true;
                 };
                 # fcitx5 5.1.22+ renders theme SVGs natively (9-slice). Stylix ships a
-                # 30px panel.svg with its own 15px margins: 15+15=30 leaves a zero-width
-                # center, so the popup background disappears. 14 keeps a 2px center.
+                # 30px panel.svg whose painted rect sits inside a transparent margin, so
+                # only the corners paint and the body stays transparent.
                 # https://github.com/fcitx/fcitx5/issues/1668
+                # Drop the image; the opaque Color then fills the whole popup.
                 sections = {
+                  "InputPanel/Background" = {
+                    Image = "";
+                    Color = lib.mkForce "#22273d";
+                  };
+                  "Menu/Background" = {
+                    Image = "";
+                    Color = lib.mkForce "#22273d";
+                  };
                   "InputPanel/Background/Margin" = {
                     Bottom = 14;
                     Left = 14;
