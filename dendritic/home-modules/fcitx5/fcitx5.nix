@@ -2,7 +2,7 @@
   flake.homeModules.fcitx5 =
     { pkgs, lib, ... }:
     {
-      stylix.targets.fcitx5.enable = true;
+      stylix.targets.fcitx5.enable = false;
 
       i18n.inputMethod = {
         type = "fcitx5";
@@ -95,6 +95,7 @@
             addons = {
               classicui = {
                 globalSection = {
+                  Theme = "rose-pine";
                   "Vertical Candidate List" = false;
                   WheelForPaging = true;
                   Font = lib.mkForce "Noto Sans Mono CJK HK 14";
@@ -106,33 +107,6 @@
                   PerScreenDPI = false;
                   ForceWaylandDPI = 0;
                   EnableFractionalScale = true;
-                };
-                # fcitx5 5.1.22+ renders theme SVGs natively (9-slice). Stylix ships a
-                # 30px panel.svg whose painted rect sits inside a transparent margin, so
-                # only the corners paint and the body stays transparent.
-                # https://github.com/fcitx/fcitx5/issues/1668
-                # Drop the image; the opaque Color then fills the whole popup.
-                sections = {
-                  "InputPanel/Background" = {
-                    Image = "";
-                    Color = lib.mkForce "#22273d";
-                  };
-                  "Menu/Background" = {
-                    Image = "";
-                    Color = lib.mkForce "#22273d";
-                  };
-                  "InputPanel/Background/Margin" = {
-                    Bottom = 14;
-                    Left = 14;
-                    Right = 14;
-                    Top = 14;
-                  };
-                  "InputPanel/Highlight/Margin" = {
-                    Bottom = 9;
-                    Left = 14;
-                    Right = 14;
-                    Top = 9;
-                  };
                 };
               };
 
