@@ -399,7 +399,7 @@
         meta = false;
         accel = true;
       };
-      disabled = false;
+      disabled = true;
     }
     {
       id = "key_find";
