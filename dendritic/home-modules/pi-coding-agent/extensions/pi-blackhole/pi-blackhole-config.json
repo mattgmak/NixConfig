@@ -127,12 +127,12 @@
       "contextWindow": 1048576
     },
     {
-      "_comment": "Reflector 4: Dots 3 Note Preview free. 2202ms probe, 512k window.",
-      "provider": "openrouter",
-      "id": "dots-studio/dots-3-note-preview:free",
+      "_comment": "Reflector 4: Hungerg free on opencode-go. 1695ms probe, 1M window.",
+      "provider": "opencode-go",
+      "id": "hungerg-free",
       "thinking": "low",
       "cooldownHours": 2,
-      "contextWindow": 512000
+      "contextWindow": 1000000
     },
     {
       "_comment": "Reflector 5: Nemotron 3.5 Lightning free. 679ms probe, 1M window.",
