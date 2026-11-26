@@ -125,6 +125,14 @@ The default profile is `peer`, in its own session. `peer` holds the full tool se
 
 Spawn returns at once. Do not poll, do not tail, do not sleep. The result arrives as a steer message.
 
+### `cwd`
+
+Pass `cwd` as the lane's own worktree path. Never pass the base worktree path.
+
+A lane spawned in the base tree works by `cd` before every command. One forgotten `cd` then edits the base branch. A lane resumed with `subagent_message` keeps the `cwd` of its first spawn, so the first call decides.
+
+Read the path from the `wt` output, or from `bash ~/.pi/agent/skills/parallel-work/scripts/parse-worktree-path.sh`.
+
 ### Model
 
 Pass `model: "balance/deepseek-v4.1-flash"` in every spawn, at every level. That covers a lane, a reviewer, and a child a lane spawns. The model comes from OpenRouter. Do not rely on profile inheritance, because `~/.pi/agent/agents` is a read-only link into the Nix store. A model line written there is lost when home-manager runs.
@@ -158,6 +166,10 @@ Every brief carries these fields:
 | Evidence | the artifacts a UI or logic change needs, with the screen name |
 | Report | head sha, changed files, exit code per gate, evidence artifact |
 
+Say the gate list once. A steer that resumes a lane names only the step that changed, and no lane re-reads a list it already holds.
+
+A brief names the ticket, the ruling and the gate. A later steer names the delta.
+
 Gate order. Give this exact list:
 
 ```bash
@@ -176,7 +188,8 @@ Rules to state in every brief:
 - Name each surface the diff touches: a screen, a query, a mutation, or a schema table.
 - A diff that touches an app screen carries device evidence before the pull request opens. The lane captures it on a leased simulator and publishes it on the pull request. Read `reference/evidence.md`.
 - The device ladder decides the capture device. A leased iOS simulator on the mini is the default. The Android emulator on this host is the fallback, and it applies when the fleet does not answer. Name the device in the Evidence block.
-- The lane asks the user before the first simulator command. Ask once per wave, then reuse the lease.
+- A lane drives the iOS simulator itself through the manzanas MCP tools. It asks nothing. Read `reference/evidence.md`.
+- A lane asks the user before an emulator fallback, because that device differs from the shipped platform.
 - A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
 - Run a long command in the foreground: `ctx_shell` with `timeout` 900 or more. Never end a turn to wait for anything.
@@ -215,6 +228,10 @@ A lane that idles on a background job gets one foreground command that blocks, a
 ## 7. Review
 
 Review spawn is off by user ruling on 2026-11-12. Do not spawn `code-reviewer`. A lane reports its own gate exits. The user reviews in the web interface. Restore the block below when the user asks.
+
+A lane spawns no reviewer either. The rule covers the master session and every child it starts, so a lane that wants a second pair of eyes reports the doubt instead of spawning one.
+
+CodeRabbit threads arrive from the GitHub App, not from this flow. The `code-review` flag does not reach it. A reply to a CodeRabbit thread follows the rule in `## Review threads`.
 
 <!-- Review flow, off by user ruling on 2026-11-12.
 
@@ -395,7 +412,29 @@ A lane runs `scripts/preflight-evidence.sh` before the first capture, and pastes
 
 `work-mode=direct` is the one exception: the lane captures its own Android still with no ask, and the still serves no review. Read `## Work mode`.
 
-A wave with three UI tickets asks once for the simulator run. Then it hands the lease detail to each lane.
+### Simulator access
+
+A lane leases its own target through the manzanas MCP server. It asks no permission.
+
+| Step | Tool |
+|---|---|
+| see the fleet | `manzanas_targets` |
+| claim a target | `manzanas_lease_acquire` with `labels: ["ios26"]`, then keep `lease_id` |
+| install and launch the app | `manzanas_app` |
+| read the screen | `manzanas_ui_tree` |
+| tap, type, scroll | `manzanas_tap_element`, `manzanas_type_into_element`, `manzanas_scroll_to_element` |
+| wait, never sleep | `manzanas_wait_for_element`, `manzanas_wait_tree_stable` |
+| capture a still | `manzanas_screenshot` |
+| export the run journal | `manzanas_journal_export` with `run_id` = `lease_id` |
+| free the target | `manzanas_lease_release` |
+
+Rules:
+
+- The lane renews a lease before `ttl_seconds` runs out, and releases it before the report.
+- A lane prefers an element matcher over a screen coordinate. A raw `manzanas_tap` needs the reason.
+- A lane reads each still and states what it sees before it publishes.
+- Two lanes share no target. Each lane leases its own.
+- A failing fleet names the error string in the report. The lane then asks the user before it tries the Android emulator.
 
 ### Device ladder
 
@@ -419,6 +458,10 @@ asset and appends the image to the body. The repository keeps no evidence file.
 Never use a release asset, a committed file, a raw URL, or an outside image host.
 
 You need `gh` 2.99.0 or later. `scripts/publish-evidence.sh <pr> <folder>` does the uploads.
+
+Write the body text first, then attach last. `gh pr edit --body` replaces the whole body, so a text edit after an attach drops every image.
+
+Read the body back after the attach. A block without a `user-attachments` url fails the gate.
 
 A pull request whose `## Evidence` block holds a release link fails the gate. Send it back.
 
@@ -446,7 +489,7 @@ Ask the user only for these:
 - a scope call
 - a cost call
 - an irreversible action
-- a simulator or device run
+- an Android emulator or physical device run, because the lane leases an iOS simulator itself
 - a change to a contract
 
 Everything else runs without a question.
@@ -516,7 +559,7 @@ still, states what it sees, and fixes a fault before it reports.
   rule in `## Sandbox dev`. Each worktree gets its own port, and `dev:mock` passes it as
   `TCM_METRO_PORT`.
 - Still path: `/tmp/agent-tmp/tcm/evidence/<change>/`. The repository keeps no evidence file.
-- `work-mode=standard` keeps the current rule: one ask per wave, and the still goes on the pull
+- `work-mode=standard` keeps the current rule: the lane leases its own iOS simulator through manzanas, and the still goes on the pull
   request.
 - Devices: a leased iOS simulator still needs the user ask, in both modes. A change that touches a
   native path still needs a device run that the user approves.

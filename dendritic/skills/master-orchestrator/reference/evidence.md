@@ -6,6 +6,25 @@ Every app UI change carries evidence before the review opens. A small change tak
 
 Capture it from the real app on a leased simulator, built on the mini. Embed it in the pull request body as an inline image. Never use a GitHub release, a release asset, or a release download link. A pull request without that block waits at the gate, and the body names the missing artifact.
 
+### Who leases the target
+
+The lane leases it, through the manzanas MCP server. The lane asks no permission, and the orchestrator runs no simulator command.
+
+| Step | Tool |
+|---|---|
+| list the fleet | `manzanas_targets` |
+| claim a target | `manzanas_lease_acquire` with `labels: ["ios26"]` |
+| renew before expiry | `manzanas_lease_renew` |
+| install, launch, stop | `manzanas_app` |
+| read the screen | `manzanas_ui_tree` |
+| tap, type, scroll | `manzanas_tap_element`, `manzanas_type_into_element`, `manzanas_scroll_to_element` |
+| wait, never sleep | `manzanas_wait_for_element`, `manzanas_wait_tree_stable` |
+| take a still | `manzanas_screenshot` |
+| export the journal | `manzanas_journal_export`, `run_id` = `lease_id` |
+| free the target | `manzanas_lease_release` |
+
+A lane that reaches an emulator fallback asks the user first, and names the fleet error string.
+
 | Change | Evidence |
 |---|---|
 | static element, layout, or copy | one screenshot per changed state |
@@ -58,7 +77,7 @@ Paste these four lines in the report before the first capture:
 
 | Check | Pass condition |
 |---|---|
-| lease | id, TTL left, device, and the client installed from this head |
+| lease | id, TTL left, device, from `manzanas_lease_acquire`, and the client installed from this head |
 | bundle | one visible word drawn from this head, then reverted |
 | tools | dev Tools button off, or the gear bubble clear of the header |
 | tap | the a11y tree reports points, so a pixel tap is 3x |
