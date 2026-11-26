@@ -612,3 +612,44 @@ The command stops the sandbox and clears the Convex deployment directory of this
 Three guards keep the reset local. The CLI call clears the deployment selector with `CONVEX_DEPLOYMENT: ""` (`scripts/sandbox/convex-cli.ts:20`). It sets `CONVEX_SELF_HOSTED_URL` to the local `state.convexUrl`. No script passes `--prod`. `wipeDeployment` refuses a path that is not a plain directory (`scripts/sandbox/common.ts:206-207`).
 
 **Failure.** `reset` fails with exit code 1. Read the log, run `pnpm sandbox:status`, then retry once. Do not delete the deployment directory by hand.
+
+### Local emulator (Android, this host)
+
+Use this route when a still or a manual check comes from the emulator of this host. It needs no tailnet name and no public origin. Drop `SANDBOX_LAN` and `SANDBOX_PUBLIC_ORIGIN` for this route.
+
+Boot the AVD in a real tmux window. Never boot it with `ctx_bg`, because that job dies with the turn. The window keeps the process and shows the boot log.
+
+```bash
+tmux new-window -d -t sandbox-dev -n emu -c "$PWD" \
+  "ANDROID_HOME=$SDK ANDROID_SDK_ROOT=$SDK emulator -avd <avd> \
+   -no-snapshot-save -gpu swiftshader_indirect -no-audio \
+   -no-boot-anim 2>&1 | tee /tmp/agent-tmp/tcm/emulator.log"
+```
+
+`$SDK` is the sdk path in `apps/tcm-app/android/local.properties`. The tmux server carries no `ANDROID_HOME`, so the emulator stops with `FATAL | Cannot find AVD system path` when the prefix is absent.
+
+Wait for the boot in one blocking command:
+
+```bash
+adb wait-for-device && adb shell \
+  'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 2; done; echo booted'
+```
+
+The emulator reaches the sandbox through `adb reverse` on each loopback port. Read the ports from `pnpm sandbox:status`, then run one rule per port. The app needs the Metro port, the Convex port, the HTTP actions port, the tongue backend port and the mock Clerk port.
+
+```bash
+for p in <metroPort> <convexPort> <sitePort> <backendPort> <issuerPort>; do
+  adb reverse tcp:$p tcp:$p
+done
+```
+
+Then start the app on the Metro url:
+
+```bash
+adb shell am start -a android.intent.action.VIEW \
+  -d "exp+easy-tcm://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A<metroPort>"
+```
+
+An emulator restart drops every rule. Apply them again before the next capture.
+
+Tap the mock-auth fixture in the app when the bundle lands. A cold start returns to the sign-in screen.
