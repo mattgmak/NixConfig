@@ -76,6 +76,7 @@ shell_allowlist_extra = [
     "ffmpeg",
     "lua",
     "kdeconnect-cli",
+    "nvim",
 ]
 
 [telemetry]

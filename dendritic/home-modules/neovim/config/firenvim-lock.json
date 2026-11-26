@@ -1,6 +1,6 @@
 {
   "firenvim": { "branch": "master", "commit": "302c105ff79c51d3d362eb37210f95f65285926d" },
-  "lazy.nvim": { "branch": "main", "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97" },
+  "lazy.nvim": { "branch": "main", "commit": "85c7ff3711b730b4030d03144f6db6375044ae82" },
   "leap.nvim": { "branch": "main", "commit": "5af48b78f6c1310ab1f61131d785387faae4cdd4" },
   "mini.nvim": { "branch": "main", "commit": "24cf4ad5840f0d092e3d8296b17eaf7026bf27f3" },
   "nvim-treesitter": { "branch": "main", "commit": "52773f0d13a0c11d0c3ef33c14ab6ecc1c17148b" },
