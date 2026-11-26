@@ -2,6 +2,20 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
 
+vim.opt.clipboard = 'unnamedplus'
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.undofile = true
+vim.opt.undodir = vim.fn.stdpath('data') .. '/firenvim-undo'
+
+vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { silent = true, desc = 'Save' })
+vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<cr>', { silent = true })
+vim.keymap.set('n', 'U', '<C-r>')
+vim.keymap.set('v', 'p', 'P')
+vim.keymap.set('n', 'c', '"_c', { noremap = true })
+vim.keymap.set('n', 'C', '"_C', { noremap = true })
+vim.keymap.set('n', 'x', '"_x', { noremap = true })
+
 vim.g.firenvim_config = {
   globalSettings = {},
   localConfig = {
