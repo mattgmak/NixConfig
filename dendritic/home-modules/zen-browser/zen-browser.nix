@@ -379,7 +379,21 @@
                   @import url("${themeCopy}/userChrome.css");
                   ${builtins.readFile ./extensions/userChrome-fonts.css}
                 '';
-              userContent = ../../../vendor/mattgmak/zen-wireframe-2/userContent.css;
+              userContent =
+                let
+                  theme = ../../../vendor/mattgmak/zen-wireframe-2;
+                  themeCopy = pkgs.runCommandLocal "zen-usercontent-theme" { } ''
+                    cp -r ${theme} $out
+                  '';
+                in
+                ''
+                  @import url("${themeCopy}/userContent.css");
+
+                  /* Firenvim inherits the textarea font; give it the terminal face. */
+                  textarea {
+                    font-family: "IosevkaTerm Nerd Font Propo" !important;
+                  }
+                '';
 
               containersForce = true;
               containers = {
