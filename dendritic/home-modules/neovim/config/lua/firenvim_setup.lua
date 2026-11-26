@@ -21,10 +21,10 @@ vim.keymap.set('n', 'x', '"_x', { noremap = true })
 
 vim.g.firenvim_config = {
   globalSettings = {},
-  localConfig = {
+  localSettings = {
     ['.*'] = {
       selector = 'textarea, input:not([type]), input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], [contenteditable]',
-      takeover = 'off',
+      takeover = 'never',
       mode = 'insert',
     },
   },
