@@ -390,8 +390,8 @@
     }
     {
       id = "key_findAgain";
-      key = "g";
-      keycode = null;
+      key = "";
+      keycode = "";
       modifiers = {
         control = false;
         alt = false;
