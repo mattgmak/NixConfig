@@ -11,6 +11,7 @@ vim.o.number = true
 vim.o.relativenumber = true
 
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { silent = true, desc = 'Save' })
+vim.keymap.set('n', '<leader>d', '<cmd>x<cr>', { silent = true, desc = 'Save and close' })
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<cr>', { silent = true })
 vim.keymap.set('n', 'U', '<C-r>')
 vim.keymap.set('v', 'p', 'P')
@@ -23,7 +24,7 @@ vim.g.firenvim_config = {
   localConfig = {
     ['.*'] = {
       selector = 'textarea, input:not([type]), input[type=text], input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], [contenteditable]',
-      takeover = 'always',
+      takeover = 'off',
       mode = 'insert',
     },
   },
