@@ -41,6 +41,8 @@
         ".config/nvim/lua".source = config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lua";
         ".config/nvim/lazy-lock.json".source =
           config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lazy-lock.json";
+        ".config/nvim/firenvim-lock.json".source =
+          config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/firenvim-lock.json";
       };
       programs.neovim = {
         enable = true;
@@ -70,8 +72,12 @@
           ''
           + ''
             ${pkgs.lib.optionalString (hostname == "Goofeus") "vim.g.disable_ui2 = true"}
-            require('lazy_setup')
-            require('config')
+            if vim.g.started_by_firenvim then
+              require('firenvim_setup')
+            else
+              require('lazy_setup')
+              require('config')
+            end
           '';
         extraLuaPackages = ps: [ ps.magick ];
         extraPackages = with pkgs; [
