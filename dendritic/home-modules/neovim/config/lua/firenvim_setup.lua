@@ -7,6 +7,8 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.undofile = true
 vim.opt.undodir = vim.fn.stdpath('data') .. '/firenvim-undo'
+vim.o.number = true
+vim.o.relativenumber = true
 
 vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { silent = true, desc = 'Save' })
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<cr>', { silent = true })
