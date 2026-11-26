@@ -11,13 +11,17 @@
     let
       system = pkgs.stdenv.hostPlatform.system;
 
-      # The upstream derivation sets SETUPTOOLS_SCM_PRETEND_VERSION as an attribute.
-      # Structured attrs do not export it, so hatch-vcs cannot read it.
+      # Workarounds for caelestia-dots/shell#2096: export the pretend version, and
+      # send gpu-screen-recorder's output to DEVNULL. The recorder inherits the
+      # shell's stderr pipe; when caelestia exits the pipe closes and the recorder
+      # dies on SIGPIPE, so a UI recording stops after about two seconds.
       patchedCli =
         inputs.caelestia-shell.inputs.caelestia-cli.packages.${system}.default.overrideAttrs
           (old: {
             patchPhase = ''
               export SETUPTOOLS_SCM_PRETEND_VERSION=1
+              f=$(grep -rlF "Popen([RECORDER" . --include='*.py' | head -1)
+              [ -n "$f" ] && sed -i 's/str(recording_path)], start_new_session=True)/str(recording_path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)/' "$f"
             '' + (old.patchPhase or "");
           });
     in
