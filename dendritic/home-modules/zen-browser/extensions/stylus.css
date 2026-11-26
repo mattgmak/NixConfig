@@ -28,10 +28,12 @@ samp *,
 var *,
 output *,
 textarea *,
+/* GitHub's .branch-action merge box matches [class*="branch"], so branch matchers
+   stay on anchors. */
 [class*="code" i],
 [class*="diff" i],
 [class*="mono" i],
-[class*="branch" i],
+a[class*="branch" i],
 [class*="commit" i],
 .commit-hash,
 .sha,
@@ -40,7 +42,7 @@ textarea *,
 [class*="code" i] *,
 [class*="diff" i] *,
 [class*="mono" i] *,
-[class*="branch" i] *,
+a[class*="branch" i] *,
 [class*="commit" i] * {
   font-family: "IosevkaTerm Nerd Font", monospace !important;
 }
