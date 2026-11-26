@@ -106,7 +106,7 @@
                   "{762f9885-5a13-4abd-9c77-433dcd38b8fd}" = "return-youtube-dislikes";
                   "sponsorBlocker@ajay.app" = "sponsorblock";
                   "vimium-c@gdh1995.cn" = "vimium-c";
-                  "firenvim@glacambre.dev" = "firenvim";
+                  "firenvim@lacamb.re" = "firenvim";
                   "{7a7a4a92-a2a0-41d1-9fd7-1e92480d612d}" = "styl-us";
                   "@crw-extension-firefox" = "consumer-rights-wiki";
                   "a7812ae3-777d-43ee-922f-871e684fc6c5" = "youtube-recommended-videos";

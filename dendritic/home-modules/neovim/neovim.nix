@@ -15,6 +15,12 @@
       lockFile = "${neovimRoot}/config/lazy-lock.json";
       restoreStamp = "${config.home.homeDirectory}/.local/state/nvim/lazy-restore.lock.sha256";
       nvim = config.programs.neovim.package;
+      # Firefox reads the manifest from ~/.mozilla/native-messaging-hosts; Zen
+      # shares that path, so the launcher lives here instead of in the browser module.
+      firenvimLauncher = pkgs.writeShellScript "firenvim" ''
+        unset NVIM_LISTEN_ADDRESS
+        exec ${nvim}/bin/nvim --headless --cmd "let g:firenvim_i=[]|let g:firenvim_o=[]|let g:Firenvim_oi={i,d,e->add(g:firenvim_i,d)}|let g:Firenvim_oo={t->[chansend(2,t)]+add(g:firenvim_o,t)}|let g:firenvim_c=stdioopen({'on_stdin':{i,d,e->g:Firenvim_oi(i,d,e)},'on_print':{t->g:Firenvim_oo(t)}})" --cmd "let g:started_by_firenvim = v:true" -c "try|call firenvim#run()|catch|qall!|endtry"
+      '';
       # Stylix is absent on the minimal installer ISO; the lua side falls back.
       hasStylix = config.lib ? stylix;
       c = if hasStylix then config.lib.stylix.colors.withHashtag else { };
@@ -43,6 +49,14 @@
           config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/lazy-lock.json";
         ".config/nvim/firenvim-lock.json".source =
           config.lib.file.mkOutOfStoreSymlink "${neovimRoot}/config/firenvim-lock.json";
+      } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        ".mozilla/native-messaging-hosts/firenvim.json".source = pkgs.writeText "firenvim-manifest" (builtins.toJSON {
+          name = "firenvim";
+          description = "Turn your browser into a Neovim GUI.";
+          path = "${firenvimLauncher}";
+          type = "stdio";
+          allowed_extensions = [ "firenvim@lacamb.re" ];
+        });
       };
       programs.neovim = {
         enable = true;
