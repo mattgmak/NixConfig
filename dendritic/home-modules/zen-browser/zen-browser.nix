@@ -364,7 +364,7 @@
               keyboardShortcuts = lib.mkIf pkgs.stdenv.hostPlatform.isLinux self.zenBrowserShortcuts;
               # Fails activation on schema changes to detect potential regressions
               # Find this in about:config or prefs.js of your profile
-              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 22;
+              keyboardShortcutsVersion = lib.mkIf pkgs.stdenv.hostPlatform.isLinux 21;
 
               # userChrome takes CSS text, not a path. The theme loads its parts by a relative
               # path, so a copy goes to the store and the text imports that copy.
