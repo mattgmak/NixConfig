@@ -129,13 +129,15 @@ Both the approval workflow and the hermes review session use one layout. One win
 
 Pass `-t "$TMUX_PANE"` on the first split. Without it, tmux picks the session's active window. pi moves that window whenever it spawns a new one, so the ambient target is rarely the pi pane.
 
-From the pi pane, build the layout with two splits:
+From the pi pane, build the layout with two splits. Set `wt_path` to the worktree path from `wt switch --create` or `wt list`, never the repo root:
 
 ```sh
+branch=<branch>
+wt_path=$(wt list --format json | jq -r "if type == \"object\" then (.items // [])[] else .[] end | select(.branch==\"$branch\") | (.path // .worktree.path)")
 lg=$(tmux split-window -h -t "$TMUX_PANE" -P -F '#{pane_id}')
 ap=$(tmux split-window -v -P -F '#{pane_id}' -t "$lg")
-tmux send-keys -t "$lg" "cd <worktree> && l"
-tmux send-keys -t "$ap" "cd <worktree> && scripts/approve-and-deploy.sh <branch> --caller $TMUX_PANE"
+tmux send-keys -t "$lg" "cd \"$wt_path\" && l"
+tmux send-keys -t "$ap" "cd \"$wt_path\" && scripts/approve-and-deploy.sh $branch --caller $TMUX_PANE"
 ```
 
 Never add a second window, and never kill the pi pane. `spawn-approval-session` builds the same layout for hermes.
