@@ -14,6 +14,8 @@
       neovimRoot = "${repoRoot}/home-modules/neovim";
       lockFile = "${neovimRoot}/config/lazy-lock.json";
       restoreStamp = "${config.home.homeDirectory}/.local/state/nvim/lazy-restore.lock.sha256";
+      firenvimLockFile = "${neovimRoot}/config/firenvim-lock.json";
+      firenvimRestoreStamp = "${config.home.homeDirectory}/.local/state/nvim/firenvim-lazy-restore.lock.sha256";
       nvim = config.programs.neovim.package;
       # Firefox reads the manifest from ~/.mozilla/native-messaging-hosts; Zen
       # shares that path, so the launcher lives here instead of in the browser module.
@@ -126,5 +128,20 @@
           fi
         fi
       '';
+      # Pre-install the firenvim lazy set so the browser launch never prints
+      # lazy's install progress to stdout, which breaks the native protocol.
+      home.activation.restoreFirenvimPlugins = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (
+        inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if [ -f ${lib.escapeShellArg firenvimLockFile} ]; then
+            mkdir -p "$(dirname ${lib.escapeShellArg firenvimRestoreStamp})"
+            lock_hash=$(${pkgs.coreutils}/bin/sha256sum ${lib.escapeShellArg firenvimLockFile} | ${pkgs.coreutils}/bin/cut -d' ' -f1)
+            if [ ! -f ${lib.escapeShellArg firenvimRestoreStamp} ] || [ "$(cat ${lib.escapeShellArg firenvimRestoreStamp})" != "$lock_hash" ]; then
+              export PATH="${restorePath}:$PATH"
+              ${nvim}/bin/nvim --headless --cmd "let g:started_by_firenvim = v:true" "+Lazy! restore" +qa >/dev/null
+              printf '%s' "$lock_hash" > ${lib.escapeShellArg firenvimRestoreStamp}
+            fi
+          fi
+        ''
+      );
     };
 }
