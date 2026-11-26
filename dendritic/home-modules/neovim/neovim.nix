@@ -21,6 +21,7 @@
       # shares that path, so the launcher lives here instead of in the browser module.
       firenvimLauncher = pkgs.writeShellScript "firenvim" ''
         unset NVIM_LISTEN_ADDRESS
+        cd "$HOME"
         exec ${nvim}/bin/nvim --headless --cmd "let g:firenvim_i=[]|let g:firenvim_o=[]|let g:Firenvim_oi={i,d,e->add(g:firenvim_i,d)}|let g:Firenvim_oo={t->[chansend(2,t)]+add(g:firenvim_o,t)}|let g:firenvim_c=stdioopen({'on_stdin':{i,d,e->g:Firenvim_oi(i,d,e)},'on_print':{t->g:Firenvim_oo(t)}})" --cmd "let g:started_by_firenvim = v:true" -c "try|call firenvim#run()|catch|qall!|endtry"
       '';
       # Stylix is absent on the minimal installer ISO; the lua side falls back.
