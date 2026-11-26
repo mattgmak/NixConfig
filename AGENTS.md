@@ -127,17 +127,19 @@ A worktree is a separate flake ref. Nix copies its tree once and reuses that cop
 
 Both the approval workflow and the hermes review session use one layout. One window holds everything: the pi session on the left, and the right side split into two stacked panes. The top-right pane runs `l` (the zsh lazygit wrapper) in the worktree under an interactive zsh. The bottom-right pane holds the approval command, typed but not entered.
 
-Pass `-t "$TMUX_PANE"` on the first split. Without it, tmux picks the session's active window. pi moves that window whenever it spawns a new one, so the ambient target is rarely the pi pane.
+Pass `-t "$pi_pane"` on the first split, and pass that same id to `--caller`. Without it, tmux picks the session's active window. pi moves that window whenever it spawns a new one, so the ambient target is rarely the pi pane. An ambient value can also name another session's pane, and then the layout and the handoff prompt both land there.
 
-From the pi pane, build the layout with two splits. Set `wt_path` to the worktree path from `wt switch --create` or `wt list`, never the repo root:
+From the pi pane, build the layout with two splits. Check the id first. Set `wt_path` from `wt list`, never the repo root:
 
 ```sh
 branch=<branch>
+pi_pane=$TMUX_PANE
+case "$(tmux display-message -p -t "$pi_pane" '#{pane_current_command}')" in pi*) ;; *) exit 1 ;; esac
 wt_path=$(wt list --format json | jq -r "if type == \"object\" then (.items // [])[] else .[] end | select(.branch==\"$branch\") | (.path // .worktree.path)")
-lg=$(tmux split-window -h -t "$TMUX_PANE" -P -F '#{pane_id}')
+lg=$(tmux split-window -h -t "$pi_pane" -P -F '#{pane_id}')
 ap=$(tmux split-window -v -P -F '#{pane_id}' -t "$lg")
 tmux send-keys -t "$lg" "cd \"$wt_path\" && l"
-tmux send-keys -t "$ap" "cd \"$wt_path\" && scripts/approve-and-deploy.sh $branch --caller $TMUX_PANE"
+tmux send-keys -t "$ap" "cd \"$wt_path\" && scripts/approve-and-deploy.sh $branch --caller $pi_pane"
 ```
 
 Never add a second window, and never kill the pi pane. `spawn-approval-session` builds the same layout for hermes.
