@@ -376,6 +376,43 @@ git branch -D <branch>
 
 The pull request landing is the trigger. Do not leave a session or a worktree behind.
 
+### Audit before you remove
+
+A merged branch still holds a session and its dev processes. Run three checks first, because removal loses what they find.
+
+1. Which branches merged. Test each local branch against both deployed branches, since a squash merge hides the ancestry.
+
+```bash
+git merge-base --is-ancestor <branch> origin/mattmak/meal-plan-agent && echo base
+git merge-base --is-ancestor <branch> origin/main && echo main
+git rev-list --count origin/mattmak/meal-plan-agent..<branch>
+```
+
+A count of 0 means the branch sits inside the base.
+
+2. Which worktrees hold work. `wt list` marks a dirty tree with `!` and a commit count beside it. A `!` beside no count means uncommitted work. A count alone means unpushed commits.
+
+3. Which dev services belong to a removed tree. One worktree can run four processes: `dev-mock.ts`, `supervisor.ts`, `expo start`, and `convex-local-backend`. They outlive the worktree, hold Metro ports, and answer on no screen the user sees.
+
+### Kill the dev services
+
+Match each process to the worktree path in its command line, then keep the paths that still exist.
+
+```bash
+ps -eo pid,args --no-headers | rg 'expo start|dev-mock\.ts|supervisor\.ts|convex-local-backend'
+for p in <stale pids>; do kill -TERM $p; done
+```
+
+A Convex backend names its store under `/tmp`, so read its parent path instead. Never kill a process whose path still holds a live lane. Never kill the sandbox a lane writes evidence from.
+
+### Rules
+
+- Remove with `wt remove`. Never run a raw `git worktree` command.
+- A worktree holding uncommitted work stays until the user rules on it. Report the path count and the file names, then wait.
+- A generated file left changed, such as `packages/backend/convex/_generated/api.d.ts`, reverts with `git checkout -- <path>` before removal.
+- The base worktree keeps no sandbox when no lane runs on it. Kill that sandbox with the rest.
+- Report one line per removal: branch, commit, and what left with it.
+
 ## 14. Background gates
 
 `ctx_bg` is the master's tool only. The master runs it, ends the turn, and messages the lane the result. A lane that runs `ctx_bg` ends its turn, the pane closes, and the job dies.
