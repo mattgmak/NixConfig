@@ -107,6 +107,24 @@
                   ForceWaylandDPI = 0;
                   EnableFractionalScale = true;
                 };
+                # fcitx5 5.1.22+ renders theme SVGs natively (9-slice). Stylix ships a
+                # 30px panel.svg with its own 15px margins: 15+15=30 leaves a zero-width
+                # center, so the popup background disappears. 14 keeps a 2px center.
+                # https://github.com/fcitx/fcitx5/issues/1668
+                sections = {
+                  "InputPanel/Background/Margin" = {
+                    Bottom = 14;
+                    Left = 14;
+                    Right = 14;
+                    Top = 14;
+                  };
+                  "InputPanel/Highlight/Margin" = {
+                    Bottom = 9;
+                    Left = 14;
+                    Right = 14;
+                    Top = 9;
+                  };
+                };
               };
 
               clipboard = {
