@@ -194,12 +194,6 @@ function tick(): void {
     if (!live.woken) wake(live);
   }
   updateWidget(running);
-  if (running.length === 0 && ticker) {
-    clearInterval(ticker);
-    ticker = undefined;
-    ctxRef?.ui.setWidget(WIDGET_KEY, undefined);
-    widgetState.theme = undefined;
-  }
 }
 
 function ensureTicker(): void {
