@@ -28,6 +28,8 @@ const BLOCKED_TOOLS: readonly string[] = [
 	"list_session_files",
 	"list_subagent_sessions",
 	"mcpScript",
+	"set_session_name",
+	"get_session_name",
 ];
 
 const BLOCKED_PATTERNS: readonly string[] = ["mcp__*", "Linear_*", "github-readonly_*", "github_readonly_*", "argent_*", "nixos_*"];
@@ -76,8 +78,6 @@ const REVIEWED_TOOLS: readonly string[] = [
 	"mem_consolidate",
 	"mem_suggest_topic_key",
 	"ste_lint",
-	"set_session_name",
-	"get_session_name",
 ];
 
 const GLOB_CHARS = /[*?[]/;
