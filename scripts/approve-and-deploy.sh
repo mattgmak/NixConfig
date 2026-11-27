@@ -140,11 +140,11 @@ log=${LOG:-${TMPDIR:-/tmp}/agent-tmp/NixConfig/approve-and-deploy-${branch}.log}
 [ "$dry" = 1 ] || mkdir -p "$(dirname "$log")"
 
 main() {
-  printf '%sbranch%s  %s (%s)\n%smain%s    %s\n%shosts%s   %s\n%slog%s     %s\n' \
-    "$c_key" "$c_r" "$branch" "$wt_path" \
-    "$c_key" "$c_r" "$main_path" \
-    "$c_key" "$c_r" "$hosts" \
-    "$c_key" "$c_r" "$log"
+  printf '%sbranch%s  %s%s%s (%s%s%s)\n%smain%s    %s%s%s\n%shosts%s   %s%s%s\n%slog%s     %s%s%s\n' \
+    "$c_key" "$c_r" "$c_run" "$branch" "$c_r" "$c_run" "$wt_path" "$c_r" \
+    "$c_key" "$c_r" "$c_run" "$main_path" "$c_r" \
+    "$c_key" "$c_r" "$c_run" "$hosts" "$c_r" \
+    "$c_key" "$c_r" "$c_run" "$log" "$c_r"
 
   say 'merge'
   # --no-remove keeps the worktree alive. A caller session started there keeps a
