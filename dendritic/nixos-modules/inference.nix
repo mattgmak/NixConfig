@@ -1,4 +1,4 @@
-# Inference stack for Strix Halo: llama-swap routes the LLMs, gufo serves ASR.
+# Inference stack for Strix Halo: llama-swap proxies the Halogen stacks, gufo serves ASR and decisions.
 # Both bind loopback only. Tailscale serve publishes them on the tailnet.
 { inputs, ... }:
 {
@@ -12,32 +12,12 @@
     let
       modelsDir = "/var/lib/inference/models";
 
-      # Gufo discovers the other three shards from the first one.
-      flashNextModel = "${modelsDir}/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
-      flashNextMtp = "${modelsDir}/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
-
-      # The uncensored projector repeats the stock base name, so it lives in a
-      # subdirectory and both paths below stay explicit.
-      uncensoredDir = "${modelsDir}/uncensored";
-      uncensoredModel = "${uncensoredDir}/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf";
-      uncensoredMmproj = "${uncensoredDir}/mmproj-BF16.gguf";
-      uncensoredMtp = "${uncensoredDir}/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf";
-
       asrModel = "${modelsDir}/Qwen3-ASR-1.7B";
-
-      # 1.72 GB Q8_0 text checkpoint. Weights plus an 8192-token FP32 KV cache
-      # cost about 3 GiB, which fits the pool beside halogen.
-      lfm3Model = "${modelsDir}/lfm3/LFM3-1.7B-Q8_0.gguf";
 
       # d1 answers packed decision questions and never generates text. The
       # projector carries the vision tower, so text and image requests share it.
       d1Model = "${modelsDir}/d1/d1-Omni-2B-Q8_0.gguf";
       d1Mmproj = "${modelsDir}/d1/mmproj-d1-Omni-2B-BF16.gguf";
-
-      # The Swift requant and its projector live in a subdir, because gufo picks
-      # a sibling mmproj by base name.
-      swiftModel = "${modelsDir}/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf";
-      swiftMmproj = "${modelsDir}/swift/mmproj-BF16.gguf";
 
       # Upstream helper: same flags as the CLI, so no flag name is retyped here.
       gufoServe = args: inputs.gufo.lib.mkGufoServe ({ gufo = pkgs.gufo; } // args);
@@ -52,111 +32,6 @@
           healthCheckTimeout = 1200;
           globalTTL = 0;
           logToStdout = "both";
-
-          models = {
-            "gufo-flash-next" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = flashNextModel;
-                port = "\${PORT}";
-                servedModelName = "gufo-flash-next";
-                speculative = "mtp";
-                mtpModel = flashNextMtp;
-                sessions = 2;
-                context = 131072;
-                extraArgs = [ "--mmproj" "${modelsDir}/mmproj-BF16.gguf" ];
-              };
-              useModelName = "gufo-flash-next";
-              ttl = 300;
-              checkEndpoint = "/ready";
-            };
-
-            "gufo-flash-next-uncensored-abliterated" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = uncensoredModel;
-                port = "\${PORT}";
-                servedModelName = "gufo-flash-next-uncensored-abliterated";
-                speculative = "mtp";
-                mtpModel = uncensoredMtp;
-                sessions = 2;
-                context = 131072;
-                extraArgs = [
-                  "--mmproj"
-                  uncensoredMmproj
-                ];
-              };
-              useModelName = "gufo-flash-next-uncensored-abliterated";
-              ttl = 300;
-              checkEndpoint = "/ready";
-            };
-
-            # Same weights as gufo-flash-next-uncensored-abliterated with a small KV
-            # footprint. The refusal probe sends short prompts and froze the box
-            # at 131072.
-            "gufo-flash-next-uncensored-abliterated-bench" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = uncensoredModel;
-                port = "\${PORT}";
-                servedModelName = "gufo-flash-next-uncensored-abliterated-bench";
-                speculative = "mtp";
-                mtpModel = uncensoredMtp;
-                sessions = 1;
-                context = 32768;
-                extraArgs = [
-                  "--mmproj"
-                  uncensoredMmproj
-                ];
-              };
-              useModelName = "gufo-flash-next-uncensored-abliterated-bench";
-              ttl = 300;
-              checkEndpoint = "/ready";
-            };
-
-            # Swift 1.5 keeps the shared Unsloth MTP head and cuts thinking
-            # tokens: 51 tok/s decode beats stock.
-            "gufo-flash-next-swift" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = swiftModel;
-                port = "\${PORT}";
-                servedModelName = "gufo-flash-next-swift";
-                speculative = "mtp";
-                mtpModel = flashNextMtp;
-                sessions = 2;
-                context = 131072;
-                extraArgs = [ "--mmproj" swiftMmproj ];
-              };
-              useModelName = "gufo-flash-next-swift";
-              ttl = 300;
-              checkEndpoint = "/ready";
-            };
-
-            # Autoname and OM calls stay on the cloud or the halogen peer, so
-            # this model loads only on demand. A cold load costs 80 to 130 s
-            # under halogen load, and the ttl keeps the wait rare. The RAM
-            # checkpoint cache is capped, because the default takes half of free
-            # RAM at 4.7 GiB per process.
-            "lfm3-1.7b" = {
-              cmd = gufoServe {
-                modality = "llm";
-                model = lfm3Model;
-                port = "\${PORT}";
-                servedModelName = "lfm3-1.7b";
-                sessions = 1;
-                context = 8192;
-                think = "off";
-                extraArgs = [
-                  "--cache-ram-bytes"
-                  "536870912"
-                ];
-              };
-              useModelName = "lfm3-1.7b";
-              ttl = 1800;
-              checkEndpoint = "/ready";
-            };
-          };
 
           # The Halogen containers own the graphics memory. These peers only
           # appear in the model list while the container that serves them runs.
@@ -185,30 +60,13 @@
               targets = [ "halogen-thinkingcap/halogen-flash-next-thinkingcap-abliterated" ];
             };
           };
-
-          routing.router.settings.groups = {
-            # All gufo models share one group: about 104G of weights leaves no
-            # room for a second KV cache. swap makes them evict each other.
-            gpu = {
-              swap = true;
-              exclusive = false;
-              persistent = false;
-              members = [
-                "gufo-flash-next"
-                "gufo-flash-next-uncensored-abliterated"
-                "gufo-flash-next-uncensored-abliterated-bench"
-                "gufo-flash-next-swift"
-              ];
-            };
-          };
         };
       };
 
-      # The weight fetch and the Swift requant are long oneshots. Hanging them
-      # off multi-user.target makes every switch wait for the download chain:
-      # a 175 GiB fetch cost 41 minutes on 2026-10-30. This target reaches after
-      # multi-user.target, so activation returns and the stack comes up behind
-      # it. Check progress with `systemctl status inference.target`.
+      # The weight fetch is a long oneshot. Hanging it off multi-user.target
+      # makes every switch wait for the download chain, so this target reaches
+      # after multi-user.target and activation returns first. Check progress
+      # with `systemctl status inference.target`.
       systemd.targets.inference = {
         description = "Inference stack";
         wantedBy = [ "multi-user.target" ];
@@ -229,8 +87,8 @@
           ];
           LimitMEMLOCK = "infinity";
           # Each HIP process opens hardware queues of its own. Above eight
-          # compute queues on the box the iGPU stays 100% busy at idle, so
-          # every spawned model caps itself at one.
+          # compute queues on the box the iGPU stays 100% busy at idle, so every
+          # spawned model caps itself at one.
           Environment = [ "GPU_MAX_HW_QUEUES=1" ];
         };
       };

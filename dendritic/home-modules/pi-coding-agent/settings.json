@@ -75,10 +75,6 @@
     "commandcode/inclusionai/ling-3.1-flash",
     "cursor/grok-4.7@256k:slow",
     "cursor/grok-4.7@256k:fast",
-    "ramsay/gufo-flash-next",
-    "ramsay/gufo-flash-next-swift",
-    "ramsay/gufo-flash-next-uncensored-abliterated",
-    "ramsay/gufo-flash-next-uncensored-abliterated-bench",
     "openrouter/deepseek/deepseek-v4.1-flash-1017"
   ],
   "showHardwareCursor": false,
@@ -100,10 +96,6 @@
     "commandcode/stealth/glyph-cluster:free": "medium",
     "commandcode/inclusionai/ling-3.1-flash": "medium",
     "ramsay/halogen-flash-next-signal-abliterated": "high",
-    "ramsay/halogen-flash-next-thinkingcap-abliterated": "high",
-    "ramsay/gufo-flash-next": "medium",
-    "ramsay/gufo-flash-next-swift": "medium",
-    "ramsay/gufo-flash-next-uncensored-abliterated": "medium",
-    "ramsay/gufo-flash-next-uncensored-abliterated-bench": "medium"
+    "ramsay/halogen-flash-next-thinkingcap-abliterated": "high"
   }
 }

@@ -605,9 +605,8 @@ in
             keep=$(mktemp)
             found=$(mktemp)
 
-            # Each manifest line is "url dest". One curl per 45 GiB shard runs at
-            # about 77 MB/s, so the serial form cost 41 minutes for the Swift set.
-            # The keep list drives the prune at the end.
+            # Each manifest line is "url dest". Parallel fetch keeps the pack off
+            # the boot path. The keep list drives the prune at the end.
             want() {
               printf '%s %s\n' "$1" "$2" >> "$manifest"
               printf '%s\n' "$2" >> "$keep"
@@ -619,46 +618,6 @@ in
               mv "$2.part" "$2"
             }
             export -f fetch
-
-            # gufo reads token_embd.weight at Q8_0 or better, so the older
-            # IQ4_NL requant cannot load. Upstream target is UD-Q4_K_XL.
-            flash=https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/38bb39ee97821de2c9009abb7e93950eec396e66
-            want "$flash/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf" \
-              "$root/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
-            want "$flash/mmproj-BF16.gguf" "$root/mmproj-BF16.gguf"
-            for shard in 00001 00002 00003 00004; do
-              file="Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00004.gguf"
-              want "$flash/UD-Q4_K_XL/$file" "$root/$file"
-            done
-
-            # Swift 1.5 publishes no UD-Q4_K_XL build, so these Q8_0 shards feed
-            # gufo-swift-requant. The projector takes its own dir because gufo
-            # resolves a sibling by base name. The requant deletes the shards,
-            # so gate them on its output: an ungated loop re-downloads 175 GiB
-            # at every boot.
-            swift=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GGUF/resolve/0142554c963a8653912c0c8283f05f13f63653f3
-            if [ ! -s "$root/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00005.gguf" ]; then
-              for shard in 00001 00002 00003 00004 00005; do
-                file="Swift-1.5-Qwen3.8-Flash-Next-Q8_0-$shard-of-00005.gguf"
-                want "$swift/Q8_0/$file" "$root/swift/$file"
-              done
-            fi
-            want "$swift/mmproj-Swift-1.5-Qwen3.8-Flash-Next-BF16.gguf" \
-              "$root/swift/mmproj-BF16.gguf"
-
-            imatrix=https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/99bb8f7f95c7aa7b24a36a7786a4f657b30f5d3d
-            want "$imatrix/imatrix-swiftfn-v1mix.gguf" \
-              "$root/swift/imatrix-swiftfn-v1mix.gguf"
-
-            # This projector shares its base name with the stock one. Gufo picks
-            # the wrong sibling for the parent dir, so the subdir stays separate.
-            uncensored=https://huggingface.co/vmlinux/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix-GGUF/resolve/0a0843cce72b4d8c377096960b3f0f9c0f4d197f
-            want "$uncensored/mmproj-BF16.gguf" "$root/uncensored/mmproj-BF16.gguf"
-            want "$uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf" \
-              "$root/uncensored/Qwen3.8-Flash-Next-Uncensored-Gufo-Q4Mix.gguf"
-            mtp=https://huggingface.co/jcbtc/Qwen3.8-Flash-CIRU-STRIX-Orca/resolve/139c9f5eb561dafbcf7cfab0622661b6fc0137e7
-            want "$mtp/mtp/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf" \
-              "$root/uncensored/Qwen3.8-Flash-CIRU-STRIX-Orca-MTP-Q8_0.gguf"
 
             asr=https://huggingface.co/Qwen/Qwen3-ASR-1.7B/resolve/7278e1e70fe206f11671096ffdd38061171dd6e5
             for file in \
@@ -675,11 +634,6 @@ in
             do
               want "$asr/$file" "$root/Qwen3-ASR-1.7B/$file"
             done
-
-            # 1.72 GB Q8_0. Q4 and NVFP4 builds exist upstream, but the LFM3
-            # backend opens Q8_0 and BF16 only.
-            lfm3=https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/b3f2ae5d73cd3c91bf40e8ba752c648aa05dffdf
-            want "$lfm3/LFM3-1.7B-Q8_0.gguf" "$root/lfm3/LFM3-1.7B-Q8_0.gguf"
 
             # d1 answers decision questions over text, pictures and audio. The
             # projector is optional for text, but the image path needs it.
@@ -735,17 +689,6 @@ in
               want "$tc/tokenizer/$file" "$root/halogen-thinkingcap/tokenizer/$file"
             done
 
-            # The requant writes this map and its guard path never rebuilds it, so
-            # the prune must not treat it as litter.
-            printf '%s\n' "$root/swift/tensor-types.txt" >> "$keep"
-
-            # The requant unit produces these five files. This fetch never
-            # downloads them and gufo loads them, so the prune needs their names.
-            for shard in 00001 00002 00003 00004 00005; do
-              printf '%s\n' \
-                "$root/swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL-$shard-of-00005.gguf" >> "$keep"
-            done
-
             # The bench trees live on this filesystem and hold the same bytes, so
             # a hardlink costs no space and no download. A dest that exists wins,
             # and the bench file is only read as the link target.
@@ -794,67 +737,6 @@ SEED
             done
             find "$root" -mindepth 1 -type d -empty -delete
             rm -f "$manifest" "$keep" "$keep.sorted" "$found"
-
-            chmod -R a+rX "$root"
-          '';
-        };
-
-        # gufo loads one Flash-Next tensor map only, so Swift 1.5 needs a requant
-        # of its Q8_0 source to the types of the stock build.
-        systemd.services.gufo-swift-requant = {
-          description = "Requantize Swift 1.5 for gufo";
-          wantedBy = [ "inference.target" ];
-          after = [ "gufo-models.service" ];
-          requires = [ "gufo-models.service" ];
-          serviceConfig = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            Nice = 15;
-            IOSchedulingClass = "idle";
-          };
-          path = [
-            pkgs.coreutils
-            pkgs.llama-cpp
-            (pkgs.python3.withPackages (ps: [ ps.gguf ]))
-          ];
-          script = ''
-            set -eu
-            root=/var/lib/inference/models
-            swift=$root/swift
-            out=$swift/Swift-1.5-Qwen3.8-Flash-Next-UD-Q4_K_XL
-
-            # gufo loads the requant output. The Q8_0 sources cost 175 GiB and
-            # feed nothing after this point.
-            cleanup() {
-              rm -f "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf
-            }
-
-            # The guard exits before the quantize step, so cleanup has to run on
-            # both paths.
-            if [ -s "$out-00001-of-00005.gguf" ]; then
-              cleanup
-              exit 0
-            fi
-
-            # The map comes from the stock build, so the result stays identical to
-            # what gufo loads today. The name check stops a mismatch before 103 GiB
-            # are written.
-            python3 ${../../scripts/gguf-tensor-types.py} \
-              "$root"/Qwen3.8-Flash-Next-UD-Q4_K_XL-*-of-00004.gguf \
-              -- "$swift"/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-*-of-00005.gguf \
-              > "$swift/tensor-types.txt"
-
-            # This build takes the output path as the second positional argument.
-            llama-quantize \
-              --imatrix "$swift/imatrix-swiftfn-v1mix.gguf" \
-              --allow-requantize \
-              --keep-split \
-              --tensor-type-file "$swift/tensor-types.txt" \
-              "$swift/Swift-1.5-Qwen3.8-Flash-Next-Q8_0-00001-of-00005.gguf" \
-              "$out.gguf" \
-              Q4_K_M
-
-            cleanup
 
             chmod -R a+rX "$root"
           '';

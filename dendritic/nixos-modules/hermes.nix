@@ -408,26 +408,6 @@
               provider = "custom";
               base_url = localBaseUrl;
             };
-            gufo-flash-next = {
-              model = "gufo-flash-next";
-              provider = "custom";
-              base_url = localBaseUrl;
-            };
-            gufo-flash-next-uncensored-abliterated = {
-              model = "gufo-flash-next-uncensored-abliterated";
-              provider = "custom";
-              base_url = localBaseUrl;
-            };
-            gufo-flash-next-uncensored-abliterated-bench = {
-              model = "gufo-flash-next-uncensored-abliterated-bench";
-              provider = "custom";
-              base_url = localBaseUrl;
-            };
-            gufo-flash-next-swift = {
-              model = "gufo-flash-next-swift";
-              provider = "custom";
-              base_url = localBaseUrl;
-            };
           };
         };
         environment = {
