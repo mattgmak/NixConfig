@@ -17,11 +17,31 @@ import { Type } from "typebox";
 
 const STATE_DIR = join(process.env.TMPDIR ?? tmpdir(), "pi-background");
 const TAIL_BYTES = 4000;
-const WIDGET_KEY = "zbg-probe";
+const WIDGET_KEY = "pi-background-jobs";
 const TICK_MS = 1000;
 const MAX_ROWS = 3;
 const CUSTOM_TYPE = "pi-background-job";
 const EXIT_LINE = /\n?exit=(\d+)\s*$/;
+
+const ICON = {
+  done: "\uF00D",
+  fail: "\uF00D",
+  stopped: "\uF05E",
+  running: "\uF110",
+  clock: "\uF017",
+  id: "\uF292",
+};
+const BAR = "\u2503 ";
+const ELAPSED_COL = 7;
+const TAIL_MAX = 60;
+
+type Outcome = "success" | "failure" | "cancelled" | "running";
+const GLYPH: Record<Outcome, { color: ThemeColor; mark: string; label: string }> = {
+  success: { color: "success", mark: ICON.done, label: "completed" },
+  failure: { color: "error", mark: ICON.fail, label: "failed" },
+  cancelled: { color: "warning", mark: ICON.stopped, label: "cancelled" },
+  running: { color: "warning", mark: ICON.running, label: "running" },
+};
 
 interface JobMeta {
   id: string;
@@ -131,10 +151,23 @@ function lastMeaningfulLine(text: string): string {
   return "";
 }
 
+function field(theme: any, glyph: string, color: ThemeColor, value: string): string {
+  return `${theme.fg(color, glyph)} ${theme.fg("dim", value)}`;
+}
+
 function widgetRow(theme: any, name: string, meta: JobMeta, line: string): string {
-  const head = `${durationText(meta.startedAt)} ${meta.command.slice(0, 48)}`;
-  const detail = line || `pid ${meta.pid}`;
-  return `${theme.fg("accent", name)} ${theme.fg("dim", head)} ${theme.fg("muted", detail)}`;
+  const outcome: Outcome =
+    meta.exitedAt === null ? "running" : meta.exitCode === 0 ? "success" : meta.exitCode === null ? "cancelled" : "failure";
+  const glyph = GLYPH[outcome];
+  const elapsed = durationText(meta.startedAt).padStart(ELAPSED_COL);
+  const fields = [
+    theme.fg("accent", name),
+    field(theme, ICON.clock, "dim", elapsed),
+    field(theme, glyph.mark, glyph.color, glyph.label),
+    field(theme, ICON.id, "dim", meta.id),
+  ];
+  const detail = line ? line.slice(0, TAIL_MAX) : `pid ${meta.pid}`;
+  return BAR + fields.join("  ") + "  " + theme.fg("muted", detail);
 }
 
 function setUi(ctx: ExtensionContext): void {
@@ -152,11 +185,15 @@ function updateWidget(running: JobMeta[]): void {
   const ctx = ctxRef;
   const theme = widgetState.theme;
   if (!ctx || !theme) return;
+  if (running.length === 0) {
+    ctx.ui.setWidget(WIDGET_KEY, undefined);
+    return;
+  }
   const shown = running.slice(0, MAX_ROWS);
   const overflow = Math.max(0, running.length - MAX_ROWS);
   const lines = shown.map((meta) => widgetRow(theme, meta.name || meta.id, meta, lastMeaningfulLine(tail(meta.id))));
-  if (overflow > 0) lines.push(theme.fg("muted", `+${overflow} more`));
-  ctx.ui.setWidget(WIDGET_KEY, lines.length > 0 ? lines : [theme.fg("dim", "bg_bash idle")], { placement: "aboveEditor" });
+  if (overflow > 0) lines.push(BAR + theme.fg("muted", `+${overflow} more`));
+  ctx.ui.setWidget(WIDGET_KEY, lines, { placement: "aboveEditor" });
 }
 
 function wake(meta: JobMeta): void {
