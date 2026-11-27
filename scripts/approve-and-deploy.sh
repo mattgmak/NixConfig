@@ -26,16 +26,26 @@
 # A failed step stops the run and leaves the pane open with the log on screen.
 set -euo pipefail
 
+# Colors: set before the main|tee pipe so the check sees the real terminal.
+if [ -t 1 ] && [ "${TERM:-dumb}" != dumb ] && [ -z "${NO_COLOR:-}" ]; then
+  c_r=$'\e[0m'; c_b=$'\e[1m'; c_d=$'\e[2m'
+  c_head=$'\e[1;36m'; c_run=$'\e[2;36m'; c_ok=$'\e[1;32m'
+  c_err=$'\e[1;31m'; c_warn=$'\e[1;33m'; c_key=$'\e[1;35m'
+else
+  c_r=''; c_b=''; c_d=''; c_head=''; c_run=''; c_ok=''
+  c_err=''; c_warn=''; c_key=''
+fi
+
 usage() { sed -n '3,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 send_to_caller() {
-  if [ "$dry" = 1 ] || [ -z "$caller" ]; then printf '  -> %s: %s\n' "$caller" "$1"; return 0; fi
+  if [ "$dry" = 1 ] || [ -z "$caller" ]; then printf '  %s-> %s: %s%s\n' "$c_d" "$caller" "$1" "$c_r"; return 0; fi
   tmux send-keys -t "$caller" -l "$1"
   tmux send-keys -t "$caller" Enter
 }
-say() { printf '\n== %s\n' "$*"; }
+say() { printf '\n%s== %s%s\n' "$c_head" "$*" "$c_r"; }
 run() {
-  if [ "$dry" = 1 ]; then printf '  dry: %s\n' "$*"; return 0; fi
-  printf '  run: %s\n' "$*"
+  if [ "$dry" = 1 ]; then printf '  %sdry: %s%s\n' "$c_d" "$*" "$c_r"; return 0; fi
+  printf '  %srun: %s%s\n' "$c_run" "$*" "$c_r"
   "$@"
 }
 
@@ -130,8 +140,11 @@ log=${LOG:-${TMPDIR:-/tmp}/agent-tmp/NixConfig/approve-and-deploy-${branch}.log}
 [ "$dry" = 1 ] || mkdir -p "$(dirname "$log")"
 
 main() {
-  printf 'branch  %s (%s)\nmain    %s\nhosts   %s\nlog     %s\n' \
-    "$branch" "$wt_path" "$main_path" "$hosts" "$log"
+  printf '%sbranch%s  %s (%s)\n%smain%s    %s\n%shosts%s   %s\n%slog%s     %s\n' \
+    "$c_key" "$c_r" "$branch" "$wt_path" \
+    "$c_key" "$c_r" "$main_path" \
+    "$c_key" "$c_r" "$hosts" \
+    "$c_key" "$c_r" "$log"
 
   say 'merge'
   # --no-remove keeps the worktree alive. A caller session started there keeps a
@@ -139,7 +152,7 @@ main() {
   run wt -C "$wt_path" merge main --no-remove
   local sha
   sha=$(git -C "$main_path" rev-parse --short HEAD)
-  printf '  main is now %s\n' "$sha"
+  printf '  %smain is now %s%s\n' "$c_ok" "$sha" "$c_r"
 
   say 'push'
   run git -C "$main_path" push origin main
@@ -160,7 +173,7 @@ main() {
             deploy_ran=1
             run ${line#run:}
             ;;
-          print:*) printf '  manual: %s\n' "${line#print:}" ;;
+          print:*) printf '  %smanual: %s%s\n' "$c_warn" "${line#print:}" "$c_r" ;;
         esac
       done < <(deploy_action "$h")
     done
@@ -195,7 +208,7 @@ main() {
 
 on_err() {
   local where=${2:-main} err
-  printf '\nFAILED at line %s in %s -- pane stays open, log at %s\n' "$1" "$where" "$log" >&2
+  printf '\n%sFAILED%s at line %s in %s -- pane stays open, log at %s\n' "$c_err" "$c_r" "$1" "$where" "$log" >&2
   err=${msg:-}
   if [ -z "$err" ]; then
     err="Deploy failed in $where at line $1. Read the log at $log, fix it, then report the result."
