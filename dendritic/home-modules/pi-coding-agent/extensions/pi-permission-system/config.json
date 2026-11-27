@@ -1,7 +1,7 @@
 {
   "debugLog": false,
   "permissionReviewLog": true,
-  "yoloMode": true,
+  "yoloMode": false,
   "shellTools": {
     "bash": {
       "commandArgument": "command"
@@ -159,6 +159,15 @@
       "truncate * /mnt/copyparty*": "deny",
       "tee /mnt/copyparty*": "deny",
       "dd * of=/mnt/copyparty*": "deny"
+    },
+    "mcp": {
+      "*": "ask",
+      "Linear": "allow",
+      "argent": "allow",
+      "bladebro": "allow",
+      "github-readonly": "allow",
+      "manzanas": "allow",
+      "nixos": "allow"
     },
     "external_directory": "allow"
   }

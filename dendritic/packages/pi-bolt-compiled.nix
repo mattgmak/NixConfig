@@ -391,7 +391,7 @@
           # dependencies of one platform, so the store differs between linux and darwin.
           # Each value below came from the build that prints the mismatch.
           pnpmDepsHashes = {
-            "x86_64-linux" = "sha256-4Y1toGVK2MSKaaZuUGDCf/hIwqXSgcPojFoBSRTjHLg=";
+            "x86_64-linux" = "sha256-weN4OgP8eT2GVARlWZ/dUO2DIZH9mHYpwj2+s1osxiM=";
             "aarch64-darwin" = "sha256-gKQr6q81EfbVvliMifveiFECJbkMefqlyOFaz81nhn4=";
           };
 
