@@ -263,6 +263,26 @@
               runHook postInstall
             '';
           })
+          # hermes-genui: generative-UI boards (charts, tables, plans) drawn in Desktop.
+          # Only the runtime Python ships; the repo's web/desktop renderer, tests, evals
+          # and assets stay out of the store path.
+          (pkgs.stdenv.mkDerivation {
+            pname = "hermes-genui";
+            version = "0.3.1";
+            src = pkgs.fetchurl {
+              url = "https://github.com/sagarmainkar/hermes-genui/archive/refs/tags/v0.3.1.tar.gz";
+              hash = "sha256-WZ1KFg6cbhluEvgOiqmRQgEph/MBm9Vl69F5Ndrr3HM=";
+            };
+            sourceRoot = "hermes-genui-0.3.1";
+            dontConfigure = true;
+            dontBuild = true;
+            installPhase = ''
+              runHook preInstall
+              mkdir -p $out
+              cp -r --no-preserve=mode __init__.py plugin.yaml core hooks recipes templates tools $out/
+              runHook postInstall
+            '';
+          })
         ];
         # pi, deploy and nixconfig-worktree are runtime artifacts owned by the
         # curator; the repo no longer ships them. Only the HUI+ skill is seeded.
@@ -338,7 +358,7 @@
           # extraPlugins installs the plugin dir, and the webui shows it Disabled
           # until its name joins this list. `hermes plugins enable` writes the same
           # key into config.yaml.
-          plugins.enabled = [ "hermes-vcc-engine" "hermes-ui-plus" ];
+          plugins.enabled = [ "hermes-vcc-engine" "hermes-ui-plus" "hermes-genui" ];
           # HUI+ settings. The main gateway keeps port 8646, and the bridge points
           # at the same agenix secret. expose_memory lets paired devices read
           # MEMORY.md and USER.md.
