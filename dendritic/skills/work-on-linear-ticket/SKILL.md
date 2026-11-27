@@ -40,15 +40,15 @@ mattmak/prd-239-dashboard-banner-add-url do a configurable on press openLink url
 
 ## Workflow
 
-### 0. Preflight (shell allowlist)
+### 0. Preflight (shell permissions)
 
-Shell via `mcp_pi_shell` / `mcp_pi_ctx_shell` — native Shell maybe unavailable.
+Shell runs through native `bash`. `pi-permission-system` gates each command from `home-modules/pi-coding-agent/extensions/pi-permission-system/config.json`.
 
-`wt`/`sesh`/`tmux`/`jq`/`bash` pre-allowed in `home-modules/pi-coding-agent/lean-ctx/config.toml`. Widen: `lean-ctx allow <binary>`.
+`wt`/`sesh`/`tmux`/`jq`/`bash` sit in that config. Widen it there, then commit.
 
-`[BLOCKED — DO NOT RETRY]` → `lean-ctx allow <binary>`; declined → user adds to `lean-ctx/config.toml` (+ `home-manager switch` / Pi restart).
+`[BLOCKED — DO NOT RETRY]` means the rule is missing. Add it, then reload Pi.
 
-**`$(...)` gotcha:** allowlist tokenizes inside subshells; flags/words must be allowlisted separately. `lean-ctx allow` can't fix non-binary tokens. Fix → call committed `scripts/*.sh` via top-level `bash` (allowlist gates only top-level `bash`).
+**`$(...)` gotcha:** the gate tokenizes inside subshells, so flags and words need their own rule. Fix → call a committed `scripts/*.sh` through top-level `bash`. The gate checks only the top-level command.
 
 ### 1. Parse branch
 
@@ -141,7 +141,7 @@ Parent stays alive. **Never inline-kill parent** — stale ctx during `agent_set
 
 | Failure | Action |
 |---------|--------|
-| Blocked by allowlist | Use `bash "$SKILL_ROOT/scripts/..."` not inline `$(...)`. Missing binary → `lean-ctx allow` or `config.toml` |
+| Blocked by permission rule | Use `bash "$SKILL_ROOT/scripts/..."` not inline `$(...)`. Missing rule → add it in `extensions/pi-permission-system/config.json` |
 | Not in git repo | User `cd` into repo — peer spawn also needs `$TMUX` set (tmux gate) |
 | Linear issue not found | Show extracted id; ask confirm |
 | `wt switch` fails | Show stderr; `wt list` |

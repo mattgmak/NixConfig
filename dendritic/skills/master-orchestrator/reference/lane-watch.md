@@ -1,13 +1,12 @@
 ## Lane watch
 
-One `ctx_bg` job watches the whole wave, by branch name. Start it in the same turn as the first lane spawn, not when the first pull request opens. A branch with no pull request yet prints `PR_OPEN` when the request appears, so the watch covers the wait before it.
+One `bg_bash` job watches the whole wave, by branch name. Start it in the same turn as the first lane spawn, not when the first pull request opens. A branch with no pull request yet prints `PR_OPEN` when the request appears, so the watch covers the wait before it.
 
 ```text
-ctx_bg {
-  name:      "watch wave",
-  command:   "bash ~/.pi/agent/skills/master-orchestrator/scripts/watch-wave.sh <branch> [<branch> ...] --window 3000",
-  wake_on:   "^(PR_OPEN|CLEAN|STATE|CIFAIL|MERGED|CLOSED) ",
-  timeout_ms: 3300000
+bg_bash {
+  action:  "start",
+  name:    "watch wave",
+  command: "bash ~/.pi/agent/skills/master-orchestrator/scripts/watch-wave.sh <branch> [<branch> ...] --window 3000"
 }
 ```
 
@@ -68,11 +67,11 @@ Rules:
 - Never poll by hand, never sleep, never tail a log. The job holds the loop.
 - A `MERGED` line starts the cleanup turn. Unstack the pull requests above it, remove the worktree, kill the lane session, and set the ticket to Done.
 - The script window is 3000 s and `timeout_ms` is 3300000. The job limit of 60 minutes kills a longer window, so keep the window under it. Keep a 60 s margin between the loop and `timeout_ms`. A loop of 120 ticks at 60 s runs 7200 s, so the job dies at the limit with exit 124. A job that exits 124 ran its loop past `timeout_ms`, so shorten the loop, not the margin.
-- A job that exits 124 hit its job limit. Start the watch again with a fresh window.
+- A job that stops without a result lost its process. Start the watch again with a fresh window.
 - A job id can expire and leave its process running. Before a restart, clear the process and check the count.
 - Clear a watcher with a bracket pattern: `pkill -f 'watch-lanes[.]sh'`. A plain pattern matches the command line of the shell that runs it, and the shell then kills itself with exit 143.
 - The shell policy denies a pipe to `xargs`. Kill with `pkill` alone, and read the count with `pgrep -cf 'watch-lanes[.]sh'`.
-- A lost job reports `not found or expired` and holds no result. Read the three gate states by hand, then start a fresh watch with `unique: true`.
-- `ctx_bg` reuses the id of an identical command. So an expiry message can name an earlier instance. Run `status` on the id before a restart, and pass `unique: true` on a start so each watch holds its own id.
+- A lost job reports `not found` and holds no result. Read the three gate states by hand, then start a fresh watch.
+- `bg_bash` returns a fresh id on every start, so each watch holds its own id. Run `status` on the id you got from `start`.
 
 `watch-coderabbit.sh` stays for a CodeRabbit-only watch. `watch-lane.sh <pr>` covers one pull request. `watch-lanes.sh` covers the whole wave with one job.

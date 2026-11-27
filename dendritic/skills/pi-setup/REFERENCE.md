@@ -7,7 +7,7 @@ Companion to [SKILL.md](SKILL.md). Layout, conventions, and debugging for pi in 
 ```
 NixConfig/
 ├── vendor/                          # ALL git submodules, grouped <Owner>/<repo>
-│   ├── <owner>/<repo>/              # e.g. vendor/mattgmak/lean-ctx
+│   ├── <owner>/<repo>/              # e.g. vendor/mattgmak/pi-autoname
 │   └── …                            # extensions, themes, skills, zen, tools
 └── dendritic/
     ├── skills/                      # global pi skills (SKILL.md dirs)
@@ -33,7 +33,6 @@ Deployed at runtime:
 | `home-modules/pi-coding-agent/themes/` | `themes/` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/models.json` | `models.json` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/mcp.json` | `mcp.json` | `home.file` → `mkOutOfStoreSymlink` |
-| `home-modules/pi-coding-agent/lean-ctx/config.toml` | `~/.config/lean-ctx/config.toml` | `home.file` → `mkOutOfStoreSymlink` |
 | `home-modules/pi-coding-agent/AGENTS.md` | `AGENTS.md` | `coding-agents.agentsMdPath` → `mkOutOfStoreSymlink` |
 
 `pi-coding-agent.nix` also imports `inputs.coding-agents.homeManagerModules.default`, enables `pi-coding-agent`, and adds `node-bin`.
@@ -146,7 +145,6 @@ Two loaders write beside their own code, so a symlink into the store fails with 
 | Loader | Write | Cost of a missing write |
 |--------|-------|------------------------|
 | `pi-permission-system` | `logs/` on the first audit line | no audit trail |
-| `pi-lean-ctx` | `mcp-schema-cache.json` | 3.3 s on every start. A warm cache costs about 4 ms |
 
 `writableExtensions` in `pi-coding-agent.nix` names them. `writableMirror` builds a real directory for each name, with one symlink per leaf file. A compiled name takes its leaves from the store tree, else from the repo. `builtins.readDir` lists the files at eval time, so the build makes links only. A new file in a writable loader needs a rebuild.
 
@@ -168,9 +166,8 @@ The compile needs no network. Each staged repo that imports npm packages gets it
 | `fitchmultz/pi-agent-browser-native` | dev lockfile install, then `node scripts/build.mjs` |
 | `mattgmak/agent-ste` | gleam build, plus four hex tarballs in `$HOME/.cache/gleam/hex/hexpm/packages`, named by manifest checksum |
 | `Gentleman-Programming/engram` | manifest cut to `dependencies`, then `npm install --omit=dev --offline`. Bare imports reach the staged `vendor/node_modules` |
-| `mattgmak/lean-ctx/packages/pi-lean-ctx` | dev install trimmed to `@modelcontextprotocol/sdk` and `esbuild`, then `npm run build:vendor` |
 
-`npmNodeModules` takes `dropPackages` (a name test on lock entries) and `dropOverrides` (drop the manifest `overrides`). The lean-ctx install needs both. An override cannot name a store file, and the bundled shrinkwrap records seven `@earendil-works` tarballs with no integrity. `prodLock` drops the dev entries for the same reason.
+`npmNodeModules` takes `dropPackages` (a name test on lock entries) and `dropOverrides` (drop the manifest `overrides`). An override cannot name a store file, and a bundled shrinkwrap can record tarballs with no integrity. `prodLock` drops the dev entries for the same reason.
 
 A lockfile change makes `fetchPnpmDeps` stop and print the new `hash`.
 
@@ -182,7 +179,6 @@ No patch remains. 1.0.5 compile maps `@sinclair/typebox` and the other Pi module
 
 | Decision | Reason |
 |----------|--------|
-| `pi-lean-ctx` compiled in, with a writable dir | its factory wants a schema cache beside its config |
 | `pi-clinepass-provider` re-added (jellydn 1.7.0) | ClinePass returns to the roster. d308592 dropped it for compile scoping, not for a defect ([selection](#clinepass-provider-selection-4-nov-2026)) |
 | `pi-balance` added (first-party) | Registers `balance/deepseek-v4.1-flash`, one model id that spreads usage over the three subscriptions ([details](#balance-virtual-model-4-nov-2026)) |
 | `mcp-nixos` loader removed, `nixos` MCP server added | the generated store path from nixpkgs `mcp-nixos` pins the server. `mcp.json` is the human-edited source |
@@ -355,7 +351,6 @@ Extension submodules whose `.gitmodules` URL is **your fork** must be checked ag
 | Loader / vendor dir | Submodule URL (fork) | Upstream | Upstream branch |
 |---------------------|----------------------|----------|-----------------|
 | `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) | *(direct upstream)* | `https://github.com/fitchmultz/pi-cursor-sdk.git` | default — active loader `extensions/pi-cursor-sdk/`; provider `cursor` |
-| `lean-ctx` (`vendor/mattgmak/lean-ctx`) | `mattgmak/lean-ctx` | `https://github.com/yvgude/lean-ctx.git` | `main` |
 | `pi-interactive-subagents` (`vendor/mattgmak/pi-interactive-subagents`) | `mattgmak/pi-interactive-subagents` | `https://github.com/amosblomqvist/pi-interactive-subagents.git` | `main` |
 | `pi-nvim-bridge` (`vendor/mattgmak/pi-nvim-bridge`) | `mattgmak/pi-nvim-bridge` | `https://github.com/dabstractor/pi-nvim-bridge.git` | `main` |
 | `pi-autoname` (`vendor/mattgmak/pi-autoname`) | `mattgmak/pi-autoname` | `https://github.com/ssdiwu/pi-autoname.git` | `main` |
@@ -482,10 +477,10 @@ Nothing hides by silence.
 ## Shell wait guard
 
 `extensions/shell-wait-guard/index.ts` blocks a foreground wait in a shell tool call.
-It watches `tool_call` on `ctx_shell` and `bash`. A wait of 3 s or more returns
+It watches `tool_call` on `bash`. A wait of 3 s or more returns
 `block` with a reason that names the fix.
 
-The tool layer cannot see a job finish, so the fix is `ctx_bg`. That tool ends the
+The tool layer cannot see a job finish, so the fix is `bg_bash`. That tool ends the
 turn, and the harness wakes the agent with the result. A command that must wait for
 a condition uses a blocking form instead.
 
@@ -507,7 +502,7 @@ host. `pi-stock` reads the repo loader and takes the edit at once.
 
 ## Install extension deps (`pi-ext-deps-install`)
 
-Home Manager installs `pi-ext-deps-install`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `lean-ctx`, `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
+Home Manager installs `pi-ext-deps-install`. It walks top-level `extensions/*` loaders and `vendor/<owner>/*` submodules, running `npm i --omit=dev` where `package.json` has deps (skipping themes/skills/zen/tools repos and the special-case installers for `pi-packages`, `fgladisch/pi-extensions`, `engram`, `pi-cursor-sdk`).
 
 `pi-cursor-sdk` (`vendor/fitchmultz/pi-cursor-sdk`) runs `npm ci --ignore-scripts`, then `node scripts/build.mjs`, then `npm prune --omit=dev --ignore-scripts` (skips `prepare`, which can mutate `package-lock.json`). Restores tracked submodule files after install so vendor discard stays clean. Loader needs built `dist/index.js`; `pi-ext-deps-install` fails if missing.
 
@@ -533,7 +528,7 @@ Check floor per tag: `git -C vendor/Gentleman-Programming/engram grep -l '<route
 Bump procedure (`dendritic/packages/engram.nix`):
 
 1. Set `version` = new tag; keep `baseUrl` scheme.
-2. Fetch 4 tarballs `engram_<v>_{linux_amd64,linux_arm64,darwin_arm64,darwin_amd64}.tar.gz` from releases. SRI hash per platform: `curl -fsSLO <url>; nix hash file <tarball>` (`nix-prefetch-url` can be blocked by the lean-ctx shell allowlist).
+2. Fetch 4 tarballs `engram_<v>_{linux_amd64,linux_arm64,darwin_arm64,darwin_amd64}.tar.gz` from releases. SRI hash each tarball with `nix hash file <tarball>` after `curl -fsSLO <url>`.
 3. Verify flat layout (binary `engram` at archive root — `dontUnpack` + `tar -xOf` depends on it) and `engram version` prints the new version (installCheck greps it).
 4. `nix build --no-link .#engram` → installCheck confirms version.
 5. Running server = old bin until `nixos-rebuild switch` / home-manager switch applies the new generation.
@@ -671,8 +666,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 | Loader | Role |
 |--------|------|
-| `pi-lean-ctx` | ctx_* read/search/shell (replace mode) |
-| `pi-permission-system` | permission gates on ctx_shell |
+| `pi-permission-system` | permission gates on bash |
 | `pi-cursor-sdk` | cursor provider models |
 | `pi-web-access` | web_search / fetch_content |
 | `pi-powerline-footer` | footer in tmux panes |
@@ -695,7 +689,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 **Edit list:** `vendor/mattgmak/pi-interactive-subagents/pi-extension/subagents/index.ts` → `SUBAGENT_BASE_EXTENSIONS`. Run `npm test` in that submodule. Bump NixConfig submodule pointer after push to `mattgmak/pi-interactive-subagents`.
 
-**Agent tools:** use `ctx_read`, `ctx_grep`, `ctx_find`, `ctx_ls`, `ctx_shell` in `dendritic/home-modules/pi-coding-agent/agents/*.md` (not native `read`/`bash`).
+**Agent tools:** use native `read`, `grep`, `find`, `ls`, `bash` in `dendritic/home-modules/pi-coding-agent/agents/*.md`.
 
 **MCP tools in subagents:** name each tool. Do not name bare `mcp`.
 
@@ -707,7 +701,7 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 
 **Per-agent MCP files:** avoid `cwd/.pi/agent/mcp.json`. The fork exports `PI_CODING_AGENT_DIR` from it, and the child loses the global `settings.json`, `auth.json`, skills and extension list. A malformed file crashes the child with SIGSEGV.
 
-**Permissions:** mirror `bash` rules under `ctx_shell` in `extensions/pi-permission-system/config.json`.
+**Permissions:** keep `bash` rules in `extensions/pi-permission-system/config.json`.
 
 **Upstream merges:** fetch `upstream` (amosblomqvist), merge into fork, re-apply fork commits if needed, push `origin`, bump submodule SHA in NixConfig.
 
@@ -723,7 +717,6 @@ Restricted subagents (`tools:` in agent frontmatter) launch with `--no-extension
 | MCP server binaries | `home.packages` in `pi-coding-agent.nix`. `mcp.json` names a bare command, so pi finds it on the profile PATH only |
 | MCP adapter settings | `dendritic/home-modules/pi-coding-agent/mcp-adapter.json`. The adapter ignores `settings` in `mcp.json` and warns at session start |
 | Add skill | `dendritic/skills/<name>/SKILL.md` |
-| lean-ctx shell allowlist extras | `dendritic/home-modules/pi-coding-agent/lean-ctx/config.toml` |
 | Agent shell permission rules | `dendritic/home-modules/pi-coding-agent/extensions/pi-permission-system/config.json` |
 | Subagent curated extension list | `vendor/mattgmak/pi-interactive-subagents/pi-extension/subagents/index.ts` (`SUBAGENT_BASE_EXTENSIONS`) |
 | Subagent agent profiles | `dendritic/home-modules/pi-coding-agent/agents/*.md` |

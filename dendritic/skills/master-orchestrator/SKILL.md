@@ -192,8 +192,8 @@ Rules to state in every brief:
 - A lane asks the user before an emulator fallback, because that device differs from the shipped platform.
 - A diff with no screen and no visible value carries no simulator evidence. Say so in the report.
 - Report the head sha, the changed files, one exit code per gate, and the evidence artifact.
-- Run a long command in the foreground: `ctx_shell` with `timeout` 900 or more. Never end a turn to wait for anything.
-- Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `ctx_bg` is the master's tool, never a lane tool.
+- Run a long command in the foreground: `bash` with `timeout` 900 or more. Never end a turn to wait for anything.
+- Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `bg_bash` is the master's tool, never a lane tool.
 - A lane that spawns its own subagents passes no model override. The default model applies at every level.
 - A provider rate limit is not a failure. Wait, retry the same call with a growing pause, and keep the worktree so a retry resumes. Report the exact error string only after a retry fails.
 - Run `scripts/gate-cache.sh` once per head, and read the cache in every later turn. Read `reference/agent-loop.md`.
@@ -415,9 +415,9 @@ A Convex backend names its store under `/tmp`, so read its parent path instead. 
 
 ## 14. Background gates
 
-`ctx_bg` is the master's tool only. The master runs it, ends the turn, and messages the lane the result. A lane that runs `ctx_bg` ends its turn, the pane closes, and the job dies.
+`bg_bash` is the master's tool only. The master runs it, ends the turn, and messages the lane the result. A lane that runs `bg_bash` ends its turn, the pane closes, and the job dies.
 
-A lane runs a long gate in the foreground: `ctx_shell` with `timeout` 900 or more. Read `reference/agent-loop.md`.
+A lane runs a long gate in the foreground: `bash` with `timeout` 900 or more. Read `reference/agent-loop.md`.
 
 Never poll. Never sleep. Write one line of status per phase change.
 
@@ -697,7 +697,7 @@ Three guards keep the reset local. The CLI call clears the deployment selector w
 
 Use this route when a still or a manual check comes from the emulator of this host. It needs no tailnet name and no public origin. Drop `SANDBOX_LAN` and `SANDBOX_PUBLIC_ORIGIN` for this route.
 
-Boot the AVD in a real tmux window. Never boot it with `ctx_bg`, because that job dies with the turn. The window keeps the process and shows the boot log.
+Boot the AVD in a real tmux window. Never boot it with `bg_bash`, because that job dies with the turn. The window keeps the process and shows the boot log.
 
 ```bash
 tmux new-window -d -t sandbox-dev -n emu -c "$PWD" \

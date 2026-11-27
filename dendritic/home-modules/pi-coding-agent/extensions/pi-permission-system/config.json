@@ -3,19 +3,17 @@
   "permissionReviewLog": true,
   "yoloMode": true,
   "shellTools": {
-    "ctx_shell": {
+    "bash": {
       "commandArgument": "command"
     },
-    "ctx_bg": {
-      "commandArgument": "command",
-      "workdirArgument": "cwd"
+    "bg_bash": {
+      "commandArgument": "command"
     }
   },
   "permission": {
     "*": "allow",
     "path": {
       "*": "allow",
-      "~/.config/lean-ctx/config.toml": "deny",
       "*.env": "deny",
       "*.env.*": "deny",
       "*.env.example": "allow"
@@ -50,13 +48,6 @@
       "find * -ok*": "deny",
       "fd * -x*": "deny",
       "fd * --exec*": "deny",
-      "lean-ctx allow *": "deny",
-      "lean-ctx allow": "deny",
-      "lean-ctx config set shell_allowlist*": "deny",
-      "lean-ctx config set shell_allowlist_extra*": "deny",
-      "lean-ctx config set shell_security*": "deny",
-      "lean-ctx security *": "deny",
-      "lean-ctx harden undo*": "deny",
       "sudo *": "deny",
       "gh pr merge *": "deny",
       "gh pr close *": "deny",
@@ -98,7 +89,7 @@
       "tee /mnt/copyparty*": "deny",
       "dd * of=/mnt/copyparty*": "deny"
     },
-    "ctx_shell": {
+    "bg_bash": {
       "*": "allow",
       "rm -rf *": "deny",
       "tmux kill-server*": {
@@ -128,13 +119,6 @@
       "find * -ok*": "deny",
       "fd * -x*": "deny",
       "fd * --exec*": "deny",
-      "lean-ctx allow *": "deny",
-      "lean-ctx allow": "deny",
-      "lean-ctx config set shell_allowlist*": "deny",
-      "lean-ctx config set shell_allowlist_extra*": "deny",
-      "lean-ctx config set shell_security*": "deny",
-      "lean-ctx security *": "deny",
-      "lean-ctx harden undo*": "deny",
       "sudo *": "deny",
       "gh pr merge *": "deny",
       "gh pr close *": "deny",

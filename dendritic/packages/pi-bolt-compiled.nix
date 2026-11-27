@@ -57,6 +57,7 @@
             "pi-agent-sesh"
             "pi-autoname"
             "pi-away"
+            "pi-background"
             "pi-balance"
             "pi-blackhole"
             "pi-codegraph"
@@ -67,7 +68,6 @@
             "pi-cursor-sdk"
             "pi-cursor-usage"
             "pi-interactive-subagents"
-            "pi-lean-ctx"
             "pi-markdown-preview"
             "pi-mcp-adapter"
             "pi-model-pick"
@@ -177,10 +177,6 @@
             {
               repo = "Gentleman-Programming/engram";
               subdir = "plugin/pi";
-            }
-            {
-              repo = "mattgmak/lean-ctx";
-              subdir = "packages/pi-lean-ctx";
             }
           ];
 
@@ -360,51 +356,6 @@
             installPhase = ''
               mkdir -p $out
               cp -a dist $out/
-            '';
-          };
-
-          # pi-lean-ctx stays in `extensions`, and its agent dir is writable (see
-          # `writableExtensions` in pi-coding-agent.nix). Its factory reads a schema cache
-          # beside its own config.json and starts an eager MCP connect only on a cache miss.
-          # From the store tree that cache never persists, so every start would pay the full
-          # ~3.3 s discovery. From a writable dir the cache is warm and the factory costs
-          # about 4 ms. Its staging stays, so the tree keeps the host layout.
-
-          # pi-lean-ctx bundles the MCP SDK into extensions/vendor at build time, and the
-          # published package then carries no runtime npm dependency.
-          piLeanCtx = pkgs.stdenvNoCC.mkDerivation {
-            pname = "pi-lean-ctx-vendor-bundle";
-            version = "0";
-            src = srcOf "vendor/mattgmak/lean-ctx/packages/pi-lean-ctx";
-            nativeBuildInputs = [ pkgs.nodejs ];
-            buildPhase = ''
-              runHook preBuild
-              cp -a ${npmNodeModules {
-                repo = "mattgmak/lean-ctx/packages/pi-lean-ctx";
-                devDeps = true;
-                # The build reads esbuild and the MCP SDK. The other dev entries pull
-                # vite, whose esbuild range the lock satisfies only through the
-                # manifest overrides, and an override cannot name a store file.
-                keepDevDeps = [
-                  "@modelcontextprotocol/sdk"
-                  "esbuild"
-                ];
-                dropOverrides = true;
-                # npm installs root peer deps, and the SDK peers resolve through the
-                # dropped shrinkwrap.
-                dropPeers = true;
-                # The bundled shrinkwrap inside the dev SDK records seven nested
-                # @earendil-works tarballs with no integrity, and the build never reads
-                # them.
-                dropPackages = name: lib.hasPrefix "node_modules/@earendil-works/pi-coding-agent/" name;
-              }}/node_modules node_modules
-              chmod -R u+w node_modules
-              npm run build:vendor
-              runHook postBuild
-            '';
-            installPhase = ''
-              mkdir -p $out
-              cp -a extensions/vendor $out/
             '';
           };
 
@@ -592,11 +543,6 @@
 
               # agent-ste loads its compiled Gleam output from dist/.
               cp -a ${agentSte}/dist $stage/vendor/mattgmak/agent-ste/
-
-              # pi-lean-ctx loads its bundled MCP SDK from extensions/vendor. The staged dir
-              # already exists, so copy the contents, not the dir itself.
-              cp -a ${piLeanCtx}/vendor/. \
-                $stage/vendor/mattgmak/lean-ctx/packages/pi-lean-ctx/extensions/vendor/
 
               # gentle-engram resolves its bare imports through vendor/node_modules.
               mkdir -p $stage/vendor/.engram-deps

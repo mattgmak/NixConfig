@@ -194,16 +194,14 @@
         # deploy skill inspects the clone with plain git commands.
         # nix and comma reach any nixpkgs tool: `nix run nixpkgs#<pkg>` and
         # `comma <cmd>`. nix-daemon.socket is 0666, so an unprivileged unit can
-        # use the daemon. lean-ctx is the CLI behind the context engine plugin.
-        # The agent's install check names ripgrep, node, npm, and ffmpeg.
-        # Without them every start warns "install out of sync".
+        # use the daemon. The agent's install check names ripgrep, node, npm, and
+        # ffmpeg. Without them every start warns "install out of sync".
         extraPackages = [
           pkgs.piLocal
           pkgs.ramsayDeploy
           pkgs.git
           pkgs.nix
           pkgs.comma
-          pkgs.lean-ctx
           pkgs.ripgrep
           pkgs.nodejs
           pkgs.ffmpeg
@@ -229,18 +227,6 @@
         # parseDrvName on newer Nix, so the plugin dir ships as a small
         # derivation. Hermes links it as plugins/nix-managed-<name>.
         extraPlugins = [
-          (pkgs.stdenv.mkDerivation {
-            pname = "hermes-lean-ctx";
-            version = "0.1.0";
-            src = ../../vendor/mattgmak/lean-ctx/integrations/hermes-lean-ctx;
-            dontUnpack = true;
-            installPhase = ''
-              runHook preInstall
-              mkdir -p $out
-              cp -r --no-preserve=mode $src/. $out/
-              runHook postInstall
-            '';
-          })
           # plugin.yaml names this plugin hermes-ui-plus. The npm bridge package
           # ships no plugin dir, so the source comes from the vendored repo.
           (pkgs.stdenv.mkDerivation {
@@ -348,8 +334,6 @@
           # The active context engine. vcc (hermes-vcc-engine) replaces the
           # built-in ContextCompressor with deterministic no-LLM compaction;
           # it subclasses the built-in, so the compression.* keys below apply.
-          # Rollback: restore "lean-ctx" here and in plugins.enabled — the
-          # lean-ctx plugin stays installed.
           context.engine = "vcc";
           # extraPlugins installs the plugin dir, and the webui shows it Disabled
           # until its name joins this list. `hermes plugins enable` writes the same
@@ -420,20 +404,6 @@
           # The file: form keeps the token itself out of the environment.
           HERMES_DASHBOARD_SESSION_TOKEN = "file:${config.age.secrets."hermes-dashboard-session-token".path}";
           HERMES_LOCAL_STT_COMMAND = "${qwenAsrSttScript} {input_path} {output_dir}";
-          # lean-ctx engine settings. The plugin reads its whole config from this
-          # namespace (config.py), and the port is the `lean-ctx serve` tools API,
-          # not the LLM proxy. update_model() overrides the window on model
-          # switch, so the value here only covers the start of a session.
-          # CORE_COMPACTION and ENABLE_TOOLS stay off: both need the `leanctx`
-          # Python SDK in the sealed venv, and nixpkgs has no python3Packages
-          # entry for it. Add it through extraPythonPackages, then flip both to 1
-          # and point a `lean-ctx serve` instance at 8080 for the agent account.
-          # With them off, the engine runs its own Python compaction.
-          LEANCTX_BASE_URL = "http://127.0.0.1:8080";
-          LEANCTX_CONTEXT_LENGTH = "131072";
-          LEANCTX_THRESHOLD_FRACTION = "0.75";
-          LEANCTX_CORE_COMPACTION = "0";
-          LEANCTX_ENABLE_TOOLS = "0";
         };
         environmentFiles = [ config.age.secrets."hermes-env".path ];
         # A non-loopback dashboard bind refuses to start without a registered
@@ -554,7 +524,6 @@
           pkgs.git
           pkgs.nix
           pkgs.comma
-          pkgs.lean-ctx
           # bladebro MCP needs a Chrome/Chromium binary on the PATH.
           pkgs.chromium
           # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
@@ -618,7 +587,6 @@
           pkgs.git
           pkgs.nix
           pkgs.comma
-          pkgs.lean-ctx
           # bladebro MCP needs a Chrome/Chromium binary on the PATH.
           pkgs.chromium
           # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core

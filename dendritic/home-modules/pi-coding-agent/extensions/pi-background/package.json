@@ -1,9 +1,9 @@
 {
-  "name": "pi-lean-ctx",
+  "name": "pi-background",
   "private": true,
   "type": "module",
   "keywords": ["pi-package"],
-  "description": "Pi loader for pi-lean-ctx (vendored yvgude/lean-ctx submodule)",
+  "description": "bg_bash: run shell commands in the background and poll them",
   "pi": {
     "extensions": ["./index.ts"]
   }

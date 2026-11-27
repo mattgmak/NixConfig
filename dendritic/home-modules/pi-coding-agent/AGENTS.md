@@ -39,18 +39,17 @@ Maintenance: keep this section short. A stale line goes out during review.
 
 - Shell grep always `rg` over `grep`. Faster.
 - NEVER `find` on `/`, `/nix`, `~` — never completes, may crash terminal.
-- Never prefix a command with `sleep`. `ctx_shell` blocks a wait of 3 s or more
-  (extension `shell-wait-guard`). Run long work with `ctx_bg`, then end the turn:
+- Never prefix a command with `sleep`. `bash` blocks a wait of 3 s or more
+  (extension `shell-wait-guard`). Run long work with `bg_bash`, then end the turn:
   the result wakes you. To wait for a condition, use a blocking form such as
   `gh run watch`, `simctl bootstatus -b`, or `tail -f --pid`.
 - No lint/format/type checks — Pi runs them, reports all errors on finish. Tests/other checks OK.
 
 # Large output
 
-- Default: ctx_shell compression + auto-tee handles it — don't pre-redirect.
-- Known-huge output you'll grep repeatedly or need later (builds, test runs,
-  CI dumps) → redirect once: `cmd > $TMPDIR/agent-tmp/<project>/x.log 2>&1`,
-  check exit code, then `rg` / bounded `ctx_read` on the file.
+- Big output (builds, test runs, CI dumps) → redirect once:
+  `cmd > $TMPDIR/agent-tmp/<project>/x.log 2>&1`, check exit code, then `rg` or a
+  bounded `read` on the file.
 
 # Codemode
 

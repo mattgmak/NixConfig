@@ -16,7 +16,6 @@
       piAgentRoot = "${repoRoot}/home-modules/pi-coding-agent";
       extensionsDir = "${piAgentRoot}/extensions";
       vendorRoot = "${nixConfigRoot}/vendor";
-      leanCtx = self.packages.${system}.lean-ctx;
       # pkgs.bun is nixpkgs 1.4.2, and its embedded store still trusts the revoked
       # emSign ECC Root CA - G3. bunBin is 1.4.4, the fixed build.
       bunBin = self.packages.${system}.bunBin;
@@ -78,7 +77,6 @@
       # directory in the agent dir, with every file linked to its source.
       writableExtensions = [
         "pi-permission-system" # permission audit trail: writes logs/ beside its config
-        "pi-lean-ctx" # MCP schema cache: writes mcp-schema-cache.json beside its config
       ];
       writablePresent = lib.filter (name: lib.elem name (compiledExtensions ++ repoExtensionNames)) writableExtensions;
       writableSource =
@@ -499,18 +497,6 @@
             (cd "$dir" && npm ci --omit=dev --ignore-scripts)
           }
 
-          install_lean_ctx_pi() {
-            local dir="$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx"
-            [ -f "$dir/package.json" ] || return 0
-            echo "pi-ext-deps-install: vendor/mattgmak/lean-ctx/packages/pi-lean-ctx (npm ci + build:vendor)"
-            if [ -f "$dir/package-lock.json" ]; then
-              (cd "$dir" && npm ci)
-            else
-              (cd "$dir" && npm install --no-package-lock)
-            fi
-            (cd "$dir" && npm run build:vendor)
-          }
-
           restore_vendor_tracked_changes() {
             local dir="$1"
             local label="$2"
@@ -627,7 +613,7 @@
           for vendor in "$VENDOR_ROOT"/*/*; do
             [ -d "$vendor" ] || continue
             case "$vendor" in
-              "$VENDOR_ROOT/mattgmak/lean-ctx"|"$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/mattgmak/agent-ste") continue ;;
+              "$VENDOR_ROOT/gotgenes/pi-packages"|"$VENDOR_ROOT/fgladisch/pi-extensions"|"$VENDOR_ROOT/Gentleman-Programming/engram"|"$VENDOR_ROOT/fitchmultz/pi-cursor-sdk"|"$VENDOR_ROOT/mattgmak/agent-ste") continue ;;
             esac
             case "$(basename "$vendor")" in
               pi-coding-agent|pi-ansi-themes|pi-coding-agent-catppuccin) continue ;;
@@ -638,7 +624,6 @@
 
           queue_parallel gated_install "$VENDOR_ROOT/gotgenes/pi-packages" "vendor/gotgenes/pi-packages" install_pi_packages
           queue_parallel gated_install "$VENDOR_ROOT/fgladisch/pi-extensions" "vendor/fgladisch/pi-extensions" install_fgladisch_pi
-          queue_parallel gated_install "$VENDOR_ROOT/mattgmak/lean-ctx/packages/pi-lean-ctx" "vendor/mattgmak/lean-ctx/packages/pi-lean-ctx" install_lean_ctx_pi
           queue_parallel gated_install "$VENDOR_ROOT/fitchmultz/pi-cursor-sdk" "vendor/fitchmultz/pi-cursor-sdk" install_pi_cursor_sdk
           queue_parallel gated_install "$VENDOR_ROOT/Gentleman-Programming/engram" "gentle-engram" install_engram_deps
           queue_parallel gated_install "$VENDOR_ROOT/mattgmak/agent-ste" "vendor/mattgmak/agent-ste" install_agent_ste
@@ -770,7 +755,6 @@
             piStockWrapper
             piLocalWrapper
             (lib.hiPrio piOauthWrapper)
-            self.packages.${system}.lean-ctx
             self.packages.${system}.engram
           ]
           ++ markdownPreviewDeps;
@@ -965,8 +949,6 @@
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
         home.file.".config/pi/web-search.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/web-search.json";
-        home.file.".config/lean-ctx/config.toml".source =
-          config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/lean-ctx/config.toml";
         home.file.".pi/agent/pi-blackhole/pi-blackhole-config.json".source =
           config.lib.file.mkOutOfStoreSymlink "${piAgentRoot}/extensions/pi-blackhole/pi-blackhole-config.json";
         home.file.".pi/agent/pi-autoname.json".source =
@@ -991,8 +973,6 @@
         };
 
         home.sessionVariables = {
-          LEAN_CTX_BIN = lib.getExe leanCtx;
-          LEAN_CTX_SHELL = lib.getExe pkgs.bash;
           PI_CURSOR_ASK_QUESTION = "0";
           # ssh forwards TERM but never COLORTERM or TERM_PROGRAM, so pi's truecolor
           # hint (COLORTERM=truecolor|24bit, TERM=*-direct) and the powerline

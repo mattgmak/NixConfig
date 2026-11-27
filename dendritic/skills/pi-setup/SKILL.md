@@ -27,7 +27,7 @@ The compiler records the absolute path of each extension and a fingerprint of fi
 | `pi` | `packages.piCompiled` | 36 compiled names from the store tree |
 | `pi-stock` | `packages.pi`, plain 1.0.4 | every loader from the repo tree, for extension development |
 
-**Rebuild trigger.** Any edit to a compiled extension, its deps, or the extension list needs `nh`. Such an edit is not live after `/reload`. `pi-permission-system` and `pi-lean-ctx` stay writable, so their own log and cache files still land at run time.
+**Rebuild trigger.** Any edit to a compiled extension, its deps, or the extension list needs `nh`. Such an edit is not live after `/reload`. `pi-permission-system` stays writable, so its own log files still land at run time.
 
 **Measured on 1.0.3:** warm first prompt 678 ms compiled against 2578 ms plain.
 

@@ -33,7 +33,7 @@ The master reads the file only when a fact is missing from the three lines. A la
 
 A lane ends its turn on a result or a blocker. It never reports a start, a wait, or a job that finished. It never ends a turn to wait for anything.
 
-A long command runs in the foreground: `ctx_shell` with `timeout` 900 or more. Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `ctx_bg` is the master's tool: the master runs it, parks, and messages the lane the result.
+A long command runs in the foreground: `bash` with `timeout` 900 or more. Several long commands at once need one `worker` subagent per command, each with a foreground call. The lane waits for them. `bg_bash` is the master's tool: the master runs it, ends the turn, and polls `status` for the result.
 
 A blocker reply holds three lines: the command, its output, and the step that failed.
 

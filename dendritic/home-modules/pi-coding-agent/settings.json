@@ -53,10 +53,6 @@
   "extensions": [
     "-builtin:mcp"
   ],
-  "defaultTools": [
-    "-grep",
-    "-find"
-  ],
   "enabledModels": [
     "balance/deepseek-v4.1-flash",
     "ramsay/halogen-flash-next-signal-abliterated",

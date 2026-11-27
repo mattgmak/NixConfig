@@ -40,9 +40,6 @@
 [submodule "otahontas/pi-coding-agent-catppuccin"]
 	path = vendor/otahontas/pi-coding-agent-catppuccin
 	url = https://github.com/otahontas/pi-coding-agent-catppuccin.git
-[submodule "mattgmak/lean-ctx"]
-	path = vendor/mattgmak/lean-ctx
-	url = https://github.com/mattgmak/lean-ctx.git
 [submodule "michalvavra/agents"]
 	path = vendor/michalvavra/agents
 	url = https://github.com/michalvavra/agents.git

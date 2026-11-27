@@ -43,14 +43,6 @@
           hermesUiPlusBridge = self.packages.${system}.hermesUiPlusBridge;
         };
 
-      # The lean-ctx CLI behind the hermes context engine plugin. See
-      # dendritic/packages/lean-ctx.nix.
-      leanCtxOverlay =
-        _final: _prev:
-        {
-          lean-ctx = self.packages.${system}.lean-ctx;
-        };
-
       # The autonomous deploy helpers for the hermes user. See
       # dendritic/packages/ramsay-deploy.nix.
       ramsayDeployOverlay =
@@ -157,7 +149,6 @@
         createWorktreeOverlay
         piLocalOverlay
         hermesUiPlusBridgeOverlay
-        leanCtxOverlay
         bladebroOverlay
         tmuxBridgeOverlay
         ramsayDeployOverlay
