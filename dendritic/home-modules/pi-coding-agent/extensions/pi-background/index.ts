@@ -8,7 +8,7 @@
 
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ExtensionAPI, ExtensionContext, ThemeColor } from "@earendil-works/pi-coding-agent";
@@ -31,9 +31,9 @@ const ICON = {
   clock: "\uF017",
   id: "\uF292",
 };
-const BAR = "\u2503 ";
 const ELAPSED_COL = 7;
 const TAIL_MAX = 60;
+const PRUNE_MS = 3600000;
 
 type Outcome = "success" | "failure" | "cancelled" | "running";
 const GLYPH: Record<Outcome, { color: ThemeColor; mark: string; label: string }> = {
@@ -52,6 +52,7 @@ interface JobMeta {
   exitedAt: number | null;
   exitCode: number | null;
   woken?: boolean;
+  sessionPid?: number;
 }
 
 const TEXT = Type.Object({
@@ -83,10 +84,19 @@ function writeMeta(meta: JobMeta): void {
 function allMeta(): JobMeta[] {
   if (!existsSync(STATE_DIR)) return [];
   const out: JobMeta[] = [];
+  const now = Date.now();
   for (const file of readdirSync(STATE_DIR)) {
     if (!file.endsWith(".json")) continue;
     try {
-      out.push(JSON.parse(readFileSync(join(STATE_DIR, file), "utf8")) as JobMeta);
+      const meta = JSON.parse(readFileSync(join(STATE_DIR, file), "utf8")) as JobMeta;
+      if (meta.sessionPid !== process.pid) continue;
+      const ended = meta.exitedAt ?? meta.startedAt;
+      if (meta.exitedAt !== null && now - ended > PRUNE_MS) {
+        rmSync(join(STATE_DIR, file), { force: true });
+        rmSync(logPath(meta.id), { force: true });
+        continue;
+      }
+      out.push(meta);
     } catch {
       // Skip a torn write.
     }
@@ -167,7 +177,7 @@ function widgetRow(theme: any, name: string, meta: JobMeta, line: string): strin
     field(theme, ICON.id, "dim", meta.id),
   ];
   const detail = line ? line.slice(0, TAIL_MAX) : `pid ${meta.pid}`;
-  return BAR + fields.join("  ") + "  " + theme.fg("muted", detail);
+  return fields.join(" ") + "  " + theme.fg("muted", detail);
 }
 
 function setUi(ctx: ExtensionContext): void {
@@ -192,7 +202,7 @@ function updateWidget(running: JobMeta[]): void {
   const shown = running.slice(0, MAX_ROWS);
   const overflow = Math.max(0, running.length - MAX_ROWS);
   const lines = shown.map((meta) => widgetRow(theme, meta.name || meta.id, meta, lastMeaningfulLine(tail(meta.id))));
-  if (overflow > 0) lines.push(BAR + theme.fg("muted", `+${overflow} more`));
+  if (overflow > 0) lines.push(theme.fg("muted", `+${overflow} more`));
   ctx.ui.setWidget(WIDGET_KEY, lines, { placement: "aboveEditor" });
 }
 
@@ -256,6 +266,7 @@ function start(command: string, name: string) {
     startedAt: Date.now(),
     exitedAt: null,
     exitCode: null,
+    sessionPid: process.pid,
   };
   writeMeta(meta);
   child.unref();
