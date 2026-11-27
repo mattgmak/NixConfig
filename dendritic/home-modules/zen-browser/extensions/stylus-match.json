@@ -4,7 +4,10 @@
   "urls": [],
   "regexps": [],
   "exclusions": [
-    "https://www.hltv.org/*"
+    "https://liquipedia.net/*",
+    "https://www.hltv.org/*",
+    "https://www.printables.com/*",
+    "https://xdaforums.com/*"
   ],
   "inclusions": []
 }
