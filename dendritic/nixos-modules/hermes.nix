@@ -210,17 +210,17 @@
           # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
           # components on the service PATH.
           pkgs.tigervnc
-          pkgs.xfce.xfwm4
-          pkgs.xfce.xfce4-panel
-          pkgs.xfce.xfdesktop
-          pkgs.xfce.xfce4-settings
+          pkgs.xfwm4
+          pkgs.xfce4-panel
+          pkgs.xfdesktop
+          pkgs.xfce4-settings
           pkgs.dbus
-          pkgs.xorg.xauth
-          pkgs.xorg.xset
-          pkgs.xorg.xsetroot
-          pkgs.xorg.xdpyinfo
-          pkgs.xorg.xprop
-          pkgs.xorg.setxkbmap
+          pkgs.xauth
+          pkgs.xset
+          pkgs.xsetroot
+          pkgs.xdpyinfo
+          pkgs.xprop
+          pkgs.setxkbmap
         ];
         # types.package takes a derivation or a top-level store path. The nested
         # vendor path fails that check, and its builtins.path form trips
@@ -549,17 +549,17 @@
           # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
           # components on the service PATH.
           pkgs.tigervnc
-          pkgs.xfce.xfwm4
-          pkgs.xfce.xfce4-panel
-          pkgs.xfce.xfdesktop
-          pkgs.xfce.xfce4-settings
+          pkgs.xfwm4
+          pkgs.xfce4-panel
+          pkgs.xfdesktop
+          pkgs.xfce4-settings
           pkgs.dbus
-          pkgs.xorg.xauth
-          pkgs.xorg.xset
-          pkgs.xorg.xsetroot
-          pkgs.xorg.xdpyinfo
-          pkgs.xorg.xprop
-          pkgs.xorg.setxkbmap
+          pkgs.xauth
+          pkgs.xset
+          pkgs.xsetroot
+          pkgs.xdpyinfo
+          pkgs.xprop
+          pkgs.setxkbmap
         ];
         environment = {
           HOME = altStateDir;
@@ -612,17 +612,17 @@
           # Hermes Bot Desktop (the Screen feature) needs Xvnc plus the Xfce core
           # components on the service PATH.
           pkgs.tigervnc
-          pkgs.xfce.xfwm4
-          pkgs.xfce.xfce4-panel
-          pkgs.xfce.xfdesktop
-          pkgs.xfce.xfce4-settings
+          pkgs.xfwm4
+          pkgs.xfce4-panel
+          pkgs.xfdesktop
+          pkgs.xfce4-settings
           pkgs.dbus
-          pkgs.xorg.xauth
-          pkgs.xorg.xset
-          pkgs.xorg.xsetroot
-          pkgs.xorg.xdpyinfo
-          pkgs.xorg.xprop
-          pkgs.xorg.setxkbmap
+          pkgs.xauth
+          pkgs.xset
+          pkgs.xsetroot
+          pkgs.xdpyinfo
+          pkgs.xprop
+          pkgs.setxkbmap
         ];
         environment = {
           HOME = altStateDir;
