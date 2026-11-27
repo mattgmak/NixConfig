@@ -46,8 +46,8 @@
             name = "Noto Sans CJK HK";
           };
           emoji = {
-            package = pkgs.noto-fonts-color-emoji;
-            name = "Noto Color Emoji";
+            package = pkgs.openmoji-color;
+            name = "OpenMoji";
           };
         };
       };
@@ -67,6 +67,11 @@
       # path (qt5ct/qt6ct + Base16Kvantum theming). mkForce is required: the
       # stylix module assigns the auto-detected value at default priority.
       stylix.targets.qt.platform = lib.mkForce "qtct";
+
+      # Stylix only aliases the generic "emoji" family, so apps that request a
+      # concrete family ignore it and take U+2611 from Iosevka as a monochrome
+      # glyph. This alias makes OpenMoji-Color win the glyphs it defines.
+      fonts.fontconfig.aliases."Iosevka Charon".prefer = [ "OpenMoji" ];
 
       # Icon theme shared by GTK + Qt (via qt5ct/qt6ct icon_theme). Without
       # this, the qtct platform leaves Qt tray icons (kdeconnect, caelestia
