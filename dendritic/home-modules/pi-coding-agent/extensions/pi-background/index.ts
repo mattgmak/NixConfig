@@ -12,12 +12,12 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ExtensionAPI, ExtensionContext, ThemeColor } from "@earendil-works/pi-coding-agent";
-import { Box, Text, truncateToWidth } from "@earendil-works/pi-tui";
+import { Box, Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 
 const STATE_DIR = join(process.env.TMPDIR ?? tmpdir(), "pi-background");
 const TAIL_BYTES = 4000;
-const WIDGET_KEY = "pi-background-jobs";
+const WIDGET_KEY = "zbg-probe";
 const TICK_MS = 1000;
 const MAX_ROWS = 3;
 const CUSTOM_TYPE = "pi-background-job";
@@ -110,12 +110,8 @@ function text(s: string) {
 
 let ctxRef: ExtensionContext | undefined;
 let ticker: ReturnType<typeof setInterval> | undefined;
-let widgetRegistered = false;
 const widgetState = {
-  tui: undefined as { requestRender(): void } | undefined,
   theme: undefined as any,
-  lines: [] as string[],
-  overflow: 0,
 };
 
 function durationText(startedAt: number): string {
@@ -138,52 +134,29 @@ function lastMeaningfulLine(text: string): string {
 function widgetRow(theme: any, name: string, meta: JobMeta, line: string): string {
   const head = `${durationText(meta.startedAt)} ${meta.command.slice(0, 48)}`;
   const detail = line || `pid ${meta.pid}`;
-  return truncateToWidth(`${theme.fg("accent", name)} ${theme.fg("dim", head)} ${theme.fg("muted", detail)}`, 200);
-}
-
-function paintRow(theme: any, textValue: string): string {
-  const bg = theme.bg?.("customMessageBg", textValue) ?? textValue;
-  return `  ${bg.length ? bg : textValue}`;
-}
-
-function widgetRender(width: number): string[] {
-  const { theme, lines, overflow } = widgetState;
-  if (!theme || (lines.length === 0 && overflow === 0)) return [];
-  const rows = lines.map((line) => paintRow(theme, line));
-  if (overflow > 0) rows.push(paintRow(theme, theme.fg("muted", `+${overflow} more`)));
-  return rows;
-}
-
-function resetWidget(): void {
-  widgetState.tui = undefined;
-  widgetState.theme = undefined;
-  widgetState.lines = [];
-  widgetState.overflow = 0;
-  widgetRegistered = false;
+  return `${theme.fg("accent", name)} ${theme.fg("dim", head)} ${theme.fg("muted", detail)}`;
 }
 
 function setUi(ctx: ExtensionContext): void {
   ctxRef = ctx;
   if (ctx.mode !== "tui") return;
-  if (widgetRegistered) return;
-  widgetRegistered = true;
-  widgetState.tui = ctx.ui as unknown as { requestRender(): void };
-  widgetState.theme = ctx.ui.theme;
-  ctx.ui.setWidget(WIDGET_KEY, (tui, theme) => ({
-    render: (width: number) => {
-      widgetState.tui = tui;
-      widgetState.theme = theme;
-      return widgetRender(width);
-    },
-    invalidate: () => {},
-  }), { placement: "aboveEditor" });
+  try {
+    widgetState.theme = ctx.ui.theme;
+    updateWidget([]);
+  } catch (error) {
+    ctx.ui.notify(`pi-background setUi: ${error instanceof Error ? error.message : String(error)}`, "error");
+  }
 }
 
 function updateWidget(running: JobMeta[]): void {
+  const ctx = ctxRef;
+  const theme = widgetState.theme;
+  if (!ctx || !theme) return;
   const shown = running.slice(0, MAX_ROWS);
-  widgetState.overflow = Math.max(0, running.length - MAX_ROWS);
-  widgetState.lines = shown.map((meta) => widgetRow(widgetState.theme, meta.name || meta.id, meta, lastMeaningfulLine(tail(meta.id))));
-  widgetState.tui?.requestRender();
+  const overflow = Math.max(0, running.length - MAX_ROWS);
+  const lines = shown.map((meta) => widgetRow(theme, meta.name || meta.id, meta, lastMeaningfulLine(tail(meta.id))));
+  if (overflow > 0) lines.push(theme.fg("muted", `+${overflow} more`));
+  ctx.ui.setWidget(WIDGET_KEY, lines.length > 0 ? lines : [theme.fg("dim", "bg_bash idle")], { placement: "aboveEditor" });
 }
 
 function wake(meta: JobMeta): void {
@@ -225,12 +198,12 @@ function tick(): void {
     clearInterval(ticker);
     ticker = undefined;
     ctxRef?.ui.setWidget(WIDGET_KEY, undefined);
-    resetWidget();
+    widgetState.theme = undefined;
   }
 }
 
 function ensureTicker(): void {
-  if (ticker || !ctxRef || ctxRef.mode !== "tui") return;
+  if (ticker || !ctxRef || ctxRef.mode !== "tui" || !widgetState.theme) return;
   ticker = setInterval(tick, TICK_MS);
   tick();
 }
@@ -327,7 +300,7 @@ export default function (pi: ExtensionAPI) {
       ticker = undefined;
     }
     ctxRef?.ui.setWidget(WIDGET_KEY, undefined);
-    resetWidget();
+    widgetState.theme = undefined;
     ctxRef = undefined;
   });
 
