@@ -2,7 +2,8 @@
  * bg_bash: start a shell command detached, poll it, cancel it.
  *
  * Each job writes its log and metadata under $TMPDIR/pi-background. A detached
- * child survives this process, so a later session can still read the log.
+ * child survives this process, so a later session can still read the log. The
+ * TUI widget shows running jobs. An exit sends a wake message that starts a turn.
  */
 
 import { spawn } from "node:child_process";
@@ -10,11 +11,17 @@ import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, ThemeColor } from "@earendil-works/pi-coding-agent";
+import { Box, Text, truncateToWidth } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 
 const STATE_DIR = join(process.env.TMPDIR ?? tmpdir(), "pi-background");
 const TAIL_BYTES = 4000;
+const WIDGET_KEY = "pi-background-jobs";
+const TICK_MS = 1000;
+const MAX_ROWS = 3;
+const CUSTOM_TYPE = "pi-background-job";
+const EXIT_LINE = /\n?exit=(\d+)\s*$/;
 
 interface JobMeta {
   id: string;
@@ -24,6 +31,7 @@ interface JobMeta {
   startedAt: number;
   exitedAt: number | null;
   exitCode: number | null;
+  woken?: boolean;
 }
 
 const TEXT = Type.Object({
@@ -46,6 +54,10 @@ function readMeta(id: string): JobMeta | undefined {
   } catch {
     return undefined;
   }
+}
+
+function writeMeta(meta: JobMeta): void {
+  writeFileSync(metaPath(meta.id), JSON.stringify(meta));
 }
 
 function allMeta(): JobMeta[] {
@@ -78,10 +90,15 @@ function tail(id: string): string {
   return text.length <= TAIL_BYTES ? text : text.slice(-TAIL_BYTES);
 }
 
+function stripExit(text: string): string {
+  return text.replace(EXIT_LINE, "").replace(/^\s*\r?\n/, "");
+}
+
 function refresh(meta: JobMeta): JobMeta {
   if (meta.exitedAt !== null || isAlive(meta.pid)) return meta;
-  const next: JobMeta = { ...meta, exitedAt: Date.now(), exitCode: null };
-  writeFileSync(metaPath(next.id), JSON.stringify(next));
+  const match = EXIT_LINE.exec(tail(meta.id));
+  const next: JobMeta = { ...meta, exitedAt: Date.now(), exitCode: match ? Number(match[1]) : null };
+  writeMeta(next);
   return next;
 }
 
@@ -89,10 +106,141 @@ function text(s: string) {
   return { content: [{ type: "text" as const, text: s }], details: {} };
 }
 
+// --- TUI state ---
+
+let ctxRef: ExtensionContext | undefined;
+let ticker: ReturnType<typeof setInterval> | undefined;
+let widgetRegistered = false;
+const widgetState = {
+  tui: undefined as { requestRender(): void } | undefined,
+  theme: undefined as any,
+  lines: [] as string[],
+  overflow: 0,
+};
+
+function durationText(startedAt: number): string {
+  const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m`;
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}
+
+function lastMeaningfulLine(text: string): string {
+  const lines = stripExit(text).split(/\r?\n/);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i].trim();
+    if (line) return line;
+  }
+  return "";
+}
+
+function widgetRow(theme: any, name: string, meta: JobMeta, line: string): string {
+  const head = `${durationText(meta.startedAt)} ${meta.command.slice(0, 48)}`;
+  const detail = line || `pid ${meta.pid}`;
+  return truncateToWidth(`${theme.fg("accent", name)} ${theme.fg("dim", head)} ${theme.fg("muted", detail)}`, 200);
+}
+
+function paintRow(theme: any, textValue: string): string {
+  const bg = theme.bg?.("customMessageBg", textValue) ?? textValue;
+  return `  ${bg.length ? bg : textValue}`;
+}
+
+function widgetRender(width: number): string[] {
+  const { theme, lines, overflow } = widgetState;
+  if (!theme || (lines.length === 0 && overflow === 0)) return [];
+  const rows = lines.map((line) => paintRow(theme, line));
+  if (overflow > 0) rows.push(paintRow(theme, theme.fg("muted", `+${overflow} more`)));
+  return rows;
+}
+
+function resetWidget(): void {
+  widgetState.tui = undefined;
+  widgetState.theme = undefined;
+  widgetState.lines = [];
+  widgetState.overflow = 0;
+  widgetRegistered = false;
+}
+
+function setUi(ctx: ExtensionContext): void {
+  ctxRef = ctx;
+  if (ctx.mode !== "tui") return;
+  if (widgetRegistered) return;
+  widgetRegistered = true;
+  widgetState.tui = ctx.ui as unknown as { requestRender(): void };
+  widgetState.theme = ctx.ui.theme;
+  ctx.ui.setWidget(WIDGET_KEY, (tui, theme) => ({
+    render: (width: number) => {
+      widgetState.tui = tui;
+      widgetState.theme = theme;
+      return widgetRender(width);
+    },
+    invalidate: () => {},
+  }), { placement: "aboveEditor" });
+}
+
+function updateWidget(running: JobMeta[]): void {
+  const shown = running.slice(0, MAX_ROWS);
+  widgetState.overflow = Math.max(0, running.length - MAX_ROWS);
+  widgetState.lines = shown.map((meta) => widgetRow(widgetState.theme, meta.name || meta.id, meta, lastMeaningfulLine(tail(meta.id))));
+  widgetState.tui?.requestRender();
+}
+
+function wake(meta: JobMeta): void {
+  const ctx = ctxRef;
+  if (!ctx || meta.woken) return;
+  meta.woken = true;
+  writeMeta(meta);
+  const exit = meta.exitCode === null ? "unknown" : String(meta.exitCode);
+  const body = stripExit(tail(meta.id));
+  const content = [
+    `bg_bash job ${meta.id} finished with exit code ${exit}.`,
+    "",
+    `$ ${meta.command}`,
+    "",
+    body || "(no output)",
+  ].join("\n");
+  void piSendMessage({
+    customType: CUSTOM_TYPE,
+    content,
+    display: true,
+    details: { jobId: meta.id, name: meta.name, command: meta.command, exitCode: meta.exitCode },
+  }, { triggerTurn: true, deliverAs: "followUp" });
+}
+
+let piSendMessage: ExtensionAPI["sendMessage"] = () => Promise.resolve();
+
+function tick(): void {
+  const running: JobMeta[] = [];
+  for (const job of allMeta()) {
+    const live = refresh(job);
+    if (live.exitedAt === null) {
+      running.push(live);
+      continue;
+    }
+    if (!live.woken) wake(live);
+  }
+  updateWidget(running);
+  if (running.length === 0 && ticker) {
+    clearInterval(ticker);
+    ticker = undefined;
+    ctxRef?.ui.setWidget(WIDGET_KEY, undefined);
+    resetWidget();
+  }
+}
+
+function ensureTicker(): void {
+  if (ticker || !ctxRef || ctxRef.mode !== "tui") return;
+  ticker = setInterval(tick, TICK_MS);
+  tick();
+}
+
+// --- Tool actions ---
+
 function start(command: string, name: string) {
   mkdirSync(STATE_DIR, { recursive: true });
   const id = randomBytes(6).toString("hex");
-  const child = spawn("sh", ["-c", `exec >${logPath(id)} 2>&1; ${command}`], {
+  const child = spawn("sh", ["-c", `exec >${logPath(id)} 2>&1; { ${command}; }; printf 'exit=%s\\n' "$?" >>${logPath(id)}`], {
     detached: true,
     stdio: "ignore",
   });
@@ -105,8 +253,9 @@ function start(command: string, name: string) {
     exitedAt: null,
     exitCode: null,
   };
-  writeFileSync(metaPath(id), JSON.stringify(meta));
+  writeMeta(meta);
   child.unref();
+  ensureTicker();
   return text(`started ${id} name=${meta.name} pid=${meta.pid} log=${logPath(id)}`);
 }
 
@@ -115,8 +264,8 @@ function status(jobId?: string) {
   const meta = readMeta(jobId);
   if (!meta) return text(`no job ${jobId}`);
   const live = refresh(meta);
-  const state = live.exitedAt === null ? "running" : "exited";
-  return text(`[${state}] ${live.id} name=${live.name} pid=${live.pid}\n${tail(live.id)}`);
+  const state = live.exitedAt === null ? "running" : `exited code=${live.exitCode ?? "unknown"}`;
+  return text(`[${state}] ${live.id} name=${live.name} pid=${live.pid}\n${stripExit(tail(live.id))}`);
 }
 
 function cancel(jobId?: string) {
@@ -130,7 +279,7 @@ function cancel(jobId?: string) {
     return text(`job ${jobId} is gone`);
   }
   const next: JobMeta = { ...meta, exitedAt: Date.now(), exitCode: null };
-  writeFileSync(metaPath(next.id), JSON.stringify(next));
+  writeMeta(next);
   return text(`cancelled ${jobId}`);
 }
 
@@ -146,6 +295,42 @@ function list() {
 }
 
 export default function (pi: ExtensionAPI) {
+  piSendMessage = pi.sendMessage.bind(pi);
+
+  pi.registerMessageRenderer(CUSTOM_TYPE, (message, theme, context) => {
+    const details = (message.details ?? {}) as { name?: string; command?: string; exitCode?: number | null };
+    const label = details.name || "job";
+    const code = details.exitCode ?? "?";
+    const color: ThemeColor = details.exitCode === 0 ? "success" : details.exitCode === null ? "warning" : "error";
+    const command = details.command ? `  $ ${details.command.slice(0, 72)}` : "";
+    const body = stripExit(typeof message.content === "string" ? message.content : "").slice(0, 2000);
+    const box = new Box(() => theme.bg("customMessageBg", ""), () => {
+      const lines = [
+        new Text(`${theme.fg(color, `bg_bash ${label}`)} ${theme.fg("dim", `exit ${code}`)}`, 0, false),
+      ];
+      if (command) lines.push(new Text(theme.fg("dim", command), 0, false));
+      if (body) lines.push(new Text(theme.fg("muted", body), 0, true));
+      return lines;
+    });
+    void context;
+    return box;
+  });
+
+  pi.on("session_start", async (_event, ctx) => {
+    setUi(ctx);
+    ensureTicker();
+  });
+
+  pi.on("session_shutdown", () => {
+    if (ticker) {
+      clearInterval(ticker);
+      ticker = undefined;
+    }
+    ctxRef?.ui.setWidget(WIDGET_KEY, undefined);
+    resetWidget();
+    ctxRef = undefined;
+  });
+
   pi.registerTool({
     name: "bg_bash",
     label: "bg_bash",

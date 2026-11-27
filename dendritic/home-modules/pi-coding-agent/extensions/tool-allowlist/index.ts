@@ -4,7 +4,6 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 // deliberate active tool, and a name in neither stays active but gets reported.
 const BLOCKED_TOOLS: readonly string[] = [
 	"read",
-	"bash",
 	"powershell",
 	"grep",
 	"find",
@@ -51,9 +50,7 @@ const REVIEWED_TOOLS: readonly string[] = [
 	"codemode",
 	"edit",
 	"write",
-	"ctx_read",
-	"ctx_shell",
-	"ctx_bg",
+	"bg_bash",
 	"ctx_compose",
 	"ctx_search",
 	"ctx_find",
