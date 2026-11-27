@@ -279,7 +279,7 @@
             installPhase = ''
               runHook preInstall
               mkdir -p $out
-              cp -r --no-preserve=mode __init__.py plugin.yaml core hooks recipes templates tools $out/
+              cp -r --no-preserve=mode __init__.py plugin.yaml blocks core hooks recipes templates tools $out/
               runHook postInstall
             '';
           })
