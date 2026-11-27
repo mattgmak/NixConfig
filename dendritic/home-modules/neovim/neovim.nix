@@ -16,7 +16,9 @@
       restoreStamp = "${config.home.homeDirectory}/.local/state/nvim/lazy-restore.lock.sha256";
       firenvimLockFile = "${neovimRoot}/config/firenvim-lock.json";
       firenvimRestoreStamp = "${config.home.homeDirectory}/.local/state/nvim/firenvim-lazy-restore.lock.sha256";
-      nvim = config.programs.neovim.package;
+      # The wrapper, not the unwrapped binary: tree-sitter compiles parsers
+      # with `cc`, which only the extraPackages wrapper puts on PATH.
+      nvim = config.programs.neovim.finalPackage;
       # Firefox reads the manifest from ~/.mozilla/native-messaging-hosts; Zen
       # shares that path, so the launcher lives here instead of in the browser module.
       firenvimLauncher = pkgs.writeShellScript "firenvim" ''
