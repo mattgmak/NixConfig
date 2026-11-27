@@ -5,7 +5,7 @@ description: >
   extension/skill/theme, bumping pi or extension versions, editing an agent dir or
   loadout (`pi`, `pi-stock`, `pi-local`), or debugging pi discovery/reload. Subcommands:
   `extend` (install), `update` (bump with changelog review),
-  `blackhole` (refresh free memory-model chains).
+  `blackhole` (refresh free memory-model chains), `allowlist` (tool-allowlist audit).
 ---
 
 References are relative to `~/NixConfig/dendritic` unless noted.
@@ -54,7 +54,8 @@ Three rules keep the dirs working:
 | `/pi-setup extend …` | Run **extend** (install) |
 | `/pi-setup update …` | Run **update** (bump) |
 | `/pi-setup blackhole …` | Run **blackhole** (refresh free memory-model chains) |
-| `/pi-setup` (no subcommand) | Ask the user which: `extend`, `update`, or `blackhole` (never guess) |
+| `/pi-setup allowlist` | Run **allowlist** (tool-allowlist audit) |
+| `/pi-setup` (no subcommand) | Ask the user which: `extend`, `update`, `blackhole`, or `allowlist`. Never guess |
 
 Discovery/reload failures: [REFERENCE.md — Debugging](REFERENCE.md#debugging).
 
@@ -130,6 +131,27 @@ Submodule naming in `.gitmodules`: **`owner/repo`** from the git URL, not the ch
 - Tell the user to `/reload` in pi — content edits are live for a repo loader; HM rebuild only when Nix wiring changed ([REFERENCE.md — Apply config changes](REFERENCE.md#apply-config-changes)). A compiled loader needs `nh` instead: see [Compiled host](#compiled-host-picompiled).
 
 **Done when** — loader check passes for the new item, commit made, user told to `/reload`.
+
+---
+
+## `allowlist` — maintain tool-allowlist
+
+File: `dendritic/home-modules/pi-coding-agent/extensions/tool-allowlist/index.ts`. Three lists exist: `BLOCKED_TOOLS` (deny), `BLOCKED_PATTERNS` (glob deny), `REVIEWED_TOOLS` (documented active tools).
+
+Run after any tool enters or leaves the stack, and on request.
+
+1. Build the live tool set from the tool list in your own system prompt, plus `mcp({ })` for MCP tools.
+2. For each name in `BLOCKED_TOOLS` or `REVIEWED_TOOLS` that is absent, confirm absence in source:
+   ```sh
+   cd ~/.pi/agent-local/extensions && rg -L -o 'name: "<tool>"' -g '*.ts' -g '!**/node_modules/**'
+   ```
+   A loader-only extension resolves through `vendor/<owner>/<repo>/...`. Search there too.
+3. Dead name in `REVIEWED_TOOLS` → delete the line. Dead name in `BLOCKED_TOOLS` → keep it only when another extension still registers it, otherwise delete.
+4. Native Pi tools (`bash`, `read`, `grep`, `find`, `ls`, `edit`, `write`) stay allowed. Never add them to `BLOCKED_TOOLS`, and list them in `REVIEWED_TOOLS`.
+5. A tool removed on purpose (for example lean-ctx) → delete its name from both lists.
+6. Validate with `bash scripts/host-sandbox.sh ramsay --tier eval`, commit subject-only, then the worktree flow.
+
+**Done when** — every entry maps to a live tool or a deliberate deny, eval passes, commit made.
 
 ---
 
