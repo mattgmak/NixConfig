@@ -18,12 +18,18 @@
         settings =
           let
             phoneName = "phone";
+            newPhoneName = "nothing";
           in
           {
             devices = {
               "${phoneName}" = {
                 id = "LRGIDSH-W6NIW7U-SV62HMC-EMHYALK-RSK7Y5K-OOZK7WI-IEQR6ZU-CGWRWQT";
                 addresses = [ "tcp://goofypixiepro:22000" ];
+                autoAcceptFolders = true;
+              };
+              "${newPhoneName}" = {
+                id = "M2AD4LO-2NGIORW-VNCEI7E-JL422PI-3UUQIIG-YQBKEV7-LF7SWBQ-ELMI6Q7";
+                addresses = [ "tcp://nothingoofy:22000" ];
                 autoAcceptFolders = true;
               };
             }
